@@ -34,7 +34,7 @@ object UnityTranslateClientCommands {
                         Component.literal("- Server supports UnityTranslate: ${UnityTranslateClient.connectedServerHasSupport}"),
                         Component.literal("- Supports local translation server: ${LocalLibreTranslateInstance.canRunLibreTranslate()}"),
                         Component.literal("- Is local translation server running: ${LocalLibreTranslateInstance.hasStarted}"),
-                        Component.literal("- Supports CUDA: ${TranslatorManager.supportsCuda}"),
+                        Component.literal("- Supports CUDA: ${TranslatorManager.checkSupportsCuda()}"),
                     ), Component.literal("\n")
                 )
             }, false)

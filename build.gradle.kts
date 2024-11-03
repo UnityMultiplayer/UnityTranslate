@@ -2,7 +2,13 @@ import com.modrinth.minotaur.dependencies.DependencyType
 import com.modrinth.minotaur.dependencies.ModDependency
 import dev.deftu.gradle.tools.minecraft.CurseRelation
 import dev.deftu.gradle.tools.minecraft.CurseRelationType
-import dev.deftu.gradle.utils.*
+import dev.deftu.gradle.utils.MinecraftInfo
+import dev.deftu.gradle.utils.MinecraftVersion
+import dev.deftu.gradle.utils.ModLoader
+import dev.deftu.gradle.utils.includeOrShade
+import org.jetbrains.kotlin.daemon.common.toHexString
+import java.net.URI
+import java.security.MessageDigest
 
 plugins {
     java
@@ -69,6 +75,14 @@ val architecturyVersion = when (mcData.version.rawVersion) {
     1_20_04 -> "11.1.17"
     1_20_06 -> "12.1.4"
     1_21_01 -> "13.0.6"
+
+    else -> throw IllegalStateException()
+}
+
+val lwjglVersion = when (mcData.version.rawVersion) {
+    1_20_01 -> "3.3.1"
+    1_20_04 -> "3.3.2"
+    1_20_06, 1_21_01 -> "3.3.3"
 
     else -> throw IllegalStateException()
 }
@@ -141,7 +155,15 @@ dependencies {
         minecraftRuntimeLibraries(jws)
     }
 
-    shade(implementation("com.squareup.okhttp3:okhttp:${project.property("okhttp_version")}")!!)
+    val okhttp = shade(implementation("com.squareup.okhttp3:okhttp:${project.property("okhttp_version")}") {
+        exclude("kotlin")
+        exclude("org.jetbrains")
+    })
+    if (mcData.isForgeLike) {
+        minecraftRuntimeLibraries(okhttp!!)
+    }
+
+    shade(implementation("org.lwjgl:lwjgl:$lwjglVersion")!!)
 }
 
 toolkitReleases {
@@ -184,7 +206,46 @@ toolkitReleases {
 }
 
 tasks {
+    create("getLwjgl") {
+        doFirst {
+            val dir = layout.buildDirectory.dir("lwjgl/lwjgl").get().asFile
+            if (!dir.exists())
+                dir.mkdirs()
+
+            for (suffix in listOf("", "-natives-windows", "-natives-macos", "-natives-linux")) {
+                val lwjglFile = File(dir, "lwjgl-$lwjglVersion$suffix.jar")
+                if (lwjglFile.exists()) {
+                    logger.info("LWJGL file ${lwjglFile.name} already downloaded, not redownloading it.")
+                    continue
+                }
+
+                val hash = URI("https://repo1.maven.org/maven2/org/lwjgl/lwjgl/$lwjglVersion/lwjgl-$lwjglVersion$suffix.jar.sha256").toURL().readText()
+                val downloadUrl = URI("https://repo1.maven.org/maven2/org/lwjgl/lwjgl/$lwjglVersion/lwjgl-$lwjglVersion$suffix.jar").toURL()
+
+                logger.info("Downloading ${lwjglFile.name}...")
+                lwjglFile.createNewFile()
+                lwjglFile.writeBytes(downloadUrl.readBytes())
+
+                val sha1 = MessageDigest.getInstance("SHA256")
+                sha1.update(lwjglFile.readBytes())
+
+                if (hash != sha1.digest().toHexString()) {
+                    lwjglFile.delete()
+                    throw SecurityException("SHA1 mismatch for ${lwjglFile.name} (expected $hash, got ${sha1.digest().toHexString()})")
+                }
+            }
+
+            val versionFile = File(dir, "version.txt")
+
+            if (!versionFile.exists())
+                versionFile.createNewFile()
+
+            versionFile.writeText(lwjglVersion, Charsets.UTF_8)
+        }
+    }
+
     processResources {
+        dependsOn("getLwjgl")
         val properties = mutableMapOf<String, String>()
 
         properties.putAll(mapOf(
@@ -254,9 +315,22 @@ tasks {
         }
     }
 
+    // Modified from https://github.com/DexPatcher/dexpatcher-tool/blob/v1.2.1/tool/build.gradle#L57-L79
+    val shadowBugWorkaround = create<Jar>("shadowBugWorkaround") {
+        dependsOn("getLwjgl")
+        destinationDirectory.set(layout.buildDirectory.dir("shadow-bug-workaround"))
+        archiveBaseName.set("nested-content")
+
+        from(layout.buildDirectory.dir("lwjgl"))
+    }
+
     fatJar {
+        dependsOn("shadowBugWorkaround")
+
         relocate("okhttp3", "xyz.bluspring.unitytranslate.shaded.okhttp3")
         relocate("okio", "xyz.bluspring.unitytranslate.shaded.okio")
         exclude("kotlin/**/*", "org/**/*")
+
+        from(shadowBugWorkaround)
     }
 }

@@ -5,20 +5,17 @@ package xyz.bluspring.unitytranslate.translator
 //#endif
 import dev.architectury.event.events.common.LifecycleEvent
 import dev.architectury.event.events.common.PlayerEvent
-import net.minecraft.Util
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.player.Player
-import org.lwjgl.system.APIUtil
-import org.lwjgl.system.JNI
-import org.lwjgl.system.MemoryUtil
-import org.lwjgl.system.SharedLibrary
 import xyz.bluspring.unitytranslate.Language
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 import xyz.bluspring.unitytranslate.compat.voicechat.UTVoiceChatCompat
 import xyz.bluspring.unitytranslate.network.PacketIds
 import xyz.bluspring.unitytranslate.util.ClassLoaderProviderForkJoinWorkerThreadFactory
+import xyz.bluspring.unitytranslate.util.nativeaccess.CudaState
+import xyz.bluspring.unitytranslate.util.nativeaccess.NativeAccess
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentLinkedDeque
@@ -141,132 +138,26 @@ object TranslatorManager {
         return null
     }
 
-    private var isLibraryLoaded = false
-    private lateinit var library: SharedLibrary
-    private var PFN_cuInit: Long = 0L
-    private var PFN_cuDeviceGetCount: Long = 0L
-    private var PFN_cuDeviceComputeCapability: Long = 0L
+    var hasChecked = false
 
-    private var PFN_cuGetErrorName: Long = 0L
-    private var PFN_cuGetErrorString: Long = 0L
-
-    private fun logCudaError(code: Int, at: String) {
-        if (code == 0)
-            return
-
-        // TODO: these return ??? for some reason.
-        //       can we figure out why?
-
-        val errorCode = if (PFN_cuGetErrorName != MemoryUtil.NULL) {
-            val ptr = MemoryUtil.nmemAlloc(255)
-            JNI.callPP(code, ptr, PFN_cuGetErrorName)
-            MemoryUtil.memUTF16(ptr).apply {
-                MemoryUtil.nmemFree(ptr)
-            }
-        } else "[CUDA ERROR NAME NOT FOUND]"
-
-        val errorDesc = if (PFN_cuGetErrorString != MemoryUtil.NULL) {
-            val ptr = MemoryUtil.nmemAlloc(255)
-            JNI.callPP(code, ptr, PFN_cuGetErrorString)
-            MemoryUtil.memUTF16(ptr).apply {
-                MemoryUtil.nmemFree(ptr)
-            }
-        } else "[CUDA ERROR DESC NOT FOUND]"
-
-        UnityTranslate.logger.error("CUDA error at $at: $code $errorCode ($errorDesc)")
-    }
-
-    private fun isCudaSupported(): Boolean {
+    fun checkSupportsCuda(): Boolean {
         if (!UnityTranslate.config.server.shouldUseCuda) {
             UnityTranslate.logger.info("CUDA is disabled in the config, not enabling CUDA support.")
             return false
         }
 
-        if (!isLibraryLoaded) {
-            try {
-                library = if (Util.getPlatform() == Util.OS.WINDOWS) {
-                    APIUtil.apiCreateLibrary("nvcuda.dll")
-                } else if (Util.getPlatform() == Util.OS.LINUX) {
-                    APIUtil.apiCreateLibrary("libcuda.so")
-                } else {
-                    return false
+        return NativeAccess.isCudaSupported().apply {
+            if (!hasChecked) {
+                if (this == CudaState.AVAILABLE)
+                    UnityTranslate.logger.info("CUDA is supported, using GPU for translations.")
+                else {
+                    UnityTranslate.logger.info("CUDA is not supported, using CPU for translations.")
+                    UnityTranslate.logger.info("CUDA state: $ordinal ($name): $message")
                 }
 
-                PFN_cuInit = library.getFunctionAddress("cuInit")
-                PFN_cuDeviceGetCount = library.getFunctionAddress("cuDeviceGetCount")
-                PFN_cuDeviceComputeCapability = library.getFunctionAddress("cuDeviceComputeCapability")
-                PFN_cuGetErrorName = library.getFunctionAddress("cuGetErrorName")
-                PFN_cuGetErrorString = library.getFunctionAddress("cuGetErrorString")
-
-                if (PFN_cuInit == MemoryUtil.NULL || PFN_cuDeviceGetCount == MemoryUtil.NULL || PFN_cuDeviceComputeCapability == MemoryUtil.NULL) {
-                    // TODO: remove in prod
-                    UnityTranslate.logger.info("CUDA results: $PFN_cuInit $PFN_cuDeviceGetCount $PFN_cuDeviceComputeCapability")
-                    return false
-                }
-            } catch (_: UnsatisfiedLinkError) {
-                UnityTranslate.logger.warn("CUDA library failed to load! Not attempting to initialize CUDA functions.")
-                return false
-            } catch (e: Throwable) {
-                UnityTranslate.logger.warn("An error occurred while searching for CUDA devices! You don't have to report this, don't worry.")
-                e.printStackTrace()
-                return false
+                hasChecked = true
             }
-
-            isLibraryLoaded = true
-        }
-
-        val success = 0
-
-        if (JNI.callI(0, PFN_cuInit).apply {
-                logCudaError(this, "init")
-            } != success) {
-            return false
-        }
-
-        val totalPtr = MemoryUtil.nmemAlloc(Int.SIZE_BYTES.toLong())
-        if (JNI.callPI(totalPtr, PFN_cuDeviceGetCount).apply {
-                logCudaError(this, "get device count")
-            } != success) {
-            return false
-        }
-
-        val totalCudaDevices = MemoryUtil.memGetInt(totalPtr)
-        UnityTranslate.logger.info("Total CUDA devices: $totalCudaDevices")
-        if (totalCudaDevices <= 0) {
-            return false
-        }
-
-        MemoryUtil.nmemFree(totalPtr)
-
-        for (i in 0 until totalCudaDevices) {
-            val minorPtr = MemoryUtil.nmemAlloc(Int.SIZE_BYTES.toLong())
-            val majorPtr = MemoryUtil.nmemAlloc(Int.SIZE_BYTES.toLong())
-
-            if (JNI.callPPI(majorPtr, minorPtr, i, PFN_cuDeviceComputeCapability).apply {
-                    logCudaError(this, "get device compute capability $i")
-                } != success) {
-                continue
-            }
-
-            val majorVersion = MemoryUtil.memGetInt(majorPtr)
-            val minorVersion = MemoryUtil.memGetInt(minorPtr)
-
-            MemoryUtil.nmemFree(majorPtr)
-            MemoryUtil.nmemFree(minorPtr)
-
-            UnityTranslate.logger.info("Found device with CUDA compute capability major $majorVersion minor $minorVersion.")
-
-            return true
-        }
-
-        return false
-    }
-
-    val supportsCuda = isCudaSupported().apply {
-        if (this)
-            UnityTranslate.logger.info("CUDA is supported, using GPU for translations.")
-        else
-            UnityTranslate.logger.info("CUDA is not supported, using CPU for translations.")
+        } == CudaState.AVAILABLE
     }
 
     fun installLibreTranslate() {

@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 import java.util.zip.ZipFile
 
-class LocalLibreTranslateInstance private constructor(val process: Process, val port: Int) : LibreTranslateInstance("http://127.0.0.1:$port", 150) {
+class LocalLibreTranslateInstance protected constructor(val process: Process, val port: Int) : LibreTranslateInstance("http://127.0.0.1:$port", 150) {
     init {
         info("Started local LibreTranslate instance on port $port.")
 
@@ -41,12 +41,12 @@ class LocalLibreTranslateInstance private constructor(val process: Process, val 
         var hasStarted = false
         var currentInstance: LocalLibreTranslateInstance? = null
 
-        val libreTranslateDir = File(UnityTranslate.instance.proxy.gameDir.toFile(), ".unitytranslate")
+        val unityTranslateDir = File(UnityTranslate.instance.proxy.gameDir.toFile(), ".unitytranslate")
 
         fun canRunLibreTranslate(): Boolean {
             val systemInfo = SystemInfo()
 
-            return (Runtime.getRuntime().availableProcessors() >= 2 || TranslatorManager.supportsCuda) &&
+            return (Runtime.getRuntime().availableProcessors() >= 2 || TranslatorManager.checkSupportsCuda()) &&
                     // Require a minimum of 2 GiB free for LibreTranslate
                     ((systemInfo.hardware.memory.total - Runtime.getRuntime().maxMemory()) / 1048576L) >= 2048
         }
@@ -84,7 +84,7 @@ class LocalLibreTranslateInstance private constructor(val process: Process, val 
         }
 
         private fun clearDeadDirectories() {
-            val files = libreTranslateDir.listFiles()
+            val files = unityTranslateDir.listFiles()
 
             if (files != null) {
                 for (file in files) {
@@ -127,7 +127,7 @@ class LocalLibreTranslateInstance private constructor(val process: Process, val 
                 "--disable-files-translation"
             ))
 
-            processBuilder.directory(libreTranslateDir)
+            processBuilder.directory(unityTranslateDir)
 
             val environment = processBuilder.environment()
             environment["PYTHONIOENCODING"] = "utf-8"
@@ -179,26 +179,26 @@ class LocalLibreTranslateInstance private constructor(val process: Process, val 
         }
 
         fun isLibreTranslateInstalled(): Boolean {
-            val supportsCuda = TranslatorManager.supportsCuda
+            val supportsCuda = TranslatorManager.checkSupportsCuda()
             val platform = Util.getPlatform()
 
             if (platform != Util.OS.WINDOWS && platform != Util.OS.OSX && platform != Util.OS.LINUX) {
                 return false
             }
 
-            val file = File(libreTranslateDir, "libretranslate/libretranslate${if (supportsCuda) "_cuda" else ""}${if (platform == Util.OS.WINDOWS) ".exe" else ""}")
+            val file = File(unityTranslateDir, "libretranslate/libretranslate${if (supportsCuda) "_cuda" else ""}${if (platform == Util.OS.WINDOWS) ".exe" else ""}")
             return file.exists()
         }
 
         fun installLibreTranslate(): CompletableFuture<File> {
-            val supportsCuda = TranslatorManager.supportsCuda
+            val supportsCuda = TranslatorManager.checkSupportsCuda()
             val platform = Util.getPlatform()
 
             if (platform != Util.OS.WINDOWS && platform != Util.OS.OSX && platform != Util.OS.LINUX) {
                 throw IllegalStateException("Unsupported platform! (Detected platform: $platform)")
             }
 
-            val file = File(libreTranslateDir, "libretranslate/libretranslate${if (supportsCuda) "_cuda" else ""}${if (platform == Util.OS.WINDOWS) ".exe" else ""}")
+            val file = File(unityTranslateDir, "libretranslate/libretranslate${if (supportsCuda) "_cuda" else ""}${if (platform == Util.OS.WINDOWS) ".exe" else ""}")
             if (!file.parentFile.exists())
                 file.parentFile.mkdirs()
 
