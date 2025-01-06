@@ -1,21 +1,10 @@
 import com.modrinth.minotaur.dependencies.DependencyType
 import com.modrinth.minotaur.dependencies.ModDependency
-import dev.deftu.gradle.tools.minecraft.CurseRelation
-import dev.deftu.gradle.tools.minecraft.CurseRelationType
-import dev.deftu.gradle.utils.*
 
 plugins {
     java
     kotlin("jvm")
     kotlin("plugin.serialization")
-
-    id("dev.deftu.gradle.multiversion")
-    id("dev.deftu.gradle.tools")
-    id("dev.deftu.gradle.tools.resources")
-    id("dev.deftu.gradle.tools.bloom")
-    id("dev.deftu.gradle.tools.shadow")
-    id("dev.deftu.gradle.tools.minecraft.loom")
-    id("dev.deftu.gradle.tools.minecraft.releases")
 }
 
 toolkitMultiversion {
@@ -69,6 +58,7 @@ val architecturyVersion = when (mcData.version.rawVersion) {
     1_20_04 -> "11.1.17"
     1_20_06 -> "12.1.4"
     1_21_01 -> "13.0.6"
+    1_21_03 -> "14.0.4"
 
     else -> throw IllegalStateException()
 }
@@ -86,6 +76,7 @@ dependencies {
             1_20_04 -> "9.2.0"
             1_20_06 -> "10.0.0"
             1_21_01 -> "11.0.2"
+            1_21_03 -> "12.0.0-beta.1"
 
             else -> throw IllegalStateException()
         }
@@ -112,6 +103,7 @@ dependencies {
         1_20_04 -> "13.0.121"
         1_20_06 -> "14.0.126"
         1_21_01 -> "15.0.128"
+        1_21_03 -> "16.0.141"
 
         else -> throw IllegalStateException()
     }

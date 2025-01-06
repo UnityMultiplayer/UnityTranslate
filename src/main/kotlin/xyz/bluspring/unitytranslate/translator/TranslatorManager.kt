@@ -388,7 +388,7 @@ object TranslatorManager {
 
                         queuedTranslations.add(translation)
                     }
-                } catch (e: Exception) {
+                } catch (e: Throwable) {
                     e.printStackTrace()
                 }
             }

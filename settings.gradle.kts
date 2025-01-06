@@ -3,21 +3,17 @@ pluginManagement {
         maven("https://maven.fabricmc.net")
         maven("https://maven.architectury.dev")
         maven("https://maven.neoforged.net/releases")
-        maven("https://maven.firstdark.dev/releases")
-        maven("https://maven.deftu.dev/releases")
-        maven("https://maven.deftu.dev/snapshots")
         maven("https://maven.minecraftforge.net")
-        maven("https://repo.essential.gg/repository/maven-public")
-        maven("https://server.bbkr.space/artifactory/libs-release/")
 
         gradlePluginPortal()
         mavenCentral()
     }
 
     plugins {
-        kotlin("jvm") version("2.0.20")
-        kotlin("plugin.serialization") version("2.0.20")
-        id("dev.deftu.gradle.multiversion-root") version("2.9.1+alpha.3")
+        kotlin("jvm") version("2.1.0")
+        kotlin("plugin.serialization") version("2.1.0")
+        id("architectury-plugin") version("3.4-SNAPSHOT")
+        id("dev.architectury.loom") version("1.7-SNAPSHOT")
     }
 }
 
@@ -40,6 +36,10 @@ listOf(
     "1.21.1-fabric",
     "1.21.1-neoforge",
     //"1.21.1-forge",
+
+    "1.21.3-fabric",
+    "1.21.3-neoforge",
+    //"1.21.3-forge"
 ).forEach { version ->
     include(":$version")
     project(":$version").apply {
