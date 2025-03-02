@@ -17,5 +17,6 @@ Other browsers are not guaranteed to support the [Web Speech API](https://develo
 
 ### Credits & Acknowledgements
 Thank you to [Argos Open Tech](https://www.argosopentech.com/) for developing [LibreTranslate](https://libretranslate.com) & [ArgosTranslate](https://github.com/argosopentech/argos-translate).<br>
-Without LibreTranslate, this project would have been made significantly more expensive, and the translation system would
+An additional thank you is deserved to OpenNMT for developing [CTranslate2](https://github.com/OpenNMT/CTranslate2).<br>
+Without either of these libraries, this project would have been made significantly more expensive, and the translation system would
 have been impossible to develop for free.

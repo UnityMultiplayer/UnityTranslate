@@ -1,252 +1,228 @@
-import com.modrinth.minotaur.dependencies.DependencyType
-import com.modrinth.minotaur.dependencies.ModDependency
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import net.fabricmc.loom.api.LoomGradleExtensionAPI
+import net.fabricmc.loom.util.Version
+import org.jetbrains.kotlin.gradle.utils.extendsFrom
 
 plugins {
     java
-    kotlin("jvm")
-    kotlin("plugin.serialization")
+    kotlin("jvm") version("2.1.10")
+    kotlin("plugin.serialization") version("2.1.10")
+    id("architectury-plugin") version("3.4-SNAPSHOT") apply false
+    id("dev.architectury.loom") version("1.9-SNAPSHOT") apply false
+    id("com.gradleup.shadow") version("8.3.3") apply false
 }
 
-toolkitMultiversion {
-    moveBuildsToRootProject.set(true)
+val versions = project.subprojects
+    .filter { it.name.endsWith("-fabric") }
+    .map { it.name.replace("-fabric", "") }
+    .sortedBy { Version.parse(it) }
+
+fun getAllPriorVersions(current: String): List<String> {
+    val versionList = mutableListOf<String>()
+
+    for (version in versions) {
+        if (version == current)
+            break
+
+        versionList.add(version)
+    }
+
+    return versionList
 }
 
-toolkitLoomHelper {
-    if (!mcData.isNeoForge) {
-        useMixinRefMap("unitytranslate")
-    }
+allprojects {
+    apply(plugin = "java")
+    apply(plugin = "architectury-plugin")
 
-    if (mcData.isForge) {
-        useTweaker("org.spongepowered.asm.launch.MixinTweaker")
-        useForgeMixin("unitytranslate.mixins.json", true)
-    }
-
-    if (mcData.isForgeLike) {
-        useKotlinForForge()
-    }
-}
-
-version = "${project.property("mod.version")}+mc${mcData.version}-${mcData.loader.friendlyString}"
-
-repositories {
-    mavenCentral()
-    maven("https://maven.parchmentmc.org")
-    maven("https://oss.sonatype.org/content/repositories/snapshots")
-    exclusiveContent {
-        forRepository {
-            maven("https://api.modrinth.com/maven")
-        }
-        filter {
-            includeGroup("maven.modrinth")
-        }
-    }
-    maven("https://repo.clojars.org")
-    maven("https://maven.terraformersmc.com/")
-    maven("https://maven.architectury.dev/")
-    maven("https://maven.maxhenkel.de/repository/public")
-    maven("https://maven.neoforged.net/releases/")
-    maven("https://maven.nucleoid.xyz/")
-    maven("https://maven.minecraftforge.net")
-
-    maven("https://repo.plo.su")
-    maven("https://repo.plasmoverse.com/releases")
-    maven("https://repo.plasmoverse.com/snapshots")
-}
-
-val architecturyVersion = when (mcData.version.rawVersion) {
-    1_20_01 -> "9.2.14"
-    1_20_04 -> "11.1.17"
-    1_20_06 -> "12.1.4"
-    1_21_01 -> "13.0.6"
-    1_21_03 -> "14.0.4"
-
-    else -> throw IllegalStateException()
-}
-
-dependencies {
-    implementation("de.maxhenkel.voicechat:voicechat-api:${project.property("voicechat_api_version")}")
-    compileOnly("su.plo.voice.api:server:${project.property("plasmo_api_version")}")
-    compileOnly("su.plo.voice.api:client:${project.property("plasmo_api_version")}")
-
-    modApi("dev.architectury:architectury-${mcData.loader.friendlyString}:$architecturyVersion")
-
-    if (mcData.isFabric) {
-        val modMenuVersion = when (mcData.version.rawVersion) {
-            1_20_01 -> "7.2.2"
-            1_20_04 -> "9.2.0"
-            1_20_06 -> "10.0.0"
-            1_21_01 -> "11.0.2"
-            1_21_03 -> "12.0.0-beta.1"
-
-            else -> throw IllegalStateException()
-        }
-
-        modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
-    }
-
-    if (mcData.isFabric) {
-        includeOrShade(modImplementation("me.lucko:fabric-permissions-api:0.3.1")!!)
-    }
-
-    val useSVC = true
-
-    if (useSVC)
-        modRuntimeOnly("maven.modrinth:simple-voice-chat:${mcData.loader.friendlyString}-${if (mcData.version != MinecraftVersion.VERSION_1_21_1) mcData.version else "1.21"}-${project.property("voicechat_version")}")
-    else if (!mcData.isNeoForge) {
-        modRuntimeOnly("maven.modrinth:plasmo-voice:${mcData.loader.friendlyString}-${if (mcData.version != MinecraftVersion.VERSION_1_21_1) mcData.version else "1.21"}-${project.property("plasmo_version")}")
-        runtimeOnly("su.plo.voice.api:server:${project.property("plasmo_api_version")}")
-        runtimeOnly("su.plo.voice.api:client:${project.property("plasmo_api_version")}")
-    }
-
-    val clothConfigVersion = when(mcData.version.rawVersion) {
-        1_20_01 -> "11.1.118"
-        1_20_04 -> "13.0.121"
-        1_20_06 -> "14.0.126"
-        1_21_01 -> "15.0.128"
-        1_21_03 -> "16.0.141"
-
-        else -> throw IllegalStateException()
-    }
-
-    modCompileOnly("maven.modrinth:cloth-config:${clothConfigVersion}+${mcData.loader.friendlyString}")
-
-    val cerbonsApiVersion = if (mcData.isForgeLike) "XWZQbKsr" else "1.1.0"
-    modCompileOnly("maven.modrinth:cerbons-api:$cerbonsApiVersion")
-
-    val talkBalloonsVersion = if (mcData.isForgeLike) "kN8kdQ22" else "1.0.0"
-    modCompileOnly("maven.modrinth:talk-balloons:$talkBalloonsVersion")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:${project.property("kotlin_serialization_version")}")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:${project.property("kotlin_serialization_version")}")
-
-    implementation("org.jetbrains.kotlin:kotlin-reflect:${project.property("kotlin_version")}")
-
-    if (mcData.isFabric) {
-        modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
-        modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
-    }
-
-    val jws = includeOrShade("org.java-websocket:Java-WebSocket:1.5.7")!!
-
-    implementation(jws)
-    if (mcData.isForgeLike) {
-        minecraftRuntimeLibraries(jws)
-    }
-
-    if (!mcData.isForgeLike) {// fuck you Forge
-        includeOrShade("commons-logging:commons-logging:1.3.4")
-        includeOrShade("org.apache.httpcomponents:httpcore:4.4.16")
-        includeOrShade("org.apache.httpcomponents:httpclient:4.5.13")
-    }
-}
-
-toolkitReleases {
-    detectVersionType.set(true)
-    releaseName.set("[${mcData.version}] UnityTranslate ${modData.version} (${mcData.loader.friendlyName})")
-
-    modrinth {
-        projectId.set("yA7uge1H")
-
-        if (mcData.loader == ModLoader.FABRIC) {
-            dependencies.add(ModDependency("Ha28R6CL", DependencyType.REQUIRED)) // Fabric Language Kotlin
-        } else if (mcData.isForgeLike) {
-            dependencies.add(ModDependency("ordsPcFz", DependencyType.REQUIRED)) // Kotlin for Forge
-        }
-
-        dependencies.addAll(listOf(
-            ModDependency("lhGA9TYQ", DependencyType.REQUIRED), // Architectury API
-            ModDependency("l3tS9WUS", DependencyType.OPTIONAL), // Talk Balloons
-            ModDependency("9eGKb6K1", DependencyType.OPTIONAL), // Simple Voice Chat
-        ))
-    }
-
-    curseforge {
-        projectId.set("1093604")
-
-        if (mcData.loader == ModLoader.FABRIC) {
-            relations.add(CurseRelation("fabric-language-kotlin", CurseRelationType.REQUIRED)) // Fabric Language Kotlin
-        } else if (mcData.isForgeLike) {
-            relations.add(CurseRelation("kotlin-for-forge", CurseRelationType.REQUIRED)) // Kotlin for Forge
-        }
-
-        relations.addAll(listOf(
-            CurseRelation("architectury-api", CurseRelationType.REQUIRED), // Architectury API
-            CurseRelation("talk-balloons", CurseRelationType.OPTIONAL), // Talk Balloons
-            CurseRelation("simple-voice-chat", CurseRelationType.OPTIONAL), // Simple Voice Chat
-        ))
-    }
-
-    changelogFile.set(File(project.rootDir, "CHANGELOG.md"))
-}
-
-tasks {
-    processResources {
-        val properties = mutableMapOf<String, String>()
-
-        properties.putAll(mapOf(
-            "mod_version" to modData.version,
-            "mc_version" to mcData.version.toString(),
-            "architectury_version" to architecturyVersion,
-        ))
-
-        val forgeLoaderVersion: String? = run {
-            if (!mcData.isPresent) {
-                return@run null
+    repositories {
+        mavenCentral()
+        maven("https://maven.parchmentmc.org")
+        maven("https://oss.sonatype.org/content/repositories/snapshots")
+        exclusiveContent {
+            forRepository {
+                maven("https://api.modrinth.com/maven")
             }
-
-            if (!mcData.isForgeLike) {
-                return@run null
+            filter {
+                includeGroup("maven.modrinth")
             }
+        }
+        maven("https://repo.clojars.org")
+        maven("https://maven.terraformersmc.com/")
+        maven("https://maven.architectury.dev/")
+        maven("https://maven.shedaniel.me/")
+        maven("https://maven.maxhenkel.de/repository/public")
+        maven("https://maven.neoforged.net/releases/")
+        maven("https://maven.nucleoid.xyz/")
+        maven("https://maven.minecraftforge.net")
+        maven("https://maven.su5ed.dev/releases")
 
-            if (mcData.isLegacyForge) {
-                return@run null
-            }
+        maven("https://repo.plo.su")
+        maven("https://repo.plasmoverse.com/releases")
+        maven("https://repo.plasmoverse.com/snapshots")
 
-            val version = MinecraftInfo.ForgeLike.getKotlinForForgeVersion(mcData.version)
-            val majorVersion = version.split(".")[0]
-            "[$majorVersion,)"
+        maven("https://mvn.devos.one/snapshots")
+    }
+}
+
+subprojects {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
+    apply(plugin = "com.gradleup.shadow")
+
+    val modLoaderName = if (project.name.endsWith("fabric"))
+        "Fabric"
+    else if (project.name.endsWith("neoforge"))
+        "NeoForge"
+    else if (project.name.endsWith("forge"))
+        "Forge"
+    else ""
+
+    val supportsVanilla = project.name != "bukkit" && project.name != "common" && project.name != "vanilla"
+    val shadow = configurations.getByName("shadow")
+
+    val minecraftVersion = if (project.name == "fabric" || project.name == "vanilla")
+        "1.16.5"
+    else
+        project.name.replaceAfter("-", "").removeSuffix("-")
+
+    val common = configurations.create("common")
+    val shadowCommon = configurations.create("shadowCommon")
+
+    configurations.compileClasspath.extendsFrom(configurations.named("common"))
+    configurations.runtimeClasspath.extendsFrom(configurations.named("common"))
+
+    // versioned dependency
+    fun verdep(name: String): String {
+        return rootProject.property("${minecraftVersion}.$name") as String
+    }
+
+    /*if (supportsVanilla) {
+        val architectury = project.extensions.getByName<ArchitectPluginExtension>("architectury")
+
+        if (modLoaderName == "" && mcVersionComp >= 1_20_04) // Assume common
+            architectury.common("fabric", "forge", "neoforge")
+        else if (modLoaderName == "")
+            architectury.common("fabric", "forge")
+    }*/
+
+    if (supportsVanilla || project.name == "vanilla") {
+        apply(plugin = "dev.architectury.loom")
+    }
+
+    dependencies {
+        if (supportsVanilla) {
+            val loom = project.extensions.getByName<LoomGradleExtensionAPI>("loom")
+
+            "minecraft"("com.mojang:minecraft:$minecraftVersion")
+            "mappings"(loom.layered() {
+                officialMojangMappings()
+                parchment("org.parchmentmc.data:parchment-$minecraftVersion:${rootProject.property("${minecraftVersion}.parchment_release")}@zip")
+            })
         }
 
-        if (mcData.isForgeLike) {
-            properties["forge_kotlin_version"] = mcData.dependencies.forgeLike.kotlinForForgeVersion
-            properties["forge_loader_version"] = forgeLoaderVersion!!
-            properties["mod_loader_name"] = mcData.loader.friendlyString
+        if (project.name != "common") {
+            shadow(implementation(project(":common"))!!)
+        }
 
-            if (mcData.isForge && mcData.version.rawVersion <= 1_20_01) {
-                properties["forge_loader"] = "javafml"
-            } else {
-                properties["forge_loader"] = "kotlinforforge"
-            }
+        if (supportsVanilla) {
+            for (priorVersion in getAllPriorVersions(minecraftVersion)) {
+                common(project(path = ":$priorVersion-fabric", configuration = "namedElements")) {
+                    isTransitive = false
+                }
 
-            if (mcData.isForge) {
-                properties["FUCKING_REQUIRED"] = "mandatory=true"
-            } else {
-                properties["FUCKING_REQUIRED"] = "required=true"
+                shadowCommon(project(path = ":$priorVersion-fabric", configuration = "transformProduction$modLoaderName")) {
+                    isTransitive = false
+                }
+
+                if (modLoaderName != "Fabric") {
+                    val lowerModLoader = modLoaderName.lowercase()
+
+                    if (rootProject.subprojects.any { it.name == "$priorVersion-$lowerModLoader" }) {
+                        common(project(path = ":$priorVersion-$lowerModLoader", configuration = "namedElements")) {
+                            isTransitive = false
+                        }
+
+                        shadowCommon(project(path = ":$priorVersion-$lowerModLoader", configuration = "transformProduction$modLoaderName")) {
+                            isTransitive = false
+                        }
+                    }
+                }
             }
         }
 
-        if (mcData.isFabric) {
-            properties["fabric_kotlin_version"] = mcData.dependencies.fabric.fabricLanguageKotlinVersion
-            properties["loader_version"] = mcData.dependencies.fabric.fabricLoaderVersion
-
-            exclude("META-INF/mods.toml")
-            exclude("META-INF/neoforge.mods.toml")
+        if (supportsVanilla || project.name == "vanilla") {
+            "include"(implementation("com.moulberry:mixinconstraints:${rootProject.property("mixinconstraints_version")}")!!)
         }
 
-        for ((key, value) in properties) {
-            inputs.property(key, value)
+        // Voice Chat APIs
+        implementation("de.maxhenkel.voicechat:voicechat-api:${rootProject.property("voicechat_api_version")}")
+        compileOnly("su.plo.voice.api:server:${rootProject.property("plasmo_api_version")}")
+        compileOnly("su.plo.voice.api:client:${rootProject.property("plasmo_api_version")}")
+
+        // Kotlin
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:${rootProject.property("kotlin_serialization_version")}")
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:${rootProject.property("kotlin_serialization_version")}")
+        implementation("org.jetbrains.kotlin:kotlin-reflect:${rootProject.property("kotlin_version")}")
+
+        if (modLoaderName != "Fabric") { // Fabric has FLK, but KFF is unreliable and Bukkit doesn't have a commonly-used Kotlin provider
+            shadow("org.jetbrains.kotlin:kotlin-reflect:${rootProject.property("kotlin_version")}")
+            shadow("org.jetbrains.kotlin:kotlin-stdlib:${rootProject.property("kotlin_version")}")
+            shadow("org.jetbrains.kotlin:kotlin-stdlib-jdk7:${rootProject.property("kotlin_version")}")
+            shadow("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.property("kotlin_version")}")
+            shadow("org.jetbrains.kotlinx:kotlinx-coroutines-core:${rootProject.property("kotlin_coroutines_version")}")
+            shadow("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:${rootProject.property("kotlin_coroutines_version")}")
+            shadow("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${rootProject.property("kotlin_coroutines_version")}")
+            shadow("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:${rootProject.property("kotlin_serialization_version")}")
+            shadow("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:${rootProject.property("kotlin_serialization_version")}")
         }
 
-        filesMatching("META-INF/neoforge.mods.toml") {
-            expand(properties)
+        // UnityTranslateLib
+        shadow(implementation("xyz.bluspring.unitytranslate:UnityTranslateLib:${rootProject.property("unitytranslatelib_version")}")!!)
+        shadow(implementation("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-windows-amd64:${rootProject.property("unitytranslatelib_version")}")!!)
+        shadow(implementation("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-linux-amd64:${rootProject.property("unitytranslatelib_version")}")!!)
+
+        shadow(implementation("org.reflections:reflections:0.10.2")!!)
+    }
+
+    tasks {
+        named<ShadowJar>("shadowJar") {
+            configurations = listOf(shadow, shadowCommon)
+            archiveClassifier.set("dev-shadow")
+
+            val shadowPkg = "xyz.bluspring.unitytranslate.shaded"
+
+            relocate("org.jetbrains", "$shadowPkg.jetbrains")
+            relocate("kotlin", "$shadowPkg.kotlin")
+            relocate("kotlinx", "$shadowPkg.kotlinx")
+            relocate("org.reflections", "$shadowPkg.reflections")
         }
 
-        filesMatching("META-INF/mods.toml") {
-            expand(properties)
-        }
+        processResources {
+            val properties = mutableMapOf<String, String>()
 
-        filesMatching("fabric.mod.json") {
-            expand(properties)
+            properties["mod_version"] = rootProject.property("mod.version") as String
+            if (supportsVanilla) {
+                properties["mc_version"] = minecraftVersion
+                properties["architectury_version"] = verdep("architectury_version")
+                properties["fabric_kotlin_version"] = rootProject.property("fabric_kotlin_version") as String
+                properties["loader_version"] = rootProject.property("loader_version") as String
+            }
+
+            filesMatching("plugin.yml") {
+                expand(properties)
+            }
+
+            filesMatching("fabric.mod.json") {
+                expand(properties)
+            }
+
+            filesMatching("META-INF/mods.toml") {
+                expand(properties)
+            }
+
+            filesMatching("META-INF/neoforge.mods.toml") {
+                expand(properties)
+            }
         }
     }
 }

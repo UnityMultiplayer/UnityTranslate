@@ -1,0 +1,9 @@
+package xyz.bluspring.unitytranslate.minecraft
+
+import xyz.bluspring.unitytranslate.common.UnityTranslate
+
+class UnityTranslateMC {
+    companion object {
+        val instance = UnityTranslate(MinecraftProxy.getConfigPath())
+    }
+}

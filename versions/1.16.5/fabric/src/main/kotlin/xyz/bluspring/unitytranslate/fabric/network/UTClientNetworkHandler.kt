@@ -1,0 +1,24 @@
+package xyz.bluspring.unitytranslate.fabric.network
+
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
+import xyz.bluspring.unitytranslate.common.network.PacketIds
+import xyz.bluspring.unitytranslate.fabric.network.UTServerNetworkHandler.readType
+import xyz.bluspring.unitytranslate.minecraft.MinecraftProxy.asPacketResource
+
+object UTClientNetworkHandler {
+    fun init() {
+        for (definitions in PacketIds.definitions) {
+            for (packetDef in definitions.packets) {
+                ClientPlayNetworking.registerGlobalReceiver(packetDef.id.asPacketResource()) { client, handler, buf, sender ->
+                    val values = mutableListOf<Any>()
+                    for (dataDef in packetDef.types) {
+                        values.add(readType(buf, dataDef))
+                    }
+
+                    val packet = packetDef.build(*values.toTypedArray())
+                    packet.handleClient()
+                }
+            }
+        }
+    }
+}
