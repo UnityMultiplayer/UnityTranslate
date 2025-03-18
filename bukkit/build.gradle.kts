@@ -1,3 +1,5 @@
+version = "${rootProject.property("mod.version")}-bukkit"
+
 repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")

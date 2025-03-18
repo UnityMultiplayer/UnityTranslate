@@ -15,53 +15,52 @@ pluginManagement {
     }
 
     plugins {
-        kotlin("jvm") version("2.1.0")
-        kotlin("plugin.serialization") version("2.1.0")
-        id("dev.deftu.gradle.multiversion-root") version("2.26.0")
+        val dgtVersion = "2.26.0"
+
+        kotlin("jvm") version("2.0.10")
+        kotlin("plugin.serialization") version("2.0.10")
+        id("dev.deftu.gradle.multiversion-root") version(dgtVersion)
+        id("dev.deftu.gradle.tools.shadow") version(dgtVersion)
     }
 }
 
 val projectName: String = extra["mod.name"]?.toString()!!
 rootProject.name = projectName
-rootProject.buildFileName = "root.gradle.kts"
 
-listOf("bukkit", "common", "vanilla").forEach {
-    include(it)
-    project(":$it").apply {
-        buildFileName = "build.gradle.kts"
-    }
-}
+include("bukkit", "common")
 
-include()
+include(":minecraft")
+project(":minecraft").buildFileName = "root.gradle.kts"
 
 val neoforgeVersion = "1.20.4"
 var hasNeoForge = false
 
 listOf(
-    "1.16.5", "1.18.2", "1.19.2",
+    //"1.16.5",
+    "1.18.2", "1.19.2",
     "1.20.1", "1.20.4", "1.20.6",
     "1.21.1", "1.21.3", "1.21.4"
 ).forEach { version ->
     if (version == neoforgeVersion)
         hasNeoForge = true
 
-    include("$version-fabric")
-    project(":$version-fabric").apply {
-        projectDir = file("versions/$version/fabric")
-        buildFileName = "../../../minecraft.gradle.kts"
+    include(":minecraft:$version-fabric")
+    project(":minecraft:$version-fabric").apply {
+        projectDir = file("minecraft/versions/$version/fabric")
+        buildFileName = "../../../build.gradle.kts"
     }
 
-    include("$version-forge")
-    project(":$version-forge").apply {
-        projectDir = file("versions/$version/forge")
-        buildFileName = "../../../minecraft.gradle.kts"
+    include(":minecraft:$version-forge")
+    project(":minecraft:$version-forge").apply {
+        projectDir = file("minecraft/versions/$version/forge")
+        buildFileName = "../../../build.gradle.kts"
     }
 
     if (hasNeoForge) {
-        include("$version-neoforge")
-        project(":$version-neoforge").apply {
-            projectDir = file("versions/$version/neoforge")
-            buildFileName = "../../../minecraft.gradle.kts"
+        include(":minecraft:$version-neoforge")
+        project(":minecraft:$version-neoforge").apply {
+            projectDir = file("minecraft/versions/$version/neoforge")
+            buildFileName = "../../../build.gradle.kts"
         }
     }
 }

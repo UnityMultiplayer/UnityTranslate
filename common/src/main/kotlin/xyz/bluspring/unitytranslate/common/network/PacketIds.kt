@@ -3,7 +3,6 @@ package xyz.bluspring.unitytranslate.common.network
 import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.network.v0.V0Packets
 import xyz.bluspring.unitytranslate.common.network.v1.V1Packets
-import kotlin.reflect.full.primaryConstructor
 
 /*
 UnityTranslate Network System
@@ -43,7 +42,7 @@ object PacketIds {
     fun <T : UTPacket> getPacketDefinition(packet: T): PacketBuilder<T> {
         for (definition in definitions) {
             for (builder in definition.packets) {
-                if (builder.constructor == packet::class.primaryConstructor) {
+                if (builder.constructor == packet::class.constructors.first()) {
                     return builder as PacketBuilder<T>
                 }
             }

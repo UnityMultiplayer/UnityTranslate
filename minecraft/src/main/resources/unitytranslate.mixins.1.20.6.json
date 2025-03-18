@@ -1,0 +1,25 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "xyz.bluspring.unitytranslate.minecraft.mixin",
+    "compatibilityLevel": "JAVA_17",
+    "mixins": [
+        "AbstractWidgetAccessor",
+        "MinecraftServerMixin",
+        "PlatformProxyMixin",
+        "fabric.MinecraftProxyMixin",
+        "fabric.PlatformProxyMixin",
+        "network.UnityTranslateFabricMixin",
+        "network.UTModernNetworkHelperMixin",
+        "network.UTPacketMixin"
+    ],
+    "client": [
+        "AbstractWidgetMixin",
+        "client.KeyMappingAccessor",
+        "client.OptionsMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    },
+    "plugin": "com.moulberry.mixinconstraints.ConstraintsMixinPlugin"
+}

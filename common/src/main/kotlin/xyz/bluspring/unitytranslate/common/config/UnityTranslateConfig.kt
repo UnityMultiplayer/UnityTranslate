@@ -1,40 +1,12 @@
 package xyz.bluspring.unitytranslate.common.config
 
 import kotlinx.serialization.Serializable
-import xyz.bluspring.unitytranslate.common.Language
-import xyz.bluspring.unitytranslate.common.transcriber.TranscriberType
 
 @Serializable
 data class UnityTranslateConfig(
-    val client: ClientConfig = ClientConfig(),
     var common: CommonConfig = CommonConfig(),
     var server: ServerConfig = ServerConfig(),
 ) {
-    @Serializable
-    data class ClientConfig(
-        var enabled: Boolean = true,
-        var openBrowserWithoutPrompt: Boolean = false,
-        var muteTranscriptWhenVoiceChatMuted: Boolean = true,
-
-        val transcriptBoxes: MutableList<TranscriptBoxConfig> = mutableListOf(),
-
-        @get:Hidden
-        val transcriber: TranscriberType = TranscriberType.BROWSER,
-
-        @get:Hidden
-        var language: Language = Language.ENGLISH,
-
-        var clientTranslation: ClientTranslation = ClientTranslation.ENABLED_IF_CUDA,
-
-        var disappearingText: Boolean = true,
-        @get:DependsOn("disappearingText")
-        @get:FloatRange(from = 0.2f, to = 60.0f, increment = 0.1f)
-        var disappearingTextDelay: Float = 20.0f,
-        @get:DependsOn("disappearingText")
-        @get:FloatRange(from = 0.0f, to = 5.0f, increment = 0.1f)
-        var disappearingTextFade: Float = 0.5f
-    )
-
     @Serializable
     data class CommonConfig(
         var shouldUseCuda: Boolean = true,
@@ -69,40 +41,8 @@ data class UnityTranslateConfig(
         var maxConcurrentTranslations: Int = 20
     )
 
-    @Serializable
-    data class TranscriptBoxConfig(
-        var language: Language,
-
-        @get:IntRange(from = 10, to = 300, increment = 10)
-        var textScale: Int = 100,
-
-        var offsetX: Int = 0,
-        var offsetY: Int = 0,
-        var width: Int = 150,
-        var height: Int = 170,
-        var opacity: Int = 120,
-        var color: Int = 0x000000,
-
-        var horizontalSnapType: HorizontalSnapType,
-        var verticalSnapType: VerticalSnapType
-    )
-
-    enum class HorizontalSnapType {
-        LEFT_EDGE, CENTER, RIGHT_EDGE
-    }
-
-    enum class VerticalSnapType {
-        TOP_EDGE, CENTER, BOTTOM_EDGE
-    }
-
     enum class TriState {
         TRUE, FALSE, DEFAULT
-    }
-
-    enum class ClientTranslation {
-        ENABLED,
-        ENABLED_IF_CUDA,
-        DISABLED
     }
 
     enum class TranslationPriority {

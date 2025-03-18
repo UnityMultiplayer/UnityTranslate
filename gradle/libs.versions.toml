@@ -1,0 +1,37 @@
+[versions]
+# Kotlin - https://github.com/FabricMC/fabric-language-kotlin/blob/master/generated/library_versions.json
+kotlin = "2.1.10"
+kotlin_coroutines = "1.10.1"
+kotlin_serialization = "1.8.0"
+kotlin_atomicfu = "0.27.0"
+kotlin_datetime = "0.6.1"
+kotlin_io = "0.6.0"
+
+[libraries]
+kotlin_stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlin_stdlib_jdk7 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlin" }
+kotlin_stdlib_jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
+kotlin_reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+
+kotlinx_coroutines_core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin_coroutines" }
+kotlinx_coroutines_core_jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "kotlin_coroutines" }
+kotlinx_coroutines_jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "kotlin_coroutines" }
+
+kotlinx_serialization_core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core-jvm", version.ref = "kotlin_serialization" }
+kotlinx_serialization_json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm", version.ref = "kotlin_serialization" }
+
+kotlinx_atomicfu = { module = "org.jetbrains.kotlinx:atomicfu-jvm", version.ref = "kotlin_atomicfu" }
+kotlinx_datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime-jvm", version.ref = "kotlin_datetime" }
+
+kotlinx_io_core = { module = "org.jetbrains.kotlinx:kotlinx-io-core-jvm", version.ref = "kotlin_io" }
+kotlinx_io_bytestring = { module = "org.jetbrains.kotlinx:kotlinx-io-bytestring-jvm", version.ref = "kotlin_io" }
+
+[bundles]
+kotlin = [
+    "kotlin_stdlib", "kotlin_stdlib_jdk7", "kotlin_stdlib_jdk8", "kotlin_reflect",
+]
+kotlinx = [
+    "kotlinx_coroutines_core", "kotlinx_coroutines_core_jvm", "kotlinx_coroutines_jdk8",
+    "kotlinx_serialization_core", "kotlinx_serialization_json",
+    "kotlinx_atomicfu", "kotlinx_datetime", "kotlinx_io_core", "kotlinx_io_bytestring",
+]

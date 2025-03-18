@@ -63,13 +63,16 @@ class UnityTranslate(val path: Path) {
 
     @OptIn(ExperimentalSerializationApi::class)
     fun loadConfig() {
-        if (!this.configFile.exists())
+        if (!this.configFile.exists()) {
+            config = UnityTranslateConfig()
             return
+        }
 
         try {
             config = json.decodeFromStream(UnityTranslateConfig.serializer(), configFile.inputStream())
         } catch (e: Exception) {
             logger.error("Failed to load UnityTranslate config, reverting to defaults.")
+            config = UnityTranslateConfig()
             e.printStackTrace()
         }
     }
