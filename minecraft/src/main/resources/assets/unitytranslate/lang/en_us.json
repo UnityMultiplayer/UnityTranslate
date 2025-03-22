@@ -9,17 +9,19 @@
     "unitytranslate.request_download.deny": "Deny",
     "unitytranslate.request_download.deny.desc": "If you deny the download, the \"Should Run Translation Server\" config option will be disabled automatically. To turn it back on again, you may access the UnityTranslate config menu, which will bring you this screen again.",
 
-    "unitytranslate.transcriber.connected": "Connected to Browser Transcription.",
-    "unitytranslate.transcriber.disconnected": "Disconnected from Browser Transcription, please click here to reconnect.",
+    "unitytranslate.transcriber.browser.connected": "Connected to Browser Transcription.",
+    "unitytranslate.transcriber.browser.disconnected": "Disconnected from Browser Transcription, attempting to reconnect.",
 
     "unitytranslate.transcriber.error": "An error occurred: ",
-    "unitytranslate.transcriber.error.too_many_resets": "Too many transcriber resets have occurred within a small timeframe, please restart your browser!",
-    "unitytranslate.transcriber.error.no_support": "Your browser doesn't support the Web Speech Recognition API! Please try using Google Chrome or Microsoft Edge instead.",
+    "unitytranslate.transcriber.browser.error.too_many_resets": "Too many transcriber resets have occurred within a small timeframe, attempting to reconnect!",
+    "unitytranslate.transcriber.browser.error.no_support": "Your browser doesn't support the Web Speech Recognition API! Please try installing Google Chrome or Microsoft Edge instead.",
 
     "unitytranslate.transcriber.type.sphinx": "PocketSphinx (disabled)",
     "unitytranslate.transcriber.type.sphinx.description": "Uses the PocketSphinx speech recognition engine for speech transcription. Currently disabled due to its large size requirement.",
     "unitytranslate.transcriber.type.browser": "Web Speech API",
-    "unitytranslate.transcriber.type.browser.description": "Uses the Web Speech API for speech transcription. This requires opening your web browser to use it, and may use more resources.\n\nMainly supports Google Chrome and Microsoft Edge.",
+    "unitytranslate.transcriber.type.browser.description": "Uses the Web Speech API for speech transcription. This tries to automatically open a supported web browser to use it, and may use more resources.\n\nMainly supports Google Chrome and Microsoft Edge.",
+    "unitytranslate.transcriber.type.whisper": "OpenAI Whisper",
+    "unitytranslate.transcriber.type.whisper.description": "Uses OpenAI's Whisper models for speech transcription. This may use significantly more resources and requires to download some files.",
     "unitytranslate.transcriber.type.windows_sapi": "Windows Speech API (disabled)",
     "unitytranslate.transcriber.type.windows_sapi.description": "Uses the Windows Speech API for speech transcription. This is natively supported in Windows, but requires you to install the language packs for the languages you intend to speak. Currently disabled due to requiring some research to set it up properly.",
 

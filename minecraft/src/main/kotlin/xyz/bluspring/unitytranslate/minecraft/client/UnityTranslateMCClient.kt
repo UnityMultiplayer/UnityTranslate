@@ -2,6 +2,7 @@ package xyz.bluspring.unitytranslate.minecraft.client
 
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.architectury.event.events.client.ClientGuiEvent
+import dev.architectury.event.events.client.ClientLifecycleEvent
 import dev.architectury.event.events.client.ClientTickEvent
 import dev.architectury.registry.ReloadListenerRegistry
 import kotlinx.coroutines.launch
@@ -38,7 +39,9 @@ class UnityTranslateMCClient {
         instance = this
 
         loadConfig()
-        updateConfig()
+        ClientLifecycleEvent.CLIENT_STARTED.register {
+            updateConfig()
+        }
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, UTResourceReloadListener())
 
         ClientGuiEvent.RENDER_HUD.register { poseStack, delta ->
@@ -195,6 +198,15 @@ class UnityTranslateMCClient {
         }
 
         fun displayMessage(text: Component, isError: Boolean = false) {
+            if (Minecraft.getInstance().gui == null || Minecraft.getInstance().player == null) {
+                if (isError)
+                    logger.error("UnityTranslate: ${text.string}")
+                else
+                    logger.info("UnityTranslate: ${text.string}")
+
+                return
+            }
+
             val full = MinecraftProxy.literal("").copy()
                 .append(MinecraftProxy.literal("[UnityTranslate]: ")
                     .copy().withStyle(if (isError) ChatFormatting.RED else ChatFormatting.YELLOW, ChatFormatting.BOLD)

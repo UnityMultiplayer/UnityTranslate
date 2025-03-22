@@ -63,7 +63,7 @@ class TranscriptBoxRenderer {
 
         //RenderSystem.enableScissor(minX, minY, width, height)
         poseStack.pushPose()
-        poseStack.translate(0.0, 0.0, -255.0)
+        poseStack.translate(0.0, 0.0, 250.0)
 
         RenderSystem.enableBlend()
         RenderSystem.defaultBlendFunc()
@@ -98,7 +98,7 @@ class TranscriptBoxRenderer {
         val currentTime = System.currentTimeMillis()
         val delay = (UnityTranslateMCClient.clientConfig.disappearingTextDelay * 1000L).toLong()
 
-        for (transcript in holder.transcripts) {
+        for (transcript in holder.transcripts.reversed()) {
             val component = MinecraftProxy.translatable("chat.type.text", (transcript.playerRef as Player).displayName
                     .copy()
                     .append(MinecraftProxy.literal(" (${transcript.language.code.uppercase(Locale.ENGLISH)})").withStyle(ChatFormatting.GREEN)),

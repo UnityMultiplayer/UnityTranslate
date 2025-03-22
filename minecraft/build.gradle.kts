@@ -75,6 +75,9 @@ dependencies {
         else if (mcData.version < MinecraftVersions.VERSION_1_20_4 || !mcData.isForge) // Architectury is not available for LexForge 1.20.4 and above.
             "modImplementation"("dev.architectury:architectury-${modLoaderName.lowercase()}:${architecturyVersion}")
     }
+
+    val playwrightVersion = rootProject.property("playwright_version")
+    "shade"("implementation"("com.microsoft.playwright:playwright:${playwrightVersion}")!!)
 }
 
 tasks {

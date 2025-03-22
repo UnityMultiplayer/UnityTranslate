@@ -2,6 +2,7 @@ package xyz.bluspring.unitytranslate.transcriber.browser
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import com.microsoft.playwright.*
 import com.sun.net.httpserver.HttpServer
 import org.java_websocket.WebSocket
 import org.java_websocket.handshake.ClientHandshake
@@ -11,6 +12,8 @@ import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.common.transcriber.TranscriberType
 import xyz.bluspring.unitytranslate.common.util.HttpUtil
+import xyz.bluspring.unitytranslate.minecraft.MinecraftProxy
+import xyz.bluspring.unitytranslate.minecraft.client.UnityTranslateMCClient
 import java.net.InetSocketAddress
 
 class BrowserSpeechTranscriber(instance: UnityTranslate, language: Language) : SpeechTranscriber(instance, language) {
@@ -23,6 +26,11 @@ class BrowserSpeechTranscriber(instance: UnityTranslate, language: Language) : S
         25117
     val browserApplication = BrowserApplication(instance)
 
+    var playwright = Playwright.create()
+    var browser: Browser
+    var context: BrowserContext
+    var page: Page
+
     init {
         browserApplication.socketPort = socketPort
         server = HttpServer.create(InetSocketAddress("0.0.0.0", serverPort), 0)
@@ -33,30 +41,26 @@ class BrowserSpeechTranscriber(instance: UnityTranslate, language: Language) : S
         socket.isDaemon = true
         socket.start()
 
-        /*ClientPlayerEvent.CLIENT_PLAYER_JOIN.register { _ ->
-            openWebsite()
-        }*/
+        playwright = Playwright.create()
+        // Focus on trying to use Chromium, as other browsers don't support the Web Speech API.
+        browser = playwright.chromium().launch(BrowserType.LaunchOptions().apply {
+            this.executablePath = UTBrowserType.CHROME.findExistingPath()
+            this.chromiumSandbox = true // Sandbox Chromium, we don't want people to hack outside if an exploit is found.
+            this.headless = true // Run in headless mode, so a new browser window won't be opened.
+        })
+        context = browser.newContext(Browser.NewContextOptions().apply {
+            this.permissions = listOf("microphone")
+        })
+        page = context.newPage()
+        page.navigate("http://127.0.0.1:$serverPort")
     }
 
-    /*fun openWebsite() {
-        val mc = Minecraft.getInstance()
-
-        if (socket.totalConnections <= 0 && UnityTranslate.config.client.enabled) {
-            if (UnityTranslate.config.client.openBrowserWithoutPrompt) {
-                Util.getPlatform().openUri("http://127.0.0.1:$serverPort")
-            } else {
-                Minecraft.getInstance().execute {
-                    if (mc.screen is RequestDownloadScreen) {
-                        (mc.screen as RequestDownloadScreen).parent = OpenBrowserScreen("http://127.0.0.1:$serverPort")
-                    } else {
-                        mc.setScreen(OpenBrowserScreen("http://127.0.0.1:$serverPort"))
-                    }
-                }
-            }
-        }
-    }*/
-
     override fun stop() {
+        page.close()
+        context.close()
+        browser.close()
+        playwright.close()
+
         server.stop(0)
         socket.stop(1000)
     }
@@ -83,17 +87,14 @@ class BrowserSpeechTranscriber(instance: UnityTranslate, language: Language) : S
             })
             totalConnections++
 
-            //UnityTranslateClient.displayMessage(Component.translatable("unitytranslate.transcriber.connected"))
-            //setMuted(!UnityTranslateClient.shouldTranscribe)
+            UnityTranslateMCClient.displayMessage(MinecraftProxy.translatable("unitytranslate.transcriber.browser.connected"))
+            setMuted(UnityTranslateMCClient.isMuted)
         }
 
         override fun onClose(ws: WebSocket, code: Int, reason: String, remote: Boolean) {
             totalConnections--
 
-            /*UnityTranslateClient.displayMessage(Component.translatable("unitytranslate.transcriber.disconnected")
-                .withStyle {
-                    it.withClickEvent(ClickEvent(ClickEvent.Action.OPEN_URL, "http://127.0.0.1:${serverPort}"))
-                })*/
+            UnityTranslateMCClient.displayMessage(MinecraftProxy.translatable("unitytranslate.transcriber.browser.disconnected"))
         }
 
         override fun onMessage(ws: WebSocket, message: String) {
@@ -132,8 +133,12 @@ class BrowserSpeechTranscriber(instance: UnityTranslate, language: Language) : S
                 "error" -> {
                     val type = data.get("type").asString
 
-                    /*UnityTranslateClient.displayMessage(Component.translatable("unitytranslate.transcriber.error")
-                        .append(Component.translatable("unitytranslate.transcriber.error.$type")), true)*/
+                    if (type == "too_many_resets") {
+                        page.reload()
+                    }
+
+                    UnityTranslateMCClient.displayMessage(MinecraftProxy.translatable("unitytranslate.transcriber.error")
+                        .append(MinecraftProxy.translatable("unitytranslate.transcriber.browser.error.$type")), true)
                 }
             }
         }
