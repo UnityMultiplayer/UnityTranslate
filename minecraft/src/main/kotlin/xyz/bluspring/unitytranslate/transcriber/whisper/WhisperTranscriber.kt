@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.exists
 
 // Realtime Whisper transcription, based on https://github.com/ggerganov/whisper.cpp/blob/master/examples/stream/stream.cpp
-class WhisperTranscriber(instance: UnityTranslate, language: Language) : SpeechTranscriber(instance, language) {
+class WhisperTranscriber(instance: UnityTranslate, language: Language) : SpeechTranscriber(TranscriberType.WHISPER, instance, language) {
     val whisper = WhisperJNI()
     val ctx: WhisperContext
 

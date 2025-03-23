@@ -53,8 +53,8 @@ class TranscriptBoxRenderer {
             UnityTranslateClientConfig.VerticalAlignType.BOTTOM_EDGE -> screenHeight - (box.offsetY * heightDiv)
         }.toInt()
 
-        val width = (box.width * screenWidth).toInt()
-        val height = (box.height * screenHeight).toInt()
+        val width = box.width
+        val height = box.height
 
         val maxX = minX + width
         val maxY = minY + height

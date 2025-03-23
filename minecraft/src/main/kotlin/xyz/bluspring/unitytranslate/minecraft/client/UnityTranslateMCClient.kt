@@ -42,6 +42,11 @@ class UnityTranslateMCClient {
         ClientLifecycleEvent.CLIENT_STARTED.register {
             updateConfig()
         }
+
+        ClientLifecycleEvent.CLIENT_STOPPING.register {
+            transcriber.stop()
+        }
+
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, UTResourceReloadListener())
 
         ClientGuiEvent.RENDER_HUD.register { poseStack, delta ->
@@ -118,7 +123,14 @@ class UnityTranslateMCClient {
     }
 
     fun updateConfig() {
-        transcriber = clientConfig.transcriber.creator.invoke(UnityTranslate.instance, clientConfig.spokenLanguage)
+        try {
+            if (transcriber.type != clientConfig.transcriber) {
+                transcriber.stop()
+                transcriber = clientConfig.transcriber.creator.invoke(UnityTranslate.instance, clientConfig.spokenLanguage)
+            }
+        } catch (_: Throwable) {
+            transcriber = clientConfig.transcriber.creator.invoke(UnityTranslate.instance, clientConfig.spokenLanguage)
+        }
         setupTranscriber(transcriber)
 
         if (useClientTranslations && !allowsClientTranslation()) {

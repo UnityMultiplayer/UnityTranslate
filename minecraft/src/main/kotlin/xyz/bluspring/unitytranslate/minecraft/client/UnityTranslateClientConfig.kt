@@ -47,8 +47,8 @@ data class UnityTranslateClientConfig(
         // value between 0 and 1
         var offsetX: Double = 0.0,
         var offsetY: Double = 0.0,
-        var width: Double = 0.078125,
-        var height: Double = 0.157407,
+        var width: Int = 150,
+        var height: Int = 120,
 
         var opacity: Int = 120,
         var color: Int = 0x000000,

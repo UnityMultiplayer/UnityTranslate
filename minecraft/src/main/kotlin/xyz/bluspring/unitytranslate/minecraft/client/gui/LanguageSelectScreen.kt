@@ -11,7 +11,6 @@ import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.util.FormattedCharSequence
 import xyz.bluspring.unitytranslate.common.Language
-import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.minecraft.MinecraftProxy
 import xyz.bluspring.unitytranslate.minecraft.MinecraftProxy.text
 import xyz.bluspring.unitytranslate.minecraft.client.UnityTranslateClientConfig
@@ -68,12 +67,14 @@ class LanguageSelectScreen(val parent: Screen?, val isAddingBox: Boolean) : Scre
 
             Minecraft.getInstance().execute {
                 UnityTranslateMCClient.clientConfig.transcriptBoxes.add(UnityTranslateClientConfig.TranscriptBoxConfig(language))
-                UnityTranslate.instance.saveConfig()
+                UnityTranslateMCClient.instance.saveConfig()
+                UnityTranslateMCClient.instance.updateConfig()
             }
         } else {
             UnityTranslateMCClient.clientConfig.spokenLanguage = language
             UnityTranslateMCClient.transcriber.changeLanguage(language)
-            UnityTranslate.instance.saveConfig()
+            UnityTranslateMCClient.instance.saveConfig()
+            UnityTranslateMCClient.instance.updateConfig()
         }
 
         onClose()

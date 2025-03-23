@@ -2,11 +2,15 @@ package xyz.bluspring.unitytranslate.transcriber.browser
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.microsoft.playwright.*
 import com.sun.net.httpserver.HttpServer
 import org.java_websocket.WebSocket
 import org.java_websocket.handshake.ClientHandshake
 import org.java_websocket.server.WebSocketServer
+import org.openqa.selenium.WebDriver
+import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.chrome.ChromeOptions
+import org.openqa.selenium.edge.EdgeDriver
+import org.openqa.selenium.edge.EdgeOptions
 import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.transcriber.SpeechTranscriber
@@ -16,7 +20,7 @@ import xyz.bluspring.unitytranslate.minecraft.MinecraftProxy
 import xyz.bluspring.unitytranslate.minecraft.client.UnityTranslateMCClient
 import java.net.InetSocketAddress
 
-class BrowserSpeechTranscriber(instance: UnityTranslate, language: Language) : SpeechTranscriber(instance, language) {
+class BrowserSpeechTranscriber(instance: UnityTranslate, language: Language) : SpeechTranscriber(TranscriberType.BROWSER, instance, language) {
     val socketPort = HttpUtil.availablePort
     val server: HttpServer
     val socket = BrowserSocket()
@@ -26,10 +30,7 @@ class BrowserSpeechTranscriber(instance: UnityTranslate, language: Language) : S
         25117
     val browserApplication = BrowserApplication(instance)
 
-    var playwright = Playwright.create()
-    var browser: Browser
-    var context: BrowserContext
-    var page: Page
+    var driver: WebDriver
 
     init {
         browserApplication.socketPort = socketPort
@@ -41,25 +42,37 @@ class BrowserSpeechTranscriber(instance: UnityTranslate, language: Language) : S
         socket.isDaemon = true
         socket.start()
 
-        playwright = Playwright.create()
-        // Focus on trying to use Chromium, as other browsers don't support the Web Speech API.
-        browser = playwright.chromium().launch(BrowserType.LaunchOptions().apply {
-            this.executablePath = UTBrowserType.CHROME.findExistingPath()
-            this.chromiumSandbox = true // Sandbox Chromium, we don't want people to hack outside if an exploit is found.
-            this.headless = true // Run in headless mode, so a new browser window won't be opened.
-        })
-        context = browser.newContext(Browser.NewContextOptions().apply {
-            this.permissions = listOf("microphone")
-        })
-        page = context.newPage()
-        page.navigate("http://127.0.0.1:$serverPort")
+        val type = UTBrowserType.CHROME
+        val path = type.findExistingPath()?.toFile() ?: throw IllegalArgumentException("No browser path found for browser type $type!")
+
+        driver = if (type == UTBrowserType.CHROME) {
+            ChromeDriver(ChromeOptions().apply {
+                this.addArguments(
+                    "--headless=new",
+                    "--disable-user-media-security=true",
+                    "--use-fake-ui-for-media-stream"
+                )
+                this.setBinary(path)
+            })
+        } else if (type == UTBrowserType.EDGE) {
+            EdgeDriver(EdgeOptions().apply {
+                this.addArguments(
+                    "--headless=new",
+                    "--disable-user-media-security=true",
+                    "--use-fake-ui-for-media-stream"
+                )
+                this.setBinary(path)
+            })
+        } else {
+            throw IllegalStateException()
+        }
+
+        driver.get("http://127.0.0.1:$serverPort")
     }
 
     override fun stop() {
-        page.close()
-        context.close()
-        browser.close()
-        playwright.close()
+        driver.close()
+        driver.quit()
 
         server.stop(0)
         socket.stop(1000)
@@ -134,7 +147,7 @@ class BrowserSpeechTranscriber(instance: UnityTranslate, language: Language) : S
                     val type = data.get("type").asString
 
                     if (type == "too_many_resets") {
-                        page.reload()
+                        driver.navigate().refresh()
                     }
 
                     UnityTranslateMCClient.displayMessage(MinecraftProxy.translatable("unitytranslate.transcriber.error")

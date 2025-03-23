@@ -3,8 +3,9 @@ package xyz.bluspring.unitytranslate.transcriber.sapi5
 import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.transcriber.SpeechTranscriber
+import xyz.bluspring.unitytranslate.common.transcriber.TranscriberType
 
-class WindowsSpeechApiTranscriber(instance: UnityTranslate, language: Language) : SpeechTranscriber(instance, language) {
+class WindowsSpeechApiTranscriber(instance: UnityTranslate, language: Language) : SpeechTranscriber(TranscriberType.WINDOWS_SAPI, instance, language) {
     init {
     }
 

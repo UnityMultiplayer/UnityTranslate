@@ -100,6 +100,7 @@ class EditTranscriptBoxesScreen(val boxes: MutableList<UnityTranslateClientConfi
         //$$ guiGraphics: GuiGraphics,
         //#else
         poseStack: PoseStack,
+        //#endif
         mouseX: Int, mouseY: Int, partialTick: Float) {
         var inAnyBox = false
 
@@ -132,8 +133,8 @@ class EditTranscriptBoxesScreen(val boxes: MutableList<UnityTranslateClientConfi
                     UnityTranslateClientConfig.VerticalAlignType.BOTTOM_EDGE -> screenHeight - (box.offsetY * heightDiv)
                 }.toInt()
 
-                val width = (box.width * screenWidth).toInt()
-                val height = (box.height * screenHeight).toInt()
+                val width = box.width
+                val height = box.height
                 
                 if (mouseX >= minX - 1 && mouseY >= minY - 1 && mouseX <= minX + width + 1 && mouseY <= minY + height + 1) {
                     if (mouseX >= minX - 1 && mouseX <= minX + 1) {
@@ -256,8 +257,8 @@ class EditTranscriptBoxesScreen(val boxes: MutableList<UnityTranslateClientConfi
                 UnityTranslateClientConfig.VerticalAlignType.BOTTOM_EDGE -> screenHeight - (box.offsetY * heightDiv)
             }.toDouble()
             
-            val width = (box.width * screenWidth).toDouble()
-            val height = (box.height * screenHeight).toDouble()
+            val width = box.width.toDouble()
+            val height = box.height.toDouble()
 
             if (mouseX >= minX - 1 && mouseY >= minY - 1 && mouseX <= minX + width + 1 && mouseY <= minY + height + 1) {
                 val offset = 5
@@ -416,8 +417,8 @@ class EditTranscriptBoxesScreen(val boxes: MutableList<UnityTranslateClientConfi
             ctx.box.verticalAlignType = UnityTranslateClientConfig.VerticalAlignType.TOP_EDGE
         }
 
-        ctx.box.width = ctx.newWidth / screenWidth
-        ctx.box.height = ctx.newHeight / screenHeight
+        ctx.box.width = ctx.newWidth.toInt()
+        ctx.box.height = ctx.newHeight.toInt()
     }
 
     private data class BoxEditContext(

@@ -1,3 +1,4 @@
+import dev.deftu.gradle.utils.includeOrShade
 import dev.deftu.gradle.utils.version.MinecraftVersions
 
 plugins {
@@ -76,8 +77,8 @@ dependencies {
             "modImplementation"("dev.architectury:architectury-${modLoaderName.lowercase()}:${architecturyVersion}")
     }
 
-    val playwrightVersion = rootProject.property("playwright_version")
-    "shade"("implementation"("com.microsoft.playwright:playwright:${playwrightVersion}")!!)
+    val seleniumVersion = rootProject.property("selenium_version")
+    includeOrShade("implementation"("org.seleniumhq.selenium:selenium-java:${seleniumVersion}")!!)
 }
 
 tasks {

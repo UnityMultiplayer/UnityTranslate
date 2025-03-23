@@ -4,7 +4,7 @@ import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.common.UnityTranslate
 import java.util.function.BiConsumer
 
-abstract class SpeechTranscriber(val instance: UnityTranslate, var language: Language) {
+abstract class SpeechTranscriber(val type: TranscriberType, val instance: UnityTranslate, var language: Language) {
     var lastIndex = 0
     var currentOffset = 0
 
