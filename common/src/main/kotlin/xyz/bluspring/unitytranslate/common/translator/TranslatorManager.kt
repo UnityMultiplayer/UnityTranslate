@@ -1,9 +1,6 @@
 package xyz.bluspring.unitytranslate.common.translator
 
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.config.UnityTranslateConfig
@@ -113,8 +110,8 @@ class TranslatorManager(val instance: UnityTranslate) {
                                 }
 
                                 // Start a new coroutine for translating this batch.
-                                scope.launch {
-                                    val translated = translatorInstance.batchTranslate(spliced.map { it.id }, from, to)
+                                scope.launch(start = CoroutineStart.UNDISPATCHED) {
+                                    val translated = translatorInstance.batchTranslate(spliced.map { it.text }, from, to)
 
                                     // Translation failed, mark them as failed and requeue them.
                                     // The client is expected to display a warning icon if the translation has failed.

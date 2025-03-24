@@ -3,8 +3,10 @@ package xyz.bluspring.unitytranslate.minecraft.client
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.architectury.event.events.client.ClientGuiEvent
 import dev.architectury.event.events.client.ClientLifecycleEvent
+import dev.architectury.event.events.client.ClientPlayerEvent
 import dev.architectury.event.events.client.ClientTickEvent
 import dev.architectury.registry.ReloadListenerRegistry
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
@@ -19,6 +21,8 @@ import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.UnityTranslate.Companion.json
 import xyz.bluspring.unitytranslate.common.UnityTranslate.Companion.logger
+import xyz.bluspring.unitytranslate.common.network.v0.serverbound.V0SetCurrentLanguagePacket
+import xyz.bluspring.unitytranslate.common.network.v0.serverbound.V0SetUsedLanguagesPacket
 import xyz.bluspring.unitytranslate.common.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.common.translator.Transcript
 import xyz.bluspring.unitytranslate.common.util.nativeaccess.CudaHelper
@@ -30,6 +34,7 @@ import xyz.bluspring.unitytranslate.minecraft.client.gui.UTConfigScreen
 import xyz.bluspring.unitytranslate.minecraft.client.resources.UTResourceReloadListener
 import xyz.bluspring.unitytranslate.minecraft.events.TranscriptEvents
 import xyz.bluspring.unitytranslate.minecraft.network.UTClientNetworkSender
+import java.util.*
 import java.util.function.BiConsumer
 
 class UnityTranslateMCClient {
@@ -45,6 +50,20 @@ class UnityTranslateMCClient {
 
         ClientLifecycleEvent.CLIENT_STOPPING.register {
             transcriber.stop()
+        }
+
+        ClientPlayerEvent.CLIENT_PLAYER_JOIN.register { player ->
+            Minecraft.getInstance().execute {
+                if (transcriptHolders.isEmpty())
+                    return@execute
+
+                UnityTranslate.instance.proxy.sendPacketClient(V0SetUsedLanguagesPacket(EnumSet.copyOf(transcriptHolders.keys)))
+                UnityTranslate.instance.proxy.sendPacketClient(V0SetCurrentLanguagePacket(clientConfig.spokenLanguage))
+            }
+        }
+
+        ClientPlayerEvent.CLIENT_PLAYER_QUIT.register { player ->
+
         }
 
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, UTResourceReloadListener())
@@ -162,7 +181,7 @@ class UnityTranslateMCClient {
                 val translatorManager = UnityTranslate.instance.translatorManager
 
                 for ((language, holder) in transcriptHolders) {
-                    translatorManager.scope.launch {
+                    translatorManager.scope.launch(start = CoroutineStart.UNDISPATCHED) {
                         val translated = translatorManager.queueTranslation(text, transcriber.language, language, player.uuid, index)
                         holder.updateTranscript(player, translated ?: text, transcriber.language, index, updateTime, translated == null)
                     }

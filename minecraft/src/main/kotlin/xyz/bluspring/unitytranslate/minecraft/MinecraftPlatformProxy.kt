@@ -3,10 +3,12 @@ package xyz.bluspring.unitytranslate.minecraft
 import me.lucko.fabric.api.permissions.v0.Permissions
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.common.PlatformProxy
 import xyz.bluspring.unitytranslate.common.network.PacketIds
 import xyz.bluspring.unitytranslate.common.network.UTPacket
 import xyz.bluspring.unitytranslate.minecraft.MinecraftProxy.asPacketResource
+import xyz.bluspring.unitytranslate.minecraft.client.UnityTranslateMCClient
 import java.util.*
 
 class MinecraftPlatformProxy : PlatformProxy(UnityTranslateMC.instance) {
@@ -17,7 +19,7 @@ class MinecraftPlatformProxy : PlatformProxy(UnityTranslateMC.instance) {
     override fun hasPermission(uuid: UUID, permission: String): Boolean {
         //#if FABRIC
         val player = MinecraftProxy.getPlayer(uuid) ?: return false
-        return Permissions.check(player, permission)
+        return Permissions.check(player, permission, true)
         //#endif
     }
 
@@ -30,6 +32,10 @@ class MinecraftPlatformProxy : PlatformProxy(UnityTranslateMC.instance) {
         //#else
 
         //#endif
+    }
+
+    override fun setClientPlayerLanguage(language: Language) {
+        UnityTranslateMCClient.clientConfig.spokenLanguage = language
     }
 
     override fun broadcastPacketServer(packet: UTPacket) {

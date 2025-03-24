@@ -108,6 +108,7 @@ class BrowserSpeechTranscriber(instance: UnityTranslate, language: Language) : S
             totalConnections--
 
             UnityTranslateMCClient.displayMessage(MinecraftProxy.translatable("unitytranslate.transcriber.browser.disconnected"))
+            driver.navigate().refresh()
         }
 
         override fun onMessage(ws: WebSocket, message: String) {

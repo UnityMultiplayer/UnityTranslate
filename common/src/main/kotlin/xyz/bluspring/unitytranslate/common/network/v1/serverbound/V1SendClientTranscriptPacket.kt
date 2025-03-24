@@ -1,10 +1,11 @@
 package xyz.bluspring.unitytranslate.common.network.v1.serverbound
 
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
 import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.common.network.UTPacket
 import xyz.bluspring.unitytranslate.common.util.Permissions
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 data class V1SendClientTranscriptPacket(
@@ -31,7 +32,7 @@ data class V1SendClientTranscriptPacket(
         val text = translated[sourceLanguage]!!
 
         for (language in usedLanguages) {
-            instance.translatorManager.scope.launch {
+            instance.translatorManager.scope.launch(start = CoroutineStart.UNDISPATCHED) {
                 val translated = instance.translatorManager.queueTranslation(text, sourceLanguage, language, player, index)
 
                 translationsToSend[language] = translated
