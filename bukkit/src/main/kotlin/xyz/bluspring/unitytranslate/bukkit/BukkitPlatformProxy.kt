@@ -83,14 +83,14 @@ class BukkitPlatformProxy(val plugin: UnityTranslateBukkit) : PlatformProxy(plug
     }
 
     override fun sendPacketServer(player: UUID, packet: UTPacket) {
-        val definition = PacketIds.getPacketDefinition(packet)
+        val definition = PacketIds.getPacketDefinition(packet, PacketBuilder.Direction.CLIENTBOUND)
         val writer = serializePacket(definition, packet)
 
         Bukkit.getPlayer(player)?.sendPluginMessage(plugin, definition.id.asPacketId(), writer.asByteArray())
     }
 
     override fun broadcastPacketServer(packet: UTPacket) {
-        val definition = PacketIds.getPacketDefinition(packet)
+        val definition = PacketIds.getPacketDefinition(packet, PacketBuilder.Direction.SERVERBOUND)
         val writer = serializePacket(definition, packet)
 
         for (player in Bukkit.getOnlinePlayers()) {

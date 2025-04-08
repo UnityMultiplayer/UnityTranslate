@@ -1,6 +1,7 @@
 package xyz.bluspring.unitytranslate.common.translator
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.asFlow
 import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.config.UnityTranslateConfig
@@ -10,6 +11,8 @@ import xyz.bluspring.unitytranslate.common.translator.instances.LocalTranslation
 import xyz.bluspring.unitytranslate.common.translator.instances.TranslationInstance
 import xyz.bluspring.unitytranslate.common.util.IgnoredException
 import xyz.bluspring.unitytranslate.common.util.nativeaccess.CudaHelper
+import xyz.bluspring.unitytranslate.library.util.collect
+import xyz.bluspring.unitytranslate.library.util.concurrent
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -76,6 +79,16 @@ class TranslatorManager(val instance: UnityTranslate) {
 
                 for (offloadServer in offloadServers) {
                     list.add(LibreTranslateInstance(instance, offloadServer.url, offloadServer.weight, offloadServer.authKey))
+                }
+            }
+        }
+
+        runBlocking(Dispatchers.IO) {
+            instance.library.packageIndex.indexList.asFlow().concurrent().collect { index ->
+                index.packages.asFlow().concurrent().collect { pkg ->
+                    UnityTranslate.logger.info("Downloading package ${pkg.fromCode}-${pkg.toCode}")
+                    index.getOrDownloadModelInfos(pkg.fromCode, pkg.toCode)
+                    UnityTranslate.logger.info("Downloaded package ${pkg.fromCode}-${pkg.toCode}")
                 }
             }
         }

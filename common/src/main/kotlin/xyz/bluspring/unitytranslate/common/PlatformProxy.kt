@@ -75,4 +75,8 @@ open class PlatformProxy(val instance: UnityTranslate) {
     open fun queue(runnable: Runnable) {
         runnable.run()
     }
+
+    open fun handleTranscriptClient(uuid: UUID, language: Language, index: Int, updateTime: Long, toSend: Map<Language, String>) {
+        throw IllegalStateException("Not abstracted!")
+    }
 }

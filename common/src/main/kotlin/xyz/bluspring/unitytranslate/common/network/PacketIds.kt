@@ -39,10 +39,10 @@ object PacketIds {
     val definitions = listOf(V0Packets, V1Packets)
     @JvmField val PROTOCOL_VERSION = definitions.size - 1
 
-    fun <T : UTPacket> getPacketDefinition(packet: T): PacketBuilder<T> {
+    fun <T : UTPacket> getPacketDefinition(packet: T, direction: PacketBuilder.Direction): PacketBuilder<T> {
         for (definition in definitions) {
             for (builder in definition.packets) {
-                if (builder.constructor == packet::class.constructors.first()) {
+                if (builder.constructor == packet::class.constructors.first() && builder.direction == direction) {
                     return builder as PacketBuilder<T>
                 }
             }

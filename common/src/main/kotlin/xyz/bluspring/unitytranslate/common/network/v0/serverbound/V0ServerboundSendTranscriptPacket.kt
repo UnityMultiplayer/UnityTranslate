@@ -19,7 +19,7 @@ data class V0ServerboundSendTranscriptPacket(val sourceLanguage: Language, val t
             instance.translatorManager.scope.launch(start = CoroutineStart.UNDISPATCHED) {
                 val translated = instance.translatorManager.queueTranslation(text, sourceLanguage, language, player, index)
 
-                translationsToSend[language] = translated
+                translationsToSend[language] = translated ?: text
 
                 instance.proxy.queue {
                     if (translationsToSend.isEmpty())

@@ -11,10 +11,14 @@ import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.util.FormattedCharSequence
 import xyz.bluspring.unitytranslate.common.Language
+import xyz.bluspring.unitytranslate.common.UnityTranslate
+import xyz.bluspring.unitytranslate.common.network.v0.serverbound.V0SetCurrentLanguagePacket
+import xyz.bluspring.unitytranslate.common.network.v0.serverbound.V0SetUsedLanguagesPacket
 import xyz.bluspring.unitytranslate.minecraft.MinecraftProxy
 import xyz.bluspring.unitytranslate.minecraft.MinecraftProxy.text
 import xyz.bluspring.unitytranslate.minecraft.client.UnityTranslateClientConfig
 import xyz.bluspring.unitytranslate.minecraft.client.UnityTranslateMCClient
+import java.util.*
 
 class LanguageSelectScreen(val parent: Screen?, val isAddingBox: Boolean) : Screen(MinecraftProxy.translatable("options.language")) {
     private lateinit var list: LanguageSelectionList
@@ -67,12 +71,14 @@ class LanguageSelectScreen(val parent: Screen?, val isAddingBox: Boolean) : Scre
 
             Minecraft.getInstance().execute {
                 UnityTranslateMCClient.clientConfig.transcriptBoxes.add(UnityTranslateClientConfig.TranscriptBoxConfig(language))
+                UnityTranslate.instance.proxy.sendPacketClient(V0SetUsedLanguagesPacket(EnumSet.copyOf(UnityTranslateMCClient.transcriptHolders.keys)))
                 UnityTranslateMCClient.instance.saveConfig()
                 UnityTranslateMCClient.instance.updateConfig()
             }
         } else {
             UnityTranslateMCClient.clientConfig.spokenLanguage = language
             UnityTranslateMCClient.transcriber.changeLanguage(language)
+            UnityTranslate.instance.proxy.sendPacketClient(V0SetCurrentLanguagePacket(language))
             UnityTranslateMCClient.instance.saveConfig()
             UnityTranslateMCClient.instance.updateConfig()
         }

@@ -54,11 +54,11 @@ class UnityTranslateMCClient {
 
         ClientPlayerEvent.CLIENT_PLAYER_JOIN.register { player ->
             Minecraft.getInstance().execute {
-                if (transcriptHolders.isEmpty())
-                    return@execute
-
-                UnityTranslate.instance.proxy.sendPacketClient(V0SetUsedLanguagesPacket(EnumSet.copyOf(transcriptHolders.keys)))
                 UnityTranslate.instance.proxy.sendPacketClient(V0SetCurrentLanguagePacket(clientConfig.spokenLanguage))
+
+                if (transcriptHolders.isNotEmpty()) {
+                    UnityTranslate.instance.proxy.sendPacketClient(V0SetUsedLanguagesPacket(EnumSet.copyOf(transcriptHolders.keys)))
+                }
             }
         }
 
