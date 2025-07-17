@@ -7,6 +7,7 @@ import xyz.bluspring.unitytranslate.common.config.FloatRange
 import xyz.bluspring.unitytranslate.common.config.Hidden
 import xyz.bluspring.unitytranslate.common.config.IntRange
 import xyz.bluspring.unitytranslate.common.transcriber.TranscriberType
+import xyz.bluspring.unitytranslate.common.util.TranslatableEnum
 import xyz.bluspring.unitytranslate.transcriber.whisper.WhisperModel
 
 @Serializable
@@ -34,7 +35,9 @@ data class UnityTranslateClientConfig(
     var disappearingTextDelay: Float = 20.0f,
     @get:DependsOn("disappearingText")
     @get:FloatRange(from = 0.0f, to = 5.0f, increment = 0.1f)
-    var disappearingTextFade: Float = 0.5f
+    var disappearingTextFade: Float = 0.5f,
+
+    var isDarkMode: Boolean = true
 ) {
     @Serializable
     data class TranscriptBoxConfig(
@@ -71,9 +74,11 @@ data class UnityTranslateClientConfig(
         TOP_EDGE, CENTER, BOTTOM_EDGE
     }
 
-    enum class ClientTranslation {
+    enum class ClientTranslation : TranslatableEnum {
         ENABLED,
         ENABLED_IF_CUDA,
-        DISABLED
+        DISABLED;
+
+        override val translationKey = "config.unitytranslate.client.clientTranslation.${this.name.lowercase()}"
     }
 }

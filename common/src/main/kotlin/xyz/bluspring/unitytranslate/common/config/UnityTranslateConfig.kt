@@ -1,6 +1,7 @@
 package xyz.bluspring.unitytranslate.common.config
 
 import kotlinx.serialization.Serializable
+import xyz.bluspring.unitytranslate.common.util.TranslatableEnum
 
 @Serializable
 data class UnityTranslateConfig(
@@ -59,7 +60,7 @@ data class UnityTranslateConfig(
         TRUE, FALSE, DEFAULT
     }
 
-    enum class TranslationPriority {
+    enum class TranslationPriority : TranslatableEnum {
         SERVER_GPU,
         SERVER_CPU,
         CLIENT_GPU,
@@ -74,5 +75,7 @@ data class UnityTranslateConfig(
 
         val isCuda: Boolean
             get() = this == SERVER_GPU || this == CLIENT_GPU
+
+        override val translationKey = "config.unitytranslate.server.translatePriority.${this.name.lowercase()}"
     }
 }
