@@ -1,14 +1,9 @@
 package xyz.bluspring.unitytranslate.common.network
 
-import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
-import org.apache.commons.codec.language.bm.Lang
 import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.common.UnityTranslate
-import xyz.bluspring.unitytranslate.common.config.UnityTranslateConfig
-import xyz.bluspring.unitytranslate.common.network.v0.clientbound.V0ClientboundSendTranscriptPacket
-import xyz.bluspring.unitytranslate.common.network.v0.clientbound.V0MarkIncompletePacket
-import xyz.bluspring.unitytranslate.common.util.Permissions
+import xyz.bluspring.unitytranslate.common.network.v1.clientbound.V1ClientboundSendTranscriptPacket
+import xyz.bluspring.unitytranslate.common.network.v1.clientbound.V1MarkIncompletePacket
 import java.util.EnumSet
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -25,26 +20,19 @@ class UTServerNetworking(val instance: UnityTranslate) {
     }
 
     fun broadcastTranslations(uuid: UUID, sourceLanguage: Language, index: Int, updateTime: Long, translations: Map<Language, String?>, originalLine: String) {
-        if (instance.voiceChat != null) {
-            val nearby = instance.voiceChat!!.getNearbyPlayers(uuid)
+        val players = if (instance.voiceChat != null)
+            instance.voiceChat!!.getNearbyPlayers(uuid)
+        else
+            instance.proxy.getAllPlayersInLevel(uuid)
 
-            for (player in nearby) {
-                if (instance.voiceChat!!.isPlayerDeafened(player) && player != uuid)
-                    continue
+        for (player in players) {
+            if (instance.voiceChat?.isPlayerDeafened(player) == true)
+                continue
 
-                instance.proxy.sendPacketServer(player, V0ClientboundSendTranscriptPacket(uuid, sourceLanguage, index, updateTime, translations.mapValues { it.value ?: originalLine }))
+            instance.proxy.sendPacketServer(player, V1ClientboundSendTranscriptPacket(uuid, sourceLanguage, index, updateTime, translations.mapValues { it.value ?: originalLine }))
 
-                translations.filter { it.value == null }.forEach { lang, _ ->
-                    instance.proxy.sendPacketServer(player, V0MarkIncompletePacket(sourceLanguage, lang, uuid, index, true))
-                }
-            }
-        } else {
-            for (player in instance.proxy.getAllPlayersInLevel(uuid)) {
-                instance.proxy.sendPacketServer(player, V0ClientboundSendTranscriptPacket(uuid, sourceLanguage, index, updateTime, translations.mapValues { it.value ?: originalLine }))
-
-                translations.filter { it.value == null }.forEach { lang, _ ->
-                    instance.proxy.sendPacketServer(player, V0MarkIncompletePacket(sourceLanguage, lang, uuid, index, true))
-                }
+            translations.filter { it.value == null }.forEach { lang, _ ->
+                instance.proxy.sendPacketServer(player, V1MarkIncompletePacket(uuid, sourceLanguage, lang, index, true))
             }
         }
     }

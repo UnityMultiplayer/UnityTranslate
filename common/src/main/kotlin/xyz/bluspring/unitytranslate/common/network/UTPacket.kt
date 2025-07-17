@@ -1,9 +1,10 @@
 package xyz.bluspring.unitytranslate.common.network
 
+import xyz.bluspring.modernnetworking.api.NetworkPacket
 import xyz.bluspring.unitytranslate.common.UnityTranslate
 import java.util.*
 
-interface UTPacket {
+interface UTPacket : NetworkPacket {
     val instance: UnityTranslate
         get() = UnityTranslate.instance
 

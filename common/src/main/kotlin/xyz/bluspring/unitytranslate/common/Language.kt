@@ -1,12 +1,13 @@
 package xyz.bluspring.unitytranslate.common
 
+import xyz.bluspring.modernnetworking.api.NetworkCodecs
 import xyz.bluspring.unitytranslate.common.transcriber.TranscriberType
 
 enum class Language(
     val code: String,
     val supportedTranscribers: Map<TranscriberType, String>
 ) {
-    // Any languages that don't have translation support in LibreTranslate should not be supported here.
+    // Any languages that don't have translation support in LibreTranslate or Argos Translate should not be supported here.
     // Use this for reference for the Browser Transcriber: https://r12a.github.io/app-subtags/
     ENGLISH("en", mapOf(
         TranscriberType.SPHINX to "en-us",
@@ -192,6 +193,8 @@ enum class Language(
     val translationKey = "unitytranslate.language.$code"
 
     companion object {
+        val NETWORK_CODEC = NetworkCodecs.enumCodec(Language::class.java)
+
         fun findLibreLang(code: String): Language? {
             return Language.entries.firstOrNull { it.code == code }
         }

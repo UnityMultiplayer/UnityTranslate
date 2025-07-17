@@ -1,6 +1,6 @@
 name: UnityTranslate
 main: xyz.bluspring.unitytranslate.bukkit.UnityTranslateBukkit
-version: ${version}
+version: ${mod_version}
 description: A mod designed for free live translation, inspired by the QSMP. Mainly created for the Unity Multiplayer server, and for public release towards the multilingual Minecraft community.
 # We should launch as early as possible to make sure everything gets initialized quickly.
 load: STARTUP
@@ -11,3 +11,4 @@ website: https://bluspring.xyz
 # as we're not really messing with NMS. If any future versions break with this, then we should make a separate
 # package for it.
 api-version: '1.16'
+depends: [ModernNetworking]

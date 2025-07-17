@@ -1,9 +1,12 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    id("dev.deftu.gradle.tools.shadow")
-    kotlin("jvm") apply false
-    kotlin("plugin.serialization") apply false
+    id("dev.architectury.loom") version "1.10-SNAPSHOT" apply false
+    id("architectury-plugin") version "3.4-SNAPSHOT" apply false
+    id("me.modmuss50.mod-publish-plugin") version "0.7.+" apply false
+    id("com.gradleup.shadow") version "8.3.5" apply false
+    kotlin("jvm") version "2.2.0" apply false
+    kotlin("plugin.serialization") version "2.2.0" apply false
 }
 
 allprojects {
@@ -36,49 +39,53 @@ allprojects {
 
         maven("https://mvn.devos.one/releases")
         maven("https://mvn.devos.one/snapshots")
+
+        maven("https://repo.essential.gg/repository/maven-public")
     }
 }
 
 subprojects {
-    if (project.name == "minecraft")
+    if (project.name == "minecraft" || project.name == "fabric" || project.name == "forge" || project.name == "neoforge")
         return@subprojects
 
     apply(plugin = "java")
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
-    apply(plugin = "dev.deftu.gradle.tools.shadow")
+    apply(plugin = "com.gradleup.shadow")
+
+    val shade by configurations.creating
 
     dependencies {
         if (project.name != "common") {
-            shade(implementation(project(":common"))!!)
+            shade("implementation"(project(":common"))!!)
         }
 
         // Voice Chat APIs
-        implementation("de.maxhenkel.voicechat:voicechat-api:${rootProject.property("voicechat_api_version")}")
-        compileOnly("su.plo.voice.api:server:${rootProject.property("plasmo_api_version")}")
-        compileOnly("su.plo.voice.api:client:${rootProject.property("plasmo_api_version")}")
+        "implementation"("de.maxhenkel.voicechat:voicechat-api:${mod.dep("voicechat_api")}")
+        "compileOnly"("su.plo.voice.api:server:${mod.dep("plasmo_api")}")
+        "compileOnly"("su.plo.voice.api:client:${mod.dep("plasmo_api")}")
 
         // Kotlin
         if (!project.name.contains("fabric")) { // Fabric has FLK, but KFF is unreliable and Bukkit doesn't have a commonly-used Kotlin provider
-            shade("org.jetbrains.kotlin:kotlin-reflect:${rootProject.property("kotlin_version")}")
-            shade("org.jetbrains.kotlin:kotlin-stdlib:${rootProject.property("kotlin_version")}")
-            shade("org.jetbrains.kotlin:kotlin-stdlib-jdk7:${rootProject.property("kotlin_version")}")
-            shade("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.property("kotlin_version")}")
-            shade("org.jetbrains.kotlinx:kotlinx-coroutines-core:${rootProject.property("kotlin_coroutines_version")}")
-            shade("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:${rootProject.property("kotlin_coroutines_version")}")
-            shade("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${rootProject.property("kotlin_coroutines_version")}")
-            shade("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:${rootProject.property("kotlin_serialization_version")}")
-            shade("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:${rootProject.property("kotlin_serialization_version")}")
+            shade("org.jetbrains.kotlin:kotlin-reflect:${mod.dep("kotlin")}")
+            shade("org.jetbrains.kotlin:kotlin-stdlib:${mod.dep("kotlin")}")
+            shade("org.jetbrains.kotlin:kotlin-stdlib-jdk7:${mod.dep("kotlin")}")
+            shade("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${mod.dep("kotlin")}")
+            shade("org.jetbrains.kotlinx:kotlinx-coroutines-core:${mod.dep("kotlin_coroutines")}")
+            shade("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:${mod.dep("kotlin_coroutines")}")
+            shade("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${mod.dep("kotlin_coroutines")}")
+            shade("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:${mod.dep("kotlin_serialization")}")
+            shade("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:${mod.dep("kotlin_serialization")}")
         }
 
         // UnityTranslateLib
-        shade(implementation("xyz.bluspring.unitytranslate:UnityTranslateLib:${rootProject.property("unitytranslatelib_version")}")!!)
-        shade(implementation("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-windows-amd64:${rootProject.property("unitytranslatelib_version")}")!!)
-        shade(implementation("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-linux-amd64:${rootProject.property("unitytranslatelib_version")}")!!)
+        shade("implementation"("xyz.bluspring.unitytranslate:UnityTranslateLib:${mod.dep("unitytranslatelib")}")!!)
+        shade("implementation"("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-windows-amd64:${mod.dep("unitytranslatelib")}")!!)
+        shade("implementation"("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-linux-amd64:${mod.dep("unitytranslatelib")}")!!)
     }
 
     tasks {
-        named<ShadowJar>("fatJar") {
+        named<ShadowJar>("shadowJar") {
             val shadowPkg = "xyz.bluspring.unitytranslate.shaded"
 
             relocate("org.jetbrains", "$shadowPkg.jetbrains")
@@ -86,7 +93,7 @@ subprojects {
             relocate("kotlinx", "$shadowPkg.kotlinx")
         }
 
-        processResources {
+        named<ProcessResources>("processResources") {
             val properties = mutableMapOf<String, String>()
 
             properties["mod_version"] = rootProject.property("mod.version") as String

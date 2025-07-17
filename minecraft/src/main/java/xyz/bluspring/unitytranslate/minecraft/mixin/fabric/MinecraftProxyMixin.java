@@ -12,10 +12,10 @@ import java.nio.file.Path;
 @Mixin(MinecraftProxy.class)
 @IfModLoaded("fabricloader")
 public abstract class MinecraftProxyMixin {
-    //#if FABRIC
+    //? if fabric {
     @Overwrite(remap = false)
     public Path getConfigPath() {
         return FabricLoader.getInstance().getConfigDir();
     }
-    //#endif
+    //?}
 }

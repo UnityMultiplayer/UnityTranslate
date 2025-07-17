@@ -1,11 +1,11 @@
 [versions]
 # Kotlin - https://github.com/FabricMC/fabric-language-kotlin/blob/master/generated/library_versions.json
-kotlin = "2.1.10"
-kotlin_coroutines = "1.10.1"
-kotlin_serialization = "1.8.0"
-kotlin_atomicfu = "0.27.0"
-kotlin_datetime = "0.6.1"
-kotlin_io = "0.6.0"
+kotlin = "2.2.0"
+kotlin_coroutines = "1.10.2"
+kotlin_serialization = "1.8.1"
+kotlin_atomicfu = "0.28.0"
+kotlin_datetime = "0.6.2"
+kotlin_io = "0.7.0"
 
 [libraries]
 kotlin_stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }

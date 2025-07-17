@@ -3,15 +3,19 @@ dependencies {
     shade(api("org.apache.httpcomponents:httpcore:4.4.16")!!)
     shade(api("org.apache.httpcomponents:httpclient:4.5.13")!!)
 
-    shade(api("org.java-websocket:Java-WebSocket:${rootProject.property("java_websocket_version")}")!!)
-    shade(api("com.github.jnr:jnr-ffi:${rootProject.property("jnr_version")}")!!)
-    shade(api("io.github.givimad:whisper-jni:${rootProject.property("whisper_version")}")!!)
+    api("xyz.bluspring.modernnetworking:modernnetworking-api:${mod.dep("modernnetworking")}")
+    api("io.netty:netty-buffer:4.1.97.Final")
+    api("io.netty:netty-codec:4.1.97.Final")
+
+    shade(api("org.java-websocket:Java-WebSocket:${mod.dep("java_websocket")}")!!)
+    shade(api("com.github.jnr:jnr-ffi:${mod.dep("jnr")}")!!)
+    shade(api("io.github.givimad:whisper-jni:${mod.dep("whisper")}")!!)
 }
 
 
-tasks {
-    compileKotlin {
-        kotlinOptions.jvmTarget = "17"
+kotlin {
+    compilerOptions {
+        jvmToolchain(17)
     }
 }
 

@@ -12,7 +12,6 @@ import xyz.bluspring.unitytranslate.transcriber.whisper.WhisperModel
 @Serializable
 data class UnityTranslateClientConfig(
     var enabled: Boolean = true,
-    var openBrowserWithoutPrompt: Boolean = false,
     var muteTranscriptWhenVoiceChatMuted: Boolean = true,
 
     val transcriptBoxes: MutableList<TranscriptBoxConfig> = mutableListOf(),

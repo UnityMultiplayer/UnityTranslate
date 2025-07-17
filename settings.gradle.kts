@@ -9,19 +9,15 @@ pluginManagement {
         maven("https://maven.minecraftforge.net")
         maven("https://repo.essential.gg/repository/maven-public")
         maven("https://server.bbkr.space/artifactory/libs-release/")
+        maven("https://maven.kikugie.dev/releases")
         gradlePluginPortal()
         mavenCentral()
         mavenLocal()
     }
+}
 
-    plugins {
-        val dgtVersion = "2.26.0"
-
-        kotlin("jvm") version("2.0.10")
-        kotlin("plugin.serialization") version("2.0.10")
-        id("dev.deftu.gradle.multiversion-root") version(dgtVersion)
-        id("dev.deftu.gradle.tools.shadow") version(dgtVersion)
-    }
+plugins {
+    id("dev.kikugie.stonecutter") version("0.7")
 }
 
 val projectName: String = extra["mod.name"]?.toString()!!
@@ -29,38 +25,18 @@ rootProject.name = projectName
 
 include("bukkit", "common")
 
-include(":minecraft")
-project(":minecraft").buildFileName = "root.gradle.kts"
+stonecutter {
+    centralScript = "build.gradle.kts"
+    kotlinController = true
 
-val neoforgeVersion = "1.20.4"
-var hasNeoForge = false
+    create("minecraft") {
+        versions("1.18.2", "1.19.2", "1.20.1", "1.20.4", "1.20.6", "1.21.1", "1.21.3", "1.21.4", "1.21.5", "1.21.6")
+        vcsVersion = "1.20.4"
 
-listOf(
-    //"1.16.5",
-    "1.18.2", "1.19.2",
-    "1.20.1", "1.20.4", "1.20.6",
-    "1.21.1", "1.21.3", "1.21.4"
-).forEach { version ->
-    if (version == neoforgeVersion)
-        hasNeoForge = true
-
-    include(":minecraft:$version-fabric")
-    project(":minecraft:$version-fabric").apply {
-        projectDir = file("minecraft/versions/$version/fabric")
-        buildFileName = "../../../build.gradle.kts"
-    }
-
-    include(":minecraft:$version-forge")
-    project(":minecraft:$version-forge").apply {
-        projectDir = file("minecraft/versions/$version/forge")
-        buildFileName = "../../../build.gradle.kts"
-    }
-
-    if (hasNeoForge) {
-        include(":minecraft:$version-neoforge")
-        project(":minecraft:$version-neoforge").apply {
-            projectDir = file("minecraft/versions/$version/neoforge")
-            buildFileName = "../../../build.gradle.kts"
+        branch("fabric")
+        branch("forge")
+        branch("neoforge") {
+            versions("1.20.4", "1.20.6", "1.21.1", "1.21.3", "1.21.4", "1.21.5", "1.21.6")
         }
     }
 }

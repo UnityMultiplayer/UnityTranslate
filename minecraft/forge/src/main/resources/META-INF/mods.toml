@@ -1,0 +1,38 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="MIT"
+issueTrackerURL="https://github.com/BluSpring/UnityTranslate/issues"
+
+[[mods]]
+    modId="unitytranslate"
+    version="${mod_version}"
+    displayName="UnityTranslate"
+    logoFile= "icon.png"
+    authors="BluSpring"
+    description='''
+    A mod designed for free live translation, inspired by the QSMP. Mainly created for the Unity Multiplayer server, and for public release towards the multilingual Minecraft community.
+    '''
+
+[[dependencies.unitytranslate]]
+modId="forge"
+mandatory=true
+versionRange="[1,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.unitytranslate]]
+modId="minecraft"
+mandatory=true
+versionRange="[${mc_version},)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.unitytranslate]]
+modId="modernnetworking"
+mandatory=true
+versionRange="[${modernnetworking_version},)"
+ordering="NONE"
+side="BOTH"
+
+[[mixins]]
+config = "unitytranslate.mixins.json"

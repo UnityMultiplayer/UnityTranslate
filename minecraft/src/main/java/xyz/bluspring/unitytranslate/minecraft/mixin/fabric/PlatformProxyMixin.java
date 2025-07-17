@@ -12,7 +12,7 @@ import xyz.bluspring.unitytranslate.common.UnityTranslate;
 @Mixin(value = PlatformProxy.class, remap = false)
 @IfModLoaded("fabricloader")
 public abstract class PlatformProxyMixin {
-    //#if FABRIC
+    //? if fabric {
     @Overwrite
     public boolean isClient() {
         return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
@@ -27,5 +27,5 @@ public abstract class PlatformProxyMixin {
     public String getModVersion() {
         return FabricLoader.getInstance().getModContainer(UnityTranslate.MOD_ID).orElseThrow().getMetadata().getVersion().getFriendlyString();
     }
-    //#endif
+    //?}
 }

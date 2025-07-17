@@ -1,11 +1,6 @@
 package xyz.bluspring.unitytranslate.minecraft.client
 
 import com.mojang.blaze3d.vertex.PoseStack
-import dev.architectury.event.events.client.ClientGuiEvent
-import dev.architectury.event.events.client.ClientLifecycleEvent
-import dev.architectury.event.events.client.ClientPlayerEvent
-import dev.architectury.event.events.client.ClientTickEvent
-import dev.architectury.registry.ReloadListenerRegistry
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -14,24 +9,22 @@ import net.minecraft.ChatFormatting
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.network.chat.Component
-import net.minecraft.server.packs.PackType
 import org.lwjgl.glfw.GLFW
 import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.UnityTranslate.Companion.json
 import xyz.bluspring.unitytranslate.common.UnityTranslate.Companion.logger
-import xyz.bluspring.unitytranslate.common.network.v0.serverbound.V0SetCurrentLanguagePacket
-import xyz.bluspring.unitytranslate.common.network.v0.serverbound.V0SetUsedLanguagesPacket
+import xyz.bluspring.unitytranslate.common.network.v1.serverbound.V1SetLanguagePreferencesPacket
 import xyz.bluspring.unitytranslate.common.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.common.translator.Transcript
 import xyz.bluspring.unitytranslate.common.util.nativeaccess.CudaHelper
 import xyz.bluspring.unitytranslate.minecraft.MinecraftProxy
-import xyz.bluspring.unitytranslate.minecraft.client.gui.EditTranscriptBoxesScreen
-import xyz.bluspring.unitytranslate.minecraft.client.gui.LanguageSelectScreen
 import xyz.bluspring.unitytranslate.minecraft.client.gui.TranscriptBoxRenderer
 import xyz.bluspring.unitytranslate.minecraft.client.gui.UTConfigScreen
-import xyz.bluspring.unitytranslate.minecraft.client.resources.UTResourceReloadListener
+import xyz.bluspring.unitytranslate.minecraft.client.gui.screens.EditTranscriptBoxesScreen
+import xyz.bluspring.unitytranslate.minecraft.client.gui.screens.LanguageSelectScreen
 import xyz.bluspring.unitytranslate.minecraft.events.TranscriptEvents
 import xyz.bluspring.unitytranslate.minecraft.network.UTClientNetworkSender
 import java.util.*
@@ -44,62 +37,65 @@ class UnityTranslateMCClient {
         instance = this
 
         loadConfig()
-        ClientLifecycleEvent.CLIENT_STARTED.register {
-            updateConfig()
-        }
+    }
 
-        ClientLifecycleEvent.CLIENT_STOPPING.register {
-            transcriber.stop()
-        }
+    fun onClientStarted() {
+        updateConfig()
+    }
 
-        ClientPlayerEvent.CLIENT_PLAYER_JOIN.register { player ->
-            Minecraft.getInstance().execute {
-                UnityTranslate.instance.proxy.sendPacketClient(V0SetCurrentLanguagePacket(clientConfig.spokenLanguage))
+    fun onClientStopping() {
+        transcriber.stop()
+    }
 
-                if (transcriptHolders.isNotEmpty()) {
-                    UnityTranslate.instance.proxy.sendPacketClient(V0SetUsedLanguagesPacket(EnumSet.copyOf(transcriptHolders.keys)))
-                }
+    fun onClientPlayerJoin(player: AbstractClientPlayer) {
+        Minecraft.getInstance().execute {
+            val languages = EnumSet.copyOf(transcriptHolders.keys)
+
+            if (transcriptHolders.isNotEmpty()) {
+                UnityTranslate.instance.proxy.sendPacketClient(V1SetLanguagePreferencesPacket(languages))
             }
         }
+    }
 
-        ClientPlayerEvent.CLIENT_PLAYER_QUIT.register { player ->
+    fun onRenderHud(poseStack: PoseStack, delta: Float) {
+        transcriptRenderer.render(poseStack, delta)
+    }
 
+    fun onClientEndTick() {
+        val mc = Minecraft.getInstance()
+
+        if (OPEN_CONFIG_GUI.consumeClick()) {
+            mc.setScreen(UTConfigScreen(mc.screen))
         }
 
-        ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, UTResourceReloadListener())
-
-        ClientGuiEvent.RENDER_HUD.register { poseStack, delta ->
-            transcriptRenderer.render(poseStack)
+        if (CONFIGURE_BOXES.consumeClick()) {
+            mc.setScreen(EditTranscriptBoxesScreen(mc.screen))
         }
 
-        ClientTickEvent.CLIENT_POST.register { mc ->
-            if (OPEN_CONFIG_GUI.consumeClick()) {
-                mc.setScreen(UTConfigScreen(mc.screen))
-            }
+        if (TOGGLE_TRANSCRIPTION.consumeClick()) {
+            isMuted = !isMuted
+        }
 
-            if (CONFIGURE_BOXES.consumeClick()) {
-                mc.setScreen(EditTranscriptBoxesScreen(clientConfig.transcriptBoxes, mc.screen))
-            }
+        if (TOGGLE_BOXES.consumeClick()) {
+            shouldRenderBoxes = !shouldRenderBoxes
+        }
 
-            if (TOGGLE_TRANSCRIPTION.consumeClick()) {
-                isMuted = !isMuted
-            }
+        if (SET_SPOKEN_LANGUAGE.consumeClick()) {
+            mc.setScreen(LanguageSelectScreen(mc.screen) {
+                clientConfig.spokenLanguage = it
+                saveConfig()
+                updateConfig()
+            })
+        }
 
-            if (TOGGLE_BOXES.consumeClick()) {
-                shouldRenderBoxes = !shouldRenderBoxes
-            }
-
-            if (SET_SPOKEN_LANGUAGE.consumeClick()) {
-                mc.setScreen(LanguageSelectScreen(mc.screen, false))
-            }
-
-            if (CLEAR_TRANSCRIPTS.consumeClick()) {
-                // TODO: impl
-            }
-
+        if (CLEAR_TRANSCRIPTS.consumeClick()) {
             for ((_, holder) in transcriptHolders) {
-                holder.tick()
+                holder.transcripts.clear()
             }
+        }
+
+        for ((_, holder) in transcriptHolders) {
+            holder.tick()
         }
     }
 
@@ -205,6 +201,7 @@ class UnityTranslateMCClient {
         var isMuted = false
         var useClientTranslations = false
         var shouldRenderBoxes = true
+        var serverHasTranslations = false
 
         val transcriptRenderer = TranscriptBoxRenderer()
         val transcriptHolders = mutableMapOf<Language, TranscriptHolder>()
@@ -251,8 +248,8 @@ class UnityTranslateMCClient {
             val version = UnityTranslate.instance.proxy.modVersion
             val font = Minecraft.getInstance().font
 
-            Screen.drawString(poseStack, font, "UnityTranslate v$version", 2, Minecraft.getInstance().window.guiScaledHeight - (font.lineHeight * 2) - 4, 16777215)
-            Screen.drawString(poseStack, font, MinecraftProxy.translatable("unitytranslate.credit.author"), 2, Minecraft.getInstance().window.guiScaledHeight - font.lineHeight - 2, 16777215)
+            //Screen.drawString(poseStack, font, "UnityTranslate v$version", 2, Minecraft.getInstance().window.guiScaledHeight - (font.lineHeight * 2) - 4, 16777215)
+            //Screen.drawString(poseStack, font, MinecraftProxy.translatable("unitytranslate.credit.author"), 2, Minecraft.getInstance().window.guiScaledHeight - font.lineHeight - 2, 16777215)
         }
     }
 }

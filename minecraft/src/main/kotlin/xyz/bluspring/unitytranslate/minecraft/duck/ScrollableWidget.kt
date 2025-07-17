@@ -15,10 +15,10 @@ interface ScrollableWidget {
     @JvmName("unityTranslate\$updateInitialPosition")
     fun updateInitialPosition()
 
-    //#if MC < 1.20.1
+    //? if < 1.20.1 {
     @Suppress("INAPPLICABLE_JVM_NAME")
     @get:JvmName("unityTranslate\$getTooltip")
     @set:JvmName("unityTranslate\$setTooltip")
     var tooltip: Component?
-    //#endif
+    //?}
 }

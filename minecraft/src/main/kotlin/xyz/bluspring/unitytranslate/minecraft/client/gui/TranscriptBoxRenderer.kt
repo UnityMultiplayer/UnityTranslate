@@ -21,17 +21,19 @@ class TranscriptBoxRenderer {
         get() = Minecraft.getInstance().window.guiScaledHeight
 
     fun render(
-        poseStack: PoseStack
+        poseStack: PoseStack,
+        tickDelta: Float
     ) {
         val boxes = UnityTranslateMCClient.clientConfig.transcriptBoxes
 
         for (box in boxes) {
-            renderBox(box, poseStack)
+            renderBox(box, poseStack, tickDelta)
         }
     }
 
     fun renderBox(box: UnityTranslateClientConfig.TranscriptBoxConfig,
-                  poseStack: PoseStack
+                  poseStack: PoseStack,
+                  tickDelta: Float
     ) {
         val font = Minecraft.getInstance().font
         val scale = box.textScale / 100f

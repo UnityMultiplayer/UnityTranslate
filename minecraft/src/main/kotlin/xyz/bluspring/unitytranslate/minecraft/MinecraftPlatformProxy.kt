@@ -1,39 +1,26 @@
 package xyz.bluspring.unitytranslate.minecraft
 
-import me.lucko.fabric.api.permissions.v0.Permissions
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
+import net.minecraft.server.level.ServerPlayer
+import xyz.bluspring.modernnetworking.api.minecraft.VanillaPacketSender
 import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.common.PlatformProxy
-import xyz.bluspring.unitytranslate.common.network.PacketBuilder
-import xyz.bluspring.unitytranslate.common.network.PacketIds
+import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.network.UTPacket
-import xyz.bluspring.unitytranslate.minecraft.MinecraftProxy.asPacketResource
 import xyz.bluspring.unitytranslate.minecraft.client.UnityTranslateMCClient
 import java.util.*
 
-class MinecraftPlatformProxy : PlatformProxy(UnityTranslateMC.instance) {
+abstract class MinecraftPlatformProxy : PlatformProxy(UnityTranslate.instance) {
     override fun serverSupportsTranslations(): Boolean {
-        return true
-    }
-
-    override fun hasPermission(uuid: UUID, permission: String): Boolean {
-        //#if FABRIC
-        val player = MinecraftProxy.getPlayer(uuid) ?: return false
-        return Permissions.check(player, permission, true)
-        //#endif
+        return if (isClient())
+            UnityTranslateMCClient.serverHasTranslations
+        else
+            true
     }
 
     override fun sendPacketServer(player: UUID, packet: UTPacket) {
-        //#if MC <= 1.20.4
-        val definition = PacketIds.getPacketDefinition(packet, PacketBuilder.Direction.CLIENTBOUND)
-        val buf = MinecraftProxy.buildPacket(definition, packet)
-
-        ServerPlayNetworking.send(MinecraftProxy.server.playerList.getPlayer(player), definition.id.asPacketResource(), buf)
-        //#else
-
-        //#endif
+        VanillaPacketSender.sendToPlayer(MinecraftProxy.getPlayer(player) as? ServerPlayer ?: return, packet)
     }
 
     override fun setClientPlayerLanguage(language: Language) {
@@ -62,12 +49,37 @@ class MinecraftPlatformProxy : PlatformProxy(UnityTranslateMC.instance) {
     }
 
     override fun sendPacketClient(packet: UTPacket) {
-        //#if MC <= 1.20.4
-        val definition = PacketIds.getPacketDefinition(packet, PacketBuilder.Direction.SERVERBOUND)
-        val buf = MinecraftProxy.buildPacket(definition, packet)
-        ClientPlayNetworking.send(definition.id.asPacketResource(), buf)
-        //#else
+        VanillaPacketSender.sendToServer(packet)
+    }
 
-        //#endif
+    override fun doesPlayerExist(uuid: UUID): Boolean {
+        return MinecraftProxy.getPlayer(uuid) != null
+    }
+
+    override fun getTranslation(key: String, vararg args: String): String {
+        return MinecraftProxy.translatable(key, *args).string
+    }
+
+    override fun canHearPlayer(player: UUID, other: UUID): Boolean {
+        val first = MinecraftProxy.getPlayer(player) ?: return false
+        val second = MinecraftProxy.getPlayer(player) ?: return false
+
+        return (first.isSpectator == second.isSpectator) || (first.isSpectator && !second.isSpectator)
+    }
+
+    override fun getSqDistance(player: UUID, other: UUID): Double {
+        val first = MinecraftProxy.getPlayer(player) ?: return 32767.0
+        val second = MinecraftProxy.getPlayer(player) ?: return 32767.0
+
+        return first.distanceToSqr(second)
+    }
+
+    override fun getAllPlayersInLevel(player: UUID): List<UUID> {
+        return MinecraftProxy.getPlayer(player)?.level/*? if >= 1.20.1 {*//*()*//*?} */
+            ?.players()?.map { it.uuid } ?: emptyList()
+    }
+
+    override fun sendErrorMessage(player: UUID, message: String) {
+        MinecraftProxy.getPlayer(player)?.displayClientMessage(MinecraftProxy.literal(message).withStyle(ChatFormatting.RED), false)
     }
 }

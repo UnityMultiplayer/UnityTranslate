@@ -13,11 +13,12 @@ import xyz.bluspring.unitytranslate.common.network.UTServerNetworking
 import xyz.bluspring.unitytranslate.common.translator.TranslatorManager
 import xyz.bluspring.unitytranslate.library.UnityTranslateLib
 import java.nio.file.Path
+import java.util.ServiceLoader
 
 class UnityTranslate(val path: Path) {
     val configFile = path.resolve("unitytranslate.json").toFile()
     val library = UnityTranslateLib(path)
-    var proxy = PlatformProxy(this)
+    val proxy: PlatformProxy
     lateinit var config: UnityTranslateConfig
 
     val translatorManager = TranslatorManager(this)
@@ -27,6 +28,7 @@ class UnityTranslate(val path: Path) {
 
     init {
         instance = this
+        proxy = ServiceLoader.load(PlatformProxy::class.java).first()
     }
 
     fun init() {

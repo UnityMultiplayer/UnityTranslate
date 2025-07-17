@@ -16,13 +16,16 @@ interface UTVoiceChatCompat {
 
         val distanceSq = maxVoiceDistance * maxVoiceDistance
         return instance.proxy.getAllPlayersInLevel(source).filter {
-            (!isPlayerDeafened(it) && ((instance.proxy.getSqDistance(source, it) <= distanceSq && instance.proxy.areBothSpectator(source, it)) ||
+            (!isPlayerDeafened(it) && ((instance.proxy.getSqDistance(source, it) <= distanceSq && instance.proxy.canHearPlayer(source, it)) ||
                     playerSharesGroup(it, source)))
                 || source == it
         }
     }
 
     companion object {
-        val instance = UnityTranslate.instance
+        val instance: UnityTranslate
+            get() {
+                return UnityTranslate.instance
+            }
     }
 }

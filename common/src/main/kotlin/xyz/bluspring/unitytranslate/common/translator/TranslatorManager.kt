@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.asFlow
 import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.config.UnityTranslateConfig
-import xyz.bluspring.unitytranslate.common.network.v0.clientbound.V0MarkIncompletePacket
+import xyz.bluspring.unitytranslate.common.network.v1.clientbound.V1MarkIncompletePacket
 import xyz.bluspring.unitytranslate.common.translator.instances.LibreTranslateInstance
 import xyz.bluspring.unitytranslate.common.translator.instances.LocalTranslationInstance
 import xyz.bluspring.unitytranslate.common.translator.instances.TranslationInstance
@@ -85,7 +85,7 @@ class TranslatorManager(val instance: UnityTranslate) {
 
         runBlocking(Dispatchers.IO) {
             instance.library.packageIndex.indexList.asFlow().concurrent().collect { index ->
-                index.packages.asFlow().concurrent().collect { pkg ->
+                index.packages.asFlow().concurrent(4).collect { pkg ->
                     UnityTranslate.logger.info("Downloading package ${pkg.fromCode}-${pkg.toCode}")
                     index.getOrDownloadModelInfos(pkg.fromCode, pkg.toCode)
                     UnityTranslate.logger.info("Downloaded package ${pkg.fromCode}-${pkg.toCode}")
@@ -133,7 +133,7 @@ class TranslatorManager(val instance: UnityTranslate) {
                                             if (queuedTranslations.any { it.id == translation.id && it.queueTime > translation.queueTime } || translation.attempts > 3)
                                                 continue
 
-                                            instance.proxy.broadcastPacketServer(V0MarkIncompletePacket(translation.fromLang, translation.toLang, translation.playerUUID, translation.index, true))
+                                            instance.proxy.broadcastPacketServer(V1MarkIncompletePacket(translation.playerUUID, translation.fromLang, translation.toLang, translation.index, true))
                                             translation.attempts++
                                             queuedTranslations.add(translation)
                                         }
@@ -146,7 +146,7 @@ class TranslatorManager(val instance: UnityTranslate) {
 
                                     for ((index, string) in translated.withIndex()) {
                                         val translationObj = spliced[index]
-                                        instance.proxy.broadcastPacketServer(V0MarkIncompletePacket(translationObj.fromLang, translationObj.toLang, translationObj.playerUUID, translationObj.index, false))
+                                        instance.proxy.broadcastPacketServer(V1MarkIncompletePacket(translationObj.playerUUID, translationObj.fromLang, translationObj.toLang, translationObj.index, false))
                                         translationObj.job.complete(string)
                                     }
                                 }

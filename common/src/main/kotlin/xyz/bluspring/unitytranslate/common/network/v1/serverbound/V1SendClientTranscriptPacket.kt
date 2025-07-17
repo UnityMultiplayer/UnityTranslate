@@ -1,9 +1,16 @@
 package xyz.bluspring.unitytranslate.common.network.v1.serverbound
 
+import io.netty.buffer.ByteBuf
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
+import xyz.bluspring.modernnetworking.api.CompositeCodecs
+import xyz.bluspring.modernnetworking.api.NetworkCodecs
+import xyz.bluspring.modernnetworking.api.NetworkPacket
+import xyz.bluspring.modernnetworking.api.PacketDefinition
 import xyz.bluspring.unitytranslate.common.Language
+import xyz.bluspring.unitytranslate.common.network.ExtraCodecs
 import xyz.bluspring.unitytranslate.common.network.UTPacket
+import xyz.bluspring.unitytranslate.common.network.v1.V1Packets
 import xyz.bluspring.unitytranslate.common.util.Permissions
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -46,5 +53,18 @@ data class V1SendClientTranscriptPacket(
                 }
             }
         }
+    }
+
+    override val definition: PacketDefinition<out NetworkPacket, out ByteBuf>
+        get() = V1Packets.SEND_CLIENT_TRANSCRIPT
+
+    companion object {
+        val CODEC = CompositeCodecs.composite(
+            Language.NETWORK_CODEC, V1SendClientTranscriptPacket::sourceLanguage,
+            NetworkCodecs.VAR_INT, V1SendClientTranscriptPacket::index,
+            NetworkCodecs.LONG, V1SendClientTranscriptPacket::updateTime,
+            NetworkCodecs.createMap(Language.NETWORK_CODEC, NetworkCodecs.STRING_UTF8), V1SendClientTranscriptPacket::translated,
+            ::V1SendClientTranscriptPacket
+        )
     }
 }

@@ -9,7 +9,6 @@ class UnityTranslateMC {
 
         init {
             Transcribers.init()
-            instance.proxy = MinecraftPlatformProxy()
             instance.init()
         }
     }

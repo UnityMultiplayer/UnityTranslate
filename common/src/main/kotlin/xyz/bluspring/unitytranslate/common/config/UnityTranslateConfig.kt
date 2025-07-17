@@ -16,6 +16,22 @@ data class UnityTranslateConfig(
         // which puts unnecessary stress on the translation instances.
         @get:FloatRange(from = 0.5f, to = 5.0f, increment = 0.1f)
         var batchTranslateInterval: Float = 0.5f, // 500ms
+
+        var maxConcurrentTranslations: Int = 20,
+
+        // 16384 is capable of fitting every single language of ours while still allowing pretty large text in Vanilla, but we're using
+        // 8192 just to be safe.
+        // Text should only be segmented anyway in scenarios where we just have yappers creating massive towers
+        // of text.
+        // The length should only be lowered in scenarios where people are experiencing massive packet issues with these large packets,
+        // as the mod should be automatically splitting and joining together these segments by itself. However, the mod should also be very careful about
+        // how much data it sends, because too much will cause memory issues.
+        //var maxSegmentLength: Int = 8192,
+
+        // 1024 is the max of what *should* be visible at a time, so the translator should only try translating this.
+        // It's going to be inaccurate, but it's better than translating 30k characters worth of text and crashing the translator.
+        // 1024 is actually being generous honestly, we could make it lower.
+        var maxTextLength: Int = 1024,
     )
 
     @Serializable
@@ -28,9 +44,7 @@ data class UnityTranslateConfig(
             TranslationPriority.CLIENT_CPU, // worst case scenario, use client CPU.
         ),
 
-        var offloadServers: MutableList<OffloadedLibreTranslateServer> = mutableListOf(
-            OffloadedLibreTranslateServer("https://libretranslate.devos.gay")
-        )
+        var offloadServers: MutableList<OffloadedLibreTranslateServer> = mutableListOf(),
     )
 
     @Serializable
