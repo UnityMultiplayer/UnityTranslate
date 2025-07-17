@@ -7,23 +7,37 @@ import gg.essential.elementa.constraints.SizeConstraint
 import gg.essential.elementa.constraints.resolution.ConstraintVisitor
 import java.lang.IllegalArgumentException
 
-class ImprovedChildBasedSizeConstraint(val padding: Float = 0f) : SizeConstraint {
+class CramAwareChildBasedSizeConstraint(val padding: Float = 0f) : SizeConstraint {
     override var cachedValue = 0f
     override var constrainTo: UIComponent? = null
     override var recalculate = true
 
     override fun getWidthImpl(component: UIComponent): Float {
         val holder = (constrainTo ?: component)
-        return holder.children.sumOf {
-            it.getWidth() + ((it.constraints.x as? PaddingConstraint)?.getHorizontalPadding(it) ?: 0f).toDouble()
-        }.toFloat() + (holder.children.size - 1) * padding
+        var current = 0f
+
+        for (child in holder.children) {
+            val padding = (child.constraints.y as? PaddingConstraint)?.getHorizontalPadding(child) ?: 0f
+            if (child.getRight() + padding > current) {
+                current = child.getRight() + padding
+            }
+        }
+
+        return (current - holder.getLeft() + (holder.children.size - 1).coerceAtLeast(0) * padding).coerceAtLeast(0f)
     }
 
     override fun getHeightImpl(component: UIComponent): Float {
         val holder = (constrainTo ?: component)
-        return holder.children.sumOf {
-            it.getHeight() + ((it.constraints.y as? PaddingConstraint)?.getVerticalPadding(it) ?: 0f).toDouble()
-        }.toFloat() + (holder.children.size - 1) * padding
+        var current = 0f
+
+        for (child in holder.children) {
+            val padding = (child.constraints.y as? PaddingConstraint)?.getVerticalPadding(child) ?: 0f
+            if (child.getBottom() + padding > current) {
+                current = child.getBottom() + padding
+            }
+        }
+
+        return (current - holder.getTop() + (holder.children.size - 1).coerceAtLeast(0) * padding).coerceAtLeast(0f)
     }
 
     override fun getRadiusImpl(component: UIComponent): Float {

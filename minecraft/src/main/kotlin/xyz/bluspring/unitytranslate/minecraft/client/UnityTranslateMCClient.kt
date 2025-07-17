@@ -22,9 +22,10 @@ import xyz.bluspring.unitytranslate.common.translator.Transcript
 import xyz.bluspring.unitytranslate.common.util.nativeaccess.CudaHelper
 import xyz.bluspring.unitytranslate.minecraft.MinecraftProxy
 import xyz.bluspring.unitytranslate.minecraft.client.gui.TranscriptBoxRenderer
-import xyz.bluspring.unitytranslate.minecraft.client.gui.UTConfigScreen
+import xyz.bluspring.unitytranslate.minecraft.client.gui.screens.UTConfigScreen
 import xyz.bluspring.unitytranslate.minecraft.client.gui.screens.EditTranscriptBoxesScreen
 import xyz.bluspring.unitytranslate.minecraft.client.gui.screens.LanguageSelectScreen
+import xyz.bluspring.unitytranslate.minecraft.compat.talk_balloons.TalkBalloonsCompat
 import xyz.bluspring.unitytranslate.minecraft.events.TranscriptEvents
 import xyz.bluspring.unitytranslate.minecraft.network.UTClientNetworkSender
 import java.util.*
@@ -37,6 +38,10 @@ class UnityTranslateMCClient {
         instance = this
 
         loadConfig()
+
+        if (UnityTranslate.instance.proxy.isLoaded("talk_balloons")) {
+            TalkBalloonsCompat.init()
+        }
     }
 
     fun onClientStarted() {
@@ -81,11 +86,11 @@ class UnityTranslateMCClient {
         }
 
         if (SET_SPOKEN_LANGUAGE.consumeClick()) {
-            mc.setScreen(LanguageSelectScreen(mc.screen) {
-                clientConfig.spokenLanguage = it
+            mc.setScreen(LanguageSelectScreen(mc.screen, {
+                clientConfig.spokenLanguage = it!!
                 saveConfig()
                 updateConfig()
-            })
+            }))
         }
 
         if (CLEAR_TRANSCRIPTS.consumeClick()) {

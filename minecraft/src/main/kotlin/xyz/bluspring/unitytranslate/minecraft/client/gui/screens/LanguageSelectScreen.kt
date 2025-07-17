@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import xyz.bluspring.unitytranslate.common.Language
 
-class LanguageSelectScreen(val parent: Screen? = null, val onSelected: (Language) -> Unit) : WindowScreen(ElementaVersion.V10) {
+class LanguageSelectScreen(val parent: Screen? = null, val onSelected: (Language?) -> Unit, val hasDefault: Boolean = false) : WindowScreen(ElementaVersion.V10) {
     init {
 
     }

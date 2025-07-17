@@ -3,7 +3,7 @@ package xyz.bluspring.unitytranslate.fabric.modmenu
 //? if fabric {
 import com.terraformersmc.modmenu.api.ConfigScreenFactory
 import com.terraformersmc.modmenu.api.ModMenuApi
-import xyz.bluspring.unitytranslate.minecraft.client.gui.UTConfigScreen
+import xyz.bluspring.unitytranslate.minecraft.client.gui.screens.UTConfigScreen
 
 class UTModMenuIntegration : ModMenuApi {
     override fun getModConfigScreenFactory(): ConfigScreenFactory<*> {
