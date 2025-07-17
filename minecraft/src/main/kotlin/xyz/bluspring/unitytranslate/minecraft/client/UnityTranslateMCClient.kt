@@ -1,6 +1,13 @@
 package xyz.bluspring.unitytranslate.minecraft.client
 
 import com.mojang.blaze3d.vertex.PoseStack
+import gg.essential.elementa.components.UIText
+import gg.essential.elementa.components.Window
+import gg.essential.elementa.dsl.childOf
+import gg.essential.elementa.dsl.constrain
+import gg.essential.elementa.dsl.minus
+import gg.essential.elementa.dsl.percentOfWindow
+import gg.essential.elementa.dsl.pixels
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -10,6 +17,7 @@ import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.player.AbstractClientPlayer
+import net.minecraft.client.resources.language.I18n
 import net.minecraft.network.chat.Component
 import org.lwjgl.glfw.GLFW
 import xyz.bluspring.unitytranslate.common.Language
@@ -249,12 +257,18 @@ class UnityTranslateMCClient {
             Minecraft.getInstance().gui.chat.addMessage(full)
         }
 
-        fun renderCreditText(poseStack: PoseStack) {
+        fun Window.addCreditText() {
             val version = UnityTranslate.instance.proxy.modVersion
-            val font = Minecraft.getInstance().font
 
-            //Screen.drawString(poseStack, font, "UnityTranslate v$version", 2, Minecraft.getInstance().window.guiScaledHeight - (font.lineHeight * 2) - 4, 16777215)
-            //Screen.drawString(poseStack, font, MinecraftProxy.translatable("unitytranslate.credit.author"), 2, Minecraft.getInstance().window.guiScaledHeight - font.lineHeight - 2, 16777215)
+            UIText("UnityTranslate v$version").constrain {
+                this.x = 2.pixels
+                this.y = 100.percentOfWindow - 20.pixels
+            } childOf this
+
+            UIText(I18n.get("unitytranslate.credit.author")).constrain {
+                this.x = 2.pixels
+                this.y = 100.percentOfWindow - 10.pixels
+            } childOf this
         }
     }
 }

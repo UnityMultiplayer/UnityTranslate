@@ -23,6 +23,7 @@ import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.transcriber.TranscriberType
 import xyz.bluspring.unitytranslate.minecraft.client.UnityTranslateClientConfig
 import xyz.bluspring.unitytranslate.minecraft.client.UnityTranslateMCClient
+import xyz.bluspring.unitytranslate.minecraft.client.UnityTranslateMCClient.Companion.addCreditText
 import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.ElementaUIHelpers
 import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.ElementaUIHelpers.button
 import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.ElementaUIHelpers.cycleButton
@@ -209,6 +210,8 @@ class UTConfigScreen(private val parent: Screen?, copyFrom: UTConfigScreen? = nu
                 (sections.allChildren[i] as ExpandableSection).setExpanded(child.isExpanded)
             }
         }
+
+        window.addCreditText()
     }
 
     val doneSection = UIContainer().constrain {
