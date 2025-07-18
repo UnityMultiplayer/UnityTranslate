@@ -4,7 +4,6 @@ import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.ScrollComponent
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIRoundedRectangle
-import gg.essential.elementa.components.UIText
 import gg.essential.elementa.components.UIWrappedText
 import gg.essential.elementa.components.input.UITextInput
 import gg.essential.elementa.constraints.CenterConstraint
@@ -22,13 +21,16 @@ import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.dsl.plus
 import gg.essential.elementa.effects.OutlineEffect
 import net.minecraft.ChatFormatting
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.resources.language.I18n
-import net.minecraft.util.Mth
-import org.lwjgl.glfw.GLFW
+import net.minecraft.client.resources.sounds.SimpleSoundInstance
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
 import xyz.bluspring.unitytranslate.common.util.TranslatableEnum
 import xyz.bluspring.unitytranslate.minecraft.client.UnityTranslateMCClient
-import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.constraints.CramAwareChildBasedSizeConstraint
+import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.effects.RoundedOutlineEffect
+import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.effects.RoundedOutlinedBevelEffect
 import java.awt.Color
 
 object ElementaUIHelpers {
@@ -52,10 +54,10 @@ object ElementaUIHelpers {
     }
 
     fun setupLightMode() {
-        BUTTON_COLOR = Color(0xCECECE)
-        DISABLED_BUTTON_COLOR = Color(0xA2A2A2)
+        BUTTON_COLOR = Color(0x707070)
+        DISABLED_BUTTON_COLOR = Color(0x282828)
         TEXT_COLOR = Color.WHITE
-        BACKGROUND_COLOR = Color(0x7A7A7A)
+        BACKGROUND_COLOR = Color(0xBABABA) // banana
     }
 
     fun setupDarkMode() {
@@ -134,6 +136,7 @@ object ElementaUIHelpers {
                 outline.color = OUTLINE_COLOR
             }
             .onMouseClick {
+                Minecraft.getInstance().soundManager.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1f))
                 text.setText(onClick.invoke(this, text.getText()))
             }
     }
@@ -147,93 +150,33 @@ object ElementaUIHelpers {
         }
     }
 
-    fun slider(min: Int, max: Int, current: Int, updater: (Int) -> String): UIComponent {
+    fun textInput(placeholder: String, value: String): UITextInput {
+        return UITextInput(placeholder, inactiveSelectionBackgroundColor = BACKGROUND_COLOR)
+            .constrain {
+                this.color = TEXT_COLOR.constraint
+            }
+            .effect(RoundedOutlineEffect(1f, OUTLINE_COLOR))
+            .apply {
+                this.setText(value)
+            }
+    }
+
+    fun slider(min: Int, max: Int, current: Int, updater: (Int) -> String): UISlider {
         val value = (current - min).toDouble() / (max - min).toDouble()
         return slider(0.0, 1.0, value) { updater.invoke((min.toDouble() + value * (max.toDouble() - min.toDouble())).toInt()) }
     }
 
-    fun slider(min: Float, max: Float, current: Float, updater: (Float) -> String): UIComponent {
+    fun slider(min: Float, max: Float, current: Float, updater: (Float) -> String): UISlider {
         return slider(min.toDouble(), max.toDouble(), current.toDouble()) { updater.invoke(it.toFloat()) }
     }
 
-    fun slider(min: Double, max: Double, current: Double, updater: (Double) -> String): UIComponent {
-        var current = current
+    fun slider(min: Double, max: Double, current: Double, updater: (Double) -> String): UISlider {
+        return UISlider(min, max, current, updater)
+    }
 
-        val outline = RoundedOutlineEffect(1f, OUTLINE_COLOR)
-        val sliderOutline = RoundedOutlinedBevelEffect(1f, OUTLINE_COLOR)
-
-        val text = UIWrappedText(updater.invoke(current), centered = true).constrain {
-            this.x = CenterConstraint()
-            this.y = CenterConstraint()
-            this.width = 100.percent
-        }
-        val slider = UIRoundedRectangle(3f)
-            .effect(sliderOutline)
-            .constrain {
-                this.width = 4.pixels
-                this.height = 100.percent
-                this.color = BUTTON_COLOR.constraint
-                this.x = RelativeConstraint(((current - min) / (max - min)).toFloat())
-                if (current >= max)
-                    this.x = 100.percent - 4.pixels
-                this.y = 0.pixels
-            }
-
-        var shouldDrag = false
-
-        return UIRoundedRectangle(4f)
-            .constrain {
-                this.height = 18.pixels
-                this.color = DISABLED_BUTTON_COLOR.constraint
-            }
-            .effect(outline)
-            .apply {
-                slider childOf this
-                text childOf this
-            }
-            .onMouseEnter {
-                outline.color = OUTLINE_HOVER_COLOR
-                sliderOutline.color = OUTLINE_HOVER_COLOR
-            }
-            .onMouseLeave {
-                outline.color = OUTLINE_COLOR
-                sliderOutline.color = OUTLINE_COLOR
-            }
-            .onMouseRelease {
-                shouldDrag = false
-            }
-            .onMouseClick { event ->
-                if (event.mouseButton == 1) {
-                    this.hide()
-                    shouldDrag = false
-
-                    return@onMouseClick
-                } else if (event.mouseButton != 0)
-                    return@onMouseClick
-
-                val value = (event.relativeX / this.getWidth()).coerceIn(0f, 1f)
-                current = min + value * (max - min)
-                slider.constraints.x = RelativeConstraint(value)
-
-                if (current >= max)
-                    slider.constraints.x = 100.percent - 4.pixels
-
-                text.setText(updater.invoke(current))
-                shouldDrag = true
-            }
-            .onMouseDrag { mouseX, mouseY, button ->
-                if (!shouldDrag)
-                    return@onMouseDrag
-
-                val value = (mouseX / this.getWidth()).coerceIn(0f, 1f)
-                current = min + value * (max - min)
-                slider.constraints.x = RelativeConstraint(value)
-
-                if (current >= max)
-                    slider.constraints.x = 100.percent - 4.pixels
-
-                text.setText(updater.invoke(current))
-            }
+    fun colorWithAlpha(rgb: Int, alpha: Int): Color {
+        val rgba = (rgb shl 4) or alpha
+        return Color(rgba, true)
     }
 
     fun ScrollComponent.withScrollbar(isHorizontal: Boolean = false): ScrollComponent {

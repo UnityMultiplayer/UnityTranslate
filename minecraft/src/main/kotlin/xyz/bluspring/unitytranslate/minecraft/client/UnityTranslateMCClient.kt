@@ -107,6 +107,18 @@ class UnityTranslateMCClient {
             }
         }
 
+        for ((index, key) in LANGUAGE_PROFILE_KEYS.withIndex()) {
+            if (key.consumeClick()) {
+                val language = clientConfig.languageProfiles.getOrNull(index) ?: continue
+
+                clientConfig.spokenLanguage = language
+                saveConfig()
+                updateConfig()
+
+                displayMessage(MinecraftProxy.literal("Spoken language set to ${language.translationKey}"))
+            }
+        }
+
         for ((_, holder) in transcriptHolders) {
             holder.tick()
         }
@@ -159,13 +171,14 @@ class UnityTranslateMCClient {
         } catch (_: Throwable) {
             transcriber = clientConfig.transcriber.creator.invoke(UnityTranslate.instance, clientConfig.spokenLanguage)
         }
+        transcriber.changeLanguage(clientConfig.spokenLanguage)
         setupTranscriber(transcriber)
 
         if (useClientTranslations && !allowsClientTranslation()) {
             useClientTranslations = false
         }
 
-        transcriptHolders.filter { clientConfig.transcriptBoxes.none { b -> b.language == it.key } }
+        transcriptHolders.filter { clientConfig.transcriptBoxes.none { b -> b.language == it.key } && clientConfig.spokenLanguage != it.key && clientConfig.balloonLanguage != it.key }
             .forEach { (language, _) ->
                 transcriptHolders.remove(language)
             }
@@ -174,6 +187,16 @@ class UnityTranslateMCClient {
             if (!transcriptHolders.contains(config.language))
                 transcriptHolders[config.language] = TranscriptHolder(config.language)
         }
+
+        if (!transcriptHolders.contains(clientConfig.spokenLanguage)) {
+            transcriptHolders[clientConfig.spokenLanguage] = TranscriptHolder(clientConfig.spokenLanguage)
+        }
+
+        if (clientConfig.balloonLanguage != null && !transcriptHolders.contains(clientConfig.balloonLanguage)) {
+            transcriptHolders[clientConfig.balloonLanguage!!] = TranscriptHolder(clientConfig.balloonLanguage!!)
+        }
+
+        transcriptRenderer.update()
     }
 
     fun setupTranscriber(transcriber: SpeechTranscriber) {
@@ -226,6 +249,10 @@ class UnityTranslateMCClient {
         val CLEAR_TRANSCRIPTS = KeybindHelper.register(KeyMapping("unitytranslate.clear_transcripts", -1, "UnityTranslate"))
         //val TRANSLATE_SIGN = KeybindHelper.register(KeyMapping("unitytranslate.translate_sign", GLFW.GLFW_KEY_F8, "UnityTranslate"))
         val OPEN_CONFIG_GUI = KeybindHelper.register(KeyMapping("unitytranslate.open_config", GLFW.GLFW_KEY_F7, "UnityTranslate"))
+
+        val LANGUAGE_PROFILE_KEYS = (0 until 5).map {
+            KeybindHelper.register(KeyMapping("unitytranslate.language_profile.${it + 1}", -1, "UnityTranslate"))
+        }
 
         fun allowsClientTranslation(): Boolean {
             val status = clientConfig.clientTranslation

@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.minecraft.client.gui.elementa
+package xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.effects
 
 import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.effects.Effect

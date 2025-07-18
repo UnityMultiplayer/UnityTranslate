@@ -79,6 +79,17 @@ class UTConfigScreen(private val parent: Screen?, copyFrom: UTConfigScreen? = nu
             }
                 .constrain { defaultButtonConstraints() } childOf this
 
+            toggleButton("Config Background", config.backgroundEnabled) {
+                config.backgroundEnabled = it
+                if (config.backgroundEnabled)
+                    background.unhide()
+                else
+                    background.hide()
+
+                Minecraft.getInstance().setScreen(UTConfigScreen(this@UTConfigScreen.parent, this@UTConfigScreen))
+            }
+                .constrain { defaultButtonConstraints() } childOf this
+
             button("Edit Transcript Boxes")
                 .constrain { defaultButtonConstraints() }
                 .onMouseClick {
@@ -171,6 +182,16 @@ class UTConfigScreen(private val parent: Screen?, copyFrom: UTConfigScreen? = nu
                 disappearingTextDelay.unhide()
                 disappearingTextFade.unhide()
             }
+
+            UnityTranslateMCClient.LANGUAGE_PROFILE_KEYS.forEachIndexed { index, _ ->
+                button("Set  (${I18n.get(if (config.balloonLanguage == null) config.spokenLanguage.translationKey else config.balloonLanguage!!.translationKey)})")
+                    .constrain { defaultButtonConstraints() }
+                    .onMouseClick {
+                        Minecraft.getInstance().setScreen(LanguageSelectScreen(this@UTConfigScreen, { language ->
+                            config.balloonLanguage = language
+                        }, true))
+                    } childOf this
+            }
         } childOf this
 
         // Common Section
@@ -211,6 +232,10 @@ class UTConfigScreen(private val parent: Screen?, copyFrom: UTConfigScreen? = nu
             }
         }
 
+        if (!UnityTranslateMCClient.clientConfig.backgroundEnabled) {
+            background.hide(true)
+        }
+
         window.addCreditText()
     }
 
@@ -224,12 +249,18 @@ class UTConfigScreen(private val parent: Screen?, copyFrom: UTConfigScreen? = nu
             .constrain {
                 this.x = CenterConstraint() - 10.percent - 12.pixels
                 this.width = 20.percent
+            }
+            .onMouseClick {
+                onClose()
             } childOf this
 
         button("Reset All to Default")
             .constrain {
                 this.x = CenterConstraint() + 10.percent + 12.pixels
                 this.width = 20.percent
+            }
+            .onMouseClick {
+
             } childOf this
     } childOf window
 
