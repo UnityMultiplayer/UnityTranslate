@@ -13,6 +13,7 @@ import xyz.bluspring.unitytranslate.common.network.UTPacket
 import xyz.bluspring.unitytranslate.common.network.v1.clientbound.V1ClientboundSendTranscriptPacket
 import xyz.bluspring.unitytranslate.common.network.v1.clientbound.V1MarkIncompletePacket
 import xyz.bluspring.unitytranslate.common.network.v1.clientbound.V1ResponseVersionPacket
+import xyz.bluspring.unitytranslate.common.network.v1.clientbound.V1SendAvailableLanguagesPacket
 import xyz.bluspring.unitytranslate.common.network.v1.dual.V1SyncConfigPacket
 import xyz.bluspring.unitytranslate.common.network.v1.serverbound.V1RequestVersionPacket
 import xyz.bluspring.unitytranslate.common.network.v1.serverbound.V1SendClientTranscriptPacket
@@ -37,9 +38,12 @@ object V1Packets : PacketDefinitions {
     val REQUEST_VERSION = createDefinition("request_version", V1RequestVersionPacket.CODEC)
     val MARK_INCOMPLETE = createDefinition("mark_incomplete", V1MarkIncompletePacket.CODEC)
 
+    val SEND_AVAILABLE_LANGUAGES = createDefinition("send_available_languages", V1SendAvailableLanguagesPacket.CODEC)
+
     override val clientboundPackets: Set<PacketDefinition<out UTPacket, out ByteBuf>> = setOf(
         SEND_TRANSCRIPT_CLIENTBOUND,
-        RESPONSE_VERSION
+        RESPONSE_VERSION,
+        SEND_AVAILABLE_LANGUAGES
     )
 
     override val serverboundPackets = setOf(

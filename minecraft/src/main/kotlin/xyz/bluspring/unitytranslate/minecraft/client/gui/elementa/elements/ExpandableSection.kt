@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.minecraft.client.gui.elementa
+package xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.elements
 
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.UIContainer
@@ -10,7 +10,6 @@ import gg.essential.elementa.dsl.constrain
 import gg.essential.elementa.dsl.constraint
 import gg.essential.elementa.dsl.minus
 import gg.essential.elementa.dsl.percent
-import gg.essential.elementa.dsl.percentOfWindow
 import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.dsl.plus
 import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.ElementaUIHelpers.TEXT_COLOR

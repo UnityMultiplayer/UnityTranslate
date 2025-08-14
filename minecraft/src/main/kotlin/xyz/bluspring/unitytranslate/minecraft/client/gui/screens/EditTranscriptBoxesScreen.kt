@@ -11,11 +11,14 @@ import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.constrain
+import gg.essential.elementa.dsl.effect
 import gg.essential.elementa.dsl.minus
 import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.percentOfWindow
 import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.dsl.plus
+import gg.essential.elementa.effects.OutlineEffect
+import gg.essential.elementa.effects.OutlineEffect.Side
 import gg.essential.elementa.events.UIClickEvent
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UMouse
@@ -71,9 +74,134 @@ class EditTranscriptBoxesScreen(val parent: Screen?) : WindowScreen(ElementaVers
             } childOf this
     } childOf window
 
+    private var dragRelativeX = 0f
+    private var dragRelativeY = 0f
+    private var moveState = MoveState()
+    private var currentHoverEffect: OutlineEffect? = null
+
+    private val hoverTranscriptBox: UIComponent.() -> Unit = {
+        val mouseX = Minecraft.getInstance().mouseHandler.xpos()
+        val mouseY = Minecraft.getInstance().mouseHandler.ypos()
+        val relativeX = mouseX - this.getLeft()
+        val relativeY = mouseY - this.getTop()
+
+        moveState.left = relativeX >= this.getLeft() - 4f && relativeX <= this.getLeft() + 4f
+        moveState.right = relativeX >= this.getRight() - 4f && relativeX <= this.getRight() + 4f
+        moveState.top = relativeY >= this.getTop() - 4f && relativeY <= this.getTop() + 4f
+        moveState.bottom = relativeY >= this.getBottom() - 4f && relativeY <= this.getBottom() + 4f
+
+        if (moveState.isAllFalse() && this.isPointInside(mouseX.toFloat(), mouseY.toFloat())) {
+            moveState.setAllTrue()
+        }
+
+        if (currentHoverEffect != null) {
+            this.removeEffect(currentHoverEffect!!)
+            currentHoverEffect = null
+        }
+
+        if (!moveState.isAllFalse()) {
+            currentHoverEffect = moveState.createOutline()
+            this.effect(currentHoverEffect!!)
+        }
+    }
+
     private val dropdownOpener: UIComponent.(UIClickEvent) -> Unit = { event ->
-        if (this is TranscriptBox)
-            createSettingDropdown(this, event.absoluteX, event.absoluteY)
+        if (this is TranscriptBox) {
+            if (event.mouseButton == 1)
+                createSettingDropdown(this, event.absoluteX, event.absoluteY)
+            else if (event.mouseButton == 0) {
+                dragRelativeX = event.relativeX / this.getWidth()
+                dragRelativeY = event.relativeY / this.getHeight()
+
+                moveState.left = event.relativeX >= this.getLeft() - 4f && event.relativeX <= this.getLeft() + 4f
+                moveState.right = event.relativeX >= this.getRight() - 4f && event.relativeX <= this.getRight() + 4f
+                moveState.top = event.relativeY >= this.getTop() - 4f && event.relativeY <= this.getTop() + 4f
+                moveState.bottom = event.relativeY >= this.getBottom() - 4f && event.relativeY <= this.getBottom() + 4f
+
+                if (moveState.isAllFalse())
+                    moveState.setAllTrue()
+            }
+        }
+    }
+
+    private val dragTranscriptBox: UIComponent.(Float, Float, Int) -> Unit = { mouseX, mouseY, mouseButton ->
+        if (this is TranscriptBox && mouseButton == 0) {
+            val relativeX = (mouseX - (dragRelativeX * this.getWidth()))
+            val relativeY = (mouseY - (dragRelativeY * this.getHeight()))
+
+            val normalizedX = relativeX / window.getWidth()
+            val normalizedY = relativeY / window.getHeight()
+
+            val horizontalAlignType = if (normalizedX < 0.25)
+                UnityTranslateClientConfig.HorizontalAlignType.LEFT_EDGE
+            else if (normalizedX > 0.75)
+                UnityTranslateClientConfig.HorizontalAlignType.RIGHT_EDGE
+            else
+                UnityTranslateClientConfig.HorizontalAlignType.CENTER
+
+            val verticalAlignType = if (normalizedY < 0.25)
+                UnityTranslateClientConfig.VerticalAlignType.TOP_EDGE
+            else if (normalizedY > 0.75)
+                UnityTranslateClientConfig.VerticalAlignType.BOTTOM_EDGE
+            else
+                UnityTranslateClientConfig.VerticalAlignType.CENTER
+
+            val width25 = window.getWidth() * 0.25
+            val width50 = window.getWidth() * 0.50
+            val width75 = window.getWidth() * 0.75
+            val height25 = window.getHeight() * 0.25
+            val height50 = window.getHeight() * 0.50
+            val height75 = window.getHeight() * 0.75
+
+            val alignCorrectedX = when (horizontalAlignType) {
+                UnityTranslateClientConfig.HorizontalAlignType.LEFT_EDGE ->
+                    mouseX / width25
+                UnityTranslateClientConfig.HorizontalAlignType.CENTER ->
+                    (mouseX - width25) / width50
+                UnityTranslateClientConfig.HorizontalAlignType.RIGHT_EDGE ->
+                    (mouseX - width75) / width25
+            }.toFloat()
+
+            val alignCorrectedY = when (verticalAlignType) {
+                UnityTranslateClientConfig.VerticalAlignType.TOP_EDGE ->
+                    mouseY / height25
+                UnityTranslateClientConfig.VerticalAlignType.CENTER ->
+                    (mouseY - height25) / height50
+                UnityTranslateClientConfig.VerticalAlignType.BOTTOM_EDGE ->
+                    (mouseY - height75) / height25
+            }.toFloat()
+
+            if (moveState.isAllTrue()) { // Regular moving
+                this.config.offsetX = alignCorrectedX
+                this.config.offsetY = alignCorrectedY
+            } else {
+                if (moveState.left) {
+                    val right = this.getRight()
+
+                    this.config.offsetX = alignCorrectedX
+                    this.config.width = (right - relativeX).toInt()
+                }
+
+                if (moveState.right) {
+                    val left = this.getLeft()
+                    this.config.width = (left - mouseX).toInt()
+                }
+
+                if (moveState.top) {
+                    val bottom = this.getBottom()
+
+                    this.config.offsetY = alignCorrectedY
+                    this.config.height = (bottom - relativeY).toInt()
+                }
+
+                if (moveState.bottom) {
+                    val bottom = this.getBottom()
+                    this.config.height = (bottom - mouseY).toInt()
+                }
+            }
+
+            this.update()
+        }
     }
 
     var currentDropdown: UIComponent? = null
@@ -98,6 +226,9 @@ class EditTranscriptBoxesScreen(val parent: Screen?) : WindowScreen(ElementaVers
 
         for (box in UnityTranslateMCClient.transcriptRenderer.renderedBoxes) {
             box.onMouseClick(dropdownOpener)
+            box.onMouseDrag(dragTranscriptBox)
+            box.onMouseEnter(hoverTranscriptBox)
+            box.onMouseLeave(hoverTranscriptBox)
         }
     }
 
@@ -229,11 +360,40 @@ class EditTranscriptBoxesScreen(val parent: Screen?) : WindowScreen(ElementaVers
 
         for (box in UnityTranslateMCClient.transcriptRenderer.renderedBoxes) {
             box.mouseClickListeners.remove(dropdownOpener)
+            box.mouseDragListeners.remove(dragTranscriptBox)
         }
     }
 
     override fun onClose() {
         super.onClose()
         Minecraft.getInstance().setScreen(parent)
+    }
+
+    private data class MoveState(var top: Boolean = false, var bottom: Boolean = false, var left: Boolean = false, var right: Boolean = false) {
+        fun isAllTrue(): Boolean {
+            return top && bottom && left && right
+        }
+
+        fun isAllFalse(): Boolean {
+            return !top && !bottom && !left && !right
+        }
+
+        fun setAllTrue() {
+            top = true
+            bottom = true
+            left = true
+            right = true
+        }
+
+        fun createOutline(): OutlineEffect {
+            val sides = mutableSetOf(Side.Left, Side.Top, Side.Right, Side.Bottom)
+
+            if (!top) sides.remove(Side.Top)
+            if (!bottom) sides.remove(Side.Bottom)
+            if (!left) sides.remove(Side.Left)
+            if (!right) sides.remove(Side.Right)
+
+            return OutlineEffect(Color.WHITE, 2f, sides = sides)
+        }
     }
 }

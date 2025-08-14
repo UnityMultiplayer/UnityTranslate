@@ -24,6 +24,7 @@ val projectName: String = extra["mod.name"]?.toString()!!
 rootProject.name = projectName
 
 include("bukkit", "common")
+include("library:library")
 
 stonecutter {
     centralScript = "build.gradle.kts"

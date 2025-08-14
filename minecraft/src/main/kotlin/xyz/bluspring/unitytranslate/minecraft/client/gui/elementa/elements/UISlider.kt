@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.minecraft.client.gui.elementa
+package xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.elements
 
 import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIWrappedText
@@ -70,8 +70,9 @@ class UISlider(val min: Double, val max: Double, var current: Double, val update
                 Minecraft.getInstance().soundManager.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1f))
 
                 if (event.mouseButton == 1) {
-                    this.hide()
-                    shouldDrag = false
+                    // TODO: make this change to manual input
+                    //this.hide()
+                    //shouldDrag = false
 
                     return@onMouseClick
                 } else if (event.mouseButton != 0)

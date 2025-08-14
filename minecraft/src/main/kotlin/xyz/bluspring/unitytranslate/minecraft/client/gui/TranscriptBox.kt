@@ -1,43 +1,27 @@
 package xyz.bluspring.unitytranslate.minecraft.client.gui
 
-import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.ScrollComponent
-import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.components.UIContainer
-import gg.essential.elementa.components.UIImage
 import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIWrappedText
 import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.FillConstraint
-import gg.essential.elementa.constraints.RelativeWindowConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
-import gg.essential.elementa.dsl.animate
-import gg.essential.elementa.dsl.childOf
-import gg.essential.elementa.dsl.constrain
-import gg.essential.elementa.dsl.constraint
-import gg.essential.elementa.dsl.effect
-import gg.essential.elementa.dsl.minus
-import gg.essential.elementa.dsl.percent
-import gg.essential.elementa.dsl.percentOfWindow
-import gg.essential.elementa.dsl.pixels
-import gg.essential.elementa.dsl.plus
+import gg.essential.elementa.dsl.*
 import gg.essential.universal.utils.toFormattedString
 import net.minecraft.ChatFormatting
-import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.texture.DynamicTexture
 import net.minecraft.client.resources.language.I18n
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.player.Player
 import xyz.bluspring.unitytranslate.common.translator.Transcript
 import xyz.bluspring.unitytranslate.minecraft.client.TranscriptHolder
 import xyz.bluspring.unitytranslate.minecraft.client.UnityTranslateClientConfig
 import xyz.bluspring.unitytranslate.minecraft.client.UnityTranslateMCClient
 import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.ElementaUIHelpers.colorWithAlpha
+import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.constraints.AlignTypeBasedXConstraint
+import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.constraints.AlignTypeBasedYConstraint
 import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.effects.RoundedOutlineEffect
 import java.awt.Color
-import java.awt.image.BufferedImage
-import java.util.concurrent.CompletableFuture
 
 class TranscriptBox(val holder: TranscriptHolder, val config: UnityTranslateClientConfig.TranscriptBoxConfig) : UIContainer() {
     val background = UIRoundedRectangle(0f)
@@ -88,17 +72,8 @@ class TranscriptBox(val holder: TranscriptHolder, val config: UnityTranslateClie
         this.constraints.width = config.width.pixels
         this.constraints.height = config.height.pixels
 
-        this.constraints.x = when (config.horizontalAlignType) {
-            UnityTranslateClientConfig.HorizontalAlignType.LEFT_EDGE -> RelativeWindowConstraint(config.offsetX)
-            UnityTranslateClientConfig.HorizontalAlignType.CENTER -> CenterConstraint() + RelativeWindowConstraint(config.offsetX)
-            UnityTranslateClientConfig.HorizontalAlignType.RIGHT_EDGE -> 100.percentOfWindow - this.constraints.width - RelativeWindowConstraint(config.offsetX)
-        }
-
-        this.constraints.y = when (config.verticalAlignType) {
-            UnityTranslateClientConfig.VerticalAlignType.TOP_EDGE -> RelativeWindowConstraint(config.offsetY)
-            UnityTranslateClientConfig.VerticalAlignType.CENTER -> CenterConstraint() + RelativeWindowConstraint(config.offsetY)
-            UnityTranslateClientConfig.VerticalAlignType.BOTTOM_EDGE -> 100.percentOfWindow - this.constraints.height - RelativeWindowConstraint(config.offsetY)
-        }
+        this.constraints.x = AlignTypeBasedXConstraint(config.horizontalAlignType, config.offsetX)
+        this.constraints.y = AlignTypeBasedYConstraint(config.verticalAlignType, config.offsetY)
 
         when (config.headerType) {
             UnityTranslateClientConfig.HeaderType.NONE -> {

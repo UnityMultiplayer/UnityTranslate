@@ -83,12 +83,16 @@ class TranslatorManager(val instance: UnityTranslate) {
             }
         }
 
-        runBlocking(Dispatchers.IO) {
-            instance.library.packageIndex.indexList.asFlow().concurrent().collect { index ->
-                index.packages.asFlow().concurrent(4).collect { pkg ->
-                    UnityTranslate.logger.info("Downloading package ${pkg.fromCode}-${pkg.toCode}")
-                    index.getOrDownloadModelInfos(pkg.fromCode, pkg.toCode)
-                    UnityTranslate.logger.info("Downloaded package ${pkg.fromCode}-${pkg.toCode}")
+        if (instance.config.common.downloadAllTranslationModels) {
+            runBlocking(Dispatchers.IO) {
+                instance.library.packageIndex.indexList.asFlow().concurrent().collect { index ->
+                    index.packages.asFlow().concurrent(4).collect { pkg ->
+                        if (!index.isModelAvailable(pkg.fromCode, pkg.toCode)) {
+                            UnityTranslate.logger.info("Downloading package ${pkg.fromCode}-${pkg.toCode}")
+                            index.tryDownloadModelInfos(pkg.fromCode, pkg.toCode)
+                            UnityTranslate.logger.info("Downloaded package ${pkg.fromCode}-${pkg.toCode}")
+                        }
+                    }
                 }
             }
         }

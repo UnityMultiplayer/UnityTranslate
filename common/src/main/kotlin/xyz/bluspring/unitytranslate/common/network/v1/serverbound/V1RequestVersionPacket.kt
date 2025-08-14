@@ -9,6 +9,7 @@ import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.network.UTPacket
 import xyz.bluspring.unitytranslate.common.network.v1.V1Packets
 import xyz.bluspring.unitytranslate.common.network.v1.clientbound.V1ResponseVersionPacket
+import xyz.bluspring.unitytranslate.common.network.v1.clientbound.V1SendAvailableLanguagesPacket
 import java.util.UUID
 
 data class V1RequestVersionPacket(

@@ -28,12 +28,14 @@ import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.ElementaUIHelp
 import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.ElementaUIHelpers.button
 import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.ElementaUIHelpers.cycleButton
 import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.ElementaUIHelpers.expandableSection
+import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.ElementaUIHelpers.fileChooser
 import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.ElementaUIHelpers.slider
 import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.ElementaUIHelpers.toggleButton
 import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.ElementaUIHelpers.withScrollbar
-import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.ExpandableSection
+import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.elements.ExpandableSection
 import xyz.bluspring.unitytranslate.transcriber.whisper.WhisperModel
 import java.nio.file.Path
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.name
 
 class UTConfigScreen(private val parent: Screen?, copyFrom: UTConfigScreen? = null) : WindowScreen(ElementaVersion.V10) {
@@ -112,7 +114,12 @@ class UTConfigScreen(private val parent: Screen?, copyFrom: UTConfigScreen? = nu
                     }, true))
                 } childOf this
 
-            val browserPath = button("Browser Path: ${if (config.browserPath.isBlank()) "(default browser)" else Path.of(config.browserPath).name}")
+            val browserPath = fileChooser("Browser Path: ${if (config.browserPath.isBlank()) "(default browser)" else Path.of(config.browserPath).name}",
+                if (config.browserPath.isNotBlank()) Path.of(config.browserPath) else null
+            ) {
+                config.browserPath = it?.absolutePathString() ?: ""
+                "Browser Path: ${if (config.browserPath.isBlank()) "(default browser)" else Path.of(config.browserPath).name}"
+            }
                 .constrain { defaultButtonConstraints() }
 
             val whisperModel = cycleButton("Whisper Model", WhisperModel.entries, config.whisperModel) {
@@ -184,11 +191,11 @@ class UTConfigScreen(private val parent: Screen?, copyFrom: UTConfigScreen? = nu
             }
 
             UnityTranslateMCClient.LANGUAGE_PROFILE_KEYS.forEachIndexed { index, _ ->
-                button("Set  (${I18n.get(if (config.balloonLanguage == null) config.spokenLanguage.translationKey else config.balloonLanguage!!.translationKey)})")
+                button("Language Profile ${index + 1}: ${I18n.get(if (config.languageProfiles.getOrNull(index) == null) "unitytranslate.value.none" else config.languageProfiles[index]!!.translationKey)}")
                     .constrain { defaultButtonConstraints() }
                     .onMouseClick {
                         Minecraft.getInstance().setScreen(LanguageSelectScreen(this@UTConfigScreen, { language ->
-                            config.balloonLanguage = language
+                            config.languageProfiles[index] = language
                         }, true))
                     } childOf this
             }

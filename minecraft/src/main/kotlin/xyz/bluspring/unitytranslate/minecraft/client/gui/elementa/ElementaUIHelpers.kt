@@ -4,34 +4,25 @@ import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.ScrollComponent
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIRoundedRectangle
-import gg.essential.elementa.components.UIWrappedText
 import gg.essential.elementa.components.input.UITextInput
 import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.ChildBasedSizeConstraint
-import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
-import gg.essential.elementa.dsl.childOf
-import gg.essential.elementa.dsl.constrain
-import gg.essential.elementa.dsl.constraint
-import gg.essential.elementa.dsl.effect
-import gg.essential.elementa.dsl.minus
-import gg.essential.elementa.dsl.percent
-import gg.essential.elementa.dsl.percentOfWindow
-import gg.essential.elementa.dsl.pixels
-import gg.essential.elementa.dsl.plus
+import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
 import net.minecraft.ChatFormatting
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.resources.language.I18n
-import net.minecraft.client.resources.sounds.SimpleSoundInstance
-import net.minecraft.sounds.SoundEvents
-import net.minecraft.sounds.SoundSource
 import xyz.bluspring.unitytranslate.common.util.TranslatableEnum
 import xyz.bluspring.unitytranslate.minecraft.client.UnityTranslateMCClient
 import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.effects.RoundedOutlineEffect
-import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.effects.RoundedOutlinedBevelEffect
+import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.elements.ExpandableSection
+import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.elements.UIButton
+import xyz.bluspring.unitytranslate.minecraft.client.gui.elementa.elements.UISlider
 import java.awt.Color
+import java.nio.file.Path
+import javax.swing.JFileChooser
+import javax.swing.filechooser.FileNameExtensionFilter
 
 object ElementaUIHelpers {
     var DISABLED_BUTTON_COLOR = Color(0xFFFFFF)
@@ -86,7 +77,7 @@ object ElementaUIHelpers {
         }
     }
 
-    fun <E> cycleButton(text: String, enums: List<E>, current: E, valueConsumer: (E) -> Unit): UIComponent where E : Enum<E>, E : TranslatableEnum {
+    fun <E> cycleButton(text: String, enums: List<E>, current: E, valueConsumer: (E) -> Unit): UIButton where E : Enum<E>, E : TranslatableEnum {
         var currentIndex = enums.indexOf(current)
         val update = { "$text: ${I18n.get(enums[currentIndex].translationKey)}" }
 
@@ -104,41 +95,33 @@ object ElementaUIHelpers {
         }
     }
 
-    fun button(text: String, onClick: UIComponent.() -> Unit): UIComponent {
+    fun button(text: String, onClick: UIComponent.() -> Unit): UIButton {
         return button(text) { str ->
             onClick.invoke(this)
             str
         }
     }
 
-    fun button(text: String, onClick: UIComponent.(String) -> String = { it }): UIComponent {
-        val outline = RoundedOutlinedBevelEffect(1f, OUTLINE_COLOR)
-        val text = UIWrappedText(text, centered = true).constrain {
-            this.x = CenterConstraint()
-            this.y = CenterConstraint()
-            this.width = 100.percent
-            this.color = TEXT_COLOR.constraint
-        }
+    fun button(text: String, onClick: UIComponent.(String) -> String = { it }): UIButton {
+        return UIButton(text, onClick)
+    }
 
-        return UIRoundedRectangle(4f)
-            .constrain {
-                this.height = 18.pixels
-                this.color = BUTTON_COLOR.constraint
+    fun fileChooser(text: String, currentFile: Path?, onSelected: (Path?) -> String): UIButton {
+        return button(text) { str ->
+            val fileChooser = JFileChooser(currentFile?.parent?.toFile())
+            fileChooser.addChoosableFileFilter(FileNameExtensionFilter("Executable files", "exe"))
+            fileChooser.isMultiSelectionEnabled = false
+            fileChooser.fileSelectionMode = JFileChooser.FILES_ONLY
+
+            val returnValue = fileChooser.showOpenDialog(null)
+
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                val file = fileChooser.selectedFile
+                onSelected.invoke(file.toPath())
+            } else {
+                onSelected.invoke(currentFile)
             }
-            .effect(outline)
-            .apply {
-                text childOf this
-            }
-            .onMouseEnter {
-                outline.color = OUTLINE_HOVER_COLOR
-            }
-            .onMouseLeave {
-                outline.color = OUTLINE_COLOR
-            }
-            .onMouseClick {
-                Minecraft.getInstance().soundManager.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1f))
-                text.setText(onClick.invoke(this, text.getText()))
-            }
+        }
     }
 
     fun expandableSection(text: String, builder: UIComponent.() -> Unit): ExpandableSection {

@@ -45,7 +45,7 @@ allprojects {
 }
 
 subprojects {
-    if (project.name == "minecraft" || project.name == "fabric" || project.name == "forge" || project.name == "neoforge")
+    if (project.name == "minecraft" || project.name == "fabric" || project.name == "forge" || project.name == "neoforge" || project.name == "library" || project.parent?.name == "library")
         return@subprojects
 
     apply(plugin = "java")
@@ -79,7 +79,8 @@ subprojects {
         }
 
         // UnityTranslateLib
-        shade("implementation"("xyz.bluspring.unitytranslate:UnityTranslateLib:${mod.dep("unitytranslatelib")}")!!)
+        //shade("implementation"("xyz.bluspring.unitytranslate:UnityTranslateLib:${mod.dep("unitytranslatelib")}")!!)
+        shade("implementation"(project(":library:library"))!!)
         shade("implementation"("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-windows-amd64:${mod.dep("unitytranslatelib")}")!!)
         shade("implementation"("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-linux-amd64:${mod.dep("unitytranslatelib")}")!!)
     }

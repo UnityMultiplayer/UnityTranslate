@@ -33,6 +33,8 @@ data class UnityTranslateConfig(
         // It's going to be inaccurate, but it's better than translating 30k characters worth of text and crashing the translator.
         // 1024 is actually being generous honestly, we could make it lower.
         var maxTextLength: Int = 1024,
+
+        var downloadAllTranslationModels: Boolean = false
     )
 
     @Serializable
