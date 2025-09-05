@@ -1,11 +1,9 @@
 package xyz.bluspring.unitytranslate.minecraft.compat.talk_balloons
 
-import com.cerbon.talk_balloons.TalkBalloons
 import com.cerbon.talk_balloons.api.TalkBalloonsApi
 import net.minecraft.world.entity.player.Player
-import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.minecraft.client.UnityTranslateMCClient
-import xyz.bluspring.unitytranslate.minecraft.events.TranscriptEvents
+import xyz.bluspring.unitytranslate.common.events.TranscriptEvents
 import java.util.*
 import java.util.concurrent.ConcurrentSkipListMap
 

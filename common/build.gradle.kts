@@ -10,6 +10,13 @@ dependencies {
     shade(api("org.java-websocket:Java-WebSocket:${mod.dep("java_websocket")}")!!)
     shade(api("com.github.jnr:jnr-ffi:${mod.dep("jnr")}")!!)
     shade(api("io.github.givimad:whisper-jni:${mod.dep("whisper")}")!!)
+
+    shade(api("gg.essential:vigilance:${mod.dep("vigilance")}")!!)
+
+    // Voice Chat APIs
+    implementation("de.maxhenkel.voicechat:voicechat-api:${mod.dep("voicechat_api")}")
+    compileOnly("su.plo.voice.api:server:${mod.dep("plasmo_api")}")
+    compileOnly("su.plo.voice.api:client:${mod.dep("plasmo_api")}")
 }
 
 

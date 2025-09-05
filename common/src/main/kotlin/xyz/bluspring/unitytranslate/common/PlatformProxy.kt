@@ -6,6 +6,8 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 abstract class PlatformProxy(val instance: UnityTranslate) {
+    open val isActive = true
+
     val playerLanguage = ConcurrentHashMap<UUID, Language>()
 
     abstract val modVersion: String

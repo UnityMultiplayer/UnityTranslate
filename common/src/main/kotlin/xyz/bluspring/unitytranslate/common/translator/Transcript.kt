@@ -1,12 +1,11 @@
 package xyz.bluspring.unitytranslate.common.translator
 
 import xyz.bluspring.unitytranslate.common.Language
-import java.util.*
+import xyz.bluspring.unitytranslate.common.holders.PlayerHolder
 
 data class Transcript(
     val index: Int,
-    val player: UUID,
-    val playerRef: Any,
+    val player: PlayerHolder,
     var text: String,
     val language: Language,
     var lastUpdateTime: Long,

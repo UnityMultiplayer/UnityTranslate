@@ -28,7 +28,7 @@ class UnityTranslate(val path: Path) {
 
     init {
         instance = this
-        proxy = ServiceLoader.load(PlatformProxy::class.java).first()
+        proxy = ServiceLoader.load(PlatformProxy::class.java).first { it.isActive }
     }
 
     fun init() {

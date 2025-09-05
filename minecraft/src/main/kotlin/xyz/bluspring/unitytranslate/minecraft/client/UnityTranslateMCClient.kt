@@ -1,40 +1,26 @@
 package xyz.bluspring.unitytranslate.minecraft.client
 
 import com.mojang.blaze3d.vertex.PoseStack
-import gg.essential.elementa.components.UIText
-import gg.essential.elementa.components.Window
-import gg.essential.elementa.dsl.childOf
-import gg.essential.elementa.dsl.constrain
-import gg.essential.elementa.dsl.minus
-import gg.essential.elementa.dsl.percentOfWindow
-import gg.essential.elementa.dsl.pixels
+import gg.essential.universal.utils.toFormattedString
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.decodeFromStream
 import net.minecraft.ChatFormatting
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.player.AbstractClientPlayer
-import net.minecraft.client.resources.language.I18n
 import net.minecraft.network.chat.Component
 import org.lwjgl.glfw.GLFW
 import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.common.UnityTranslate
-import xyz.bluspring.unitytranslate.common.UnityTranslate.Companion.json
 import xyz.bluspring.unitytranslate.common.UnityTranslate.Companion.logger
+import xyz.bluspring.unitytranslate.common.holders.PlayerHolder
 import xyz.bluspring.unitytranslate.common.network.v1.serverbound.V1SetLanguagePreferencesPacket
 import xyz.bluspring.unitytranslate.common.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.common.translator.Transcript
 import xyz.bluspring.unitytranslate.common.util.nativeaccess.CudaHelper
 import xyz.bluspring.unitytranslate.minecraft.MinecraftProxy
-import xyz.bluspring.unitytranslate.minecraft.client.gui.TranscriptBoxRenderer
-import xyz.bluspring.unitytranslate.minecraft.client.gui.screens.UTConfigScreen
-import xyz.bluspring.unitytranslate.minecraft.client.gui.screens.EditTranscriptBoxesScreen
-import xyz.bluspring.unitytranslate.minecraft.client.gui.screens.LanguageSelectScreen
 import xyz.bluspring.unitytranslate.minecraft.compat.talk_balloons.TalkBalloonsCompat
-import xyz.bluspring.unitytranslate.minecraft.events.TranscriptEvents
+import xyz.bluspring.unitytranslate.common.events.TranscriptEvents
 import xyz.bluspring.unitytranslate.minecraft.network.UTClientNetworkSender
 import java.util.*
 import java.util.function.BiConsumer
@@ -124,123 +110,11 @@ class UnityTranslateMCClient {
         }
     }
 
-    fun saveConfig() {
-        try {
-            if (!this.configFile.parentFile.exists())
-                this.configFile.parentFile.mkdirs()
-
-            if (!this.configFile.exists())
-                this.configFile.createNewFile()
-
-            val serialized = json.encodeToString(
-                UnityTranslateClientConfig.serializer(),
-                clientConfig
-            )
-
-            this.configFile.writeText(serialized)
-        } catch (e: Exception) {
-            logger.error("Failed to save UnityTranslate config!")
-            e.printStackTrace()
-        }
-
-        UnityTranslate.instance.saveConfig()
-    }
-
-    @OptIn(ExperimentalSerializationApi::class)
-    fun loadConfig() {
-        if (!configFile.exists()) {
-            clientConfig = UnityTranslateClientConfig()
-            return
-        }
-
-        try {
-            clientConfig = json.decodeFromStream(UnityTranslateClientConfig.serializer(), configFile.inputStream())
-        } catch (e: Exception) {
-            logger.error("Failed to load UnityTranslate config, reverting to defaults.")
-            clientConfig = UnityTranslateClientConfig()
-            e.printStackTrace()
-        }
-    }
-
-    fun updateConfig() {
-        try {
-            if (transcriber.type != clientConfig.transcriber) {
-                transcriber.stop()
-                transcriber = clientConfig.transcriber.creator.invoke(UnityTranslate.instance, clientConfig.spokenLanguage)
-            }
-        } catch (_: Throwable) {
-            transcriber = clientConfig.transcriber.creator.invoke(UnityTranslate.instance, clientConfig.spokenLanguage)
-        }
-        transcriber.changeLanguage(clientConfig.spokenLanguage)
-        setupTranscriber(transcriber)
-
-        if (useClientTranslations && !allowsClientTranslation()) {
-            useClientTranslations = false
-        }
-
-        transcriptHolders.filter { clientConfig.transcriptBoxes.none { b -> b.language == it.key } && clientConfig.spokenLanguage != it.key && clientConfig.balloonLanguage != it.key }
-            .forEach { (language, _) ->
-                transcriptHolders.remove(language)
-            }
-
-        for (config in clientConfig.transcriptBoxes) {
-            if (!transcriptHolders.contains(config.language))
-                transcriptHolders[config.language] = TranscriptHolder(config.language)
-        }
-
-        if (!transcriptHolders.contains(clientConfig.spokenLanguage)) {
-            transcriptHolders[clientConfig.spokenLanguage] = TranscriptHolder(clientConfig.spokenLanguage)
-        }
-
-        if (clientConfig.balloonLanguage != null && !transcriptHolders.contains(clientConfig.balloonLanguage)) {
-            transcriptHolders[clientConfig.balloonLanguage!!] = TranscriptHolder(clientConfig.balloonLanguage!!)
-        }
-
-        transcriptRenderer.update()
-    }
-
-    fun setupTranscriber(transcriber: SpeechTranscriber) {
-        transcriber.updater = BiConsumer { index, text ->
-            if (isMuted)
-                return@BiConsumer
-
-            val player = Minecraft.getInstance().player ?: return@BiConsumer
-            val updateTime = System.currentTimeMillis()
-
-            if (UnityTranslate.instance.proxy.serverSupportsTranslations()) {
-                UTClientNetworkSender.sendTranscriptToServer(transcriber.language, text, index, updateTime)
-            } else {
-                val translatorManager = UnityTranslate.instance.translatorManager
-
-                for ((language, holder) in transcriptHolders) {
-                    translatorManager.scope.launch(start = CoroutineStart.UNDISPATCHED) {
-                        val translated = translatorManager.queueTranslation(text, transcriber.language, language, player.uuid, index)
-                        holder.updateTranscript(player, translated ?: text, transcriber.language, index, updateTime, translated == null)
-                    }
-                }
-            }
-
-            val holder = transcriptHolders[transcriber.language]
-            holder?.updateTranscript(player, text, transcriber.language, index, updateTime, false)
-
-            if (holder == null) {
-                TranscriptEvents.UPDATE.invoker().onTranscriptUpdate(Transcript(index, player.uuid, player, text, transcriber.language, updateTime, false), transcriber.language)
-            }
-        }
-    }
-
     companion object {
         lateinit var instance: UnityTranslateMCClient
-        lateinit var transcriber: SpeechTranscriber
-        lateinit var clientConfig: UnityTranslateClientConfig
 
-        var isMuted = false
-        var useClientTranslations = false
         var shouldRenderBoxes = true
         var serverHasTranslations = false
-
-        val transcriptRenderer = TranscriptBoxRenderer()
-        val transcriptHolders = mutableMapOf<Language, TranscriptHolder>()
 
         val CONFIGURE_BOXES = KeybindHelper.register(KeyMapping("unitytranslate.configure_boxes", -1, "UnityTranslate"))
         val TOGGLE_TRANSCRIPTION = KeybindHelper.register(KeyMapping("unitytranslate.toggle_transcription", -1, "UnityTranslate"))
@@ -282,20 +156,6 @@ class UnityTranslateMCClient {
                 .append(text)
 
             Minecraft.getInstance().gui.chat.addMessage(full)
-        }
-
-        fun Window.addCreditText() {
-            val version = UnityTranslate.instance.proxy.modVersion
-
-            UIText("UnityTranslate v$version").constrain {
-                this.x = 2.pixels
-                this.y = 100.percentOfWindow - 20.pixels
-            } childOf this
-
-            UIText(I18n.get("unitytranslate.credit.author")).constrain {
-                this.x = 2.pixels
-                this.y = 100.percentOfWindow - 10.pixels
-            } childOf this
         }
     }
 }

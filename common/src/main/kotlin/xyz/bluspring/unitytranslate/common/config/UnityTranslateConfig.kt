@@ -1,7 +1,9 @@
 package xyz.bluspring.unitytranslate.common.config
 
 import kotlinx.serialization.Serializable
+import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.util.TranslatableEnum
+import java.io.File
 
 @Serializable
 data class UnityTranslateConfig(
@@ -15,9 +17,7 @@ data class UnityTranslateConfig(
         // Interval for when the batch translations will be sent.
         // This is done so redundant translations don't go through,
         // which puts unnecessary stress on the translation instances.
-        @get:FloatRange(from = 0.5f, to = 5.0f, increment = 0.1f)
         var batchTranslateInterval: Float = 0.5f, // 500ms
-
         var maxConcurrentTranslations: Int = 20,
 
         // 16384 is capable of fitting every single language of ours while still allowing pretty large text in Vanilla, but we're using
@@ -57,10 +57,6 @@ data class UnityTranslateConfig(
         var weight: Int = 100,
         var maxConcurrentTranslations: Int = 20
     )
-
-    enum class TriState {
-        TRUE, FALSE, DEFAULT
-    }
 
     enum class TranslationPriority : TranslatableEnum {
         SERVER_GPU,

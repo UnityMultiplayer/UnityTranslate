@@ -60,11 +60,6 @@ subprojects {
             shade("implementation"(project(":common"))!!)
         }
 
-        // Voice Chat APIs
-        "implementation"("de.maxhenkel.voicechat:voicechat-api:${mod.dep("voicechat_api")}")
-        "compileOnly"("su.plo.voice.api:server:${mod.dep("plasmo_api")}")
-        "compileOnly"("su.plo.voice.api:client:${mod.dep("plasmo_api")}")
-
         // Kotlin
         if (!project.name.contains("fabric")) { // Fabric has FLK, but KFF is unreliable and Bukkit doesn't have a commonly-used Kotlin provider
             shade("org.jetbrains.kotlin:kotlin-reflect:${mod.dep("kotlin")}")

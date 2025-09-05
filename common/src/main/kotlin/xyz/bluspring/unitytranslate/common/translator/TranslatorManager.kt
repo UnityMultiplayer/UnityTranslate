@@ -21,9 +21,6 @@ class TranslatorManager(val instance: UnityTranslate) {
     private var timer: Timer = Timer("UnityTranslate Batch Translate Manager")
     internal val queuedTranslations = ConcurrentLinkedQueue<Translation>()
 
-    private val MULTI_ASTERISK_REGEX = Regex("\\*+")
-    private val MULTI_MUSIC_NOTE_REGEX = Regex("[♩♪♫♬♭♮♯°ø\u0602≠≭]+")
-
     val scope = CoroutineScope(Dispatchers.Default)
     val instances = ConcurrentLinkedDeque<TranslationInstance>()
 
@@ -176,8 +173,15 @@ class TranslatorManager(val instance: UnityTranslate) {
         UnityTranslate.logger.info("UnityTranslate translation config successfully loaded!")
     }
 
+    fun shutdown() {
+        timer.cancel()
+    }
+
     companion object {
         const val MAX_TRANSLATION_BATCH = 15
         const val MAX_TRANSLATION_TASKS = 30
+
+        private val MULTI_ASTERISK_REGEX = Regex("\\*+")
+        private val MULTI_MUSIC_NOTE_REGEX = Regex("[♩♪♫♬♭♮♯°ø\u0602≠≭]+")
     }
 }
