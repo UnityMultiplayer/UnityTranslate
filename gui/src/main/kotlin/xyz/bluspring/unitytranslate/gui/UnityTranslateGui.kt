@@ -2,25 +2,34 @@ package xyz.bluspring.unitytranslate.gui
 
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.components.Window
-import gg.essential.elementa.dsl.childOf
-import gg.essential.elementa.dsl.constrain
-import gg.essential.elementa.dsl.minus
-import gg.essential.elementa.dsl.percentOfWindow
-import gg.essential.elementa.dsl.pixels
+import gg.essential.elementa.dsl.*
+import gg.essential.universal.UGraphics
 import gg.essential.universal.UI18n.i18n
-import gg.essential.universal.UKeyboard
-import gg.essential.universal.UMinecraft
-import gg.essential.universal.UScreen
+import gg.essential.universal.standalone.UCWindow
+import gg.essential.universal.standalone.glfw.Glfw
+import gg.essential.universal.standalone.glfw.GlfwWindow
+import gg.essential.universal.standalone.glfw.runGlfw
 import gg.essential.universal.standalone.runUniversalCraft
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
+import net.lenni0451.reflect.Agents
 import org.lwjgl.glfw.GLFW
+import org.lwjgl.opengl.GL
+import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL32C
+import org.lwjgl.opengl.GL43C
+import org.lwjgl.opengl.GLUtil
+import org.lwjgl.system.MemoryUtil
+import org.objectweb.asm.ClassReader
+import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.Opcodes
+import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.InsnList
+import org.objectweb.asm.tree.InsnNode
+import org.objectweb.asm.tree.LabelNode
+import org.objectweb.asm.tree.LdcInsnNode
+import org.objectweb.asm.tree.MethodInsnNode
 import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.UnityTranslate.Companion.json
@@ -35,18 +44,13 @@ import xyz.bluspring.unitytranslate.gui.menu.LayeredScreenManager
 import xyz.bluspring.unitytranslate.gui.standalone.StandaloneI18n
 import xyz.bluspring.unitytranslate.gui.standalone.gui.StandaloneScreen
 import xyz.bluspring.unitytranslate.gui.transcriber.Transcribers
+import java.io.PrintStream
+import java.lang.instrument.ClassFileTransformer
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
+import java.security.ProtectionDomain
 import java.util.function.BiConsumer
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
-import kotlin.io.path.Path
-import kotlin.io.path.createFile
-import kotlin.io.path.createParentDirectories
-import kotlin.io.path.exists
-import kotlin.io.path.inputStream
-import kotlin.io.path.writeText
+import kotlin.io.path.*
 
 object UnityTranslateGui {
     lateinit var instance: UnityTranslate
@@ -55,7 +59,8 @@ object UnityTranslateGui {
 
     var isMuted = false
     var useClientTranslations = false
-
+    var isStandalone = false
+        private set
 
     var clientConfig = UnityTranslateClientConfig()
 
@@ -68,8 +73,68 @@ object UnityTranslateGui {
         LayeredScreenManager.swap(StandaloneScreen())
     }
 
+    fun renderClear() {
+        if (!isStandalone)
+            return
+
+        GL32C.glClearColor(0f, 0f, 0f, 0f)
+        GL32C.glClearDepth(1.0)
+        GL32C.glClear(16384 or 256)
+    }
+
+    // We need to add some window hints
+    private fun modifyInternalStuff() {
+        val instrumentation = Agents.getInstrumentation()
+
+        instrumentation.addTransformer(object : ClassFileTransformer {
+            override fun transform(
+                loader: ClassLoader?,
+                className: String,
+                classBeingRedefined: Class<*>?,
+                protectionDomain: ProtectionDomain?,
+                classfileBuffer: ByteArray
+            ): ByteArray? {
+                if (className.contains("GlfwWindow")) {
+                    val classReader = ClassReader(classfileBuffer)
+                    val classNode = ClassNode(Opcodes.ASM9)
+
+                    classReader.accept(classNode, 0)
+
+                    run {
+                        val initMethod = classNode.methods.first { it.name == "<init>" && it.desc == "(Ljava/lang/String;IIZ)V" }
+                        val instructions = initMethod.instructions
+
+                        val target = instructions.first { it is MethodInsnNode && it.opcode == Opcodes.INVOKESTATIC && it.owner == "org/lwjgl/glfw/GLFW" && it.name == "glfwDefaultWindowHints" && it.desc == "()V" }
+
+                        val newInsns = InsnList()
+
+                        // GLFW.glfwWindowHint(GLFW.GLFW_TRANSPARENT_FRAMEBUFFER, GLFW.GLFW_TRUE)
+                        newInsns.add(LabelNode())
+                        newInsns.add(LdcInsnNode(GLFW.GLFW_TRANSPARENT_FRAMEBUFFER))
+                        newInsns.add(InsnNode(Opcodes.ICONST_1))
+                        newInsns.add(MethodInsnNode(Opcodes.INVOKESTATIC, "org/lwjgl/glfw/GLFW", "glfwWindowHint", "(II)V", false))
+
+                        instructions.insert(target, newInsns)
+
+                        initMethod.instructions = instructions
+                    }
+
+                    val classWriter = ClassWriter(ClassWriter.COMPUTE_MAXS or ClassWriter.COMPUTE_FRAMES)
+                    classNode.accept(classWriter)
+
+                    return classWriter.toByteArray()
+                }
+
+                return super.transform(loader, className, classBeingRedefined, protectionDomain, classfileBuffer)
+            }
+        }, true)
+    }
+
     @JvmStatic
     fun main(args: Array<out String>) {
+        isStandalone = true
+        modifyInternalStuff()
+
         instance = UnityTranslate(Path("."))
         configFile = Path("./unitytranslate.json")
 
@@ -77,12 +142,6 @@ object UnityTranslateGui {
 
         // otherwise it's fuckin' tiny
         //UMinecraft.guiScale = 2
-
-        runBlocking {
-            withContext(Dispatchers.Main) {
-                GLFW.glfwWindowHint(GLFW.GLFW_TRANSPARENT_FRAMEBUFFER, GLFW.GLFW_TRUE) // make window transparent
-            }
-        }
 
         runUniversalCraft("UnityTranslate", 854, 480) { window ->
             GLFW.glfwSetWindowCloseCallback(window.glfwWindow.glfwId) {

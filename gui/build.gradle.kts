@@ -10,6 +10,7 @@ dependencies {
     shade(api("com.google.code.gson:gson:${mod.dep("gson")}")!!)
 
     implementation("net.minecrell:terminalconsoleappender:1.3.0") // coloured CLI output :D
+    shadow(implementation("net.lenni0451:Reflect:1.5.0")!!)
 }
 
 java {

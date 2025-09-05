@@ -24,7 +24,7 @@ import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.button
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.withScrollbar
 import xyz.bluspring.unitytranslate.gui.menu.LayeredScreenManager
 
-class LanguageSelectScreen(val onSelected: (Language?) -> Unit, val hasDefault: Boolean = false, val checkRequiresDownload: (Language) -> Boolean = { false }) : WindowScreen(ElementaVersion.V10) {
+class LanguageSelectScreen(val onSelected: (Language?) -> Unit, val hasDefault: Boolean = false, val checkRequiresDownload: (Language) -> Boolean = { false }) : WindowScreen(ElementaVersion.V10, drawDefaultBackground = false) {
     val background = UIBlock(ElementaUIHelpers.BACKGROUND_COLOR).constrain {
         this.x = 0.pixels
         this.y = 0.pixels
@@ -112,6 +112,8 @@ class LanguageSelectScreen(val onSelected: (Language?) -> Unit, val hasDefault: 
     private val progressHandlers = mutableListOf<() -> Unit>()
 
     override fun onDrawScreen(matrixStack: UMatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
+        UnityTranslateGui.renderClear()
+
         super.onDrawScreen(matrixStack, mouseX, mouseY, partialTicks)
 
         if (System.currentTimeMillis() - timeSinceLastPoll >= 1000) {

@@ -29,7 +29,7 @@ object LayeredScreenManager {
         UScreen.displayScreen(screen)
 
         if (screen is LayeredScreenListener) {
-            screen.onScreenLayerOpened()
+            screen.onScreenLayerSwapped()
         }
     }
 

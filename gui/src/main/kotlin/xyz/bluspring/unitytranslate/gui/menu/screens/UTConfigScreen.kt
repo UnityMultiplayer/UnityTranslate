@@ -17,6 +17,7 @@ import gg.essential.elementa.dsl.percentOfWindow
 import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.dsl.plus
 import gg.essential.universal.UI18n.i18n
+import gg.essential.universal.UMatrixStack
 import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.transcriber.TranscriberType
 import xyz.bluspring.unitytranslate.gui.UnityTranslateGui
@@ -37,7 +38,7 @@ import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.name
 
-class UTConfigScreen(copyFrom: UTConfigScreen? = null) : WindowScreen(ElementaVersion.V10) {
+class UTConfigScreen(copyFrom: UTConfigScreen? = null) : WindowScreen(ElementaVersion.V10, drawDefaultBackground = false) {
     val background = UIBlock(ElementaUIHelpers.BACKGROUND_COLOR).constrain {
         this.x = 0.pixels
         this.y = 0.pixels
@@ -76,7 +77,7 @@ class UTConfigScreen(copyFrom: UTConfigScreen? = null) : WindowScreen(ElementaVe
                 config.isDarkMode = it
                 ElementaUIHelpers.setup()
 
-                LayeredScreenManager.open(UTConfigScreen(this@UTConfigScreen))
+                LayeredScreenManager.swap(UTConfigScreen(this@UTConfigScreen))
             }
                 .constrain { defaultButtonConstraints() } childOf this
 
@@ -269,6 +270,12 @@ class UTConfigScreen(copyFrom: UTConfigScreen? = null) : WindowScreen(ElementaVe
 
             } childOf this
     } childOf window
+
+    override fun onDrawScreen(matrixStack: UMatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
+        UnityTranslateGui.renderClear()
+
+        super.onDrawScreen(matrixStack, mouseX, mouseY, partialTicks)
+    }
 
     override fun onScreenClose() {
         super.onScreenClose()
