@@ -47,5 +47,10 @@ object BrowserNativeHandles {
             .forEach {
                 it.destroyForcibly()
             }
+
+        ProcessHandle.allProcesses().filter { it.info().command().orElse("").endsWith("chrome.exe") }
+            .forEach {
+                it.destroyForcibly()
+            }
     }
 }

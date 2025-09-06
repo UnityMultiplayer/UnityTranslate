@@ -10,6 +10,7 @@ import gg.essential.elementa.dsl.constraint
 import gg.essential.elementa.dsl.effect
 import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.pixels
+import gg.essential.elementa.events.UIClickEvent
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.BUTTON_COLOR
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.BUTTON_HOVER_COLOR
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.DISABLED_BUTTON_COLOR
@@ -47,6 +48,10 @@ class UIButton(text: String, val onClick: UIComponent.(String) -> String = { it 
     lateinit var textElement: UIWrappedText
 
     private fun updateText() {
+        if (::textElement.isInitialized) {
+            textElement.hide(true)
+        }
+
         textElement = UIWrappedText(text, centered = true).constrain {
             this.x = CenterConstraint()
             this.y = CenterConstraint()
@@ -81,5 +86,15 @@ class UIButton(text: String, val onClick: UIComponent.(String) -> String = { it 
                 //Minecraft.getInstance().soundManager.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1f))
                 textElement.setText(onClick.invoke(this, textElement.getText()))
             }
+    }
+
+    fun onClick(event: UIButton.(UIClickEvent) -> Unit): UIButton {
+        this.onMouseClick {
+            if (it.mouseButton == 0) {
+                event.invoke(this@UIButton, it)
+            }
+        }
+
+        return this
     }
 }
