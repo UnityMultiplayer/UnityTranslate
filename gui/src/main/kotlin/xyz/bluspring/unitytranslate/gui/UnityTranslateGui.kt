@@ -14,12 +14,16 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
 import net.lenni0451.reflect.Agents
+import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW
+import org.lwjgl.glfw.GLFWImage
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL32C
 import org.lwjgl.opengl.GL43C
 import org.lwjgl.opengl.GLUtil
+import org.lwjgl.stb.STBImage
+import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
@@ -44,12 +48,16 @@ import xyz.bluspring.unitytranslate.gui.menu.LayeredScreenManager
 import xyz.bluspring.unitytranslate.gui.standalone.StandaloneI18n
 import xyz.bluspring.unitytranslate.gui.standalone.gui.StandaloneScreen
 import xyz.bluspring.unitytranslate.gui.transcriber.Transcribers
+import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.lang.instrument.ClassFileTransformer
+import java.nio.ByteBuffer
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import java.security.ProtectionDomain
 import java.util.function.BiConsumer
+import javax.imageio.ImageIO
 import kotlin.io.path.*
 
 object UnityTranslateGui {
@@ -144,6 +152,44 @@ object UnityTranslateGui {
         //UMinecraft.guiScale = 2
 
         runUniversalCraft("UnityTranslate", 854, 480) { window ->
+            window.uiScope.launch {
+                // Load window icon
+
+                val iconResource = UnityTranslateGui::class.java.classLoader.getResource("icon_standalone.png")!!
+                var icon: ByteBuffer? = null
+
+                try {
+                    MemoryStack.stackPush().use { stack ->
+                        val width = stack.mallocInt(1)
+                        val height = stack.mallocInt(1)
+                        val channels = stack.mallocInt(1)
+
+                        val byteArray = iconResource.readBytes()
+                        val buffer = ByteBuffer.allocateDirect(byteArray.size).put(byteArray).flip()
+                        icon = STBImage.stbi_load_from_memory(buffer, width, height, channels, 4)
+
+                        val reason = STBImage.stbi_failure_reason()
+                        if (reason != null)
+                            logger.error("Failed to load icon from memory: $reason")
+
+                        if (icon == null)
+                            return@use
+
+                        withContext(Dispatchers.Glfw) {
+                            GLFW.glfwSetWindowIcon(window.glfwWindow.glfwId, GLFWImage.malloc(1, stack)
+                                .width(width.get(0))
+                                .height(height.get(0))
+                                .pixels(icon!!)
+                            )
+                        }
+                    }
+                } finally {
+                    if (icon != null) {
+                        STBImage.stbi_image_free(icon!!)
+                    }
+                }
+            }
+
             GLFW.glfwSetWindowCloseCallback(window.glfwWindow.glfwId) {
                 shutdown()
             }

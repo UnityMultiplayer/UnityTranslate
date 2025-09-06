@@ -11,6 +11,10 @@ dependencies {
 
     implementation("net.minecrell:terminalconsoleappender:1.3.0") // coloured CLI output :D
     shadow(implementation("net.lenni0451:Reflect:1.5.0")!!)
+    shadow(api("com.github.jnr:jnr-ffi:${mod.dep("jnr")}")!!)
+
+    shadow(api("net.java.dev.jna:jna:${mod.dep("jna")}")!!)
+    shadow(api("net.java.dev.jna:jna-platform:${mod.dep("jna")}")!!)
 }
 
 java {

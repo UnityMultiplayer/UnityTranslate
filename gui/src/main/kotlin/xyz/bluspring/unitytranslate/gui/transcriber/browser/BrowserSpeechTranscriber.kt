@@ -3,6 +3,7 @@ package xyz.bluspring.unitytranslate.gui.transcriber.browser
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.sun.net.httpserver.HttpServer
+import gg.essential.universal.UDesktop
 import gg.essential.universal.UI18n
 import org.java_websocket.WebSocket
 import org.java_websocket.handshake.ClientHandshake
@@ -12,6 +13,7 @@ import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.edge.EdgeDriver
 import org.openqa.selenium.edge.EdgeOptions
+import org.openqa.selenium.remote.RemoteWebDriver
 import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.transcriber.SpeechTranscriber
@@ -66,6 +68,17 @@ class BrowserSpeechTranscriber(instance: UnityTranslate, language: Language) : S
             })
         } else {
             throw IllegalStateException()
+        }
+
+        // Try making the window a child of Minecraft.
+        run {
+            if (UDesktop.isWindows) {
+                BrowserNativeHandles.makeGameParentWindows(driver as RemoteWebDriver)
+            } else if (UDesktop.isMac) {
+                BrowserNativeHandles.makeGameParentOsx(driver as RemoteWebDriver)
+            } else if (UDesktop.isLinux) {
+                BrowserNativeHandles.makeGameParentLinux(driver as RemoteWebDriver)
+            }
         }
 
         driver.get("http://127.0.0.1:$serverPort")
