@@ -43,7 +43,7 @@ class TranscriptBox(val holder: TranscriptHolder, val config: UnityTranslateClie
             this.y = 4.pixels
         } childOf innerContainer
 
-    val transcriptContainer = ScrollComponent(innerPadding = 1f, verticalScrollOpposite = true, verticalScrollEnabled = false)
+    val transcriptContainer = ScrollComponent(innerPadding = 1f, verticalScrollOpposite = true, verticalScrollEnabled = true)
         .constrain {
             this.x = 0.pixels
             this.y = SiblingConstraint(4f)

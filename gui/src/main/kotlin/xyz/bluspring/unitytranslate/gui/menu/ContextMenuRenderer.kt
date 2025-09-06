@@ -15,8 +15,10 @@ import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.events.UIClickEvent
 import gg.essential.universal.UMatrixStack
+import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.gui.UnityTranslateGui
 import xyz.bluspring.unitytranslate.gui.TranscriptBox
+import xyz.bluspring.unitytranslate.gui.config.UnityTranslateClientConfig
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers
 import xyz.bluspring.unitytranslate.gui.elementa.constraints.WindowAwarePositionConstraint
 import xyz.bluspring.unitytranslate.gui.elementa.elements.UIButton
@@ -46,12 +48,21 @@ class ContextMenuRenderer {
     }
 
     private val mainContextMenu = contextMenu {
-        contextButton("Add Transcript Box") {}
+        contextButton("Add Transcript Box") {
+            UnityTranslateGui.clientConfig.transcriptBoxes.add(UnityTranslateClientConfig.TranscriptBoxConfig(
+                language = UnityTranslateGui.clientConfig.spokenLanguage,
+            ))
+            UnityTranslateGui.updateConfig()
+            closeContextMenu()
+        }
         contextButton("Open Config Screen") {
             LayeredScreenManager.open(UTConfigScreen())
+            closeContextMenu()
         }
         spacing
-        contextButton("Remove All", Color.RED) {}
+        contextButton("Remove All", Color.RED) {
+            closeContextMenu()
+        }
     }
 
     private fun contextMenu(action: UIComponent.() -> Unit): UIComponent {
@@ -79,12 +90,8 @@ class ContextMenuRenderer {
             y = SiblingConstraint(4f)
             width = 100.percent
             height = 14.pixels
-        }.apply {
-            onMouseClick {
-                if (it.mouseButton == 0) {
-                    clickAction.invoke(this@apply, it)
-                }
-            }
+        }.onClick {
+            clickAction.invoke(this, it)
         } childOf this
     }
 

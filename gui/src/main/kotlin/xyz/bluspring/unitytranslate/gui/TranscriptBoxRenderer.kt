@@ -27,6 +27,8 @@ class TranscriptBoxRenderer {
             val holder = UnityTranslateGui.transcriptHolders[boxConfig.language] ?: continue
             val transcriptBox = TranscriptBox(holder, boxConfig)
             transcriptBox childOf window
+
+            renderedBoxes.add(transcriptBox)
         }
 
         // Now, update all boxes
