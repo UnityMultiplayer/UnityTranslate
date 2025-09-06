@@ -5,15 +5,20 @@ import gg.essential.elementa.components.Window
 import gg.essential.elementa.dsl.*
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UI18n.i18n
+import gg.essential.universal.UMinecraft
 import gg.essential.universal.standalone.UCWindow
 import gg.essential.universal.standalone.glfw.Glfw
 import gg.essential.universal.standalone.glfw.GlfwWindow
 import gg.essential.universal.standalone.glfw.runGlfw
+import gg.essential.universal.standalone.nanovg.NvgContext
+import gg.essential.universal.standalone.nanovg.NvgFont
+import gg.essential.universal.standalone.nanovg.NvgFontFace
 import gg.essential.universal.standalone.runUniversalCraft
 import kotlinx.coroutines.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
 import net.lenni0451.reflect.Agents
+import net.lenni0451.reflect.accessor.UnsafeAccess
 import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFWImage
@@ -34,6 +39,7 @@ import org.objectweb.asm.tree.InsnNode
 import org.objectweb.asm.tree.LabelNode
 import org.objectweb.asm.tree.LdcInsnNode
 import org.objectweb.asm.tree.MethodInsnNode
+import sun.misc.Unsafe
 import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.UnityTranslate.Companion.json
@@ -52,6 +58,8 @@ import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.lang.instrument.ClassFileTransformer
+import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 import java.nio.ByteBuffer
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
@@ -149,7 +157,7 @@ object UnityTranslateGui {
         init()
 
         // otherwise it's fuckin' tiny
-        //UMinecraft.guiScale = 2
+        UMinecraft.guiScale = 2
 
         runUniversalCraft("UnityTranslate", 854, 480) { window ->
             window.uiScope.launch {
@@ -192,6 +200,21 @@ object UnityTranslateGui {
 
             GLFW.glfwSetWindowCloseCallback(window.glfwWindow.glfwId) {
                 shutdown()
+            }
+
+            // Forcefully load our font instead
+            run {
+                val fontField = UGraphics::class.java.getDeclaredField("MC_FONT")
+                fontField.isAccessible = true
+
+                val fieldBase = UnsafeAccess.staticFieldBase(fontField)
+                val fieldOffset = UnsafeAccess.staticFieldOffset(fontField)
+
+                val font = NvgFont(NvgFontFace(NvgContext(),
+                    UnityTranslateGui::class.java.getResource("/fonts/TikTokSans-Regular.ttf")!!.readBytes()),
+                    8f, 6f, 1f
+                )
+                UnsafeAccess.putObject(fieldBase, fieldOffset, font)
             }
 
             LayeredScreenManager.open(StandaloneScreen())

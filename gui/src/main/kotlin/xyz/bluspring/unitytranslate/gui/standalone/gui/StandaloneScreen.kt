@@ -23,7 +23,7 @@ class StandaloneScreen : UScreen(), LayeredScreenListener {
         contextMenuRenderer.render(matrixStack, mouseX, mouseY, partialTicks)
 
         // Except for the tutorial renderer, which we should handle above all else
-        tutorialRenderer.window.draw(matrixStack)
+        tutorialRenderer.render(matrixStack)
     }
 
     override fun onMouseClicked(mouseX: Double, mouseY: Double, mouseButton: Int) {

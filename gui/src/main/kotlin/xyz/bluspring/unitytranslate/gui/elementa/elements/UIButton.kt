@@ -52,7 +52,7 @@ class UIButton(text: String, val onClick: UIComponent.(String) -> String = { it 
             textElement.hide(true)
         }
 
-        textElement = UIWrappedText(text, centered = true).constrain {
+        textElement = UIWrappedText(text, centered = true, shadow = false).constrain {
             this.x = CenterConstraint()
             this.y = CenterConstraint()
             this.width = 100.percent
