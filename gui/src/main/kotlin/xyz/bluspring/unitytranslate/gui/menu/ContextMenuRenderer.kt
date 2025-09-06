@@ -56,7 +56,7 @@ class ContextMenuRenderer {
 
     private fun contextMenu(action: UIComponent.() -> Unit): UIComponent {
         return UIContainer().constrain {
-            width = 150.pixels
+            width = 100.pixels
             height = ChildBasedSizeConstraint(4f).coerceAtMost(FillConstraint())
             color = CONTEXT_MENU_BACKGROUND.constraint
         }.apply {
@@ -78,7 +78,7 @@ class ContextMenuRenderer {
         return UIButton(text, textColor = color).constrain {
             y = SiblingConstraint(4f)
             width = 100.percent
-            height = 20.pixels
+            height = 14.pixels
         }.apply {
             onMouseClick {
                 if (it.mouseButton == 0) {
