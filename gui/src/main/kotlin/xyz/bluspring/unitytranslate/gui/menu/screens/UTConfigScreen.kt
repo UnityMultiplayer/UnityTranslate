@@ -16,6 +16,7 @@ import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.percentOfWindow
 import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.dsl.plus
+import gg.essential.universal.ChatColor
 import gg.essential.universal.UI18n.i18n
 import gg.essential.universal.UMatrixStack
 import xyz.bluspring.unitytranslate.common.UnityTranslate
@@ -23,6 +24,7 @@ import xyz.bluspring.unitytranslate.common.transcriber.TranscriberType
 import xyz.bluspring.unitytranslate.gui.UnityTranslateGui
 import xyz.bluspring.unitytranslate.gui.UnityTranslateGui.addCreditText
 import xyz.bluspring.unitytranslate.gui.config.UnityTranslateClientConfig
+import xyz.bluspring.unitytranslate.gui.elementa.CustomFontRenderer
 import xyz.bluspring.unitytranslate.gui.transcriber.whisper.WhisperModel
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.button
@@ -46,9 +48,10 @@ class UTConfigScreen(copyFrom: UTConfigScreen? = null) : WindowScreen(ElementaVe
         this.height = 100.percentOfWindow
     } childOf window
 
-    val topText = UIText("UnityTranslate").constrain {
+    val topText = UIText("${ChatColor.BOLD}UnityTranslate").constrain {
         this.x = CenterConstraint()
         this.y = 12.pixels
+        fontProvider = CustomFontRenderer
     } childOf window
 
     val sections = ScrollComponent().constrain {
@@ -64,7 +67,7 @@ class UTConfigScreen(copyFrom: UTConfigScreen? = null) : WindowScreen(ElementaVe
         }
 
         // Client Section
-        expandableSection(i18n("gui.unitytranslate.config.client")) {
+        expandableSection(ChatColor.BOLD + i18n("gui.unitytranslate.config.client")) {
             val config = UnityTranslateGui.clientConfig
 
             toggleButton("Mod Status", config.enabled) { config.enabled = it }
@@ -202,7 +205,7 @@ class UTConfigScreen(copyFrom: UTConfigScreen? = null) : WindowScreen(ElementaVe
         } childOf this
 
         // Common Section
-        expandableSection(i18n("gui.unitytranslate.config.common")) {
+        expandableSection(ChatColor.BOLD + i18n("gui.unitytranslate.config.common")) {
             val config = UnityTranslate.Companion.instance.config.common
 
             toggleButton("Should use CUDA?", config.shouldUseCuda) { config.shouldUseCuda = it }
@@ -225,7 +228,7 @@ class UTConfigScreen(copyFrom: UTConfigScreen? = null) : WindowScreen(ElementaVe
         } childOf this
 
         // Server Section
-        expandableSection(i18n("gui.unitytranslate.config.server")) {
+        expandableSection(ChatColor.BOLD + i18n("gui.unitytranslate.config.server")) {
 
         } childOf this
     } childOf window

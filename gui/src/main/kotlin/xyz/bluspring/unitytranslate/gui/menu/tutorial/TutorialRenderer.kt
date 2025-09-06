@@ -19,6 +19,7 @@ import gg.essential.elementa.dsl.pixels
 import gg.essential.universal.UMath
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UMinecraft
+import xyz.bluspring.unitytranslate.gui.elementa.CustomFontRenderer
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers
 import xyz.bluspring.unitytranslate.gui.elementa.elements.UIButton
 import java.awt.Color
@@ -42,6 +43,7 @@ class TutorialRenderer {
                 y = 8.pixels
 
                 width = 90.percent
+                fontProvider = CustomFontRenderer
             } childOf this
 
         /*UIContainer().apply {

@@ -11,6 +11,7 @@ import gg.essential.elementa.dsl.effect
 import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.events.UIClickEvent
+import xyz.bluspring.unitytranslate.gui.elementa.CustomFontRenderer
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.BUTTON_COLOR
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.BUTTON_HOVER_COLOR
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.DISABLED_BUTTON_COLOR
@@ -57,6 +58,7 @@ class UIButton(text: String, val onClick: UIComponent.(String) -> String = { it 
             this.y = CenterConstraint()
             this.width = 100.percent
             this.color = textColor.constraint
+            this.fontProvider = CustomFontRenderer
         } childOf this
     }
 

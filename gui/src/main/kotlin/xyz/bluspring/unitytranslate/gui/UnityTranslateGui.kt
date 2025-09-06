@@ -203,23 +203,25 @@ object UnityTranslateGui {
             }
 
             // Forcefully load our font instead
-            run {
-                val fontField = UGraphics::class.java.getDeclaredField("MC_FONT")
-                fontField.isAccessible = true
-
-                val fieldBase = UnsafeAccess.staticFieldBase(fontField)
-                val fieldOffset = UnsafeAccess.staticFieldOffset(fontField)
-
-                val font = NvgFont(NvgFontFace(NvgContext(),
-                    UnityTranslateGui::class.java.getResource("/fonts/TikTokSans-Regular.ttf")!!.readBytes()),
-                    8f, 6f, 1f
-                )
-                UnsafeAccess.putObject(fieldBase, fieldOffset, font)
-            }
+            setFont()
 
             LayeredScreenManager.open(StandaloneScreen())
             window.renderScreenUntilClosed()
         }
+    }
+
+    fun setFont(style: String = "Regular") {
+        val fontField = UGraphics::class.java.getDeclaredField("MC_FONT")
+        fontField.isAccessible = true
+
+        val fieldBase = UnsafeAccess.staticFieldBase(fontField)
+        val fieldOffset = UnsafeAccess.staticFieldOffset(fontField)
+
+        val font = NvgFont(NvgFontFace(NvgContext(),
+            UnityTranslateGui::class.java.getResource("/fonts/TikTokSans-$style.ttf")!!.readBytes()),
+            8f, 6f, 1f
+        )
+        UnsafeAccess.putObject(fieldBase, fieldOffset, font)
     }
 
     fun init() {
