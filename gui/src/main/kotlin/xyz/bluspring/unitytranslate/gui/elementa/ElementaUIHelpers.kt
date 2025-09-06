@@ -106,7 +106,9 @@ object ElementaUIHelpers {
     }
 
     fun button(text: String, onClick: UIComponent.(String) -> String = { it }): UIButton {
-        return UIButton(text, onClick)
+        return UIButton(text).onClick {
+            this.text = onClick.invoke(this, this.text)
+        }
     }
 
     fun fileChooser(text: String, currentFile: Path?, onSelected: (Path?) -> String): UIButton {

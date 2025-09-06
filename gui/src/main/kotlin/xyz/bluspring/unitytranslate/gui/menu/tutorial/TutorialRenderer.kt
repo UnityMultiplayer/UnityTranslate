@@ -25,7 +25,7 @@ import xyz.bluspring.unitytranslate.gui.elementa.elements.UIButton
 import java.awt.Color
 
 class TutorialRenderer {
-    var isOpen = false
+    var isOpen = true
 
     val window = Window(ElementaVersion.V10)
 

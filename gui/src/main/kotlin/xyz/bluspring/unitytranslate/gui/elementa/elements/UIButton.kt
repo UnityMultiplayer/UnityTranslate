@@ -21,7 +21,7 @@ import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.TEXT_COLOR
 import xyz.bluspring.unitytranslate.gui.elementa.effects.RoundedOutlinedBevelEffect
 import java.awt.Color
 
-class UIButton(text: String, val onClick: UIComponent.(String) -> String = { it },
+class UIButton(text: String,
     val buttonColor: Color = BUTTON_COLOR,
     val buttonHoverColor: Color = BUTTON_HOVER_COLOR,
     val disabledButtonColor: Color = DISABLED_BUTTON_COLOR,
@@ -70,6 +70,8 @@ class UIButton(text: String, val onClick: UIComponent.(String) -> String = { it 
             this.color = buttonColor.constraint
         } effect outline
 
+        this.isFloating = true
+
         this
             .onMouseEnter {
                 if (!isDisabled)
@@ -86,12 +88,15 @@ class UIButton(text: String, val onClick: UIComponent.(String) -> String = { it 
                     return@onMouseClick
 
                 //Minecraft.getInstance().soundManager.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1f))
-                textElement.setText(onClick.invoke(this, textElement.getText()))
+//                textElement.setText(onClick.invoke(this, textElement.getText()))
             }
     }
 
     fun onClick(event: UIButton.(UIClickEvent) -> Unit): UIButton {
         this.onMouseClick {
+            if (isDisabled)
+                return@onMouseClick
+
             if (it.mouseButton == 0) {
                 event.invoke(this@UIButton, it)
             }
