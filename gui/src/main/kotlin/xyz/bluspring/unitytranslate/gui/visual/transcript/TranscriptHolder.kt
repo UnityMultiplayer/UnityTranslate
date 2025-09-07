@@ -31,7 +31,7 @@ class TranscriptHolder(val language: Language) {
     }
 
     fun updateTranscript(source: PlayerHolder, text: String, language: Language, index: Int, updateTime: Long, incomplete: Boolean) {
-        if (UnityTranslate.Companion.instance.voiceChat != null && !UnityTranslate.Companion.instance.voiceChat!!.isPlayerAudible(source.uuid))
+        if (UnityTranslate.instance.voiceChat != null && !UnityTranslate.instance.voiceChat!!.isPlayerAudible(source.uuid))
             return
 
         if (this.transcripts.any { it.player == source.uuid && it.index == index }) {
@@ -46,13 +46,13 @@ class TranscriptHolder(val language: Language) {
             transcript.incomplete = incomplete
             transcript.arrivalTime = System.currentTimeMillis()
 
-            TranscriptEvents.Companion.UPDATE.invoker().onTranscriptUpdate(transcript, this.language)
+            TranscriptEvents.UPDATE.invoker().onTranscriptUpdate(transcript, this.language)
 
             return
         }
 
         this.transcripts.add(Transcript(index, source, text, language, updateTime, incomplete).apply {
-            TranscriptEvents.Companion.UPDATE.invoker().onTranscriptUpdate(this, this@TranscriptHolder.language)
+            TranscriptEvents.UPDATE.invoker().onTranscriptUpdate(this, this@TranscriptHolder.language)
         })
     }
 }
