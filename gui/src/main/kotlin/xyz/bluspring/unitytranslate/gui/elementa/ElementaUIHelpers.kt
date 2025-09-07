@@ -163,7 +163,7 @@ object ElementaUIHelpers {
     }
 
     fun colorWithAlpha(rgb: Int, alpha: Int): Color {
-        val rgba = (rgb shl 4) or alpha
+        val rgba = (alpha shl 24) or rgb // THIS IS ARGB, NOT RGBA??????? JAVA WTF
         return Color(rgba, true)
     }
 
