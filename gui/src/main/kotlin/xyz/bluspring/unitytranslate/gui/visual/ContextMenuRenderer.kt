@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.gui.menu
+package xyz.bluspring.unitytranslate.gui.visual
 
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.UIComponent
@@ -15,14 +15,13 @@ import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.events.UIClickEvent
 import gg.essential.universal.UMatrixStack
-import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.gui.UnityTranslateGui
 import xyz.bluspring.unitytranslate.gui.TranscriptBox
 import xyz.bluspring.unitytranslate.gui.config.UnityTranslateClientConfig
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers
 import xyz.bluspring.unitytranslate.gui.elementa.constraints.WindowAwarePositionConstraint
 import xyz.bluspring.unitytranslate.gui.elementa.elements.UIButton
-import xyz.bluspring.unitytranslate.gui.menu.screens.UTConfigScreen
+import xyz.bluspring.unitytranslate.gui.visual.screens.UTConfigScreen
 import java.awt.Color
 
 class ContextMenuRenderer {
@@ -44,6 +43,8 @@ class ContextMenuRenderer {
         contextButton("Duplicate") {}
         contextButton("Remove", Color.RED) {
             UnityTranslateGui.clientConfig.transcriptBoxes.remove(focusedBox!!.config)
+            UnityTranslateGui.updateConfig()
+            closeContextMenu()
         }
     }
 
@@ -129,6 +130,8 @@ class ContextMenuRenderer {
 
     private fun tryOpenContextMenu(mouseX: Double, mouseY: Double) {
         isOpened = true
+
+        focusedBox = null
 
         // Select first hovered transcript box
         for (transcriptBox in UnityTranslateGui.transcriptRenderer.renderedBoxes.asReversed()) {

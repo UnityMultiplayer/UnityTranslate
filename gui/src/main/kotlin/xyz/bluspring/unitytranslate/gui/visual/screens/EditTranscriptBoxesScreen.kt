@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.gui.menu.screens
+package xyz.bluspring.unitytranslate.gui.visual.screens
 
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.UIComponent
@@ -22,7 +22,6 @@ import gg.essential.elementa.events.UIClickEvent
 import gg.essential.universal.ChatColor
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UMouse
-import gg.essential.universal.UScreen
 import xyz.bluspring.unitytranslate.gui.UnityTranslateGui
 import xyz.bluspring.unitytranslate.gui.config.UnityTranslateClientConfig
 import xyz.bluspring.unitytranslate.gui.TranscriptBox
@@ -32,7 +31,7 @@ import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.button
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.cycleButton
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.slider
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.withScrollbar
-import xyz.bluspring.unitytranslate.gui.menu.LayeredScreenManager
+import xyz.bluspring.unitytranslate.gui.visual.LayeredScreenManager
 import java.awt.Color
 import kotlin.math.floor
 

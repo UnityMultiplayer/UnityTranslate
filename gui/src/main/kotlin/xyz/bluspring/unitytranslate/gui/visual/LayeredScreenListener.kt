@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.gui.menu
+package xyz.bluspring.unitytranslate.gui.visual
 
 interface LayeredScreenListener {
     fun onScreenLayerOpened() {}

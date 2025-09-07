@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.gui.menu.screens
+package xyz.bluspring.unitytranslate.gui.visual.screens
 
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
@@ -22,7 +22,7 @@ import xyz.bluspring.unitytranslate.gui.UnityTranslateGui
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.button
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.withScrollbar
-import xyz.bluspring.unitytranslate.gui.menu.LayeredScreenManager
+import xyz.bluspring.unitytranslate.gui.visual.LayeredScreenManager
 
 class LanguageSelectScreen(val onSelected: (Language?) -> Unit, val hasDefault: Boolean = false, val checkRequiresDownload: (Language) -> Boolean = { false }) : WindowScreen(ElementaVersion.V10, drawDefaultBackground = false) {
     val background = UIBlock(ElementaUIHelpers.BACKGROUND_COLOR).constrain {

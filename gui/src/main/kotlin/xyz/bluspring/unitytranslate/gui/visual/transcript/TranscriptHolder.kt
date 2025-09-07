@@ -1,10 +1,11 @@
-package xyz.bluspring.unitytranslate.gui
+package xyz.bluspring.unitytranslate.gui.visual.transcript
 
 import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.events.TranscriptEvents
 import xyz.bluspring.unitytranslate.common.holders.PlayerHolder
 import xyz.bluspring.unitytranslate.common.translator.Transcript
+import xyz.bluspring.unitytranslate.gui.UnityTranslateGui
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class TranscriptHolder(val language: Language) {
@@ -30,7 +31,7 @@ class TranscriptHolder(val language: Language) {
     }
 
     fun updateTranscript(source: PlayerHolder, text: String, language: Language, index: Int, updateTime: Long, incomplete: Boolean) {
-        if (UnityTranslate.instance.voiceChat != null && !UnityTranslate.instance.voiceChat!!.isPlayerAudible(source.uuid))
+        if (UnityTranslate.Companion.instance.voiceChat != null && !UnityTranslate.Companion.instance.voiceChat!!.isPlayerAudible(source.uuid))
             return
 
         if (this.transcripts.any { it.player == source.uuid && it.index == index }) {
@@ -45,13 +46,13 @@ class TranscriptHolder(val language: Language) {
             transcript.incomplete = incomplete
             transcript.arrivalTime = System.currentTimeMillis()
 
-            TranscriptEvents.UPDATE.invoker().onTranscriptUpdate(transcript, this.language)
+            TranscriptEvents.Companion.UPDATE.invoker().onTranscriptUpdate(transcript, this.language)
 
             return
         }
 
         this.transcripts.add(Transcript(index, source, text, language, updateTime, incomplete).apply {
-            TranscriptEvents.UPDATE.invoker().onTranscriptUpdate(this, this@TranscriptHolder.language)
+            TranscriptEvents.Companion.UPDATE.invoker().onTranscriptUpdate(this, this@TranscriptHolder.language)
         })
     }
 }

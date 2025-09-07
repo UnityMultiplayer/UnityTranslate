@@ -4,9 +4,9 @@ import gg.essential.universal.UKeyboard
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UScreen
 import xyz.bluspring.unitytranslate.gui.UnityTranslateGui
-import xyz.bluspring.unitytranslate.gui.menu.ContextMenuRenderer
-import xyz.bluspring.unitytranslate.gui.menu.LayeredScreenListener
-import xyz.bluspring.unitytranslate.gui.menu.tutorial.TutorialRenderer
+import xyz.bluspring.unitytranslate.gui.visual.ContextMenuRenderer
+import xyz.bluspring.unitytranslate.gui.visual.LayeredScreenListener
+import xyz.bluspring.unitytranslate.gui.visual.tutorial.TutorialRenderer
 import xyz.bluspring.unitytranslate.gui.transcriber.browser.BrowserNativeHandles
 
 class StandaloneScreen : UScreen(), LayeredScreenListener {

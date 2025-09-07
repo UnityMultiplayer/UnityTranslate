@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.gui.menu.tutorial
+package xyz.bluspring.unitytranslate.gui.visual.tutorial
 
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.components.UIBlock
@@ -16,9 +16,7 @@ import gg.essential.elementa.dsl.minus
 import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.percentOfWindow
 import gg.essential.elementa.dsl.pixels
-import gg.essential.universal.UMath
 import gg.essential.universal.UMatrixStack
-import gg.essential.universal.UMinecraft
 import xyz.bluspring.unitytranslate.gui.elementa.CustomFontRenderer
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers
 import xyz.bluspring.unitytranslate.gui.elementa.elements.UIButton

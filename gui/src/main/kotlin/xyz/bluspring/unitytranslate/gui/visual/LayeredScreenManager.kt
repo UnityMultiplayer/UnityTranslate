@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.gui.menu
+package xyz.bluspring.unitytranslate.gui.visual
 
 import gg.essential.universal.UScreen
 import java.util.Stack

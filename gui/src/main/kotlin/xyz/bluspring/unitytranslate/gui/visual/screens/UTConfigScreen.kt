@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.gui.menu.screens
+package xyz.bluspring.unitytranslate.gui.visual.screens
 
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.UIConstraints
@@ -35,7 +35,7 @@ import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.slider
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.toggleButton
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.withScrollbar
 import xyz.bluspring.unitytranslate.gui.elementa.elements.ExpandableSection
-import xyz.bluspring.unitytranslate.gui.menu.LayeredScreenManager
+import xyz.bluspring.unitytranslate.gui.visual.LayeredScreenManager
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.name

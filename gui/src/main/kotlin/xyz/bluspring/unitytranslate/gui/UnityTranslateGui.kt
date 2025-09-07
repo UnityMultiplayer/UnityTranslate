@@ -6,10 +6,7 @@ import gg.essential.elementa.dsl.*
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UI18n.i18n
 import gg.essential.universal.UMinecraft
-import gg.essential.universal.standalone.UCWindow
 import gg.essential.universal.standalone.glfw.Glfw
-import gg.essential.universal.standalone.glfw.GlfwWindow
-import gg.essential.universal.standalone.glfw.runGlfw
 import gg.essential.universal.standalone.nanovg.NvgContext
 import gg.essential.universal.standalone.nanovg.NvgFont
 import gg.essential.universal.standalone.nanovg.NvgFontFace
@@ -19,17 +16,11 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
 import net.lenni0451.reflect.Agents
 import net.lenni0451.reflect.accessor.UnsafeAccess
-import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFWImage
-import org.lwjgl.opengl.GL
-import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL32C
-import org.lwjgl.opengl.GL43C
-import org.lwjgl.opengl.GLUtil
 import org.lwjgl.stb.STBImage
 import org.lwjgl.system.MemoryStack
-import org.lwjgl.system.MemoryUtil
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
@@ -39,7 +30,6 @@ import org.objectweb.asm.tree.InsnNode
 import org.objectweb.asm.tree.LabelNode
 import org.objectweb.asm.tree.LdcInsnNode
 import org.objectweb.asm.tree.MethodInsnNode
-import sun.misc.Unsafe
 import xyz.bluspring.unitytranslate.common.Language
 import xyz.bluspring.unitytranslate.common.UnityTranslate
 import xyz.bluspring.unitytranslate.common.UnityTranslate.Companion.json
@@ -50,22 +40,17 @@ import xyz.bluspring.unitytranslate.common.network.v1.serverbound.V1ServerboundS
 import xyz.bluspring.unitytranslate.common.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.common.translator.Transcript
 import xyz.bluspring.unitytranslate.gui.config.UnityTranslateClientConfig
-import xyz.bluspring.unitytranslate.gui.menu.LayeredScreenManager
+import xyz.bluspring.unitytranslate.gui.visual.LayeredScreenManager
 import xyz.bluspring.unitytranslate.gui.standalone.StandaloneI18n
 import xyz.bluspring.unitytranslate.gui.standalone.gui.StandaloneScreen
 import xyz.bluspring.unitytranslate.gui.transcriber.Transcribers
-import java.awt.image.BufferedImage
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
+import xyz.bluspring.unitytranslate.gui.visual.transcript.TranscriptHolder
 import java.lang.instrument.ClassFileTransformer
-import java.lang.reflect.Field
-import java.lang.reflect.Modifier
 import java.nio.ByteBuffer
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import java.security.ProtectionDomain
 import java.util.function.BiConsumer
-import javax.imageio.ImageIO
 import kotlin.io.path.*
 
 object UnityTranslateGui {
