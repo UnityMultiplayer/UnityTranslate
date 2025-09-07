@@ -44,6 +44,7 @@ import xyz.bluspring.unitytranslate.gui.visual.LayeredScreenManager
 import xyz.bluspring.unitytranslate.gui.standalone.StandaloneI18n
 import xyz.bluspring.unitytranslate.gui.standalone.gui.StandaloneScreen
 import xyz.bluspring.unitytranslate.gui.transcriber.Transcribers
+import xyz.bluspring.unitytranslate.gui.visual.transcript.TranscriptBoxRenderer
 import xyz.bluspring.unitytranslate.gui.visual.transcript.TranscriptHolder
 import java.lang.instrument.ClassFileTransformer
 import java.nio.ByteBuffer

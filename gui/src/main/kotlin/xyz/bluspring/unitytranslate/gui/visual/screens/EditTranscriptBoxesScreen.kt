@@ -24,7 +24,7 @@ import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UMouse
 import xyz.bluspring.unitytranslate.gui.UnityTranslateGui
 import xyz.bluspring.unitytranslate.gui.config.UnityTranslateClientConfig
-import xyz.bluspring.unitytranslate.gui.TranscriptBox
+import xyz.bluspring.unitytranslate.gui.visual.transcript.TranscriptBox
 import xyz.bluspring.unitytranslate.gui.elementa.ColorSelector
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.button

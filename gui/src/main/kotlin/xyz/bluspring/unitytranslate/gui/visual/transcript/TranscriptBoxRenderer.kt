@@ -1,9 +1,10 @@
-package xyz.bluspring.unitytranslate.gui
+package xyz.bluspring.unitytranslate.gui.visual.transcript
 
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.components.Window
 import gg.essential.elementa.dsl.childOf
 import gg.essential.universal.UMatrixStack
+import xyz.bluspring.unitytranslate.gui.UnityTranslateGui
 
 class TranscriptBoxRenderer {
     val window = Window(ElementaVersion.V10)

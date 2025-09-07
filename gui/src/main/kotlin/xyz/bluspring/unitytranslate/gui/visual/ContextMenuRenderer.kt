@@ -16,7 +16,7 @@ import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.events.UIClickEvent
 import gg.essential.universal.UMatrixStack
 import xyz.bluspring.unitytranslate.gui.UnityTranslateGui
-import xyz.bluspring.unitytranslate.gui.TranscriptBox
+import xyz.bluspring.unitytranslate.gui.visual.transcript.TranscriptBox
 import xyz.bluspring.unitytranslate.gui.config.UnityTranslateClientConfig
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers
 import xyz.bluspring.unitytranslate.gui.elementa.constraints.WindowAwarePositionConstraint

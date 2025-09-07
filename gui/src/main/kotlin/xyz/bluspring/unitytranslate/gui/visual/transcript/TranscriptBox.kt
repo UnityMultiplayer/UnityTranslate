@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.gui
+package xyz.bluspring.unitytranslate.gui.visual.transcript
 
 import gg.essential.elementa.components.ScrollComponent
 import gg.essential.elementa.components.UIContainer
@@ -12,6 +12,7 @@ import gg.essential.elementa.dsl.*
 import gg.essential.universal.ChatColor
 import gg.essential.universal.UI18n
 import xyz.bluspring.unitytranslate.common.translator.Transcript
+import xyz.bluspring.unitytranslate.gui.UnityTranslateGui
 import xyz.bluspring.unitytranslate.gui.config.UnityTranslateClientConfig
 import xyz.bluspring.unitytranslate.gui.elementa.ElementaUIHelpers.colorWithAlpha
 import xyz.bluspring.unitytranslate.gui.elementa.constraints.AlignTypeBasedXConstraint
