@@ -7,7 +7,6 @@ dependencies {
     api("io.netty:netty-buffer:4.1.97.Final")
     api("io.netty:netty-codec:4.1.97.Final")
 
-    shade(api("org.java-websocket:Java-WebSocket:${mod.dep("java_websocket")}")!!)
     shade(api("com.github.jnr:jnr-ffi:${mod.dep("jnr")}")!!)
     shade(api("io.github.givimad:whisper-jni:${mod.dep("whisper")}")!!)
 

@@ -1,11 +1,15 @@
 package xyz.bluspring.unitytranslate.gui
 
+import com.sun.jna.Pointer
+import com.sun.jna.platform.win32.WinDef
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.components.Window
 import gg.essential.elementa.dsl.*
+import gg.essential.universal.UDesktop
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UI18n.i18n
 import gg.essential.universal.UMinecraft
+import gg.essential.universal.standalone.UCWindow
 import gg.essential.universal.standalone.glfw.Glfw
 import gg.essential.universal.standalone.nanovg.NvgContext
 import gg.essential.universal.standalone.nanovg.NvgFont
@@ -18,6 +22,7 @@ import net.lenni0451.reflect.Agents
 import net.lenni0451.reflect.accessor.UnsafeAccess
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFWImage
+import org.lwjgl.glfw.GLFWNativeWin32
 import org.lwjgl.opengl.GL32C
 import org.lwjgl.stb.STBImage
 import org.lwjgl.system.MemoryStack
@@ -46,6 +51,7 @@ import xyz.bluspring.unitytranslate.gui.standalone.gui.StandaloneScreen
 import xyz.bluspring.unitytranslate.gui.transcriber.Transcribers
 import xyz.bluspring.unitytranslate.gui.visual.transcript.TranscriptBoxRenderer
 import xyz.bluspring.unitytranslate.gui.visual.transcript.TranscriptHolder
+import xyz.bluspring.unitytranslate.gui.window.blur.windows.DwmApi
 import java.lang.instrument.ClassFileTransformer
 import java.nio.ByteBuffer
 import java.nio.file.Path
@@ -170,11 +176,14 @@ object UnityTranslateGui {
                             return@use
 
                         withContext(Dispatchers.Glfw) {
+                            // Set window icon
                             GLFW.glfwSetWindowIcon(window.glfwWindow.glfwId, GLFWImage.malloc(1, stack)
                                 .width(width.get(0))
                                 .height(height.get(0))
                                 .pixels(icon!!)
                             )
+
+                            GLFW.glfwSetWindowSizeLimits(window.glfwWindow.glfwId, 854, 480, GLFW.GLFW_DONT_CARE, GLFW.GLFW_DONT_CARE)
                         }
                     }
                 } finally {
@@ -183,6 +192,10 @@ object UnityTranslateGui {
                     }
                 }
             }
+
+//            if (UDesktop.isWindows) {
+//                DwmApi.setAcrylicBackground(WinDef.HWND(Pointer.createConstant(GLFWNativeWin32.glfwGetWin32Window(window.glfwWindow.glfwId))))
+//            }
 
             GLFW.glfwSetWindowCloseCallback(window.glfwWindow.glfwId) {
                 shutdown()

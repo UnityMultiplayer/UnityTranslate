@@ -24,8 +24,11 @@ val projectName: String = extra["mod.name"]?.toString()!!
 rootProject.name = projectName
 
 include("bukkit", "common", "gui")
-include("library:library")
+include("library:library") // UnityTranslateLib
 
+include("transcribers", "transcribers:api", "transcribers:browser", "transcribers:google") // Transcriber modules
+
+// Minecraft setup
 //stonecutter {
 //    centralScript = "build.gradle.kts"
 //    kotlinController = true

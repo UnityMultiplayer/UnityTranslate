@@ -1,0 +1,15 @@
+{
+    "module_info": {
+        "id": "browser_transcription",
+        "namespace": "unitytranslate",
+        "name": "UnityTranslate Browser Transcription Module",
+        "authors": [
+            "BluSpring"
+        ],
+        "version": "${version}"
+    },
+    "speech_transcriber": {
+        "entrypoint": "xyz.bluspring.unitytranslate.transcriber.browser.BrowserSpeechTranscriber",
+        "custom_input_type": "none"
+    }
+}
