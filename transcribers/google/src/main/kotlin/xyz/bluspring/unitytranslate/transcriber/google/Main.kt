@@ -3,8 +3,8 @@ package xyz.bluspring.unitytranslate.transcriber.google
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import net.sourceforge.javaflacencoder.AudioStreamEncoder
 import net.sourceforge.javaflacencoder.FLACEncoder
 import net.sourceforge.javaflacencoder.FLACStreamOutputStream
 import net.sourceforge.javaflacencoder.StreamConfiguration
@@ -17,6 +17,7 @@ import java.nio.ByteOrder
 import javax.sound.sampled.AudioFormat
 import javax.sound.sampled.AudioInputStream
 import javax.sound.sampled.AudioSystem
+import kotlin.concurrent.thread
 import kotlin.random.Random
 import kotlin.random.nextULong
 
@@ -41,6 +42,7 @@ object Main {
 
     // https://giulianopz.github.io/full-duplex-http-streaming-in-go
     // https://gist.github.com/offlinehacker/5780124
+    // https://blog.travispayton.com/wp-content/uploads/2014/03/Google-Speech-API.pdf
 
     // https://github.com/StainlessStlRat/FullDuplexNettyExample
 
@@ -54,22 +56,27 @@ object Main {
         // network_speech_recognition_engine_impl.cc
 
         runBlocking {
-            var outputStream: OutputStream? = null
+            val byteStream = QueuedByteArrayOutputStream(FRAME_SIZE)
+            val outputStream = BufferedOutputStream(byteStream)
             val encoder = FLACEncoder()
+
             encoder.threadCount = 1
             encoder.setStreamConfiguration(StreamConfiguration(1, 16, FRAME_SIZE, SAMPLE_RATE, 16))
 
-            // Mic thread
-            async(Dispatchers.Main) {
-                val audioFormat = AudioFormat(AudioFormat.Encoding.PCM_SIGNED, SAMPLE_RATE.toFloat(), 16, 1, 2, SAMPLE_RATE.toFloat(), false)
-                val mic = AudioSystem.getTargetDataLine(audioFormat)
-                mic.open(audioFormat)
-                val audioStream = AudioInputStream(mic)
-                mic.start()
+            val audioFormat = AudioFormat(SAMPLE_RATE.toFloat(), 16, 1, true, false)
+            val mic = AudioSystem.getTargetDataLine(audioFormat)
+            mic.open(audioFormat)
+            val audioStream = AudioInputStream(mic)
+            mic.start()
 
-                println("Loaded mic")
-                while (true) {
-                    AudioStreamEncoder.encodeAudioInputStream(audioStream, FRAME_SIZE, encoder, false)
+            println("Loaded mic")
+
+            // Mic thread
+            launch {
+                while (mic.isOpen) {
+                    val bytesRead = ByteArray(FRAME_SIZE)
+                    audioStream.read(bytesRead)
+                    outputStream.write(bytesRead)
                 }
 
                 /*while (mic.isOpen) {
@@ -88,12 +95,14 @@ object Main {
                     encoder.addSamples(intArray, 1)
                 }*/
             }
+                .start()
 
             // Upstream thread - sends the data directly to the API.
-            async(Dispatchers.Main, start = CoroutineStart.UNDISPATCHED) {
+            thread {
                 println("Started upstream")
-                val url = URI.create("https://www.google.com/speech-api/full-duplex/v1/up?key=${GoogleApiKeys.GOOGLE_API_KEY}&pair=${requestKey}&output=pb&lang=en-US&pFilter=0&app=chromium&continuous").toURL()
+                val url = URI.create("https://www.google.com/speech-api/full-duplex/v1/up?key=${GoogleApiKeys.GOOGLE_API_KEY}&pair=${requestKey}&output=json&lang=en-US&pFilter=0&app=chromium&continuous&interim").toURL()
                 val connection = url.openConnection() as HttpURLConnection
+                connection.connectTimeout = 30_000
                 connection.requestMethod = "POST"
                 connection.doOutput = true
                 connection.setRequestProperty("Content-Type", "audio/x-flac; rate=16000")
@@ -101,38 +110,49 @@ object Main {
                 connection.setChunkedStreamingMode(FRAME_SIZE * 2)
                 connection.connect()
 
-                outputStream = BufferedOutputStream(connection.getOutputStream(), FRAME_SIZE * 2)
-                encoder.setOutputStream(FLACStreamOutputStream(outputStream))
+                val netStream = connection.getOutputStream()
+                //outputStream = connection.getOutputStream()//BufferedOutputStream(, FRAME_SIZE * 2)
                 encoder.clear()
+                encoder.setOutputStream(FLACStreamOutputStream(netStream))
                 encoder.openFLACStream()
                 println("Loaded upstream")
+
+                byteStream.whatToWrite = { array ->
+                    val stream = netStream
+
+                    encoder.addSamples(array, array.size / 2)
+                    encoder.encodeSamples(array.size / 2, false)
+                }
             }
 
             // Downstream thread - receives the data from the API.
-            async(Dispatchers.Main, start = CoroutineStart.UNDISPATCHED) {
+            thread {
                 println("Started downstream")
-                val url = URI.create("https://www.google.com/speech-api/full-duplex/v1/down?key=${GoogleApiKeys.GOOGLE_API_KEY}&pair=${requestKey}&output=pb").toURL()
+                val url = URI.create("https://www.google.com/speech-api/full-duplex/v1/down?key=${GoogleApiKeys.GOOGLE_API_KEY}&pair=${requestKey}&output=json").toURL()
                 val connection = url.openConnection() as HttpURLConnection
+                connection.connectTimeout = 30_000
                 connection.requestMethod = "GET"
                 connection.setRequestProperty("User-Agent", USER_AGENT)
                 connection.doInput = true
                 connection.connect()
 
                 try {
-                    val reader = connection.getInputStream().bufferedReader()
+                    val reader = connection.getInputStream().reader()
                     println("Loaded downstream")
-                    while (true) {
+                    while (connection.responseCode == 200) {
+//                        println(reader.read())
                         if (reader.ready()) {
-                            val line = reader.readLine()
+                            val line = reader.readText()
                             println(line)
                         }
                     }
                 } catch (e: Throwable) {
                     e.printStackTrace()
-                    val stream = connection.errorStream
-                    for (line in stream.reader().readLines()) {
-                        println("Error downstream: $line")
-                    }
+                }
+
+                val stream = connection.errorStream ?: return@thread
+                for (line in stream.reader().readLines()) {
+                    println("Error downstream: $line")
                 }
             }
         }
