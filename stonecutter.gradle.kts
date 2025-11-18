@@ -5,7 +5,7 @@ import net.fabricmc.loom.task.RemapJarTask
 plugins {
     id("dev.kikugie.stonecutter")
 
-    id("dev.architectury.loom") version "1.13-SNAPSHOT" apply false
+    id("dev.architectury.loom") version "1.13.9999" apply false // TODO: using a local version of Arch Loom, switch to uploaded version when fixed
     id("architectury-plugin") version "3.4-SNAPSHOT" apply false
 
     kotlin("jvm") version "2.2.21" apply false
@@ -18,6 +18,8 @@ plugins {
 stonecutter active "1.20.1"
 
 allprojects {
+    group = "xyz.bluspring"
+
     repositories {
         mavenCentral()
         maven("https://maven.parchmentmc.org")
@@ -31,6 +33,7 @@ allprojects {
             }
         }
         maven("https://repo.clojars.org")
+        maven("https://maven.shedaniel.me/")
         maven("https://maven.terraformersmc.com/")
         maven("https://maven.architectury.dev/")
         maven("https://maven.maxhenkel.de/repository/public")
@@ -66,6 +69,11 @@ subprojects {
     apply(plugin = "com.gradleup.shadow")
 
     val minecraftVersion = sc.current.version
+
+    val loader = try { project.property("loom.platform") as? String? } catch (_: Throwable) { null } ?: "unknown"
+
+    version = "${mod.version}+$minecraftVersion-$loader"
+
     val loom = project.extensions.getByName<LoomGradleExtensionAPI>("loom")
 
     loom.silentMojangMappingsLicense()

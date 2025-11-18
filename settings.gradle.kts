@@ -8,6 +8,7 @@ pluginManagement {
 
         gradlePluginPortal()
         mavenCentral()
+        mavenLocal()
     }
 
     plugins {
@@ -31,12 +32,12 @@ stonecutter {
         vcsVersion = "1.20.1"
 
         branch("fabric")
-//        branch("forge") {
-//            versions(versions.filterIndexed { i, _ -> i <= versions.indexOf("1.20.1") })
-//        }
-//        branch("neoforge") {
-//            versions(versions.filterIndexed { i, _ -> i >= versions.indexOf("1.21.1") })
-//        }
+        branch("forge") {
+            versions(versions.filterIndexed { i, _ -> i <= versions.indexOf("1.20.1") })
+        }
+        branch("neoforge") {
+            versions(versions.filterIndexed { i, _ -> i >= versions.indexOf("1.21.1") })
+        }
     }
 }
 

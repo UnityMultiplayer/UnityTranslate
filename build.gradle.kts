@@ -32,14 +32,6 @@ stonecutter {
 /*
 version = "${project.property("mod.version")}+mc${mcData.version}-${mcData.loader.friendlyString}"
 
-val leastCommonMcVersion = when (mcData.version) {
-    MinecraftVersions.VERSION_1_21_10 -> "1.21.9"
-    MinecraftVersions.VERSION_1_21_8 -> "1.21.6"
-    MinecraftVersions.VERSION_1_21_4 -> "1.21.3"
-    MinecraftVersions.VERSION_1_21_1 -> "1.21"
-    else -> mcData.version.toString()
-}
-
 val architecturyVersion = when (mcData.version) {
     MinecraftVersions.VERSION_1_20_1 -> "9.2.14"
     MinecraftVersions.VERSION_1_20_4 -> "11.1.17"
