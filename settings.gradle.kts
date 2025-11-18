@@ -15,9 +15,9 @@ pluginManagement {
     }
 
     plugins {
-        kotlin("jvm") version("2.0.20")
-        kotlin("plugin.serialization") version("2.0.20")
-        id("dev.deftu.gradle.multiversion-root") version("2.9.1+alpha.3")
+        kotlin("jvm") version("2.2.21")
+        kotlin("plugin.serialization") version("2.2.21")
+        id("dev.deftu.gradle.multiversion-root") version("2.64.0")
     }
 }
 
@@ -29,17 +29,21 @@ listOf(
     "1.20.1-fabric",
     "1.20.1-forge",
 
-    "1.20.4-fabric",
-    "1.20.4-neoforge",
-    //"1.20.4-forge",
-
-    "1.20.6-fabric",
-    "1.20.6-neoforge",
-    //"1.20.6-forge",
-
     "1.21.1-fabric",
     "1.21.1-neoforge",
     //"1.21.1-forge",
+
+    "1.21.4-fabric",
+    "1.21.4-neoforge",
+
+    "1.21.5-fabric",
+    "1.21.5-neoforge",
+
+    "1.21.8-fabric",
+    "1.21.8-neoforge",
+
+    "1.21.10-fabric",
+    "1.21.10-neoforge"
 ).forEach { version ->
     include(":$version")
     project(":$version").apply {

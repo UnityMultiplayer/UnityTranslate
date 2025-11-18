@@ -8,7 +8,7 @@ issueTrackerURL="https://github.com/BluSpring/UnityTranslate/issues"
     version="${mod_version}"
     displayName="UnityTranslate"
     logoFile="icon.png"
-    credits="Thanks to Argos Open Tech for creating LibreTranslate, without it this mod would not have been possible."
+    credits="Thanks to Argos Open Tech for creating Argos Translate, without it this mod would not have been possible."
     authors="BluSpring"
     description='''
     A mod designed for free live translation, inspired by the QSMP. Mainly created for the Unity Multiplayer server, and for public release towards the multilingual Minecraft community.
@@ -29,7 +29,7 @@ issueTrackerURL="https://github.com/BluSpring/UnityTranslate/issues"
     side="BOTH"
 
 [[dependencies.unitytranslate]]
-    modId="kotlinforforge"
+    modId="kotlinlangforge"
     mandatory=true
     versionRange="[${forge_kotlin_version},)"
     ordering="NONE"

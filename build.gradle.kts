@@ -2,13 +2,9 @@ import com.modrinth.minotaur.dependencies.DependencyType
 import com.modrinth.minotaur.dependencies.ModDependency
 import dev.deftu.gradle.tools.minecraft.CurseRelation
 import dev.deftu.gradle.tools.minecraft.CurseRelationType
-import dev.deftu.gradle.utils.MinecraftInfo
-import dev.deftu.gradle.utils.MinecraftVersion
 import dev.deftu.gradle.utils.ModLoader
 import dev.deftu.gradle.utils.includeOrShade
-import org.jetbrains.kotlin.daemon.common.toHexString
-import java.net.URI
-import java.security.MessageDigest
+import dev.deftu.gradle.utils.version.MinecraftVersions
 
 plugins {
     java
@@ -37,10 +33,6 @@ toolkitLoomHelper {
         useTweaker("org.spongepowered.asm.launch.MixinTweaker")
         useForgeMixin("unitytranslate.mixins.json", true)
     }
-
-    if (mcData.isForgeLike) {
-        useKotlinForForge()
-    }
 }
 
 version = "${project.property("mod.version")}+mc${mcData.version}-${mcData.loader.friendlyString}"
@@ -68,21 +60,45 @@ repositories {
     maven("https://repo.plo.su")
     maven("https://repo.plasmoverse.com/releases")
     maven("https://repo.plasmoverse.com/snapshots")
+    maven("https://repo.nyon.dev/releases")
+    maven("https://mvn.devos.one/releases")
+    maven("https://mvn.devos.one/snapshots")
 }
 
-val architecturyVersion = when (mcData.version.rawVersion) {
-    1_20_01 -> "9.2.14"
-    1_20_04 -> "11.1.17"
-    1_20_06 -> "12.1.4"
-    1_21_01 -> "13.0.6"
+val leastCommonMcVersion = when (mcData.version) {
+    MinecraftVersions.VERSION_1_21_10 -> "1.21.9"
+    MinecraftVersions.VERSION_1_21_8 -> "1.21.6"
+    MinecraftVersions.VERSION_1_21_4 -> "1.21.3"
+    MinecraftVersions.VERSION_1_21_1 -> "1.21"
+    else -> mcData.version.toString()
+}
+
+val architecturyVersion = when (mcData.version) {
+    MinecraftVersions.VERSION_1_20_1 -> "9.2.14"
+    MinecraftVersions.VERSION_1_20_4 -> "11.1.17"
+    MinecraftVersions.VERSION_1_20_6 -> "12.1.4"
+    MinecraftVersions.VERSION_1_21_1 -> "13.0.6"
+    MinecraftVersions.VERSION_1_21_4 -> "15.0.3"
+    MinecraftVersions.VERSION_1_21_5 -> "16.1.4"
+    MinecraftVersions.VERSION_1_21_8 -> "17.0.8"
+    MinecraftVersions.VERSION_1_21_10 -> "18.0.6"
 
     else -> throw IllegalStateException()
 }
 
-val lwjglVersion = when (mcData.version.rawVersion) {
-    1_20_01 -> "3.3.1"
-    1_20_04 -> "3.3.2"
-    1_20_06, 1_21_01 -> "3.3.3"
+val klfVersion = when (mcData.version) {
+    MinecraftVersions.VERSION_1_20_1, MinecraftVersions.VERSION_1_20_4 -> "2.0"
+    MinecraftVersions.VERSION_1_21_1, MinecraftVersions.VERSION_1_21_4, MinecraftVersions.VERSION_1_21_5, MinecraftVersions.VERSION_1_21_8 -> "3.0"
+    MinecraftVersions.VERSION_1_21_10 -> "3.1"
+
+    else -> throw IllegalStateException()
+}
+
+val fabricPermissionsApiVersion = when (mcData.version) {
+    MinecraftVersions.VERSION_1_20_1 -> "0.3.1"
+    MinecraftVersions.VERSION_1_21_1, MinecraftVersions.VERSION_1_21_4, MinecraftVersions.VERSION_1_21_5 -> "0.3.3"
+    MinecraftVersions.VERSION_1_21_8 -> "0.4.1"
+    MinecraftVersions.VERSION_1_21_10 -> "0.5.0"
 
     else -> throw IllegalStateException()
 }
@@ -95,11 +111,13 @@ dependencies {
     modApi("dev.architectury:architectury-${mcData.loader.friendlyString}:$architecturyVersion")
 
     if (mcData.isFabric) {
-        val modMenuVersion = when (mcData.version.rawVersion) {
-            1_20_01 -> "7.2.2"
-            1_20_04 -> "9.2.0"
-            1_20_06 -> "10.0.0"
-            1_21_01 -> "11.0.2"
+        val modMenuVersion = when (mcData.version) {
+            MinecraftVersions.VERSION_1_20_1 -> "7.2.2"
+            MinecraftVersions.VERSION_1_21_1 -> "11.0.2"
+            MinecraftVersions.VERSION_1_21_4 -> "13.0.3"
+            MinecraftVersions.VERSION_1_21_5 -> "14.0.0"
+            MinecraftVersions.VERSION_1_21_8 -> "15.0.0"
+            MinecraftVersions.VERSION_1_21_10 -> "16.0.0-rc.1"
 
             else -> throw IllegalStateException()
         }
@@ -108,44 +126,41 @@ dependencies {
     }
 
     if (mcData.isFabric) {
-        includeOrShade(modImplementation("me.lucko:fabric-permissions-api:0.3.1")!!)
+        includeOrShade(modImplementation("me.lucko:fabric-permissions-api:$fabricPermissionsApiVersion")!!)
     }
 
     val useSVC = true
 
     if (useSVC)
-        modRuntimeOnly("maven.modrinth:simple-voice-chat:${mcData.loader.friendlyString}-${if (mcData.version != MinecraftVersion.VERSION_1_21_1) mcData.version else "1.21"}-${project.property("voicechat_version")}")
+        modRuntimeOnly("maven.modrinth:simple-voice-chat:${mcData.loader.friendlyString}-${mcData.version}-${project.property("voicechat_version")}")
     else if (!mcData.isNeoForge) {
-        modRuntimeOnly("maven.modrinth:plasmo-voice:${mcData.loader.friendlyString}-${if (mcData.version != MinecraftVersion.VERSION_1_21_1) mcData.version else "1.21"}-${project.property("plasmo_version")}")
+        modRuntimeOnly("maven.modrinth:plasmo-voice:${mcData.loader.friendlyString}-${leastCommonMcVersion}-${project.property("plasmo_version")}")
         runtimeOnly("su.plo.voice.api:server:${project.property("plasmo_api_version")}")
         runtimeOnly("su.plo.voice.api:client:${project.property("plasmo_api_version")}")
     }
 
-    val clothConfigVersion = when(mcData.version.rawVersion) {
-        1_20_01 -> "11.1.118"
-        1_20_04 -> "13.0.121"
-        1_20_06 -> "14.0.126"
-        1_21_01 -> "15.0.128"
+    val clothConfigVersion = when(mcData.version) {
+        MinecraftVersions.VERSION_1_20_1 -> "11.1.118"
+        MinecraftVersions.VERSION_1_21_1 -> "15.0.128"
+        MinecraftVersions.VERSION_1_21_4 -> "17.0.144"
+        MinecraftVersions.VERSION_1_21_5 -> "18.0.145"
+        MinecraftVersions.VERSION_1_21_8 -> "19.0.147"
+        MinecraftVersions.VERSION_1_21_10 -> "20.0.149"
 
         else -> throw IllegalStateException()
     }
 
-    modCompileOnly("maven.modrinth:cloth-config:${clothConfigVersion}+${mcData.loader.friendlyString}")
-
-    val cerbonsApiVersion = if (mcData.isForgeLike) "XWZQbKsr" else "1.1.0"
-    modCompileOnly("maven.modrinth:cerbons-api:$cerbonsApiVersion")
-
-    val talkBalloonsVersion = if (mcData.isForgeLike) "kN8kdQ22" else "1.0.0"
-    modCompileOnly("maven.modrinth:talk-balloons:$talkBalloonsVersion")
+    modImplementation("maven.modrinth:cloth-config:${clothConfigVersion}+${mcData.loader.friendlyString}")
+    modImplementation("maven.modrinth:talk-balloons:${project.property("talk_balloons_version")}+${if (mcData.version == MinecraftVersions.VERSION_1_21_1) "1.21.1" else leastCommonMcVersion}-${mcData.loader.friendlyString}")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:${project.property("kotlin_serialization_version")}")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:${project.property("kotlin_serialization_version")}")
 
-    implementation("org.jetbrains.kotlin:kotlin-reflect:${project.property("kotlin_version")}")
-
     if (mcData.isFabric) {
         modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
         modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
+    } else {
+        modImplementation("dev.nyon:KotlinLangForge:${property("kotlinlangforge_version")}-k${property("kotlin_version")}-${klfVersion}+${mcData.loader.friendlyString}")
     }
 
     val jws = includeOrShade("org.java-websocket:Java-WebSocket:1.5.7")!!
@@ -163,7 +178,12 @@ dependencies {
         minecraftRuntimeLibraries(okhttp!!)
     }
 
-    shade(implementation("org.lwjgl:lwjgl:$lwjglVersion")!!)
+    // UnityTranslateLib
+    shade(implementation("xyz.bluspring.unitytranslate:UnityTranslateLib:${rootProject.property("unitytranslatelib_version")}")!!)
+    shade(implementation("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-windows-amd64:${rootProject.property("unitytranslatelib_version")}")!!)
+    shade(implementation("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-linux-amd64:${rootProject.property("unitytranslatelib_version")}")!!)
+
+    includeOrShade(api("com.github.jnr:jnr-ffi:${rootProject.property("jnr_version")}")!!)
 }
 
 toolkitReleases {
@@ -176,13 +196,14 @@ toolkitReleases {
         if (mcData.loader == ModLoader.FABRIC) {
             dependencies.add(ModDependency("Ha28R6CL", DependencyType.REQUIRED)) // Fabric Language Kotlin
         } else if (mcData.isForgeLike) {
-            dependencies.add(ModDependency("ordsPcFz", DependencyType.REQUIRED)) // Kotlin for Forge
+            dependencies.add(ModDependency("1vrSzlao", DependencyType.REQUIRED)) // KotlinLangForge (it's so much better oh my GOD)
         }
 
         dependencies.addAll(listOf(
             ModDependency("lhGA9TYQ", DependencyType.REQUIRED), // Architectury API
             ModDependency("l3tS9WUS", DependencyType.OPTIONAL), // Talk Balloons
             ModDependency("9eGKb6K1", DependencyType.OPTIONAL), // Simple Voice Chat
+            ModDependency("1bZhdhsH", DependencyType.OPTIONAL), // Plasmo Voice
         ))
     }
 
@@ -192,13 +213,14 @@ toolkitReleases {
         if (mcData.loader == ModLoader.FABRIC) {
             relations.add(CurseRelation("fabric-language-kotlin", CurseRelationType.REQUIRED)) // Fabric Language Kotlin
         } else if (mcData.isForgeLike) {
-            relations.add(CurseRelation("kotlin-for-forge", CurseRelationType.REQUIRED)) // Kotlin for Forge
+            relations.add(CurseRelation("kotlinlangforge", CurseRelationType.REQUIRED)) // KotlinLangForge
         }
 
         relations.addAll(listOf(
             CurseRelation("architectury-api", CurseRelationType.REQUIRED), // Architectury API
             CurseRelation("talk-balloons", CurseRelationType.OPTIONAL), // Talk Balloons
             CurseRelation("simple-voice-chat", CurseRelationType.OPTIONAL), // Simple Voice Chat
+            CurseRelation("plasmo-voice", CurseRelationType.OPTIONAL), // Plasmo Voice
         ))
     }
 
@@ -206,46 +228,7 @@ toolkitReleases {
 }
 
 tasks {
-    create("getLwjgl") {
-        doFirst {
-            val dir = layout.buildDirectory.dir("lwjgl/lwjgl").get().asFile
-            if (!dir.exists())
-                dir.mkdirs()
-
-            for (suffix in listOf("", "-natives-windows", "-natives-macos", "-natives-linux")) {
-                val lwjglFile = File(dir, "lwjgl-$lwjglVersion$suffix.jar")
-                if (lwjglFile.exists()) {
-                    logger.info("LWJGL file ${lwjglFile.name} already downloaded, not redownloading it.")
-                    continue
-                }
-
-                val hash = URI("https://repo1.maven.org/maven2/org/lwjgl/lwjgl/$lwjglVersion/lwjgl-$lwjglVersion$suffix.jar.sha256").toURL().readText()
-                val downloadUrl = URI("https://repo1.maven.org/maven2/org/lwjgl/lwjgl/$lwjglVersion/lwjgl-$lwjglVersion$suffix.jar").toURL()
-
-                logger.info("Downloading ${lwjglFile.name}...")
-                lwjglFile.createNewFile()
-                lwjglFile.writeBytes(downloadUrl.readBytes())
-
-                val sha1 = MessageDigest.getInstance("SHA256")
-                sha1.update(lwjglFile.readBytes())
-
-                if (hash != sha1.digest().toHexString()) {
-                    lwjglFile.delete()
-                    throw SecurityException("SHA1 mismatch for ${lwjglFile.name} (expected $hash, got ${sha1.digest().toHexString()})")
-                }
-            }
-
-            val versionFile = File(dir, "version.txt")
-
-            if (!versionFile.exists())
-                versionFile.createNewFile()
-
-            versionFile.writeText(lwjglVersion, Charsets.UTF_8)
-        }
-    }
-
     processResources {
-        dependsOn("getLwjgl")
         val properties = mutableMapOf<String, String>()
 
         properties.putAll(mapOf(
@@ -267,26 +250,20 @@ tasks {
                 return@run null
             }
 
-            val version = MinecraftInfo.ForgeLike.getKotlinForForgeVersion(mcData.version)
-            val majorVersion = version.split(".")[0]
-            "[$majorVersion,)"
+            "[${klfVersion.split(".")[0]},)"
         }
 
         if (mcData.isForgeLike) {
-            properties["forge_kotlin_version"] = mcData.dependencies.forgeLike.kotlinForForgeVersion
+            properties["forge_kotlin_version"] = klfVersion
             properties["forge_loader_version"] = forgeLoaderVersion!!
             properties["mod_loader_name"] = mcData.loader.friendlyString
 
-            if (mcData.isForge && mcData.version.rawVersion <= 1_20_01) {
-                properties["forge_loader"] = "javafml"
-            } else {
-                properties["forge_loader"] = "kotlinforforge"
-            }
+            properties["forge_loader"] = "klf"
 
             if (mcData.isForge) {
                 properties["FUCKING_REQUIRED"] = "mandatory=true"
             } else {
-                properties["FUCKING_REQUIRED"] = "required=true"
+                properties["FUCKING_REQUIRED"] = "type=\"required\""
             }
         }
 
@@ -315,22 +292,9 @@ tasks {
         }
     }
 
-    // Modified from https://github.com/DexPatcher/dexpatcher-tool/blob/v1.2.1/tool/build.gradle#L57-L79
-    val shadowBugWorkaround = create<Jar>("shadowBugWorkaround") {
-        dependsOn("getLwjgl")
-        destinationDirectory.set(layout.buildDirectory.dir("shadow-bug-workaround"))
-        archiveBaseName.set("nested-content")
-
-        from(layout.buildDirectory.dir("lwjgl"))
-    }
-
     fatJar {
-        dependsOn("shadowBugWorkaround")
-
         relocate("okhttp3", "xyz.bluspring.unitytranslate.shaded.okhttp3")
         relocate("okio", "xyz.bluspring.unitytranslate.shaded.okio")
         exclude("kotlin/**/*", "org/**/*")
-
-        from(shadowBugWorkaround)
     }
 }
