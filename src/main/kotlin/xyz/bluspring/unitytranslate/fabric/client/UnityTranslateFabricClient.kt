@@ -1,6 +1,6 @@
 package xyz.bluspring.unitytranslate.fabric.client
 
-//#if FABRIC
+//? if fabric {
 import net.fabricmc.api.ClientModInitializer
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 
@@ -10,4 +10,4 @@ class UnityTranslateFabricClient : ClientModInitializer {
         UnityTranslateClient.registerKeys()
     }
 }
-//#endif
+//? }

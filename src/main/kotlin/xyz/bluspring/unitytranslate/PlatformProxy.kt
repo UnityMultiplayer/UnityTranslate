@@ -3,18 +3,18 @@ package xyz.bluspring.unitytranslate
 import dev.architectury.networking.NetworkManager
 import io.netty.buffer.Unpooled
 import net.minecraft.network.FriendlyByteBuf
-//#if MC >= 1.20.6
-//$$ import net.minecraft.network.protocol.common.custom.CustomPacketPayload
-//#endif
+//? if >= 1.20.6 {
+/*import net.minecraft.network.protocol.common.custom.CustomPacketPayload
+*///? }
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.player.Player
 
-//#if FORGE
-//$$ import net.minecraftforge.server.permission.events.PermissionGatherEvent
-//#elseif NEOFORGE
-//$$ import net.neoforged.neoforge.server.permission.events.PermissionGatherEvent
-//#endif
+//? if forge {
+/*import net.minecraftforge.server.permission.events.PermissionGatherEvent
+*///? } else if neoforge {
+/*import net.neoforged.neoforge.server.permission.events.PermissionGatherEvent
+*///? }
 
 import java.nio.file.Path
 
@@ -31,27 +31,27 @@ interface PlatformProxy {
         return FriendlyByteBuf(Unpooled.buffer())
     }
 
-    //#if MC >= 1.20.6
-    //$$ fun sendPacketClient(payload: CustomPacketPayload) {
-    //$$    NetworkManager.sendToServer(payload)
-    //#else
+    //? if >= 1.20.6 {
+     /*fun sendPacketClient(payload: CustomPacketPayload) {
+        NetworkManager.sendToServer(payload)
+    *///? } else {
     fun sendPacketClient(id: ResourceLocation, buf: FriendlyByteBuf) {
         NetworkManager.sendToServer(id, buf)
-    //#endif
+    //? }
     }
 
-    //#if MC >= 1.20.6
-    //$$ fun sendPacketServer(player: ServerPlayer, payload: CustomPacketPayload) {
-    //$$    NetworkManager.sendToPlayer(player, payload)
-    //#else
+    //? if >= 1.20.6 {
+    /*fun sendPacketServer(player: ServerPlayer, payload: CustomPacketPayload) {
+        NetworkManager.sendToPlayer(player, payload)
+    *///? } else {
     fun sendPacketServer(player: ServerPlayer, id: ResourceLocation, buf: FriendlyByteBuf) {
         NetworkManager.sendToPlayer(player, id, buf)
-    //#endif
+    //? }
     }
 
-    //#if FORGE-LIKE
-    //$$ fun registerPermissions(event: PermissionGatherEvent.Nodes)
-    //#endif
+    //? if forge_like {
+    /*fun registerPermissions(event: PermissionGatherEvent.Nodes)
+    *///? }
 
     fun hasTranscriptPermission(player: Player): Boolean
 }

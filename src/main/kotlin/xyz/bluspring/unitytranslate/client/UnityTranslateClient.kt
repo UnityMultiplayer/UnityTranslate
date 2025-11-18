@@ -22,9 +22,9 @@ import xyz.bluspring.unitytranslate.events.TranscriptEvents
 import xyz.bluspring.unitytranslate.network.PacketIds
 import xyz.bluspring.unitytranslate.network.UTClientNetworking
 import xyz.bluspring.unitytranslate.transcript.Transcript
-//#if MC >= 1.20.6
-//$$ import xyz.bluspring.unitytranslate.network.payloads.SendTranscriptToServerPayload
-//#endif
+//? if >= 1.20.6 {
+/*import xyz.bluspring.unitytranslate.network.payloads.SendTranscriptToServerPayload
+*///? }
 import xyz.bluspring.unitytranslate.translator.LocalLibreTranslateInstance
 import xyz.bluspring.unitytranslate.translator.TranslatorManager
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -43,11 +43,11 @@ class UnityTranslateClient {
         ClientGuiEvent.RENDER_HUD.register { guiGraphics, delta ->
             if (shouldRenderBoxes && UnityTranslate.config.client.enabled) {
                 for (languageBox in languageBoxes) {
-                    //#if MC >= 1.21
-                    //$$ languageBox.render(guiGraphics, delta.realtimeDeltaTicks)
-                    //#else
+                    //? if >= 1.21 {
+                    /*languageBox.render(guiGraphics, delta.realtimeDeltaTicks)
+                    *///? } else {
                     languageBox.render(guiGraphics, delta)
-                    //#endif
+                    //? }
                 }
             }
         }
@@ -139,9 +139,9 @@ class UnityTranslateClient {
             val updateTime = System.currentTimeMillis()
 
             if (connectedServerHasSupport) {
-                //#if MC >= 1.20.6
-                //$$ UnityTranslate.instance.proxy.sendPacketClient(SendTranscriptToServerPayload(transcriber.language, text, index, updateTime))
-                //#else
+                //? if >= 1.20.6 {
+                /*UnityTranslate.instance.proxy.sendPacketClient(SendTranscriptToServerPayload(transcriber.language, text, index, updateTime))
+                *///? } else {
                 val buf = UnityTranslate.instance.proxy.createByteBuf()
                 buf.writeEnum(transcriber.language)
                 buf.writeUtf(text)
@@ -149,7 +149,7 @@ class UnityTranslateClient {
                 buf.writeVarLong(updateTime)
 
                 UnityTranslate.instance.proxy.sendPacketClient(PacketIds.SEND_TRANSCRIPT, buf)
-                //#endif
+                //? }
                 languageBoxes.firstOrNull { it.language == transcriber.language }?.updateTranscript(Minecraft.getInstance().player!!, text, transcriber.language, index, updateTime, false)
 
                 if (languageBoxes.none { it.language == transcriber.language }) {

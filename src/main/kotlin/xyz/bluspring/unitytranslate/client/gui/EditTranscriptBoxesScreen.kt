@@ -1,8 +1,8 @@
 package xyz.bluspring.unitytranslate.client.gui
 
-//#if MC >= 1.20.6
-//$$ import xyz.bluspring.unitytranslate.network.payloads.SetUsedLanguagesPayload
-//#endif
+//? if >= 1.20.6 {
+/*import xyz.bluspring.unitytranslate.network.payloads.SetUsedLanguagesPayload
+*///? }
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.Button
@@ -59,9 +59,9 @@ class EditTranscriptBoxesScreen(val boxes: MutableList<TranscriptBox>, val paren
         UnityTranslate.saveConfig()
 
         if (UnityTranslateClient.languageBoxes.isNotEmpty()) {
-            //#if MC <= 1.20.4
+            //? if <= 1.20.4 {
             val buf = UnityTranslate.instance.proxy.createByteBuf()
-            //#endif
+            //? }
 
             val languages = UnityTranslateClient.languageBoxes.map { it.language }.toMutableList()
 
@@ -69,19 +69,19 @@ class EditTranscriptBoxesScreen(val boxes: MutableList<TranscriptBox>, val paren
                 languages.add(UnityTranslate.config.client.language)
             }
 
-            //#if MC <= 1.20.4
+            //? if <= 1.20.4 {
             buf.writeEnumSet(
                 EnumSet.copyOf(languages),
                 Language::class.java
             )
-            //#endif
+            //? }
 
             if (Minecraft.getInstance().player != null) {
-                //#if MC >= 1.20.6
-                //$$ UnityTranslate.instance.proxy.sendPacketClient(SetUsedLanguagesPayload(languages))
-                //#else
+                //? if >= 1.20.6 {
+                /*UnityTranslate.instance.proxy.sendPacketClient(SetUsedLanguagesPayload(languages))
+                *///? } else {
                 UnityTranslate.instance.proxy.sendPacketClient(PacketIds.SET_USED_LANGUAGES, buf)
-                //#endif
+                //? }
             }
         }
 
@@ -112,11 +112,11 @@ class EditTranscriptBoxesScreen(val boxes: MutableList<TranscriptBox>, val paren
         var inAnyBox = false
 
         if (Minecraft.getInstance().player == null) { // assume user is currently configuring in the config screen
-            //#if MC >= 1.20.4
-            //$$ this.renderBackground(guiGraphics, mouseX, mouseY, partialTick)
-            //#else
+            //? if >= 1.20.4 {
+            /*this.renderBackground(guiGraphics, mouseX, mouseY, partialTick)
+            *///? } else {
             this.renderBackground(guiGraphics)
-            //#endif
+            //? }
 
             for (box in boxes) {
                 box.render(guiGraphics, partialTick)
@@ -185,13 +185,13 @@ class EditTranscriptBoxesScreen(val boxes: MutableList<TranscriptBox>, val paren
         UnityTranslateClient.renderCreditText(guiGraphics)
     }
 
-    //#if MC >= 1.20.4
-    //$$ override fun renderBackground(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
-    //$$     if (Minecraft.getInstance().player == null) {
-    //$$         super.renderBackground(guiGraphics, mouseX, mouseY, partialTick)
-    //$$     }
-    //$$ }
-    //#endif
+    //? if >= 1.20.4 {
+     /*override fun renderBackground(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
+         if (Minecraft.getInstance().player == null) {
+             super.renderBackground(guiGraphics, mouseX, mouseY, partialTick)
+         }
+     }
+    *///? }
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
         val result = super.mouseClicked(mouseX, mouseY, button)

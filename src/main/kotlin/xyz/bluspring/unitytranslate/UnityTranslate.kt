@@ -60,11 +60,11 @@ class UnityTranslate(val proxy: PlatformProxy = PlatformProxyImpl()) {
 
         @JvmStatic
         fun id(path: String): ResourceLocation {
-            //#if MC >= 1.21
-            //$$ return ResourceLocation.fromNamespaceAndPath(MOD_ID, path)
-            //#else
+            //? if >= 1.21 {
+            /*return ResourceLocation.fromNamespaceAndPath(MOD_ID, path)
+            *///? } else {
             return ResourceLocation(MOD_ID, path)
-            //#endif
+            //? }
         }
 
         fun saveConfig() {

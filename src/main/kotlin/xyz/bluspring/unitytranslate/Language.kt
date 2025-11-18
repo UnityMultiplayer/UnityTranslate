@@ -1,11 +1,11 @@
 package xyz.bluspring.unitytranslate
 
-//#if MC >= 1.20.6
-//$$ import net.minecraft.network.RegistryFriendlyByteBuf
-//$$ import net.minecraft.network.codec.StreamCodec
-//$$ import net.minecraft.network.codec.StreamDecoder
-//$$ import net.minecraft.network.codec.StreamEncoder
-//#endif
+//? if >= 1.20.6 {
+/*import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.codec.StreamCodec
+import net.minecraft.network.codec.StreamDecoder
+import net.minecraft.network.codec.StreamEncoder
+*///? }
 import net.minecraft.network.chat.Component
 import xyz.bluspring.unitytranslate.client.transcribers.TranscriberType
 
@@ -159,13 +159,13 @@ enum class Language(
     val text = Component.translatable("unitytranslate.language.$code")
 
     companion object {
-        //#if MC >= 1.20.6
-        //$$ val STREAM_CODEC: StreamCodec<RegistryFriendlyByteBuf, Language> = StreamCodec.of({ buf, language ->
-        //$$    buf.writeEnum(language)
-        //$$ }, { buf ->
-        //$$    buf.readEnum(Language::class.java)
-        //$$ })
-        //#endif
+        //? if >= 1.20.6 {
+        /*val STREAM_CODEC: StreamCodec<RegistryFriendlyByteBuf, Language> = StreamCodec.of({ buf, language ->
+            buf.writeEnum(language)
+        }, { buf ->
+            buf.readEnum(Language::class.java)
+        })
+        *///? }
 
         fun findLibreLang(code: String): Language? {
             return Language.entries.firstOrNull { it.code == code }

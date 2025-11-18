@@ -35,11 +35,11 @@ class LanguageSelectScreen(val parent: Screen?, val isAddingBox: Boolean) : Scre
     }
 
     override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
-        //#if MC >= 1.20.4
-        //$$ this.renderBackground(guiGraphics, mouseX, mouseY, partialTick)
-        //#else
+        //? if >= 1.20.4 {
+        /*this.renderBackground(guiGraphics, mouseX, mouseY, partialTick)
+        *///? } else {
         this.renderBackground(guiGraphics)
-        //#endif
+        //? }
         super.render(guiGraphics, mouseX, mouseY, partialTick)
 
         guiGraphics.drawCenteredString(font, Component.translatable(
@@ -81,13 +81,13 @@ class LanguageSelectScreen(val parent: Screen?, val isAddingBox: Boolean) : Scre
 
     private inner class LanguageSelectionList : ObjectSelectionList<LanguageSelectionList.Entry>(Minecraft.getInstance(),
         this@LanguageSelectScreen.width, this@LanguageSelectScreen.height
-        //#if MC >= 1.20.4
-        //$$ - 75
-        //#endif
+        //? if >= 1.20.4 {
+        /*- 75
+        *///? }
         , 32,
-        //#if MC <= 1.20.1
+        //? if <= 1.20.1 {
         this@LanguageSelectScreen.height - 65 + 4,
-        //#endif
+        //? }
         18
     ) {
         init {

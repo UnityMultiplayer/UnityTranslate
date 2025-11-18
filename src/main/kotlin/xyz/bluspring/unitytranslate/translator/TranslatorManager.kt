@@ -1,8 +1,8 @@
 package xyz.bluspring.unitytranslate.translator
 
-//#if MC >= 1.20.6
-//$$ import xyz.bluspring.unitytranslate.network.payloads.MarkIncompletePayload
-//#endif
+//? if >= 1.20.6 {
+/*import xyz.bluspring.unitytranslate.network.payloads.MarkIncompletePayload
+*///? }
 import dev.architectury.event.events.common.LifecycleEvent
 import dev.architectury.event.events.common.PlayerEvent
 import net.minecraft.network.FriendlyByteBuf
@@ -290,7 +290,7 @@ object TranslatorManager {
         UnityTranslate.logger.info("UnityTranslate translation config successfully loaded!")
     }
 
-    //#if MC <= 1.20.4
+    //? if <= 1.20.4 {
     // turns out, Forge requires us to rebuild the buffer every time we send it to a player,
     // so unfortunately, we cannot reuse the buffer.
     private fun buildBroadcastPacket(isIncomplete: Boolean, translation: Translation): FriendlyByteBuf {
@@ -303,7 +303,7 @@ object TranslatorManager {
 
         return buf
     }
-    //#endif
+    //? }
 
     private fun broadcastIncomplete(isIncomplete: Boolean, translation: Translation) {
         if (translation.player !is ServerPlayer)
@@ -318,20 +318,20 @@ object TranslatorManager {
                 if (UTVoiceChatCompat.isPlayerDeafened(player) && player != source)
                     continue
 
-                //#if MC >= 1.20.6
-                //$$  UnityTranslate.instance.proxy.sendPacketServer(player, MarkIncompletePayload(translation.fromLang, translation.toLang, translation.player.uuid, translation.index, isIncomplete))
-                //#else
+                //? if >= 1.20.6 {
+                /*UnityTranslate.instance.proxy.sendPacketServer(player, MarkIncompletePayload(translation.fromLang, translation.toLang, translation.player.uuid, translation.index, isIncomplete))
+                *///? } else {
                 val buf = buildBroadcastPacket(isIncomplete, translation)
                 UnityTranslate.instance.proxy.sendPacketServer(player, PacketIds.MARK_INCOMPLETE, buf)
-                //#endif
+                //? }
             }
         } else {
-            //#if MC >= 1.20.6
-            //$$  UnityTranslate.instance.proxy.sendPacketServer(source, MarkIncompletePayload(translation.fromLang, translation.toLang, translation.player.uuid, translation.index, isIncomplete))
-            //#else
+            //? if >= 1.20.6 {
+            /*UnityTranslate.instance.proxy.sendPacketServer(source, MarkIncompletePayload(translation.fromLang, translation.toLang, translation.player.uuid, translation.index, isIncomplete))
+            *///? } else {
             val buf = buildBroadcastPacket(isIncomplete, translation)
             UnityTranslate.instance.proxy.sendPacketServer(source, PacketIds.MARK_INCOMPLETE, buf)
-            //#endif
+            //? }
         }
     }
 }

@@ -1,6 +1,6 @@
 package xyz.bluspring.unitytranslate.fabric.compat.modmenu
 
-//#if FABRIC
+//? if fabric {
 import com.terraformersmc.modmenu.api.ConfigScreenFactory
 import com.terraformersmc.modmenu.api.ModMenuApi
 import xyz.bluspring.unitytranslate.client.gui.UTConfigScreen
@@ -12,4 +12,4 @@ class UTModMenuIntegration : ModMenuApi {
         }
     }
 }
-//#endif
+//? }

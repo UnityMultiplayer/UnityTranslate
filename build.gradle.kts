@@ -1,69 +1,36 @@
-import com.modrinth.minotaur.dependencies.DependencyType
-import com.modrinth.minotaur.dependencies.ModDependency
-import dev.deftu.gradle.tools.minecraft.CurseRelation
-import dev.deftu.gradle.tools.minecraft.CurseRelationType
-import dev.deftu.gradle.utils.ModLoader
-import dev.deftu.gradle.utils.includeOrShade
-import dev.deftu.gradle.utils.version.MinecraftVersions
-
 plugins {
-    java
+    id("architectury-plugin")
+    id("dev.architectury.loom")
     kotlin("jvm")
     kotlin("plugin.serialization")
-
-    id("dev.deftu.gradle.multiversion")
-    id("dev.deftu.gradle.tools")
-    id("dev.deftu.gradle.tools.resources")
-    id("dev.deftu.gradle.tools.bloom")
-    id("dev.deftu.gradle.tools.shadow")
-    id("dev.deftu.gradle.tools.minecraft.loom")
-    id("dev.deftu.gradle.tools.minecraft.releases")
 }
 
-toolkitMultiversion {
-    moveBuildsToRootProject.set(true)
+val minecraftVersion = stonecutter.current.version
+val loader = try { project.property("loom.platform") as? String? } catch (_: Throwable) { null } ?: "unknown"
+
+version = "${mod.version}+$minecraftVersion-$loader"
+group = mod.group
+
+base {
+    archivesName.set(mod.name)
 }
 
-toolkitLoomHelper {
-    if (!mcData.isNeoForge) {
-        useMixinRefMap("unitytranslate")
-    }
-
-    if (mcData.isForge) {
-        useTweaker("org.spongepowered.asm.launch.MixinTweaker")
-        useForgeMixin("unitytranslate.mixins.json", true)
-    }
+dependencies {
+    minecraft("com.mojang:minecraft:$minecraftVersion")
+    mappings(loom.officialMojangMappings())
 }
 
+stonecutter {
+    constants.match(
+        loader,
+        "fabric", "forge", "neoforge", "unknown"
+    )
+
+    constants["forge_like"] = loader == "forge" || loader == "neoforge"
+}
+
+/*
 version = "${project.property("mod.version")}+mc${mcData.version}-${mcData.loader.friendlyString}"
-
-repositories {
-    mavenCentral()
-    maven("https://maven.parchmentmc.org")
-    maven("https://oss.sonatype.org/content/repositories/snapshots")
-    exclusiveContent {
-        forRepository {
-            maven("https://api.modrinth.com/maven")
-        }
-        filter {
-            includeGroup("maven.modrinth")
-        }
-    }
-    maven("https://repo.clojars.org")
-    maven("https://maven.terraformersmc.com/")
-    maven("https://maven.architectury.dev/")
-    maven("https://maven.maxhenkel.de/repository/public")
-    maven("https://maven.neoforged.net/releases/")
-    maven("https://maven.nucleoid.xyz/")
-    maven("https://maven.minecraftforge.net")
-
-    maven("https://repo.plo.su")
-    maven("https://repo.plasmoverse.com/releases")
-    maven("https://repo.plasmoverse.com/snapshots")
-    maven("https://repo.nyon.dev/releases")
-    maven("https://mvn.devos.one/releases")
-    maven("https://mvn.devos.one/snapshots")
-}
 
 val leastCommonMcVersion = when (mcData.version) {
     MinecraftVersions.VERSION_1_21_10 -> "1.21.9"
@@ -298,3 +265,4 @@ tasks {
         exclude("kotlin/**/*", "org/**/*")
     }
 }
+*/

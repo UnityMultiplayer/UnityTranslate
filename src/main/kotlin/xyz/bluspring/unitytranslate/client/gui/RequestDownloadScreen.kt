@@ -35,11 +35,11 @@ class RequestDownloadScreen : Screen(Component.empty()) {
     }
 
     override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
-        //#if MC >= 1.20.4
-        //$$ this.renderBackground(guiGraphics, mouseX, mouseY, partialTick)
-        //#else
+        //? if >= 1.20.4 {
+        /*this.renderBackground(guiGraphics, mouseX, mouseY, partialTick)
+        *///? } else {
         this.renderBackground(guiGraphics)
-        //#endif
+        //? }
         super.render(guiGraphics, mouseX, mouseY, partialTick)
 
         val lines = font.split(Component.translatable("unitytranslate.request_download"), this.width - 50)

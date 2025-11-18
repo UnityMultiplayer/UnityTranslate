@@ -1,6 +1,6 @@
 package xyz.bluspring.unitytranslate.fabric
 
-//#if FABRIC
+//? if fabric {
 import net.fabricmc.api.ModInitializer
 import xyz.bluspring.unitytranslate.UnityTranslate
 
@@ -13,4 +13,4 @@ class UnityTranslateFabric : ModInitializer {
         lateinit var instance: UnityTranslate
     }
 }
-//#endif
+//? }
