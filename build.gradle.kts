@@ -7,6 +7,11 @@ plugins {
 
 val minecraftVersion = stonecutter.current.version
 
+architectury.common(stonecutter.tree.branches.mapNotNull {
+    if (stonecutter.current.project !in it) null
+    else it.project.prop("loom.platform")
+})
+
 dependencies {
     modCompileOnly("net.fabricmc:fabric-loader:${mod.dep("fabric_loader")}")
     modCompileOnly("net.fabricmc:fabric-language-kotlin:${mod.dep("fabric_kotlin")}")

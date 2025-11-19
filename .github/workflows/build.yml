@@ -10,27 +10,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK 21
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
-      # Taken from https://github.com/CaffeineMC/sodium-fabric/blob/1.19.3/dev/.github/workflows/gradle.yml
-      - name: Cache/Uncache
-        uses: actions/cache@v2
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/loom-cache
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          cache-read-only: false
       - name: Build artifacts
-        run: ./gradlew remapJar
+        run: ./gradlew buildAndCollect
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: UnityTranslate Artifacts
-          path: build/versions/UnityTranslate-*.jar
+          path: build/libs/

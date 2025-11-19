@@ -2,11 +2,7 @@ name: Publish JDK 21 Mods
 on:
   release:
     types:
-      - 'published'
-
-env:
-  MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-  CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+      - 'released'
 
 jobs:
   build:
@@ -21,9 +17,14 @@ jobs:
           java-version: 21
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: true
 
       - name: Execute Gradle build
-        run: ./gradlew publishMod -Pdgt.publish.modrinth.token=${{ env.MODRINTH_TOKEN }} -Pdgt.publish.curseforge.apikey=${{ env.CURSEFORGE_TOKEN }}
+        env:
+          GITHUB_TAG: ${{ github.ref_name }}
+          RELEASE_DESCRIPTION: ${{ github.event.release.body }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+        run: ./gradlew publishMods
