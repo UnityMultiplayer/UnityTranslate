@@ -118,3 +118,5 @@ run/
 !gradle-wrapper.jar
 
 src/main/resources/website/node_modules/
+.kotlin/**/*
+*.salive
