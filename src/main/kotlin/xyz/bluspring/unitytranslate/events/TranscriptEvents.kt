@@ -1,9 +1,8 @@
 package xyz.bluspring.unitytranslate.events
 
-import dev.architectury.event.Event
-import dev.architectury.event.EventFactory
 import xyz.bluspring.unitytranslate.Language
 import xyz.bluspring.unitytranslate.transcript.Transcript
+import xyz.bluspring.unitytranslate.util.Event
 
 interface TranscriptEvents {
     fun interface Update {
@@ -11,6 +10,10 @@ interface TranscriptEvents {
     }
 
     companion object {
-        val UPDATE: Event<Update> = EventFactory.createLoop(Update::class.java)
+        val UPDATE: Event<Update> = Event(Update::class.java) { callbacks -> Update { transcript, language ->
+            for (update in callbacks) {
+                update.onTranscriptUpdate(transcript, language)
+            }
+        } }
     }
 }

@@ -47,6 +47,20 @@ dependencies {
 
     modImplementation("dev.nyon:KotlinLangForge:${common.mod.dep("kotlinlangforge")}-${common.mod.dep("kotlinlangforge_loader")}+neoforge")
     modImplementation("xyz.bluspring.modernnetworking:modernnetworking-neoforge:${common.mod.dep("modernnetworking")}+${common.mod.dep("modernnetworking_mc")}")!!
+
+    modOptional("maven.modrinth:plasmo-voice", "neoforge-${mod.commonDep("plasmo_mc", common.mod, minecraftVersion)}-${mod.commonDep("plasmo", common.mod)}", common.mod.prop("proximity_chat") == "plasmo")
+    modOptional("maven.modrinth:simple-voice-chat", "neoforge-$minecraftVersion-${mod.commonDep("voicechat", common.mod)}", common.mod.prop("proximity_chat") == "svc")
+
+    minecraftRuntimeLibraries(shadowBundle("org.java-websocket:Java-WebSocket:${mod.commonDep("java_websocket", common.mod)}")!!)
+    minecraftRuntimeLibraries(shadowBundle("com.squareup.okhttp3:okhttp:${mod.commonDep("okhttp", common.mod)}") {
+        exclude("org.jetbrains")
+        exclude("kotlin")
+    })
+    minecraftRuntimeLibraries(shadowBundle("com.github.jnr:jnr-ffi:${mod.commonDep("jnr", common.mod)}")!!)
+
+    shadowBundle("xyz.bluspring.unitytranslate:UnityTranslateLib:${mod.commonDep("unitytranslatelib", common.mod)}")
+    shadowBundle("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-windows-amd64:${mod.commonDep("unitytranslatelib", common.mod)}")
+    shadowBundle("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-linux-amd64:${mod.commonDep("unitytranslatelib", common.mod)}")
 }
 
 loom {

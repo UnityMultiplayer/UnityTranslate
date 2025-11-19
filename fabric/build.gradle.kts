@@ -46,6 +46,8 @@ dependencies {
 
     modImplementation("com.terraformersmc:modmenu:${common.mod.dep("modmenu")}")
 
+    include(modImplementation("me.lucko:fabric-permissions-api:${common.mod.dep("fabric_permissions")}")!!)
+
     modImplementation("maven.modrinth:talk-balloons:${common.mod.dep("talk_balloons")}+${common.mod.dep("talk_balloons_mc")}-fabric")
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:${common.mod.dep("cloth_config")}")
 
@@ -54,6 +56,17 @@ dependencies {
 
     modImplementation("xyz.bluspring.modernnetworking:modernnetworking-fabric:${common.mod.dep("modernnetworking")}+${common.mod.dep("modernnetworking_mc")}")!!
     modImplementation("net.fabricmc:fabric-language-kotlin:${common.mod.dep("fabric_kotlin")}")
+
+    modOptional("maven.modrinth:plasmo-voice", "fabric-${mod.commonDep("plasmo_mc", common.mod, minecraftVersion)}-${mod.commonDep("plasmo", common.mod)}", common.mod.prop("proximity_chat") == "plasmo")
+    modOptional("maven.modrinth:simple-voice-chat", "fabric-$minecraftVersion-${mod.commonDep("voicechat", common.mod)}", common.mod.prop("proximity_chat") == "svc")
+
+    include("org.java-websocket:Java-WebSocket:${mod.commonDep("java_websocket", common.mod)}")
+    include("com.squareup.okhttp3:okhttp:${mod.commonDep("okhttp", common.mod)}")
+    include("com.github.jnr:jnr-ffi:${mod.commonDep("jnr", common.mod)}")
+
+    shadowBundle("xyz.bluspring.unitytranslate:UnityTranslateLib:${mod.commonDep("unitytranslatelib", common.mod)}")
+    shadowBundle("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-windows-amd64:${mod.commonDep("unitytranslatelib", common.mod)}")
+    shadowBundle("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-linux-amd64:${mod.commonDep("unitytranslatelib", common.mod)}")
 }
 
 tasks.shadowJar {

@@ -47,6 +47,20 @@ dependencies {
 
     modImplementation("dev.nyon:KotlinLangForge:${common.mod.dep("kotlinlangforge")}-${common.mod.dep("kotlinlangforge_loader")}+forge")
     modImplementation("xyz.bluspring.modernnetworking:modernnetworking-forge:${common.mod.dep("modernnetworking")}+${common.mod.dep("modernnetworking_mc")}")!!
+
+    modOptional("maven.modrinth:plasmo-voice", "forge-${mod.commonDep("plasmo_mc", common.mod, minecraftVersion)}-${mod.commonDep("plasmo", common.mod)}", common.mod.prop("proximity_chat") == "plasmo")
+    modOptional("maven.modrinth:simple-voice-chat", "forge-$minecraftVersion-${mod.commonDep("voicechat", common.mod)}", common.mod.prop("proximity_chat") == "svc")
+
+    minecraftRuntimeLibraries(shadowBundle("org.java-websocket:Java-WebSocket:${mod.commonDep("java_websocket", common.mod)}")!!)
+    minecraftRuntimeLibraries(shadowBundle("com.squareup.okhttp3:okhttp:${mod.commonDep("okhttp", common.mod)}")  {
+        exclude("org.jetbrains")
+        exclude("kotlin")
+    })
+    minecraftRuntimeLibraries(shadowBundle("com.github.jnr:jnr-ffi:${mod.commonDep("jnr", common.mod)}")!!)
+
+    shadowBundle("xyz.bluspring.unitytranslate:UnityTranslateLib:${mod.commonDep("unitytranslatelib", common.mod)}")
+    shadowBundle("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-windows-amd64:${mod.commonDep("unitytranslatelib", common.mod)}")
+    shadowBundle("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-linux-amd64:${mod.commonDep("unitytranslatelib", common.mod)}")
 }
 
 loom {
@@ -71,7 +85,7 @@ tasks.processResources {
         "mod_description" to mod.prop("description"),
         "mod_authors" to mod.prop("authors"),
         "minecraft_version_range" to common.mod.prop("mc_dep_forgelike"),
-        "neoforge_version" to common.mod.dep("neoforge"),
+        "forge_version" to common.mod.dep("forge"),
         "cloth_config_version" to common.mod.dep("cloth_config"),
         "modernnetworking_version" to common.mod.dep("modernnetworking"),
         "kotlinlangforge_loader" to common.mod.dep("kotlinlangforge_loader"),

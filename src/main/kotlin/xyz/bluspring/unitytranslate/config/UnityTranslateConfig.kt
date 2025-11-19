@@ -26,6 +26,8 @@ data class UnityTranslateConfig(
 
         @get:Hidden
         var language: Language = Language.ENGLISH,
+        @get:Hidden
+        var balloonLanguage: Language? = null,
 
         var disappearingText: Boolean = true,
         @get:DependsOn("disappearingText")

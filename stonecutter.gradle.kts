@@ -50,14 +50,11 @@ allprojects {
         maven("https://mvn.devos.one/snapshots")
     }
 
-}
+    if (project.extensions.findByType<StonecutterBuildExtension>() == null)
+        return@allprojects
 
-subprojects {
-    if (project.extensions.findByName("stonecutter") == null)
-        return@subprojects
-
-    if (parent == rootProject)
-        return@subprojects
+    if (false)
+        return@allprojects
 
     val sc = project.extensions.getByType<StonecutterBuildExtension>()
     val common = sc.node.sibling("")
@@ -74,6 +71,13 @@ subprojects {
 
     version = "${mod.version}+$minecraftVersion-$loader"
 
+    sc.constants.match(
+        loader,
+        "fabric", "forge", "neoforge", "unknown"
+    )
+
+    sc.constants["forge_like"] = loader == "forge" || loader == "neoforge"
+
     val loom = project.extensions.getByName<LoomGradleExtensionAPI>("loom")
 
     loom.silentMojangMappingsLicense()
@@ -85,9 +89,28 @@ subprojects {
 
     loom.mixin.useLegacyMixinAp = false
 
+    fun loaderDep(dep: String): Any {
+        return common?.project?.mod?.dep(dep) ?: mod.dep(dep, "[UNSUPPORTED]")
+    }
+
     dependencies {
         "minecraft"("com.mojang:minecraft:$minecraftVersion")
-        "mappings"(loom.officialMojangMappings())
+        "mappings"(loom.layered() {
+            officialMojangMappings()
+            parchment("org.parchmentmc.data:parchment-${loaderDep("parchment_version")}:${loaderDep("parchment_snapshot")}@zip")
+        })
+
+        "implementation"("org.java-websocket:Java-WebSocket:${loaderDep("java_websocket")}")
+        "implementation"("com.squareup.okhttp3:okhttp:${loaderDep("okhttp")}") {
+            exclude("kotlin")
+            exclude("org.jetbrains")
+        }
+
+        "implementation"("xyz.bluspring.unitytranslate:UnityTranslateLib:${loaderDep("unitytranslatelib")}")
+        "implementation"("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-windows-amd64:${loaderDep("unitytranslatelib")}")
+        "implementation"("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-linux-amd64:${loaderDep("unitytranslatelib")}")
+
+        "implementation"("com.github.jnr:jnr-ffi:${loaderDep("jnr")}")
     }
 
     project.extensions.configure<JavaPluginExtension>("java") {
@@ -100,6 +123,10 @@ subprojects {
     tasks.named<Jar>("jar") {
         archiveClassifier = "dev"
     }
+
+//    tasks.named<ShadowJar>("shadowJar") {
+//        relocate("org.")
+//    }
 
     tasks.named<RemapJarTask>("remapJar") {
         injectAccessWidener = true

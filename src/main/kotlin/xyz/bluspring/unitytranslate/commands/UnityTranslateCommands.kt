@@ -1,47 +1,75 @@
 package xyz.bluspring.unitytranslate.commands
 
-import net.minecraft.commands.Commands
+import com.mojang.brigadier.CommandDispatcher
+import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentUtils
 import xyz.bluspring.unitytranslate.UnityTranslate
+import xyz.bluspring.unitytranslate.client.UnityTranslateClient
+import xyz.bluspring.unitytranslate.client.transcribers.browser.BrowserSpeechTranscriber
 import xyz.bluspring.unitytranslate.translator.LocalLibreTranslateInstance
 import xyz.bluspring.unitytranslate.translator.TranslatorManager
 
 object UnityTranslateCommands {
-    val INFO = Commands.literal("info")
-        .executes { ctx ->
-            ctx.source.sendSystemMessage(ComponentUtils.formatList(listOf(
-                Component.literal("UnityTranslate v${UnityTranslate.instance.proxy.modVersion}"),
-                Component.literal("- Total instances loaded: ${TranslatorManager.instances.size}"),
-                Component.literal("- Queued translations: ${TranslatorManager.queuedTranslations.size}"),
-                Component.empty(),
-                Component.literal("- Supports local translation server: ${LocalLibreTranslateInstance.canRunLibreTranslate()}"),
-                Component.literal("- Is local translation server running: ${LocalLibreTranslateInstance.hasStarted}"),
-                Component.literal("- Supports CUDA: ${TranslatorManager.checkSupportsCuda()}"),
-            ), Component.literal("\n")))
+    fun <S> register(dispatcher: CommandDispatcher<S>, root: String, isClient: Boolean, sender: (S, Component) -> Unit) {
+        dispatcher.register(
+            LiteralArgumentBuilder.literal<S>(root)
+                .then(LiteralArgumentBuilder.literal<S>("info")
+                    .executes { ctx ->
+                        sender.invoke(ctx.source, ComponentUtils.formatList(listOf(
+                            Component.literal("UnityTranslate v${UnityTranslate.instance.proxy.modVersion}"),
+                            Component.literal("- Total instances loaded: ${TranslatorManager.instances.size}"),
+                            Component.literal("- Queued translations: ${TranslatorManager.queuedTranslations.size}"),
+                            Component.empty(),
+                            Component.literal("- Supports local translation: ${LocalLibreTranslateInstance.canRunLibreTranslate()}"),
+                            Component.literal("- Is local translation server running: ${LocalLibreTranslateInstance.hasStarted}"),
+                            Component.literal("- Supports CUDA: ${TranslatorManager.checkSupportsCuda()}"),
+                        ), Component.literal("\n")))
 
-            1
-        }
+                        if (isClient) {
+                            sender.invoke(ctx.source, ComponentUtils.formatList(listOf(
+                                Component.empty(),
+                                Component.literal("Client Info:"),
+                                Component.literal("- Enabled: ${UnityTranslate.config.client.enabled}"),
+                                Component.literal("- Current transcriber: ${UnityTranslate.config.client.transcriber}"),
+                                Component.literal("- Spoken language: ${UnityTranslate.config.client.language}"),
+                                Component.literal("- Balloon language: ${UnityTranslate.config.client.balloonLanguage}"),
+                                Component.literal("- Server supports UnityTranslate: ${UnityTranslateClient.connectedServerHasSupport}"),
+                            ), Component.literal("\n")))
+                        }
 
-    val CLEAR_QUEUE = Commands.literal("clearqueue")
-        .executes { ctx ->
-            TranslatorManager.queuedTranslations.clear()
-            ctx.source.sendSystemMessage(Component.literal("Forcefully cleared translation queue."))
+                        1
+                    })
+                .then(LiteralArgumentBuilder.literal<S>("clearqueue")
+                    .executes { ctx ->
+                        TranslatorManager.queuedTranslations.clear()
+                        sender.invoke(ctx.source, Component.literal("Forcefully cleared translation queue."))
 
-            1
-        }
+                        1
+                    })
+                .then(LiteralArgumentBuilder.literal<S>("debugreload")
+                    .executes { ctx ->
+                        TranslatorManager.installLibreTranslate()
+                        sender.invoke(ctx.source, Component.literal("Restarted timer!"))
 
-    val DEBUG_RESTART = Commands.literal("debugreload")
-        .executes { ctx ->
-            TranslatorManager.installLibreTranslate()
-            ctx.source.sendSystemMessage(Component.literal("Restarted timer!"))
+                        1
+                    })
+                .apply {
+                    if (isClient) {
+                        then(
+                            LiteralArgumentBuilder.literal<S>("checktranscriber")
+                                .executes { ctx ->
+                                    if (UnityTranslateClient.transcriber is BrowserSpeechTranscriber) {
+                                        (UnityTranslateClient.transcriber as BrowserSpeechTranscriber).openWebsite()
+                                    }
 
-            1
-        }
+                                    sender.invoke(ctx.source, Component.literal("Reopening browser transcriber if not opened"))
 
-    val ROOT = Commands.literal("unitytranslate")
-        .requires { it.hasPermission(3) }
-        .then(INFO)
-        .then(CLEAR_QUEUE)
-        .then(DEBUG_RESTART)
+                                    1
+                                }
+                        )
+                    }
+                }
+        )
+    }
 }

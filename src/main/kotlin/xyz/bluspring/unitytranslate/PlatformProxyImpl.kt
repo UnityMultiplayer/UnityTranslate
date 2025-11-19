@@ -72,7 +72,7 @@ class PlatformProxyImpl : PlatformProxy {
         *///? }
     }
 
-    // how did Forge manage to overcomplicate permissions of all things
+
 
     //? if forge_like {
      /*val requestTranslationsNode = PermissionNode(UnityTranslate.MOD_ID, "request_translations", PermissionTypes.BOOLEAN, { _, _, _ -> true })

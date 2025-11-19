@@ -1,11 +1,6 @@
 package xyz.bluspring.unitytranslate.client
 
 import com.mojang.blaze3d.platform.InputConstants
-import dev.architectury.event.events.client.ClientGuiEvent
-import dev.architectury.event.events.client.ClientLifecycleEvent
-import dev.architectury.event.events.client.ClientPlayerEvent
-import dev.architectury.event.events.client.ClientTickEvent
-import dev.architectury.registry.client.keymappings.KeyMappingRegistry
 import net.minecraft.ChatFormatting
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
@@ -16,7 +11,6 @@ import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.gui.*
 import xyz.bluspring.unitytranslate.client.transcribers.SpeechTranscriber
 import xyz.bluspring.unitytranslate.client.transcribers.windows.sapi5.WindowsSpeechApiTranscriber
-import xyz.bluspring.unitytranslate.commands.UnityTranslateClientCommands
 import xyz.bluspring.unitytranslate.compat.talkballoons.TalkBalloonsCompat
 import xyz.bluspring.unitytranslate.events.TranscriptEvents
 import xyz.bluspring.unitytranslate.network.PacketIds
@@ -35,100 +29,103 @@ class UnityTranslateClient {
     init {
         WindowsSpeechApiTranscriber.isSupported() // runs a check to load Windows Speech API. why write the code again anyway?
         setupCompat()
-        UnityTranslateClientCommands.init()
 
         transcriber = UnityTranslate.config.client.transcriber.creator.invoke(UnityTranslate.config.client.language)
         setupTranscriber(transcriber)
 
-        ClientGuiEvent.RENDER_HUD.register { guiGraphics, delta ->
-            if (shouldRenderBoxes && UnityTranslate.config.client.enabled) {
-                for (languageBox in languageBoxes) {
-                    //? if >= 1.21 {
-                    /*languageBox.render(guiGraphics, delta.realtimeDeltaTicks)
-                    *///? } else {
-                    languageBox.render(guiGraphics, delta)
-                    //? }
-                }
-            }
-        }
-
-        ClientTickEvent.CLIENT_POST.register { mc ->
-            if (CONFIGURE_BOXES.consumeClick()) {
-                mc.setScreen(EditTranscriptBoxesScreen(languageBoxes))
-            }
-
-            if (TOGGLE_TRANSCRIPTION.consumeClick()) {
-                shouldTranscribe = !shouldTranscribe
-                mc.player?.displayClientMessage(
-                    Component.translatable("unitytranslate.transcript")
-                        .append(": ")
-                        .append(if (shouldTranscribe) CommonComponents.OPTION_ON else CommonComponents.OPTION_OFF), true
-                )
-            }
-
-            if (TOGGLE_BOXES.consumeClick() && mc.screen !is EditTranscriptBoxesScreen) {
-                shouldRenderBoxes = !shouldRenderBoxes
-                mc.player?.displayClientMessage(
-                    Component.translatable("unitytranslate.transcript_boxes")
-                        .append(": ")
-                        .append(if (shouldRenderBoxes) CommonComponents.OPTION_ON else CommonComponents.OPTION_OFF),
-                    true
-                )
-            }
-
-            if (SET_SPOKEN_LANGUAGE.consumeClick() && mc.screen == null) {
-                mc.setScreen(LanguageSelectScreen(null, false))
-            }
-
-            if (CLEAR_TRANSCRIPTS.consumeClick()) {
-                for (box in languageBoxes) {
-                    box.transcripts.clear()
-                }
-            }
-
-            if (OPEN_CONFIG_GUI.consumeClick()) {
-                mc.setScreen(UTConfigScreen(null))
-            }
-
-            /*if (TRANSLATE_SIGN.consumeClick()) {
-                if (mc.player != null && mc.level != null) {
-                    val hitResult = mc.player?.pick(7.5, mc.frameTime, false)
-
-                    if (hitResult != null && hitResult is BlockHitResult) {
-                        val buf = UnityTranslate.instance.proxy.createByteBuf()
-                        buf.writeBlockPos(hitResult.blockPos)
-
-                        UnityTranslate.instance.proxy.sendPacketClient(PacketIds.TRANSLATE_SIGN, buf)
-                    }
-                }
-            }*/
-
-            // prune transcripts
-            val currentTime = System.currentTimeMillis()
-            for (box in languageBoxes) {
-                if (box.transcripts.size > 50) {
-                    for (i in 0..(box.transcripts.size - 50)) {
-                        box.transcripts.remove()
-                    }
-                }
-
-                val clientConfig = UnityTranslate.config.client
-
-                if (clientConfig.disappearingText) {
-                    for (transcript in box.transcripts) {
-                        if (currentTime >= (transcript.arrivalTime + (clientConfig.disappearingTextDelay * 1000L).toLong() + (clientConfig.disappearingTextFade * 1000L).toLong())) {
-                            box.transcripts.remove(transcript)
-                        }
-                    }
-                }
-            }
-        }
-
-        ClientLifecycleEvent.CLIENT_STOPPING.register {
-            LocalLibreTranslateInstance.killOpenInstances()
-        }
-
         UTClientNetworking.init()
+    }
+
+    fun clientRenderHud(guiGraphics: GuiGraphics, delta: Float) {
+        if (shouldRenderBoxes && UnityTranslate.config.client.enabled && !Minecraft.getInstance().options.hideGui) {
+            for (languageBox in languageBoxes) {
+                languageBox.render(guiGraphics, delta)
+            }
+        }
+    }
+
+    fun clientStopping() {
+        LocalLibreTranslateInstance.killOpenInstances()
+    }
+
+    fun clientTick(mc: Minecraft) {
+        if (CONFIGURE_BOXES.consumeClick()) {
+            mc.setScreen(EditTranscriptBoxesScreen(languageBoxes))
+        }
+
+        if (TOGGLE_TRANSCRIPTION.consumeClick()) {
+            shouldTranscribe = !shouldTranscribe
+            mc.player?.displayClientMessage(
+                Component.translatable("unitytranslate.transcript")
+                    .append(": ")
+                    .append(if (shouldTranscribe) CommonComponents.OPTION_ON else CommonComponents.OPTION_OFF), true
+            )
+        }
+
+        if (TOGGLE_BOXES.consumeClick() && mc.screen !is EditTranscriptBoxesScreen) {
+            shouldRenderBoxes = !shouldRenderBoxes
+            mc.player?.displayClientMessage(
+                Component.translatable("unitytranslate.transcript_boxes")
+                    .append(": ")
+                    .append(if (shouldRenderBoxes) CommonComponents.OPTION_ON else CommonComponents.OPTION_OFF),
+                true
+            )
+        }
+
+        if (SET_SPOKEN_LANGUAGE.consumeClick() && mc.screen == null) {
+            mc.setScreen(LanguageSelectScreen(null, false))
+        }
+
+        if (CLEAR_TRANSCRIPTS.consumeClick()) {
+            for (box in languageBoxes) {
+                box.transcripts.clear()
+            }
+        }
+
+        if (OPEN_CONFIG_GUI.consumeClick()) {
+            mc.setScreen(UTConfigScreen(null))
+        }
+
+        /*if (TRANSLATE_SIGN.consumeClick()) {
+            if (mc.player != null && mc.level != null) {
+                val hitResult = mc.player?.pick(7.5, mc.frameTime, false)
+
+                if (hitResult != null && hitResult is BlockHitResult) {
+                    val buf = UnityTranslate.instance.proxy.createByteBuf()
+                    buf.writeBlockPos(hitResult.blockPos)
+
+                    UnityTranslate.instance.proxy.sendPacketClient(PacketIds.TRANSLATE_SIGN, buf)
+                }
+            }
+        }*/
+
+        // prune transcripts
+        val currentTime = System.currentTimeMillis()
+        for (box in languageBoxes) {
+            if (box.transcripts.size > 50) {
+                for (i in 0..(box.transcripts.size - 50)) {
+                    box.transcripts.remove()
+                }
+            }
+
+            val clientConfig = UnityTranslate.config.client
+
+            if (clientConfig.disappearingText) {
+                for (transcript in box.transcripts) {
+                    if (currentTime >= (transcript.arrivalTime + (clientConfig.disappearingTextDelay * 1000L).toLong() + (clientConfig.disappearingTextFade * 1000L).toLong())) {
+                        box.transcripts.remove(transcript)
+                    }
+                }
+            }
+        }
+    }
+
+    fun clientJoinWorld() {
+        for (consumer in queuedForJoin) {
+            consumer.accept(Minecraft.getInstance())
+        }
+
+        queuedForJoin.clear()
     }
 
     fun setupTranscriber(transcriber: SpeechTranscriber) {
@@ -215,15 +212,7 @@ class UnityTranslateClient {
         val OPEN_CONFIG_GUI = (KeyMapping("unitytranslate.open_config", InputConstants.KEY_F7, "UnityTranslate"))
 
         @JvmStatic
-        fun registerKeys() {
-            KeyMappingRegistry.register(CONFIGURE_BOXES)
-            KeyMappingRegistry.register(TOGGLE_TRANSCRIPTION)
-            KeyMappingRegistry.register(TOGGLE_BOXES)
-            KeyMappingRegistry.register(SET_SPOKEN_LANGUAGE)
-            KeyMappingRegistry.register(CLEAR_TRANSCRIPTS)
-            //KeyMappingRegistry.register(TRANSLATE_SIGN)
-            KeyMappingRegistry.register(OPEN_CONFIG_GUI)
-        }
+        val keys: List<KeyMapping> = listOf(CONFIGURE_BOXES, TOGGLE_TRANSCRIPTION, TOGGLE_BOXES, SET_SPOKEN_LANGUAGE, CLEAR_TRANSCRIPTS, OPEN_CONFIG_GUI)
 
         val isTalkBalloonsInstalled = UnityTranslate.instance.proxy.isModLoaded("talk_balloons")
 
@@ -246,15 +235,6 @@ class UnityTranslateClient {
         }
 
         private val queuedForJoin = ConcurrentLinkedQueue<Consumer<Minecraft>>()
-
-        init {
-            ClientPlayerEvent.CLIENT_PLAYER_JOIN.register { _ ->
-                for (consumer in queuedForJoin) {
-                    consumer.accept(Minecraft.getInstance())
-                }
-                queuedForJoin.clear()
-            }
-        }
 
         fun openDownloadRequest() {
             queuedForJoin.add { mc ->

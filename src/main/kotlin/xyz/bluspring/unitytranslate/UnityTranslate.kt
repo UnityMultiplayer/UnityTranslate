@@ -1,11 +1,8 @@
 package xyz.bluspring.unitytranslate
 
-import dev.architectury.event.events.common.CommandRegistrationEvent
-import dev.architectury.event.events.common.LifecycleEvent
 import kotlinx.serialization.json.Json
 import net.minecraft.resources.ResourceLocation
 import org.slf4j.LoggerFactory
-import xyz.bluspring.unitytranslate.commands.UnityTranslateCommands
 import xyz.bluspring.unitytranslate.compat.voicechat.PlasmoVoiceChatCompat
 import xyz.bluspring.unitytranslate.compat.voicechat.UTVoiceChatCompat
 import xyz.bluspring.unitytranslate.config.UnityTranslateConfig
@@ -23,19 +20,15 @@ class UnityTranslate(val proxy: PlatformProxy = PlatformProxyImpl()) {
         TranslatorManager.init()
         loadConfig()
 
-        LifecycleEvent.SERVER_STOPPING.register {
-            LocalLibreTranslateInstance.killOpenInstances()
-        }
-
-        CommandRegistrationEvent.EVENT.register { dispatcher, _, _ ->
-            dispatcher.register(UnityTranslateCommands.ROOT)
-        }
-
         UTServerNetworking.init()
 
         if (proxy.isModLoaded("plasmovoice")) {
             PlasmoVoiceChatCompat.init()
         }
+    }
+
+    fun serverStopping() {
+        LocalLibreTranslateInstance.killOpenInstances()
     }
 
     companion object {
