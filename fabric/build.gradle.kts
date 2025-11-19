@@ -46,7 +46,9 @@ dependencies {
 
     modImplementation("com.terraformersmc:modmenu:${common.mod.dep("modmenu")}")
 
-    include(modImplementation("me.lucko:fabric-permissions-api:${common.mod.dep("fabric_permissions")}")!!)
+    include(modImplementation("me.lucko:fabric-permissions-api:${common.mod.dep("fabric_permissions")}") {
+        exclude("net.fabricmc.fabric-api")
+    })
 
     modImplementation("maven.modrinth:talk-balloons:${common.mod.dep("talk_balloons")}+${common.mod.dep("talk_balloons_mc")}-fabric")
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:${common.mod.dep("cloth_config")}")
