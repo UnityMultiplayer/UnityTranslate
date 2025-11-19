@@ -1,22 +1,16 @@
 package xyz.bluspring.unitytranslate.client.gui
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
 import net.minecraft.util.FastColor
 import net.minecraft.util.Mth
-import net.minecraft.world.entity.player.Player
 import xyz.bluspring.unitytranslate.Language
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
-import xyz.bluspring.unitytranslate.compat.voicechat.UTVoiceChatCompat
-import xyz.bluspring.unitytranslate.events.TranscriptEvents
-import xyz.bluspring.unitytranslate.transcript.Transcript
 import java.util.*
-import java.util.concurrent.ConcurrentLinkedQueue
 
 @Serializable
 data class TranscriptBox(
@@ -65,10 +59,9 @@ data class TranscriptBox(
             }
         }
 
-    @Transient
-    val transcripts = ConcurrentLinkedQueue<Transcript>()
-
     fun render(guiGraphics: GuiGraphics, partialTick: Float) {
+        val holder = UnityTranslateClient.getTranscriptHolder(this.language) ?: return
+
         guiGraphics.pose().pushPose()
 
         guiGraphics.pose().translate(0.0, 0.0, -255.0)
@@ -84,7 +77,7 @@ data class TranscriptBox(
 
         guiGraphics.enableScissor(x, y + 15, x + width, y + height)
 
-        val lines = transcripts.sortedByDescending { it.arrivalTime }
+        val lines = holder.transcripts.sortedByDescending { it.arrivalTime }
 
         val font = Minecraft.getInstance().font
         val scale = UnityTranslate.config.client.textScale / 100f
@@ -145,32 +138,6 @@ data class TranscriptBox(
         guiGraphics.renderOutline(x, y, width, height, FastColor.ARGB32.color(100, 0, 0, 0))
 
         guiGraphics.pose().popPose()
-    }
-
-    fun updateTranscript(source: Player, text: String, language: Language, index: Int, updateTime: Long, incomplete: Boolean) {
-        if (!UTVoiceChatCompat.isPlayerAudible(source))
-            return
-
-        if (this.transcripts.any { it.player.uuid == source.uuid && it.index == index }) {
-            val transcript = this.transcripts.first { it.player.uuid == source.uuid && it.index == index }
-
-            // it's possible for this to go out of order, let's avoid that
-            if (transcript.lastUpdateTime > updateTime)
-                return
-
-            transcript.lastUpdateTime = updateTime
-            transcript.text = text
-            transcript.incomplete = incomplete
-            transcript.arrivalTime = System.currentTimeMillis()
-
-            TranscriptEvents.UPDATE.invoker().onTranscriptUpdate(transcript, this@TranscriptBox.language)
-
-            return
-        }
-
-        this.transcripts.add(Transcript(index, source, text, language, updateTime, incomplete).apply {
-            TranscriptEvents.UPDATE.invoker().onTranscriptUpdate(this, this@TranscriptBox.language)
-        })
     }
 
     companion object {

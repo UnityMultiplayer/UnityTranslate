@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import kotlinx.coroutines.runBlocking
 import net.minecraft.util.random.Weight
 import net.minecraft.util.random.WeightedEntry
 import xyz.bluspring.unitytranslate.Language
@@ -22,12 +23,15 @@ open class LibreTranslateInstance(val url: String, private var weight: Int, val 
 
     init {
         val startTime = System.currentTimeMillis()
-        if (this.translate("Latency test for UnityTranslate", Language.ENGLISH, Language.SPANISH) == null)
-            throw Exception("Failed to run latency test for LibreTranslate instance $url!")
+        runBlocking {
+            if (translate("Latency test for UnityTranslate", Language.ENGLISH, Language.SPANISH) == null)
+                throw Exception("Failed to run latency test for LibreTranslate instance $url!")
+        }
+
         latency = (System.currentTimeMillis() - startTime).toInt()
     }
 
-    val supportedLanguages: Multimap<Language, Language>
+    open val supportedLanguages: Multimap<Language, Language>
         get() {
             if (cachedSupportedLanguages.isEmpty) {
                 val array = JsonParser.parseString(URL("$url/languages").readText()).asJsonArray
@@ -57,7 +61,7 @@ open class LibreTranslateInstance(val url: String, private var weight: Int, val 
         return supportedTargets.contains(to)
     }
 
-    fun batchTranslate(texts: List<String>, from: Language, to: Language): List<String>? {
+    suspend fun batchTranslate(texts: List<String>, from: Language, to: Language): List<String>? {
         if (!supportsLanguage(from, to))
             return null
 
@@ -89,7 +93,7 @@ open class LibreTranslateInstance(val url: String, private var weight: Int, val 
         return lang
     }
 
-    open fun batchTranslate(from: String, to: String, request: List<String>): List<String> {
+    open suspend fun batchTranslate(from: String, to: String, request: List<String>): List<String> {
         val translated = HttpHelper.post("$url/translate", JsonObject().apply {
             addProperty("source", from)
             addProperty("target", to)
@@ -106,7 +110,7 @@ open class LibreTranslateInstance(val url: String, private var weight: Int, val 
         return translated.map { it.asString }
     }
 
-    fun translate(text: String, from: Language, to: Language): String? {
+    suspend fun translate(text: String, from: Language, to: Language): String? {
         if (!supportsLanguage(from, to))
             return null
 
@@ -120,7 +124,7 @@ open class LibreTranslateInstance(val url: String, private var weight: Int, val 
         }
     }
 
-    open fun translate(from: String, to: String, request: String): String {
+    open suspend fun translate(from: String, to: String, request: String): String {
         return HttpHelper.post("$url/translate", JsonObject().apply {
             addProperty("source", from)
             addProperty("target", to)

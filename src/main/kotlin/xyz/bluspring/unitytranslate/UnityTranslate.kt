@@ -7,11 +7,11 @@ import xyz.bluspring.unitytranslate.compat.voicechat.PlasmoVoiceChatCompat
 import xyz.bluspring.unitytranslate.compat.voicechat.UTVoiceChatCompat
 import xyz.bluspring.unitytranslate.config.UnityTranslateConfig
 import xyz.bluspring.unitytranslate.network.UTServerNetworking
-import xyz.bluspring.unitytranslate.translator.LocalLibreTranslateInstance
 import xyz.bluspring.unitytranslate.translator.TranslatorManager
 import java.io.File
+import java.util.*
 
-class UnityTranslate(val proxy: PlatformProxy = PlatformProxyImpl()) {
+class UnityTranslate(val proxy: PlatformProxy = ServiceLoader.load(PlatformProxy::class.java).first()) {
     init {
         instance = this
         configFile = File(proxy.configDir.toFile(), "unitytranslate.json")
@@ -28,7 +28,7 @@ class UnityTranslate(val proxy: PlatformProxy = PlatformProxyImpl()) {
     }
 
     fun serverStopping() {
-        LocalLibreTranslateInstance.killOpenInstances()
+//        LocalLibreTranslateInstance.killOpenInstances()
     }
 
     companion object {

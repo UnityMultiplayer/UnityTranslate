@@ -7,7 +7,6 @@ import net.minecraft.network.chat.ComponentUtils
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 import xyz.bluspring.unitytranslate.client.transcribers.browser.BrowserSpeechTranscriber
-import xyz.bluspring.unitytranslate.translator.LocalLibreTranslateInstance
 import xyz.bluspring.unitytranslate.translator.TranslatorManager
 
 object UnityTranslateCommands {

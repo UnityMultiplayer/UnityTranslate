@@ -1,12 +1,15 @@
 package xyz.bluspring.unitytranslate.fabric.client
 
 import net.fabricmc.api.ClientModInitializer
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
+import xyz.bluspring.unitytranslate.commands.UnityTranslateCommands
 
 class UnityTranslateFabricClient : ClientModInitializer {
     override fun onInitializeClient() {
@@ -30,6 +33,10 @@ class UnityTranslateFabricClient : ClientModInitializer {
 
         HudRenderCallback.EVENT.register { guiGraphics, delta ->
             instance.clientRenderHud(guiGraphics, delta)
+        }
+
+        ClientCommandRegistrationCallback.EVENT.register { dispatcher, registryAccess ->
+            UnityTranslateCommands.register(dispatcher, "unitytranslateclient", true, FabricClientCommandSource::sendFeedback)
         }
     }
 }

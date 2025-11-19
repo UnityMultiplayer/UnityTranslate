@@ -1,6 +1,7 @@
 import dev.kikugie.stonecutter.build.StonecutterBuildExtension
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import net.fabricmc.loom.task.RemapJarTask
+import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 
 plugins {
     id("dev.kikugie.stonecutter")
@@ -111,6 +112,14 @@ allprojects {
         "implementation"("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-linux-amd64:${loaderDep("unitytranslatelib")}")
 
         "implementation"("com.github.jnr:jnr-ffi:${loaderDep("jnr")}")
+    }
+
+    project.extensions.configure<KotlinBaseExtension>("kotlin") {
+        jvmToolchain(
+            if (sc.eval(minecraftVersion, ">=1.20.5"))
+                21
+            else 17
+        )
     }
 
     project.extensions.configure<JavaPluginExtension>("java") {

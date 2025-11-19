@@ -1,5 +1,8 @@
 package xyz.bluspring.unitytranslate.client
 
+//? if >= 1.20.6 {
+/*import xyz.bluspring.unitytranslate.network.payloads.SendTranscriptToServerPayload
+*///? }
 import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.ChatFormatting
 import net.minecraft.client.KeyMapping
@@ -7,19 +10,15 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
+import xyz.bluspring.unitytranslate.Language
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.gui.*
 import xyz.bluspring.unitytranslate.client.transcribers.SpeechTranscriber
 import xyz.bluspring.unitytranslate.client.transcribers.windows.sapi5.WindowsSpeechApiTranscriber
 import xyz.bluspring.unitytranslate.compat.talkballoons.TalkBalloonsCompat
-import xyz.bluspring.unitytranslate.events.TranscriptEvents
 import xyz.bluspring.unitytranslate.network.PacketIds
 import xyz.bluspring.unitytranslate.network.UTClientNetworking
-import xyz.bluspring.unitytranslate.transcript.Transcript
-//? if >= 1.20.6 {
-/*import xyz.bluspring.unitytranslate.network.payloads.SendTranscriptToServerPayload
-*///? }
-import xyz.bluspring.unitytranslate.translator.LocalLibreTranslateInstance
+import xyz.bluspring.unitytranslate.transcript.TranscriptHolder
 import xyz.bluspring.unitytranslate.translator.TranslatorManager
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.function.BiConsumer
@@ -77,7 +76,7 @@ class UnityTranslateClient {
         }
 
         if (CLEAR_TRANSCRIPTS.consumeClick()) {
-            for (box in languageBoxes) {
+            for (box in transcriptHolders) {
                 box.transcripts.clear()
             }
         }
@@ -101,7 +100,7 @@ class UnityTranslateClient {
 
         // prune transcripts
         val currentTime = System.currentTimeMillis()
-        for (box in languageBoxes) {
+        for (box in transcriptHolders) {
             if (box.transcripts.size > 50) {
                 for (i in 0..(box.transcripts.size - 50)) {
                     box.transcripts.remove()
@@ -147,16 +146,13 @@ class UnityTranslateClient {
 
                 UnityTranslate.instance.proxy.sendPacketClient(PacketIds.SEND_TRANSCRIPT, buf)
                 //? }
-                languageBoxes.firstOrNull { it.language == transcriber.language }?.updateTranscript(Minecraft.getInstance().player!!, text, transcriber.language, index, updateTime, false)
 
-                if (languageBoxes.none { it.language == transcriber.language }) {
-                    TranscriptEvents.UPDATE.invoker().onTranscriptUpdate(Transcript(index, Minecraft.getInstance().player!!, text, transcriber.language, updateTime, false), transcriber.language)
-                }
+                getTranscriptHolder(transcriber.language)?.updateTranscript(Minecraft.getInstance().player!!, text, transcriber.language, index, updateTime, false)
             } else {
                 if (Minecraft.getInstance().player == null)
                     return@BiConsumer
 
-                for (box in languageBoxes) {
+                for (box in transcriptHolders) {
                     if (box.language == transcriber.language) {
                         box.updateTranscript(Minecraft.getInstance().player!!, text, transcriber.language, index, updateTime, false)
 
@@ -170,10 +166,6 @@ class UnityTranslateClient {
 
                             box.updateTranscript(Minecraft.getInstance().player!!, it, transcriber.language, index, updateTime, false)
                         }
-                }
-
-                if (languageBoxes.none { it.language == transcriber.language }) {
-                    TranscriptEvents.UPDATE.invoker().onTranscriptUpdate(Transcript(index, Minecraft.getInstance().player!!, text, transcriber.language, updateTime, false), transcriber.language)
                 }
             }
         }
@@ -197,6 +189,12 @@ class UnityTranslateClient {
             }
 
         var shouldRenderBoxes = true
+
+        val transcriptHolders = mutableSetOf<TranscriptHolder>()
+
+        fun getTranscriptHolder(language: Language): TranscriptHolder? {
+            return transcriptHolders.firstOrNull { it.language == language }
+        }
 
         val languageBoxes: MutableList<TranscriptBox>
             get() {

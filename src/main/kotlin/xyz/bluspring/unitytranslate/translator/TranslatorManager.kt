@@ -3,24 +3,28 @@ package xyz.bluspring.unitytranslate.translator
 //? if >= 1.20.6 {
 /*import xyz.bluspring.unitytranslate.network.payloads.MarkIncompletePayload
 *///? }
-import dev.architectury.event.events.common.LifecycleEvent
-import dev.architectury.event.events.common.PlayerEvent
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.asFlow
 import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.player.Player
 import xyz.bluspring.unitytranslate.Language
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 import xyz.bluspring.unitytranslate.compat.voicechat.UTVoiceChatCompat
+import xyz.bluspring.unitytranslate.library.util.collect
+import xyz.bluspring.unitytranslate.library.util.concurrent
 import xyz.bluspring.unitytranslate.network.PacketIds
-import xyz.bluspring.unitytranslate.util.ClassLoaderProviderForkJoinWorkerThreadFactory
 import xyz.bluspring.unitytranslate.util.nativeaccess.CudaState
 import xyz.bluspring.unitytranslate.util.nativeaccess.NativeAccess
 import java.util.*
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.ForkJoinPool
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.toJavaDuration
 
 object TranslatorManager {
     private var timer: Timer = Timer("UnityTranslate Batch Translate Manager")
@@ -29,17 +33,36 @@ object TranslatorManager {
     private val MULTI_ASTERISK_REGEX = Regex("\\*+")
     private val MULTI_MUSIC_NOTE_REGEX = Regex("[♩♪♫♬♭♮♯°ø\u0602≠≭]+")
 
-    var translationPool = ForkJoinPool((Runtime.getRuntime().availableProcessors() - 3).coerceAtLeast(1))
+    private val cachedTranslations = Collections.synchronizedMap(mutableMapOf<Pair<Language, Language>, Cache<String, String>>())
+
+    val scope = CoroutineScope(Dispatchers.IO)
 
     var instances = ConcurrentLinkedDeque<LibreTranslateInstance>()
         private set
 
-    fun queueTranslation(line: String, from: Language, to: Language, player: Player, index: Int): CompletableFuture<String> {
-        return CompletableFuture<String>().apply {
-            val id = "${player.stringUUID}-$index"
+    private fun getCache(from: Language, to: Language): Cache<String, String> {
+        return this.cachedTranslations.computeIfAbsent(from to to) {
+            CacheBuilder.newBuilder()
+                .maximumSize(20_000)
+                .expireAfterAccess(3.minutes.toJavaDuration())
+                .concurrencyLevel(3)
+                .build()
+        }
+    }
+
+    fun queueTranslation(line: String, from: Language, to: Language, player: Player, index: Int, chunk: Int): CompletableDeferred<String> {
+        return CompletableDeferred<String>().apply {
+            val cached = getCache(from, to).getIfPresent(line)
+
+            if (cached != null) {
+                this.complete(cached)
+                return@apply
+            }
+
+            val id = "${player.stringUUID}-$index-$chunk"
 
             for (previous in queuedTranslations.filter { it.id == id && it.fromLang == from && it.toLang == to }) {
-                previous.future.completeExceptionally(Exception("Overridden"))
+                previous.future.cancel("Overridden")
                 queuedTranslations.remove(previous)
             }
 
@@ -48,7 +71,7 @@ object TranslatorManager {
                 line, from, to,
                 System.currentTimeMillis(),
                 this,
-                player, index
+                player, index, chunk
             ))
         }
     }
@@ -86,7 +109,9 @@ object TranslatorManager {
                 continue
 
             instance.currentlyTranslating++
-            val translated = instance.translate(line, from, to)
+            val translated = runBlocking {
+                instance.translate(line, from, to)
+            }
             instance.currentlyTranslating--
 
             if (translated == null) {
@@ -102,7 +127,7 @@ object TranslatorManager {
         return null
     }
 
-    fun batchTranslateLines(lines: List<String>, from: Language, to: Language): List<String>? {
+    suspend fun batchTranslateLines(lines: List<String>, from: Language, to: Language): List<String>? {
         val possible = instances.filter { it.supportsLanguage(from, to) }.sortedByDescending { it.weight.asInt() }
 
         if (possible.isEmpty()) {
@@ -160,14 +185,17 @@ object TranslatorManager {
         } == CudaState.AVAILABLE
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun installLibreTranslate() {
         loadFromConfig()
 
-        LocalLibreTranslateInstance.installLibreTranslate().thenApplyAsync {
+        GlobalScope.launch(Dispatchers.IO, start = CoroutineStart.UNDISPATCHED) {
             try {
-                LocalLibreTranslateInstance.launchLibreTranslate(it) { a -> instances.addFirst(a) }
+                UnityTranslateLibInstance.tryLoad()
+                if (UnityTranslateLibInstance.isLibraryLoaded)
+                    instances.addFirst(UnityTranslateLibInstance.instance)
             } catch (e: Throwable) {
-                UnityTranslate.logger.error("Failed to launch local LibreTranslate instance!")
+                UnityTranslate.logger.error("Failed to launch UnityTranslateLib instance!")
                 e.printStackTrace()
             }
         }
@@ -175,34 +203,32 @@ object TranslatorManager {
 
     fun init() {
         loadFromConfig()
+    }
 
-        LifecycleEvent.SERVER_STARTING.register {
-            if (UnityTranslate.config.server.shouldRunTranslationServer && LocalLibreTranslateInstance.canRunLibreTranslate()) {
-                if (UnityTranslate.instance.proxy.isClient() && !LocalLibreTranslateInstance.isLibreTranslateInstalled()) {
-                    UnityTranslateClient.openDownloadRequest()
-                } else {
-                    installLibreTranslate()
-                }
+    fun serverStarting(server: MinecraftServer) {
+        if (server::class.java.name.endsWith("ReplayServer"))
+            return
+
+        if (UnityTranslate.config.server.shouldRunTranslationServer) {
+            if (UnityTranslate.instance.proxy.isClient() && !UnityTranslateLibInstance.isLibraryLoaded) {
+                UnityTranslateClient.openDownloadRequest()
+            } else {
+                installLibreTranslate()
             }
-        }
-
-        LifecycleEvent.SERVER_STOPPING.register {
-            timer.cancel()
-            instances.removeIf { it is LocalLibreTranslateInstance }
-        }
-
-        PlayerEvent.PLAYER_QUIT.register { player ->
-            queuedTranslations.removeIf { it.player.uuid == player.uuid }
         }
     }
 
+    fun serverStopping() {
+        timer.cancel()
+        instances.removeIf { it is UnityTranslateLibInstance }
+    }
+
+    fun playerQuit(player: Player) {
+        queuedTranslations.removeIf { it.player.uuid == player.uuid }
+    }
+
     fun loadFromConfig() {
-        // Forge shenanigans
-        val customThreadPool = ForkJoinPool(1, ClassLoaderProviderForkJoinWorkerThreadFactory(Thread.currentThread().contextClassLoader), null, false)
-        customThreadPool.execute {
-            loadFromConfigBlocking()
-            customThreadPool.shutdown()
-        }
+        loadFromConfigBlocking()
     }
 
     fun loadFromConfigBlocking() {
@@ -212,9 +238,6 @@ object TranslatorManager {
 
         timer.cancel()
         timer = Timer("UnityTranslate Batch Translate Manager")
-        
-        translationPool.shutdownNow()
-        translationPool = ForkJoinPool((Runtime.getRuntime().availableProcessors() - 3).coerceAtLeast(1), ClassLoaderProviderForkJoinWorkerThreadFactory(Thread.currentThread().contextClassLoader), null, false)
 
         for (server in UnityTranslate.config.server.offloadServers) {
             try {
@@ -226,8 +249,8 @@ object TranslatorManager {
             }
         }
 
-        if (LocalLibreTranslateInstance.currentInstance != null) {
-            list.add(0, LocalLibreTranslateInstance.currentInstance!!)
+        if (UnityTranslateLibInstance.isLibraryLoaded) {
+            list.add(0, UnityTranslateLibInstance.instance)
         }
 
         timer.scheduleAtFixedRate(object : TimerTask() {
@@ -238,6 +261,9 @@ object TranslatorManager {
 
                     while (queuedTranslations.isNotEmpty()) {
                         val translation = queuedTranslations.remove()
+
+                        if (translation.future.isCancelled || translation.future.isCompleted)
+                            continue
 
                         toTranslate.computeIfAbsent(translation.fromLang to translation.toLang) { mutableListOf() }
                             .add(translation)
@@ -250,27 +276,35 @@ object TranslatorManager {
                             else true
                         }
 
-                        translations.chunked(LibreTranslateInstance.MAX_CONCURRENT_TRANSLATIONS)
-                            .forEach { spliced ->
-                                CompletableFuture.supplyAsync({
-                                    batchTranslateLines(spliced.map { it.text }, from, to)
-                                }, translationPool)
-                                    .whenCompleteAsync({ t, u ->
-                                        spliced.forEachIndexed { i, translation ->
-                                            if (t != null && u == null) {
-                                                broadcastIncomplete(false, translation)
-                                                translation.future.completeAsync { t[i] }
-                                            } else {
-                                                if (translation.player is ServerPlayer) {
-                                                    broadcastIncomplete(true, translation)
-                                                }
-
-                                                translation.attempts++
-                                                queueLater.add(translation)
-                                            }
+                        scope.launch(start = CoroutineStart.UNDISPATCHED) {
+                            translations.chunked(LibreTranslateInstance.MAX_CONCURRENT_TRANSLATIONS)
+                                .asFlow()
+                                .concurrent()
+                                .collect { spliced ->
+                                    try {
+                                        val translated = batchTranslateLines(spliced.map { it.text }, from, to)
+                                        if (translated == null) {
+                                            throw IllegalStateException("Failed to translate lines! $spliced")
                                         }
-                                    }, translationPool)
-                            }
+
+                                        for ((index, translation) in spliced.withIndex()) {
+                                            broadcastIncomplete(false, translation)
+                                            translation.future.complete(translated[index].apply {
+                                                getCache(translation.fromLang, translation.toLang).put(translation.text, translated[index])
+                                            })
+                                        }
+                                    } catch (_: Throwable) {
+                                        for (translation in spliced) {
+                                            if (translation.player is ServerPlayer) {
+                                                broadcastIncomplete(true, translation)
+                                            }
+
+                                            translation.attempts++
+                                            queueLater.add(translation)
+                                        }
+                                    }
+                                }
+                        }
                     }
 
                     for (translation in queueLater) {
