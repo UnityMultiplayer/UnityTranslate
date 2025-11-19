@@ -34,6 +34,6 @@ class FabricPlatformProxy : PlatformProxy {
         get() = this.loader.isDevelopmentEnvironment
 
     override fun hasTranscriptPermission(player: Player): Boolean {
-        return Permissions.check(player, "${UnityTranslate.MOD_ID}.request_translations")
+        return Permissions.check(player, "${UnityTranslate.MOD_ID}.request_translations", true)
     }
 }
