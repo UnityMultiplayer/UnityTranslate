@@ -32,6 +32,7 @@ class UnityTranslateClient {
     init {
         WindowsSpeechApiTranscriber.isSupported() // runs a check to load Windows Speech API. why write the code again anyway?
         setupCompat()
+        updateConfig()
 
         transcriber = UnityTranslate.config.client.transcriber.creator.invoke(UnityTranslate.config.client.language)
         setupTranscriber(transcriber)
@@ -76,7 +77,7 @@ class UnityTranslateClient {
         }
 
         if (SET_SPOKEN_LANGUAGE.consumeClick() && mc.screen == null) {
-            mc.setScreen(LanguageSelectScreen(null, false))
+            mc.setScreen(LanguageSelectScreen(null, LanguageSelectType.SPOKEN))
         }
 
         if (CLEAR_TRANSCRIPTS.consumeClick()) {
@@ -213,7 +214,28 @@ class UnityTranslateClient {
         @JvmStatic
         val keys: List<KeyMapping> = listOf(CONFIGURE_BOXES, TOGGLE_TRANSCRIPTION, TOGGLE_BOXES, SET_SPOKEN_LANGUAGE, CLEAR_TRANSCRIPTS, OPEN_CONFIG_GUI)
 
+        val clientConfig = UnityTranslate.config.client
+
         val isTalkBalloonsInstalled = UnityTranslate.instance.proxy.isModLoaded("talk_balloons")
+
+        fun updateConfig() {
+            transcriptHolders.removeIf { holder ->
+                clientConfig.transcriptBoxes.none { it.language == holder.language }
+                        && clientConfig.language != holder.language
+                        && clientConfig.balloonLanguage != holder.language
+            }
+
+            if (transcriptHolders.none { it.language == clientConfig.language })
+                transcriptHolders.add(TranscriptHolder(clientConfig.language))
+
+            if (transcriptHolders.none { it.language == clientConfig.balloonLanguage })
+                transcriptHolders.add(TranscriptHolder(clientConfig.balloonLanguage))
+
+            for (box in clientConfig.transcriptBoxes) {
+                if (transcriptHolders.none { it.language == box.language })
+                    transcriptHolders.add(TranscriptHolder(box.language))
+            }
+        }
 
         fun displayMessage(component: Component, isError: Boolean = false) {
             val full = Component.empty()

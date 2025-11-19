@@ -5,13 +5,10 @@ import com.google.common.collect.Multimap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.runBlocking
-import net.fabricmc.api.EnvType
 import net.fabricmc.loader.api.FabricLoader
 import xyz.bluspring.unitytranslate.Language
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.library.UnityTranslateLib
-import xyz.bluspring.unitytranslate.library.util.collect
-import xyz.bluspring.unitytranslate.library.util.concurrent
 
 class UnityTranslateLibInstance private constructor(): LibreTranslateInstance("", 150) {
     override val supportedLanguages: Multimap<Language, Language>
@@ -58,15 +55,18 @@ class UnityTranslateLibInstance private constructor(): LibreTranslateInstance(""
             try {
                 library.load()
 
-                if (FabricLoader.getInstance().isDevelopmentEnvironment || FabricLoader.getInstance().environmentType == EnvType.SERVER) {
+                if (FabricLoader.getInstance().isDevelopmentEnvironment) {
                     runBlocking(Dispatchers.IO) {
                         for (index in library.packageIndex.indexList) {
                             index.packages.chunked(10).asFlow().collect {
-                                it.asFlow().concurrent().collect {
-                                    UnityTranslate.logger.info("Downloading translation model ${it.fromCode}-${it.toCode}")
-                                    index.getOrDownloadModelInfos(it.fromCode, it.toCode)
-                                    UnityTranslate.logger.info("Downloaded translation model ${it.fromCode}-${it.toCode}")
-                                }
+                                // only download what's necessary for now
+                                UnityTranslate.logger.info("Downloading translation model for en -> es")
+                                index.getOrDownloadModelInfos("en", "es")
+
+                                UnityTranslate.logger.info("Downloading translation model for es -> en")
+                                index.getOrDownloadModelInfos("es", "en")
+
+                                UnityTranslate.logger.info("Downloaded all testing translation models!")
                             }
                         }
                     }

@@ -27,7 +27,7 @@ data class UnityTranslateConfig(
         @get:Hidden
         var language: Language = Language.ENGLISH,
         @get:Hidden
-        var balloonLanguage: Language? = null,
+        private var balloonLanguageStored: Language? = null,
 
         var disappearingText: Boolean = true,
         @get:DependsOn("disappearingText")
@@ -36,7 +36,20 @@ data class UnityTranslateConfig(
         @get:DependsOn("disappearingText")
         @get:FloatRange(from = 0.0f, to = 5.0f, increment = 0.1f)
         var disappearingTextFade: Float = 0.5f
-    )
+    ) {
+        val balloonLanguage: Language
+            get() {
+                return this.balloonLanguageStored ?: this.language
+            }
+
+        fun setBalloonLanguage(language: Language?) {
+            this.balloonLanguageStored = language
+        }
+
+        fun isBalloonDefaultLanguage(): Boolean {
+            return this.balloonLanguageStored == null
+        }
+    }
 
     @Serializable
     data class CommonConfig(
@@ -57,8 +70,6 @@ data class UnityTranslateConfig(
         var libreTranslateThreads: Int = 4,
 
         var offloadServers: MutableList<OffloadedLibreTranslateServer> = mutableListOf(
-            OffloadedLibreTranslateServer("https://libretranslate.devos.gay"),
-            OffloadedLibreTranslateServer("https://trans.zillyhuhn.com"),
         ),
 
         // Interval for when the batch translations will be sent.

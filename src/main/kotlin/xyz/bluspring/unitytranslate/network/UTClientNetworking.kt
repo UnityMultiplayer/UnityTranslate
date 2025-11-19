@@ -58,4 +58,10 @@ object UTClientNetworking {
     fun onClientLeave() {
         UnityTranslateClient.connectedServerHasSupport = false
     }
+
+    fun updateLanguagesToServer() {
+        if (Minecraft.getInstance().player != null) {
+            VanillaPacketSender.sendToServer(SetUsedLanguagesPayload(EnumSet.copyOf(UnityTranslateClient.transcriptHolders.map { it.language })))
+        }
+    }
 }

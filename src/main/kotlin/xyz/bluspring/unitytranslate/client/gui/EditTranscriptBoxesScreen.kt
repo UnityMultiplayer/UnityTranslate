@@ -12,10 +12,9 @@ import net.minecraft.network.chat.Component
 import net.minecraft.util.FastColor
 import net.minecraft.util.Mth
 import org.lwjgl.glfw.GLFW
-import xyz.bluspring.modernnetworking.api.minecraft.VanillaPacketSender
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
-import xyz.bluspring.unitytranslate.network.payloads.SetUsedLanguagesPayload
+import xyz.bluspring.unitytranslate.network.UTClientNetworking
 import java.util.*
 
 class EditTranscriptBoxesScreen(val boxes: MutableList<TranscriptBox>, val parent: Screen? = null) : Screen(Component.empty()) {
@@ -42,7 +41,7 @@ class EditTranscriptBoxesScreen(val boxes: MutableList<TranscriptBox>, val paren
 
         this.addRenderableWidget(
             Button.builder(Component.literal("+")) {
-                Minecraft.getInstance().setScreen(LanguageSelectScreen(this, true))
+                Minecraft.getInstance().setScreen(LanguageSelectScreen(this, LanguageSelectType.TRANSCRIPT_BOX))
             }
                 .pos(this.width / 2 - (Button.DEFAULT_WIDTH / 2) - Button.DEFAULT_HEIGHT, this.height - 50)
                 .width(Button.DEFAULT_HEIGHT)
@@ -57,13 +56,10 @@ class EditTranscriptBoxesScreen(val boxes: MutableList<TranscriptBox>, val paren
             UnityTranslateClient.shouldRenderBoxes = false
 
         UnityTranslate.saveConfig()
+        UnityTranslateClient.updateConfig()
 
         if (UnityTranslateClient.transcriptHolders.isNotEmpty()) {
-            val languages = UnityTranslateClient.transcriptHolders.map { it.language }
-
-            if (Minecraft.getInstance().player != null) {
-                VanillaPacketSender.sendToServer(SetUsedLanguagesPayload(EnumSet.copyOf(languages)))
-            }
+            UTClientNetworking.updateLanguagesToServer()
         }
 
         // make sure that the cursor is reset

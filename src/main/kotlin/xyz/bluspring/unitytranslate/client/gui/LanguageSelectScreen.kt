@@ -12,8 +12,9 @@ import net.minecraft.util.FormattedCharSequence
 import xyz.bluspring.unitytranslate.Language
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
+import xyz.bluspring.unitytranslate.network.UTClientNetworking
 
-class LanguageSelectScreen(val parent: Screen?, val isAddingBox: Boolean) : Screen(Component.translatable("options.language")) {
+class LanguageSelectScreen(val parent: Screen?, val type: LanguageSelectType) : Screen(Component.translatable("options.language")) {
     private lateinit var list: LanguageSelectionList
 
     override fun init() {
@@ -43,10 +44,11 @@ class LanguageSelectScreen(val parent: Screen?, val isAddingBox: Boolean) : Scre
         super.render(guiGraphics, mouseX, mouseY, partialTick)
 
         guiGraphics.drawCenteredString(font, Component.translatable(
-            if (isAddingBox)
-                "unitytranslate.select_language"
-            else
-                "unitytranslate.set_spoken_language"
+            when (type) {
+                LanguageSelectType.TRANSCRIPT_BOX -> "unitytranslate.select_language"
+                LanguageSelectType.SPOKEN -> "unitytranslate.set_spoken_language"
+                LanguageSelectType.BALLOON -> "unitytranslate.set_balloon_language"
+            }
         ), this.width / 2, 15, 16777215)
 
         UnityTranslateClient.renderCreditText(guiGraphics)
@@ -60,7 +62,7 @@ class LanguageSelectScreen(val parent: Screen?, val isAddingBox: Boolean) : Scre
             return
         }
 
-        if (isAddingBox) {
+        if (type == LanguageSelectType.TRANSCRIPT_BOX) {
             if (list.selected?.shouldBeDeactivated == true) {
                 onClose()
                 return
@@ -69,11 +71,25 @@ class LanguageSelectScreen(val parent: Screen?, val isAddingBox: Boolean) : Scre
             Minecraft.getInstance().execute {
                 UnityTranslate.config.client.transcriptBoxes.add(TranscriptBox(0, 0, 150, 170, 120, language))
                 UnityTranslate.saveConfig()
+                UnityTranslateClient.updateConfig()
+
+                UTClientNetworking.updateLanguagesToServer()
             }
         } else {
-            UnityTranslate.config.client.language = language
-            UnityTranslateClient.transcriber.changeLanguage(language)
+            if (type == LanguageSelectType.SPOKEN) {
+                UnityTranslate.config.client.language = language
+                UnityTranslateClient.transcriber.changeLanguage(language)
+            } else {
+                if (list.selected!!.isBalloonDefault)
+                    UnityTranslate.config.client.setBalloonLanguage(null)
+                else
+                    UnityTranslate.config.client.setBalloonLanguage(language)
+            }
+
             UnityTranslate.saveConfig()
+            UnityTranslateClient.updateConfig()
+
+            UTClientNetworking.updateLanguagesToServer()
         }
 
         onClose()
@@ -91,18 +107,29 @@ class LanguageSelectScreen(val parent: Screen?, val isAddingBox: Boolean) : Scre
         18
     ) {
         init {
+            if (type == LanguageSelectType.BALLOON) {
+                val default = Entry(UnityTranslate.config.client.language, true)
+                this.addEntry(default)
+
+                if (UnityTranslate.config.client.isBalloonDefaultLanguage()) {
+                    this.selected = default
+                }
+            }
+
             for (language in Language.entries.sortedBy { it.name }) {
                 val entry = Entry(language)
                 this.addEntry(entry)
 
-                if (!isAddingBox && UnityTranslateClient.transcriber.language == language) {
+                if (type == LanguageSelectType.SPOKEN && UnityTranslateClient.transcriber.language == language) {
+                    this.selected = entry
+                } else if (type == LanguageSelectType.BALLOON && UnityTranslate.config.client.balloonLanguage == language && !UnityTranslate.config.client.isBalloonDefaultLanguage()) {
                     this.selected = entry
                 }
             }
         }
 
-        inner class Entry(val language: Language) : ObjectSelectionList.Entry<Entry>() {
-            internal val shouldBeDeactivated = isAddingBox && UnityTranslate.config.client.transcriptBoxes.any { it.language == language }
+        inner class Entry(val language: Language, var isBalloonDefault: Boolean = true) : ObjectSelectionList.Entry<Entry>() {
+            internal val shouldBeDeactivated = type == LanguageSelectType.TRANSCRIPT_BOX && UnityTranslate.config.client.transcriptBoxes.any { it.language == language }
             private var lastClickTime: Long = 0L
 
             override fun render(
@@ -116,9 +143,12 @@ class LanguageSelectScreen(val parent: Screen?, val isAddingBox: Boolean) : Scre
                     0x656565
                 } else 0xFFFFFF
 
-                guiGraphics.drawCenteredString(font, language.text, this@LanguageSelectScreen.width / 2, top + 1, color)
+                if (isBalloonDefault)
+                    guiGraphics.drawCenteredString(font, Component.translatable("unitytranslate.select_language.balloon_default", language.text), this@LanguageSelectScreen.width / 2, top + 1, color)
+                else
+                    guiGraphics.drawCenteredString(font, language.text, this@LanguageSelectScreen.width / 2, top + 1, color)
 
-                if (!isAddingBox) {
+                if (type != LanguageSelectType.TRANSCRIPT_BOX) {
                     var x = this@LanguageSelectScreen.width / 2 + (font.width(language.text) / 2) + 4
                     for (type in language.supportedTranscribers.keys) {
                         if (!type.enabled)
