@@ -8,6 +8,7 @@ import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 import xyz.bluspring.unitytranslate.client.transcribers.browser.BrowserSpeechTranscriber
 import xyz.bluspring.unitytranslate.translator.TranslatorManager
+import xyz.bluspring.unitytranslate.translator.UnityTranslateLibInstance
 
 object UnityTranslateCommands {
     fun <S> register(dispatcher: CommandDispatcher<S>, root: String, isClient: Boolean, sender: (S, Component) -> Unit) {
@@ -20,8 +21,7 @@ object UnityTranslateCommands {
                             Component.literal("- Total instances loaded: ${TranslatorManager.instances.size}"),
                             Component.literal("- Queued translations: ${TranslatorManager.queuedTranslations.size}"),
                             Component.empty(),
-                            Component.literal("- Supports local translation: ${LocalLibreTranslateInstance.canRunLibreTranslate()}"),
-                            Component.literal("- Is local translation server running: ${LocalLibreTranslateInstance.hasStarted}"),
+                            Component.literal("- Using library: ${UnityTranslateLibInstance.isLibraryLoaded}"),
                             Component.literal("- Supports CUDA: ${TranslatorManager.checkSupportsCuda()}"),
                         ), Component.literal("\n")))
 

@@ -1,8 +1,8 @@
 package xyz.bluspring.unitytranslate.compat.voicechat
 
-import com.google.inject.Inject
 import su.plo.voice.api.addon.AddonInitializer
 import su.plo.voice.api.addon.AddonLoaderScope
+import su.plo.voice.api.addon.InjectPlasmoVoice
 import su.plo.voice.api.addon.annotation.Addon
 import su.plo.voice.api.client.PlasmoVoiceClient
 
@@ -14,7 +14,7 @@ import su.plo.voice.api.client.PlasmoVoiceClient
     scope = AddonLoaderScope.CLIENT
 )
 class PlasmoVoiceChatClientCompat : AddonInitializer {
-    @Inject
+    @InjectPlasmoVoice
     lateinit var voiceClient: PlasmoVoiceClient
 
     override fun onAddonInitialize() {

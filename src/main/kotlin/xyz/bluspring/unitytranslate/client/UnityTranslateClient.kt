@@ -4,20 +4,24 @@ package xyz.bluspring.unitytranslate.client
 /*import xyz.bluspring.unitytranslate.network.payloads.SendTranscriptToServerPayload
 *///? }
 import com.mojang.blaze3d.platform.InputConstants
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.launch
 import net.minecraft.ChatFormatting
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
+import xyz.bluspring.modernnetworking.api.minecraft.VanillaPacketSender
 import xyz.bluspring.unitytranslate.Language
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.gui.*
 import xyz.bluspring.unitytranslate.client.transcribers.SpeechTranscriber
+import xyz.bluspring.unitytranslate.client.transcribers.browser.BrowserSpeechTranscriber
 import xyz.bluspring.unitytranslate.client.transcribers.windows.sapi5.WindowsSpeechApiTranscriber
 import xyz.bluspring.unitytranslate.compat.talkballoons.TalkBalloonsCompat
-import xyz.bluspring.unitytranslate.network.PacketIds
 import xyz.bluspring.unitytranslate.network.UTClientNetworking
+import xyz.bluspring.unitytranslate.network.payloads.SendTranscriptToServerPayload
 import xyz.bluspring.unitytranslate.transcript.TranscriptHolder
 import xyz.bluspring.unitytranslate.translator.TranslatorManager
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -44,7 +48,7 @@ class UnityTranslateClient {
     }
 
     fun clientStopping() {
-        LocalLibreTranslateInstance.killOpenInstances()
+//        LocalLibreTranslateInstance.killOpenInstances()
     }
 
     fun clientTick(mc: Minecraft) {
@@ -125,6 +129,16 @@ class UnityTranslateClient {
         }
 
         queuedForJoin.clear()
+
+        UTClientNetworking.onClientJoin()
+
+        if (transcriber is BrowserSpeechTranscriber) {
+            (transcriber as BrowserSpeechTranscriber).openWebsite()
+        }
+    }
+
+    fun clientLeaveWorld() {
+        UTClientNetworking.onClientLeave()
     }
 
     fun setupTranscriber(transcriber: SpeechTranscriber) {
@@ -135,17 +149,7 @@ class UnityTranslateClient {
             val updateTime = System.currentTimeMillis()
 
             if (connectedServerHasSupport) {
-                //? if >= 1.20.6 {
-                /*UnityTranslate.instance.proxy.sendPacketClient(SendTranscriptToServerPayload(transcriber.language, text, index, updateTime))
-                *///? } else {
-                val buf = UnityTranslate.instance.proxy.createByteBuf()
-                buf.writeEnum(transcriber.language)
-                buf.writeUtf(text)
-                buf.writeVarInt(index)
-                buf.writeVarLong(updateTime)
-
-                UnityTranslate.instance.proxy.sendPacketClient(PacketIds.SEND_TRANSCRIPT, buf)
-                //? }
+                VanillaPacketSender.sendToServer(SendTranscriptToServerPayload(transcriber.language, text, index, updateTime))
 
                 getTranscriptHolder(transcriber.language)?.updateTranscript(Minecraft.getInstance().player!!, text, transcriber.language, index, updateTime, false)
             } else {
@@ -159,13 +163,10 @@ class UnityTranslateClient {
                         continue
                     }
 
-                    TranslatorManager.queueTranslation(text, transcriber.language, box.language, Minecraft.getInstance().player!!, index)
-                        .whenCompleteAsync { it, e ->
-                            if (e != null)
-                                return@whenCompleteAsync
-
-                            box.updateTranscript(Minecraft.getInstance().player!!, it, transcriber.language, index, updateTime, false)
-                        }
+                    TranslatorManager.scope.launch(start = CoroutineStart.UNDISPATCHED) {
+                        val translated = TranslatorManager.queueTranslation(text, transcriber.language, box.language, Minecraft.getInstance().player!!, index, 0).await()
+                        box.updateTranscript(Minecraft.getInstance().player!!, translated, transcriber.language, index, updateTime, false)
+                    }
                 }
             }
         }

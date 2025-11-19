@@ -1,12 +1,12 @@
 package xyz.bluspring.unitytranslate.client.transcribers
 
-import net.minecraft.client.Minecraft
-import xyz.bluspring.unitytranslate.Language
-import xyz.bluspring.unitytranslate.UnityTranslate
-import xyz.bluspring.unitytranslate.network.PacketIds
 //? if >= 1.20.6 {
 /*import xyz.bluspring.unitytranslate.network.payloads.SetCurrentLanguagePayload
 *///? }
+import net.minecraft.client.Minecraft
+import xyz.bluspring.modernnetworking.api.minecraft.VanillaPacketSender
+import xyz.bluspring.unitytranslate.Language
+import xyz.bluspring.unitytranslate.network.payloads.SetCurrentLanguagePayload
 import java.util.function.BiConsumer
 
 abstract class SpeechTranscriber(var language: Language) {
@@ -22,14 +22,7 @@ abstract class SpeechTranscriber(var language: Language) {
         this.language = language
 
         if (Minecraft.getInstance().player != null) {
-            //? if >= 1.20.6 {
-            /*UnityTranslate.instance.proxy.sendPacketClient(SetCurrentLanguagePayload(language))
-            *///? } else {
-            val buf = UnityTranslate.instance.proxy.createByteBuf()
-            buf.writeEnum(language)
-
-            UnityTranslate.instance.proxy.sendPacketClient(PacketIds.SET_CURRENT_LANGUAGE, buf)
-            //? }
+            VanillaPacketSender.sendToServer(SetCurrentLanguagePayload(language))
         }
     }
 }

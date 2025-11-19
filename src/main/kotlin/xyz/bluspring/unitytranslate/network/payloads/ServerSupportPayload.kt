@@ -1,17 +1,14 @@
 package xyz.bluspring.unitytranslate.network.payloads
 
-import net.minecraft.network.RegistryFriendlyByteBuf
-import net.minecraft.network.codec.StreamCodec
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload
-import xyz.bluspring.unitytranslate.network.PacketIds
+import io.netty.buffer.ByteBuf
+import xyz.bluspring.modernnetworking.api.NetworkCodecs
+import xyz.bluspring.modernnetworking.api.NetworkPacket
+import xyz.bluspring.modernnetworking.api.PacketDefinition
+import xyz.bluspring.unitytranslate.network.PacketDefinitions
 
-class ServerSupportPayload : CustomPacketPayload {
-    override fun type(): CustomPacketPayload.Type<out CustomPacketPayload> {
-        return PacketIds.SERVER_SUPPORT.type
-    }
+object ServerSupportPayload : NetworkPacket {
+    val CODEC = NetworkCodecs.unit(ServerSupportPayload)
 
-    companion object {
-        val EMPTY = ServerSupportPayload()
-        val CODEC: StreamCodec<RegistryFriendlyByteBuf, ServerSupportPayload> = StreamCodec.unit(EMPTY)
-    }
+    override val definition: PacketDefinition<out NetworkPacket, out ByteBuf>
+        get() = PacketDefinitions.SERVER_SUPPORT
 }

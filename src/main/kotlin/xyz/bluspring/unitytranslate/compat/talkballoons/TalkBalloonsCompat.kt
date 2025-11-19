@@ -1,7 +1,6 @@
 package xyz.bluspring.unitytranslate.compat.talkballoons
 
-import com.cerbon.talk_balloons.TalkBalloons
-import com.cerbon.talk_balloons.util.mixin.IAbstractClientPlayer
+import com.cerbon.talk_balloons.api.TalkBalloonsApi
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.events.TranscriptEvents
 import java.util.*
@@ -12,15 +11,13 @@ object TalkBalloonsCompat {
 
     fun init() {
         TranscriptEvents.UPDATE.register { transcript, language ->
-            if (language != UnityTranslate.config.client.language)
-                return@register
-
-            if (transcript.player !is IAbstractClientPlayer)
+            if (language != UnityTranslate.config.client.balloonLanguage)
                 return@register
 
             val uuid = transcript.player.uuid
+            val balloonMessages = TalkBalloonsApi.INSTANCE.getBalloonMessages(transcript.player)
 
-            if (transcript.player.balloonMessages?.isNotEmpty() != true) {
+            if (balloonMessages?.isNotEmpty() != true) {
                 lastBalloonText.remove(uuid)
             }
 
@@ -33,11 +30,11 @@ object TalkBalloonsCompat {
                     return@register
 
                 if (index == transcript.index) {
-                    transcript.player.balloonMessages.removeIf { it == lastText }
+                    balloonMessages.removeIf { it.string == lastText }
                 }
             }
 
-            transcript.player.createBalloonMessage(text, TalkBalloons.config.balloonAge * 20)
+            TalkBalloonsApi.INSTANCE.createBalloonMessage(transcript.player, text, TalkBalloonsApi.INSTANCE.defaultDuration * 20)
             lastBalloonText[uuid] = transcript.index to text
         }
     }

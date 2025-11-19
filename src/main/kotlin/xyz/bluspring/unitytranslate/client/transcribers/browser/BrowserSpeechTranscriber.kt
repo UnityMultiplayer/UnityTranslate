@@ -3,7 +3,6 @@ package xyz.bluspring.unitytranslate.client.transcribers.browser
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.sun.net.httpserver.HttpServer
-import dev.architectury.event.events.client.ClientPlayerEvent
 import net.minecraft.Util
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.ClickEvent
@@ -40,10 +39,6 @@ class BrowserSpeechTranscriber(language: Language) : SpeechTranscriber(language)
 
         socket.isDaemon = true
         socket.start()
-
-        ClientPlayerEvent.CLIENT_PLAYER_JOIN.register { _ ->
-            openWebsite()
-        }
     }
 
     fun openWebsite() {

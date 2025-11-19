@@ -12,10 +12,10 @@ import net.minecraft.network.chat.Component
 import net.minecraft.util.FastColor
 import net.minecraft.util.Mth
 import org.lwjgl.glfw.GLFW
-import xyz.bluspring.unitytranslate.Language
+import xyz.bluspring.modernnetworking.api.minecraft.VanillaPacketSender
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
-import xyz.bluspring.unitytranslate.network.PacketIds
+import xyz.bluspring.unitytranslate.network.payloads.SetUsedLanguagesPayload
 import java.util.*
 
 class EditTranscriptBoxesScreen(val boxes: MutableList<TranscriptBox>, val parent: Screen? = null) : Screen(Component.empty()) {
@@ -58,30 +58,11 @@ class EditTranscriptBoxesScreen(val boxes: MutableList<TranscriptBox>, val paren
 
         UnityTranslate.saveConfig()
 
-        if (UnityTranslateClient.languageBoxes.isNotEmpty()) {
-            //? if <= 1.20.4 {
-            val buf = UnityTranslate.instance.proxy.createByteBuf()
-            //? }
-
-            val languages = UnityTranslateClient.languageBoxes.map { it.language }.toMutableList()
-
-            if (!languages.contains(UnityTranslate.config.client.language)) {
-                languages.add(UnityTranslate.config.client.language)
-            }
-
-            //? if <= 1.20.4 {
-            buf.writeEnumSet(
-                EnumSet.copyOf(languages),
-                Language::class.java
-            )
-            //? }
+        if (UnityTranslateClient.transcriptHolders.isNotEmpty()) {
+            val languages = UnityTranslateClient.transcriptHolders.map { it.language }
 
             if (Minecraft.getInstance().player != null) {
-                //? if >= 1.20.6 {
-                /*UnityTranslate.instance.proxy.sendPacketClient(SetUsedLanguagesPayload(languages))
-                *///? } else {
-                UnityTranslate.instance.proxy.sendPacketClient(PacketIds.SET_USED_LANGUAGES, buf)
-                //? }
+                VanillaPacketSender.sendToServer(SetUsedLanguagesPayload(EnumSet.copyOf(languages)))
             }
         }
 

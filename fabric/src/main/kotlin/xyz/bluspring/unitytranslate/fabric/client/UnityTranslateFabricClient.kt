@@ -31,6 +31,10 @@ class UnityTranslateFabricClient : ClientModInitializer {
             instance.clientJoinWorld()
         }
 
+        ClientPlayConnectionEvents.DISCONNECT.register { _, _ ->
+            instance.clientLeaveWorld()
+        }
+
         HudRenderCallback.EVENT.register { guiGraphics, delta ->
             instance.clientRenderHud(guiGraphics, delta)
         }

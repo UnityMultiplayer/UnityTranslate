@@ -112,6 +112,8 @@ allprojects {
         "implementation"("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-linux-amd64:${loaderDep("unitytranslatelib")}")
 
         "implementation"("com.github.jnr:jnr-ffi:${loaderDep("jnr")}")
+
+        "implementation"("xyz.bluspring.modernnetworking:modernnetworking-api:${loaderDep("modernnetworking")}")!!
     }
 
     project.extensions.configure<KotlinBaseExtension>("kotlin") {

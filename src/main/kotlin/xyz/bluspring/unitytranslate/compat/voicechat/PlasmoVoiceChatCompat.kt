@@ -1,18 +1,17 @@
 package xyz.bluspring.unitytranslate.compat.voicechat
 
-import com.google.inject.Inject
 import net.minecraft.client.Minecraft
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.player.Player
 import su.plo.voice.api.addon.AddonInitializer
 import su.plo.voice.api.addon.AddonLoaderScope
+import su.plo.voice.api.addon.InjectPlasmoVoice
 import su.plo.voice.api.addon.annotation.Addon
 import su.plo.voice.api.client.PlasmoVoiceClient
 import su.plo.voice.api.client.event.connection.VoicePlayerUpdateEvent
 import su.plo.voice.api.event.EventSubscribe
 import su.plo.voice.api.server.PlasmoVoiceServer
 import su.plo.voice.api.server.audio.capture.ProximityServerActivationHelper
-import su.plo.voice.api.server.event.mute.PlayerVoiceMutedEvent
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 
@@ -24,7 +23,7 @@ import xyz.bluspring.unitytranslate.client.UnityTranslateClient
     scope = AddonLoaderScope.ANY
 )
 class PlasmoVoiceChatCompat : AddonInitializer {
-    @Inject
+    @InjectPlasmoVoice
     lateinit var voiceServer: PlasmoVoiceServer
 
     private var proximityHelper: ProximityServerActivationHelper? = null

@@ -14,6 +14,10 @@ dependencies {
     implementation("de.maxhenkel.voicechat:voicechat-api:${mod.dep("voicechat_api")}")
     compileOnly("su.plo.voice.api:server:${mod.dep("plasmo_api")}")
     compileOnly("su.plo.voice.api:client:${mod.dep("plasmo_api")}")
+
+    modImplementation("xyz.bluspring.modernnetworking:modernnetworking-common:${mod.dep("modernnetworking")}+${mod.dep("modernnetworking_mc")}")!!
+
+    modCompileOnly("maven.modrinth:talk-balloons:${mod.dep("talk_balloons")}+${mod.dep("talk_balloons_mc")}-fabric")
 }
 
 /*

@@ -1,21 +1,21 @@
 package xyz.bluspring.unitytranslate.network.payloads
 
-import net.minecraft.network.RegistryFriendlyByteBuf
-import net.minecraft.network.codec.StreamCodec
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload
+import io.netty.buffer.ByteBuf
+import xyz.bluspring.modernnetworking.api.CompositeCodecs
+import xyz.bluspring.modernnetworking.api.NetworkPacket
+import xyz.bluspring.modernnetworking.api.PacketDefinition
 import xyz.bluspring.unitytranslate.Language
-import xyz.bluspring.unitytranslate.network.PacketIds
+import xyz.bluspring.unitytranslate.network.PacketDefinitions
 
 data class SetCurrentLanguagePayload(
     val language: Language
-) : CustomPacketPayload {
-    override fun type(): CustomPacketPayload.Type<out CustomPacketPayload> {
-        return PacketIds.SET_CURRENT_LANGUAGE.type
-    }
+) : NetworkPacket {
+    override val definition: PacketDefinition<out NetworkPacket, out ByteBuf>
+        get() = PacketDefinitions.SET_CURRENT_LANGUAGE
 
     companion object {
-        val CODEC: StreamCodec<RegistryFriendlyByteBuf, SetCurrentLanguagePayload> = StreamCodec.composite(
-            Language.STREAM_CODEC, SetCurrentLanguagePayload::language,
+        val CODEC = CompositeCodecs.composite(
+            Language.NETWORK_CODEC, SetCurrentLanguagePayload::language,
             ::SetCurrentLanguagePayload
         )
     }

@@ -34,4 +34,9 @@ object UnityTranslateForgeClient {
     fun onClientJoin(ev: ClientPlayerNetworkEvent.LoggingIn) {
         this.instance.clientJoinWorld()
     }
+
+    @SubscribeEvent
+    fun onClientLeave(ev: ClientPlayerNetworkEvent.LoggingOut) {
+        this.instance.clientLeaveWorld()
+    }
 }

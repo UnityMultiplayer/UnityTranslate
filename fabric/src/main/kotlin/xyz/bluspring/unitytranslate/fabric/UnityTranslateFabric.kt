@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.minecraft.commands.CommandSourceStack
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.commands.UnityTranslateCommands
+import xyz.bluspring.unitytranslate.network.UTServerNetworking
 import xyz.bluspring.unitytranslate.translator.TranslatorManager
 
 class UnityTranslateFabric : ModInitializer {
@@ -25,8 +26,13 @@ class UnityTranslateFabric : ModInitializer {
             TranslatorManager.serverStopping()
         }
 
+        ServerPlayConnectionEvents.JOIN.register { handler, sender, server ->
+            UTServerNetworking.onPlayerJoin(handler.player)
+        }
+
         ServerPlayConnectionEvents.DISCONNECT.register { handler, server ->
             TranslatorManager.playerQuit(handler.player)
+            UTServerNetworking.onPlayerLeave(handler.player)
         }
     }
 

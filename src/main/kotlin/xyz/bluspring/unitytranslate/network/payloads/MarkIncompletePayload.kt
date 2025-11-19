@@ -1,12 +1,10 @@
 package xyz.bluspring.unitytranslate.network.payloads
 
-import net.minecraft.core.UUIDUtil
-import net.minecraft.network.RegistryFriendlyByteBuf
-import net.minecraft.network.codec.ByteBufCodecs
-import net.minecraft.network.codec.StreamCodec
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload
+import io.netty.buffer.ByteBuf
+import net.minecraft.network.FriendlyByteBuf
+import xyz.bluspring.modernnetworking.api.*
 import xyz.bluspring.unitytranslate.Language
-import xyz.bluspring.unitytranslate.network.PacketIds
+import xyz.bluspring.unitytranslate.network.PacketDefinitions
 import java.util.*
 
 data class MarkIncompletePayload(
@@ -15,18 +13,17 @@ data class MarkIncompletePayload(
     val uuid: UUID,
     val index: Int,
     var isIncomplete: Boolean
-) : CustomPacketPayload {
-    override fun type(): CustomPacketPayload.Type<out CustomPacketPayload> {
-        return PacketIds.MARK_INCOMPLETE.type
-    }
+) : NetworkPacket {
+    override val definition: PacketDefinition<out NetworkPacket, out ByteBuf>
+        get() = PacketDefinitions.MARK_INCOMPLETE
 
     companion object {
-        val CODEC: StreamCodec<RegistryFriendlyByteBuf, MarkIncompletePayload> = StreamCodec.composite(
-            Language.STREAM_CODEC, MarkIncompletePayload::from,
-            Language.STREAM_CODEC, MarkIncompletePayload::to,
-            UUIDUtil.STREAM_CODEC, MarkIncompletePayload::uuid,
-            ByteBufCodecs.VAR_INT, MarkIncompletePayload::index,
-            ByteBufCodecs.BOOL, MarkIncompletePayload::isIncomplete,
+        val CODEC: NetworkCodec<MarkIncompletePayload, FriendlyByteBuf> = CompositeCodecs.composite(
+            Language.NETWORK_CODEC, MarkIncompletePayload::from,
+            Language.NETWORK_CODEC, MarkIncompletePayload::to,
+            NetworkCodecs.UUID, MarkIncompletePayload::uuid,
+            NetworkCodecs.VAR_INT, MarkIncompletePayload::index,
+            NetworkCodecs.BOOL, MarkIncompletePayload::isIncomplete,
 
             ::MarkIncompletePayload
         )

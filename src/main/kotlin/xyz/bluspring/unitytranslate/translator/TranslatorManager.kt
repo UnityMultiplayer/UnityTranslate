@@ -7,17 +7,17 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.asFlow
-import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.player.Player
+import xyz.bluspring.modernnetworking.api.minecraft.VanillaPacketSender
 import xyz.bluspring.unitytranslate.Language
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 import xyz.bluspring.unitytranslate.compat.voicechat.UTVoiceChatCompat
 import xyz.bluspring.unitytranslate.library.util.collect
 import xyz.bluspring.unitytranslate.library.util.concurrent
-import xyz.bluspring.unitytranslate.network.PacketIds
+import xyz.bluspring.unitytranslate.network.payloads.MarkIncompletePayload
 import xyz.bluspring.unitytranslate.util.nativeaccess.CudaState
 import xyz.bluspring.unitytranslate.util.nativeaccess.NativeAccess
 import java.util.*
@@ -324,26 +324,12 @@ object TranslatorManager {
         UnityTranslate.logger.info("UnityTranslate translation config successfully loaded!")
     }
 
-    //? if <= 1.20.4 {
-    // turns out, Forge requires us to rebuild the buffer every time we send it to a player,
-    // so unfortunately, we cannot reuse the buffer.
-    private fun buildBroadcastPacket(isIncomplete: Boolean, translation: Translation): FriendlyByteBuf {
-        val buf = UnityTranslate.instance.proxy.createByteBuf()
-        buf.writeEnum(translation.fromLang)
-        buf.writeEnum(translation.toLang)
-        buf.writeUUID(translation.player.uuid)
-        buf.writeVarInt(translation.index)
-        buf.writeBoolean(isIncomplete)
-
-        return buf
-    }
-    //? }
-
     private fun broadcastIncomplete(isIncomplete: Boolean, translation: Translation) {
         if (translation.player !is ServerPlayer)
             return
 
         val source = translation.player
+        val payload = MarkIncompletePayload(translation.fromLang, translation.toLang, translation.player.uuid, translation.index, isIncomplete)
 
         if (UnityTranslate.hasVoiceChat) {
             val nearby = UTVoiceChatCompat.getNearbyPlayers(source)
@@ -352,20 +338,10 @@ object TranslatorManager {
                 if (UTVoiceChatCompat.isPlayerDeafened(player) && player != source)
                     continue
 
-                //? if >= 1.20.6 {
-                /*UnityTranslate.instance.proxy.sendPacketServer(player, MarkIncompletePayload(translation.fromLang, translation.toLang, translation.player.uuid, translation.index, isIncomplete))
-                *///? } else {
-                val buf = buildBroadcastPacket(isIncomplete, translation)
-                UnityTranslate.instance.proxy.sendPacketServer(player, PacketIds.MARK_INCOMPLETE, buf)
-                //? }
+                VanillaPacketSender.sendToPlayer(player, payload)
             }
         } else {
-            //? if >= 1.20.6 {
-            /*UnityTranslate.instance.proxy.sendPacketServer(source, MarkIncompletePayload(translation.fromLang, translation.toLang, translation.player.uuid, translation.index, isIncomplete))
-            *///? } else {
-            val buf = buildBroadcastPacket(isIncomplete, translation)
-            UnityTranslate.instance.proxy.sendPacketServer(source, PacketIds.MARK_INCOMPLETE, buf)
-            //? }
+            VanillaPacketSender.sendToPlayer(source, payload)
         }
     }
 }

@@ -87,6 +87,7 @@ tasks.processResources {
         "mod_authors" to mod.prop("authors"),
         "minecraft_version_range" to common.mod.prop("mc_dep_fabric"),
         "fabric_loader_version" to common.mod.dep("fabric_loader"),
+        "fabric_kotlin_version" to common.mod.dep("fabric_kotlin"),
         "cloth_config_version" to common.mod.dep("cloth_config"),
         "modernnetworking_version" to common.mod.dep("modernnetworking")
     )

@@ -1,28 +1,28 @@
 package xyz.bluspring.unitytranslate.network.payloads
 
-import net.minecraft.network.RegistryFriendlyByteBuf
-import net.minecraft.network.codec.ByteBufCodecs
-import net.minecraft.network.codec.StreamCodec
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload
+import io.netty.buffer.ByteBuf
+import xyz.bluspring.modernnetworking.api.CompositeCodecs
+import xyz.bluspring.modernnetworking.api.NetworkCodecs
+import xyz.bluspring.modernnetworking.api.NetworkPacket
+import xyz.bluspring.modernnetworking.api.PacketDefinition
 import xyz.bluspring.unitytranslate.Language
-import xyz.bluspring.unitytranslate.network.PacketIds
+import xyz.bluspring.unitytranslate.network.PacketDefinitions
 
 data class SendTranscriptToServerPayload(
     val sourceLanguage: Language,
     val text: String,
     val index: Int,
     val updateTime: Long
-) : CustomPacketPayload {
-    override fun type(): CustomPacketPayload.Type<out CustomPacketPayload> {
-        return PacketIds.SEND_TRANSCRIPT_TO_SERVER.type
-    }
+) : NetworkPacket {
+    override val definition: PacketDefinition<out NetworkPacket, out ByteBuf>
+        get() = PacketDefinitions.SEND_TRANSCRIPT_TO_SERVER
 
     companion object {
-        val CODEC: StreamCodec<RegistryFriendlyByteBuf, SendTranscriptToServerPayload> = StreamCodec.composite(
-            Language.STREAM_CODEC, SendTranscriptToServerPayload::sourceLanguage,
-            ByteBufCodecs.STRING_UTF8, SendTranscriptToServerPayload::text,
-            ByteBufCodecs.VAR_INT, SendTranscriptToServerPayload::index,
-            ByteBufCodecs.VAR_LONG, SendTranscriptToServerPayload::updateTime,
+        val CODEC = CompositeCodecs.composite(
+            Language.NETWORK_CODEC, SendTranscriptToServerPayload::sourceLanguage,
+            NetworkCodecs.STRING_UTF8, SendTranscriptToServerPayload::text,
+            NetworkCodecs.VAR_INT, SendTranscriptToServerPayload::index,
+            NetworkCodecs.VAR_LONG, SendTranscriptToServerPayload::updateTime,
 
             ::SendTranscriptToServerPayload
         )
