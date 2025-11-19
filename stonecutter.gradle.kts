@@ -1,3 +1,4 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import dev.kikugie.stonecutter.build.StonecutterBuildExtension
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import net.fabricmc.loom.task.RemapJarTask
@@ -19,7 +20,7 @@ plugins {
 stonecutter active "1.20.1"
 
 allprojects {
-    group = "xyz.bluspring"
+    group = mod.group
 
     repositories {
         mavenCentral()
@@ -54,9 +55,6 @@ allprojects {
     if (project.extensions.findByType<StonecutterBuildExtension>() == null)
         return@allprojects
 
-    if (false)
-        return@allprojects
-
     val sc = project.extensions.getByType<StonecutterBuildExtension>()
     val common = sc.node.sibling("")
 
@@ -69,6 +67,10 @@ allprojects {
     val minecraftVersion = sc.current.version
 
     val loader = try { project.property("loom.platform") as? String? } catch (_: Throwable) { null } ?: "unknown"
+
+    project.extensions.configure<BasePluginExtension>("base") {
+        archivesName.set(mod.name)
+    }
 
     version = "${mod.version}+$minecraftVersion-$loader"
 
@@ -135,9 +137,20 @@ allprojects {
         archiveClassifier = "dev"
     }
 
-//    tasks.named<ShadowJar>("shadowJar") {
-//        relocate("org.")
-//    }
+    tasks.named<ShadowJar>("shadowJar") {
+        mergeServiceFiles()
+
+        val shadowPackage = "${mod.group}.${mod.id}.shaded"
+
+        exclude("org/jetbrains/**/*", "org/intellij/**/*", "org/slf4j/**/*", "kotlin/**/*", "kotlinx/**/*")
+        relocate("com.mayakapps.kache", "$shadowPackage.kache")
+
+        if (loader.contains("forge")) {
+            relocate("org.java_websocket", "$shadowPackage.java_websocket")
+            relocate("okhttp3", "$shadowPackage.okhttp3")
+            relocate("jnr", "$shadowPackage.jnr")
+        }
+    }
 
     tasks.named<RemapJarTask>("remapJar") {
         injectAccessWidener = true
