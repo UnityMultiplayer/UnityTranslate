@@ -2,7 +2,7 @@ package xyz.bluspring.unitytranslate.client.gui
 
 //? if >= 1.20.6 {
 /*import xyz.bluspring.unitytranslate.network.payloads.SetUsedLanguagesPayload
-*///? }
+*///?}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.Button
@@ -91,9 +91,9 @@ class EditTranscriptBoxesScreen(val boxes: MutableList<TranscriptBox>, val paren
         if (Minecraft.getInstance().player == null) { // assume user is currently configuring in the config screen
             //? if >= 1.20.4 {
             /*this.renderBackground(guiGraphics, mouseX, mouseY, partialTick)
-            *///? } else {
+            *///?} else {
             this.renderBackground(guiGraphics)
-            //? }
+            //?}
 
             for (box in boxes) {
                 box.render(guiGraphics, partialTick)
@@ -168,7 +168,7 @@ class EditTranscriptBoxesScreen(val boxes: MutableList<TranscriptBox>, val paren
              super.renderBackground(guiGraphics, mouseX, mouseY, partialTick)
          }
      }
-    *///? }
+    *///?}
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
         val result = super.mouseClicked(mouseX, mouseY, button)

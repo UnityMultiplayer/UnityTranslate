@@ -38,9 +38,9 @@ class LanguageSelectScreen(val parent: Screen?, val type: LanguageSelectType) : 
     override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
         //? if >= 1.20.4 {
         /*this.renderBackground(guiGraphics, mouseX, mouseY, partialTick)
-        *///? } else {
+        *///?} else {
         this.renderBackground(guiGraphics)
-        //? }
+        //?}
         super.render(guiGraphics, mouseX, mouseY, partialTick)
 
         guiGraphics.drawCenteredString(font, Component.translatable(
@@ -99,11 +99,11 @@ class LanguageSelectScreen(val parent: Screen?, val type: LanguageSelectType) : 
         this@LanguageSelectScreen.width, this@LanguageSelectScreen.height
         //? if >= 1.20.4 {
         /*- 75
-        *///? }
+        *///?}
         , 32,
         //? if <= 1.20.1 {
         this@LanguageSelectScreen.height - 65 + 4,
-        //? }
+        //?}
         18
     ) {
         init {

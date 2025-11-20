@@ -5,7 +5,7 @@ package xyz.bluspring.unitytranslate
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.codec.StreamDecoder
 import net.minecraft.network.codec.StreamEncoder
-*///? }
+*///?}
 import net.minecraft.network.chat.Component
 import xyz.bluspring.modernnetworking.api.NetworkCodecs
 import xyz.bluspring.unitytranslate.client.transcribers.TranscriberType

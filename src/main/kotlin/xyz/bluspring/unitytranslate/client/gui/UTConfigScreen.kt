@@ -27,10 +27,10 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
         //? if >= 1.20.2 {
         /*val ARROW_UP = UnityTranslate.id("arrow_up")
         val ARROW_DOWN = UnityTranslate.id("arrow_down")
-        *///? } else {
+        *///?} else {
         val ARROW_UP = UnityTranslate.id("textures/gui/sprites/arrow_up.png")
         val ARROW_DOWN = UnityTranslate.id("textures/gui/sprites/arrow_down.png")
-        //? }
+        //?}
     }
     
     override fun init() {
@@ -65,8 +65,8 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
 
     override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
         //? if < 1.20.4 {
-        /*this.renderBackground(guiGraphics)
-        *///? }
+        this.renderBackground(guiGraphics)
+        //?}
 
         super.render(guiGraphics, mouseX, mouseY, partialTick)
 
@@ -253,25 +253,25 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
 
                     //? if >= 1.20.4 {
                     /*addRenderableWidget(SpriteIconButton.builder(Component.empty(), {
-                    *///? } else {
+                    *///?} else {
                     addRenderableWidget(TextAndImageButton.builder(Component.empty(), ARROW_UP) {
-                    //? }
+                    //?}
                         member.setter.call(instance, Mth.clamp(value + range.increment, min, max))
                         this.rebuildWidgets()
                     //? if >= 1.20.4 {
                     /*}, true)
-                    *///? } else {
+                    *///?} else {
                     }
-                    //? }
+                    //?}
                         //? if >= 1.20.4 {
                         /*.sprite(ARROW_UP, 8, 8)
                          .size(12, 12)
-                        *///? } else {
+                        *///?} else {
                         .offset(0, 2)
                         .texStart(0, 0)
                         .textureSize(8, 8)
                         .usedTextureSize(8, 8)
-                        //? }
+                        //?}
                         .build()
                         .apply {
                             this.x = this@UTConfigSubScreen.width - 18
@@ -288,25 +288,25 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
 
                     //? if >= 1.20.4 {
                     /*addRenderableWidget(SpriteIconButton.builder(Component.empty(), {
-                    *///? } else {
+                    *///?} else {
                     addRenderableWidget(TextAndImageButton.builder(Component.empty(), ARROW_DOWN) {
-                    //? }
+                    //?}
                         member.setter.call(instance, Mth.clamp(value - range.increment, min, max))
                         this.rebuildWidgets()
                     //? if >= 1.20.4 {
                     /*}, true)
-                    *///? } else {
+                    *///?} else {
                     }
-                    //? }
+                    //?}
                         //? if >= 1.20.4 {
                         /*.sprite(ARROW_DOWN, 8, 8)
                          .size(12, 12)
-                        *///? } else {
+                        *///?} else {
                         .offset(0, 2)
                         .texStart(0, 0)
                         .textureSize(8, 8)
                         .usedTextureSize(8, 8)
-                        //? }
+                        //?}
                         .build()
                         .apply {
                             this.x = this@UTConfigSubScreen.width - 18
@@ -342,25 +342,25 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
 
                     //? if >= 1.20.4 {
                     /*addRenderableWidget(SpriteIconButton.builder(Component.empty(), {
-                    *///? } else {
+                    *///?} else {
                     addRenderableWidget(TextAndImageButton.builder(Component.empty(), ARROW_UP) {
-                    //? }
+                    //?}
                         member.setter.call(instance, Mth.clamp(value + range.increment, min, max))
                         this.rebuildWidgets()
                     //? if >= 1.20.4 {
                     /*}, true)
-                    *///? } else {
+                    *///?} else {
                     }
-                    //? }
+                    //?}
                         //? if >= 1.20.4 {
                         /*.sprite(ARROW_UP, 8, 8)
                          .size(12, 12)
-                        *///? } else {
+                        *///?} else {
                         .offset(0, 2)
                         .texStart(0, 0)
                         .textureSize(8, 8)
                         .usedTextureSize(8, 8)
-                        //? }
+                        //?}
                         .build()
                         .apply {
                             this.x = this@UTConfigSubScreen.width - 18
@@ -377,25 +377,25 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
 
                     //? if >= 1.20.4 {
                     /*addRenderableWidget(SpriteIconButton.builder(Component.empty(), {
-                    *///? } else {
+                    *///?} else {
                     addRenderableWidget(TextAndImageButton.builder(Component.empty(), ARROW_DOWN) {
-                    //? }
+                    //?}
                         member.setter.call(instance, Mth.clamp(value - range.increment, min, max))
                         this.rebuildWidgets()
                     //? if >= 1.20.4 {
                     /*}, true)
-                    *///? } else {
+                    *///?} else {
                     }
-                    //? }
+                    //?}
                         //? if >= 1.20.4 {
                         /*.sprite(ARROW_DOWN, 8, 8)
                          .size(12, 12)
-                        *///? } else {
+                        *///?} else {
                         .offset(0, 2)
                         .texStart(0, 0)
                         .textureSize(8, 8)
                         .usedTextureSize(8, 8)
-                        //? }
+                        //?}
                         .build()
                         .apply {
                             this.x = this@UTConfigSubScreen.width - 18
@@ -468,9 +468,9 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
         private fun <T> addArrows(x: Int, y: Int, index: Int, actualValue: MutableList<T>) {
             //? if >= 1.20.4 {
             /*addRenderableWidget(SpriteIconButton.builder(Component.empty(), {
-            *///? } else {
+            *///?} else {
             addRenderableWidget(TextAndImageButton.builder(Component.empty(), ARROW_UP) {
-            //? }
+            //?}
                 val oldValue = actualValue[index]
                 val oldPrevValue = actualValue[index - 1]
                 actualValue[index - 1] = oldValue
@@ -478,18 +478,18 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
                 this.rebuildWidgets()
             //? if >= 1.20.4 {
             /*}, true)
-            *///? } else {
+            *///?} else {
             }
-            //? }
+            //?}
                 //? if >= 1.20.4 {
                 /*.sprite(ARROW_UP, 8, 8)
                  .size(12, 12)
-                *///? } else {
+                *///?} else {
                 .offset(0, 2)
                 .texStart(0, 0)
                 .textureSize(8, 8)
                 .usedTextureSize(8, 8)
-                //? }
+                //?}
                 .build()
                 .apply {
                     this.x = x
@@ -503,9 +503,9 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
 
             //? if >= 1.20.4 {
             /*addRenderableWidget(SpriteIconButton.builder(Component.empty(), {
-            *///? } else {
+            *///?} else {
             addRenderableWidget(TextAndImageButton.builder(Component.empty(), ARROW_DOWN) {
-            //? }
+            //?}
                 val oldValue = actualValue[index]
                 val oldPrevValue = actualValue[index + 1]
                 actualValue[index + 1] = oldValue
@@ -513,18 +513,18 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
                 this.rebuildWidgets()
             //? if >= 1.20.4 {
             /*}, true)
-            *///? } else {
+            *///?} else {
             }
-            //? }
+            //?}
                 //? if >= 1.20.4 {
                 /*.sprite(ARROW_DOWN, 8, 8)
                  .size(12, 12)
-                *///? } else {
+                *///?} else {
                 .offset(0, 2)
                 .texStart(0, 0)
                 .textureSize(8, 8)
                 .usedTextureSize(8, 8)
-                //? }
+                //?}
                 .build()
                 .apply {
                     this.x = x
@@ -544,9 +544,9 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
         override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
             //? if >= 1.20.4 {
             /*this.renderBackground(guiGraphics, mouseX, mouseY, partialTick)
-            *///? } else {
+            *///?} else {
             this.renderBackground(guiGraphics)
-            //? }
+            //?}
 
             guiGraphics.fill(0, 50, this.width, this.height - 50, FastColor.ARGB32.color(150, 0, 0, 0))
             guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 16777215)
@@ -634,9 +634,9 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
         override fun mouseScrolled(mouseX: Double, mouseY: Double,
                                    //? if >= 1.20.4 {
                                    /*scrollX: Double, delta: Double
-                                   *///? } else {
+                                   *///?} else {
                                    delta: Double
-                                   //? }
+                                   //?}
         ): Boolean {
             this.scrollAmount = Mth.clamp(this.scrollAmount - delta * (this.maxPosition / 4.0), 0.0, this.maxScroll.toDouble())
             updateScroll()

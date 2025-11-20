@@ -2,7 +2,7 @@ package xyz.bluspring.unitytranslate.client
 
 //? if >= 1.20.6 {
 /*import xyz.bluspring.unitytranslate.network.payloads.SendTranscriptToServerPayload
-*///? }
+*///?}
 import com.mojang.blaze3d.platform.InputConstants
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch

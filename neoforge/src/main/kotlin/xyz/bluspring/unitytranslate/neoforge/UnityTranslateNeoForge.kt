@@ -9,8 +9,8 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent
 
 //? if >= 1.20.4 {
-/*import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
-*///? }
+import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
+//?}
 
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
@@ -21,9 +21,9 @@ class UnityTranslateNeoForge {
         UnityTranslate()
 //? if >= 1.20.4 {
         MOD_BUS.register(this)
-//? } else {
-        FMLJavaModLoadingContext.get().modEventBus.register(this)
-//? }
+//?} else {
+        /*FMLJavaModLoadingContext.get().modEventBus.register(this)
+*///?}
         NeoForgeEvents.init()
     }
 

@@ -55,9 +55,9 @@ class UnityTranslate(val proxy: PlatformProxy = ServiceLoader.load(PlatformProxy
         fun id(path: String): ResourceLocation {
             //? if >= 1.21 {
             /*return ResourceLocation.fromNamespaceAndPath(MOD_ID, path)
-            *///? } else {
+            *///?} else {
             return ResourceLocation(MOD_ID, path)
-            //? }
+            //?}
         }
 
         fun saveConfig() {
