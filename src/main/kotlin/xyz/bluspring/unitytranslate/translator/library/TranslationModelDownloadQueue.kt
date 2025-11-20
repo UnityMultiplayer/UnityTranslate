@@ -1,6 +1,5 @@
 package xyz.bluspring.unitytranslate.translator.library
 
-import com.google.common.collect.Queues
 import kotlinx.coroutines.runBlocking
 import xyz.bluspring.unitytranslate.Language
 import xyz.bluspring.unitytranslate.UnityTranslate
@@ -17,7 +16,7 @@ object TranslationModelDownloadQueue {
 
     private val alreadyDownloaded = Collections.synchronizedSet(mutableSetOf<Pair<Language, Language>>())
 
-    private val queue = Queues.newSynchronousQueue<Pair<Language, Language>>()
+    private val queue = ArrayDeque<Pair<Language, Language>>()
     @Volatile
     private var downloadThread: DownloadThread? = null
 
