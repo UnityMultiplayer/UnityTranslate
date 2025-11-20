@@ -42,5 +42,12 @@ issueTrackerURL = "https://github.com/BluSpring/UnityTranslate/issues"
     ordering = "NONE"
     side = "BOTH"
 
+[[dependencies.${mod_id}]]
+    modId = "talk_balloons"
+    mandatory = false
+    versionRange = "[1.2.0,)"
+    ordering = "NONE"
+    side = "BOTH"
+
 [[mixins]]
     config = "unitytranslate.mixins.json"

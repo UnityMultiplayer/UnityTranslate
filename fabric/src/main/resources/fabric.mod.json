@@ -42,6 +42,9 @@
         "voicechat": "*"
     },
     "suggests": {
-        "talk_balloons": "*"
+        "talk_balloons": ">=1.2.0"
+    },
+    "breaks": {
+        "talk_balloons": "<1.2.0"
     }
 }
