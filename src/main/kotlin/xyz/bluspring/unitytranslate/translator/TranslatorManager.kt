@@ -13,7 +13,6 @@ import net.minecraft.world.entity.player.Player
 import xyz.bluspring.modernnetworking.api.minecraft.VanillaPacketSender
 import xyz.bluspring.unitytranslate.Language
 import xyz.bluspring.unitytranslate.UnityTranslate
-import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 import xyz.bluspring.unitytranslate.compat.voicechat.UTVoiceChatCompat
 import xyz.bluspring.unitytranslate.library.util.collect
 import xyz.bluspring.unitytranslate.library.util.concurrent
@@ -211,11 +210,7 @@ object TranslatorManager {
             return
 
         if (UnityTranslate.config.server.shouldRunTranslationServer) {
-            if (UnityTranslate.instance.proxy.isClient() && !UnityTranslateLibInstance.isLibraryLoaded) {
-                UnityTranslateClient.openDownloadRequest()
-            } else {
-                installLibreTranslate()
-            }
+            installLibreTranslate()
         }
     }
 

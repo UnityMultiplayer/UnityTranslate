@@ -256,21 +256,5 @@ class UnityTranslateClient {
         }
 
         private val queuedForJoin = ConcurrentLinkedQueue<Consumer<Minecraft>>()
-
-        fun openDownloadRequest() {
-            queuedForJoin.add { mc ->
-                if (mc.screen is OpenBrowserScreen) {
-                    mc.execute {
-                        mc.setScreen(RequestDownloadScreen().apply {
-                            parent = mc.screen
-                        })
-                    }
-                } else {
-                    mc.execute {
-                        mc.setScreen(RequestDownloadScreen())
-                    }
-                }
-            }
-        }
     }
 }
