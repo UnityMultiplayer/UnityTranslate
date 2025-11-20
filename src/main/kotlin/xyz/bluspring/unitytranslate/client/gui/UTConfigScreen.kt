@@ -439,15 +439,17 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
 
                 y += 30
 
-                addRenderableWidget(Button.builder(Component.translatable("unitytranslate.set_balloon_language")) {
-                    Minecraft.getInstance().setScreen(LanguageSelectScreen(this@UTConfigSubScreen, LanguageSelectType.BALLOON))
-                }
-                    .pos(this.width / 2 - (Button.DEFAULT_WIDTH / 2), y)
-                    .build()
-                    .apply {
-                        (this as ScrollableWidget).updateInitialPosition()
+                if (UnityTranslate.instance.proxy.isModLoaded("talk_balloons")) {
+                    addRenderableWidget(Button.builder(Component.translatable("unitytranslate.set_balloon_language")) {
+                        Minecraft.getInstance().setScreen(LanguageSelectScreen(this@UTConfigSubScreen, LanguageSelectType.BALLOON))
                     }
-                )
+                        .pos(this.width / 2 - (Button.DEFAULT_WIDTH / 2), y)
+                        .build()
+                        .apply {
+                            (this as ScrollableWidget).updateInitialPosition()
+                        }
+                    )
+                }
 
                 y += 30
             }
