@@ -25,6 +25,9 @@ class UnityTranslateLibInstance private constructor(): LibreTranslateInstance(""
             return cachedSupportedLanguages
         }
 
+    override fun runLatencyTest() {
+    }
+
     override suspend fun translate(from: String, to: String, request: String): String {
         return library.getTranslator(from, to, TranslatorManager.checkSupportsCuda()).batchTranslate(listOf(request)).getOrNull(0) ?: request
     }

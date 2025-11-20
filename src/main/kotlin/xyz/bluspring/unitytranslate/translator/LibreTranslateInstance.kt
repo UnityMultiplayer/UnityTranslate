@@ -24,6 +24,10 @@ open class LibreTranslateInstance(val url: String, var weightage: Int, val authK
     var currentlyTranslating = 0
 
     init {
+        runLatencyTest()
+    }
+
+    open fun runLatencyTest() {
         val startTime = System.currentTimeMillis()
         runBlocking {
             if (translate("Latency test for UnityTranslate", Language.ENGLISH, Language.SPANISH) == null)
