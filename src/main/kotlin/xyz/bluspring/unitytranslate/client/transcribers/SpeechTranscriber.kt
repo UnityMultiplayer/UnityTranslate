@@ -1,8 +1,5 @@
 package xyz.bluspring.unitytranslate.client.transcribers
 
-//? if >= 1.20.6 {
-/*import xyz.bluspring.unitytranslate.network.payloads.SetCurrentLanguagePayload
-*///?}
 import net.minecraft.client.Minecraft
 import xyz.bluspring.modernnetworking.api.minecraft.VanillaPacketSender
 import xyz.bluspring.unitytranslate.Language

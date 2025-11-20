@@ -1,7 +1,8 @@
 package xyz.bluspring.unitytranslate.client.gui
 
-//? if >= 1.20.6 {
-/*import xyz.bluspring.unitytranslate.network.payloads.SetUsedLanguagesPayload
+//? if < 1.21.4 {
+//?} else {
+/*import net.minecraft.util.ARGB
 *///?}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
@@ -9,13 +10,13 @@ import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
-import net.minecraft.util.FastColor
 import net.minecraft.util.Mth
 import org.lwjgl.glfw.GLFW
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 import xyz.bluspring.unitytranslate.network.UTClientNetworking
 import java.util.*
+import net.minecraft.util.FastColor.ARGB32 as ARGB
 
 class EditTranscriptBoxesScreen(val boxes: MutableList<TranscriptBox>, val parent: Screen? = null) : Screen(Component.empty()) {
     val CLOSE_BUTTON = UnityTranslate.id("textures/gui/close.png")
@@ -105,42 +106,42 @@ class EditTranscriptBoxesScreen(val boxes: MutableList<TranscriptBox>, val paren
                 if (mouseX >= box.x - 1 && mouseY >= box.y - 1 && mouseX <= box.x + box.width + 1 && mouseY <= box.y + box.height + 1) {
                     if (mouseX >= box.x - 1 && mouseX <= box.x + 1) {
                         if (mouseY >= box.y - 1 && mouseY <= box.y + 1) {
-                            guiGraphics.fill(box.x, box.y - 1, box.x + box.width, box.y + 1, FastColor.ARGB32.color(255, 255, 255, 255))
+                            guiGraphics.fill(box.x, box.y - 1, box.x + box.width, box.y + 1, ARGB.color(255, 255, 255, 255))
                             GLFW.glfwSetCursor(this.minecraft!!.window.window, assignCursor(GLFW.GLFW_RESIZE_NWSE_CURSOR))
                         } else if (mouseY >= box.y + box.height - 1 && mouseY <= box.y + box.height + 1) {
-                            guiGraphics.fill(box.x, box.y + box.height - 1, box.x + box.width, box.y + box.height + 1, FastColor.ARGB32.color(255, 255, 255, 255))
+                            guiGraphics.fill(box.x, box.y + box.height - 1, box.x + box.width, box.y + box.height + 1, ARGB.color(255, 255, 255, 255))
                             GLFW.glfwSetCursor(this.minecraft!!.window.window, assignCursor(GLFW.GLFW_RESIZE_NESW_CURSOR))
                         } else {
                             GLFW.glfwSetCursor(this.minecraft!!.window.window, assignCursor(GLFW.GLFW_HRESIZE_CURSOR))
                         }
 
-                        guiGraphics.fill(box.x - 1, box.y, box.x + 1, box.y + box.height, FastColor.ARGB32.color(255, 255, 255, 255))
+                        guiGraphics.fill(box.x - 1, box.y, box.x + 1, box.y + box.height, ARGB.color(255, 255, 255, 255))
                     } else if (mouseX >= box.x + box.width - 1 && mouseX <= box.x + box.width + 1) {
                         if (mouseY >= box.y - 1 && mouseY <= box.y + 1) {
-                            guiGraphics.fill(box.x, box.y - 1, box.x + box.width, box.y + 1, FastColor.ARGB32.color(255, 255, 255, 255))
+                            guiGraphics.fill(box.x, box.y - 1, box.x + box.width, box.y + 1, ARGB.color(255, 255, 255, 255))
                             GLFW.glfwSetCursor(this.minecraft!!.window.window, assignCursor(GLFW.GLFW_RESIZE_NESW_CURSOR))
                         } else if (mouseY >= box.y + box.height - 1 && mouseY <= box.y + box.height + 1) {
-                            guiGraphics.fill(box.x, box.y + box.height - 1, box.x + box.width, box.y + box.height + 1, FastColor.ARGB32.color(255, 255, 255, 255))
+                            guiGraphics.fill(box.x, box.y + box.height - 1, box.x + box.width, box.y + box.height + 1, ARGB.color(255, 255, 255, 255))
                             GLFW.glfwSetCursor(this.minecraft!!.window.window, assignCursor(GLFW.GLFW_RESIZE_NWSE_CURSOR))
                         } else {
                             GLFW.glfwSetCursor(this.minecraft!!.window.window, assignCursor(GLFW.GLFW_HRESIZE_CURSOR))
                         }
 
-                        guiGraphics.fill(box.x + box.width - 1, box.y, box.x + box.width + 1, box.y + box.height, FastColor.ARGB32.color(255, 255, 255, 255))
+                        guiGraphics.fill(box.x + box.width - 1, box.y, box.x + box.width + 1, box.y + box.height, ARGB.color(255, 255, 255, 255))
                     } else if (mouseY >= box.y - 1 && mouseY <= box.y + 1) {
-                        guiGraphics.fill(box.x, box.y - 1, box.x + box.width, box.y + 1, FastColor.ARGB32.color(255, 255, 255, 255))
+                        guiGraphics.fill(box.x, box.y - 1, box.x + box.width, box.y + 1, ARGB.color(255, 255, 255, 255))
                         GLFW.glfwSetCursor(this.minecraft!!.window.window, assignCursor(GLFW.GLFW_VRESIZE_CURSOR))
                     } else if (mouseY >= box.y + box.height - 1 && mouseY <= box.y + box.height + 1) {
-                        guiGraphics.fill(box.x, box.y + box.height - 1, box.x + box.width, box.y + box.height + 1, FastColor.ARGB32.color(255, 255, 255, 255))
+                        guiGraphics.fill(box.x, box.y + box.height - 1, box.x + box.width, box.y + box.height + 1, ARGB.color(255, 255, 255, 255))
                         GLFW.glfwSetCursor(this.minecraft!!.window.window, assignCursor(GLFW.GLFW_VRESIZE_CURSOR))
                     } else {
-                        guiGraphics.renderOutline(box.x, box.y, box.width, box.height, FastColor.ARGB32.color(255, 255, 255, 255))
+                        guiGraphics.renderOutline(box.x, box.y, box.width, box.height, ARGB.color(255, 255, 255, 255))
 
                         val offset = 5
                         if (mouseX >= box.x + offset + 1 && mouseY >= box.y + offset + 1 && mouseX <= box.x + offset + 16 && mouseY <= box.y + offset + 16) {
                             GLFW.glfwSetCursor(this.minecraft!!.window.window, arrowCursor)
-                            guiGraphics.fill(box.x + offset, box.y + offset, box.x + offset + 16, box.y + offset + 16, FastColor.ARGB32.color(95, 255, 0, 0))
-                            guiGraphics.renderOutline(box.x + offset, box.y + offset, 16, 16, FastColor.ARGB32.color(95, 255, 255, 255))
+                            guiGraphics.fill(box.x + offset, box.y + offset, box.x + offset + 16, box.y + offset + 16, ARGB.color(95, 255, 0, 0))
+                            guiGraphics.renderOutline(box.x + offset, box.y + offset, 16, 16, ARGB.color(95, 255, 255, 255))
                         } else {
                             GLFW.glfwSetCursor(this.minecraft!!.window.window, assignCursor(GLFW.GLFW_RESIZE_ALL_CURSOR))
                         }

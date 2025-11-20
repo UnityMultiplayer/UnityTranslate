@@ -24,7 +24,7 @@ issueTrackerURL = "https://github.com/BluSpring/UnityTranslate/issues"
 [[dependencies.${mod_id}]]
     modId = "minecraft"
     mandatory = true
-    versionRange = "[${mc_version},)"
+    versionRange = "[${minecraft_version_range},)"
     ordering = "NONE"
     side = "BOTH"
 

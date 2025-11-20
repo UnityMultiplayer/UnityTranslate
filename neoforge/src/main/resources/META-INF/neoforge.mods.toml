@@ -24,7 +24,7 @@ issueTrackerURL = "https://github.com/UnityMultiplayer/UnityTranslate/issues"
 [[dependencies.${mod_id}]]
     modId = "minecraft"
     type = "required"
-    versionRange = "[${mc_version},)"
+    versionRange = "[${minecraft_version_range},)"
     ordering = "NONE"
     side = "BOTH"
 
