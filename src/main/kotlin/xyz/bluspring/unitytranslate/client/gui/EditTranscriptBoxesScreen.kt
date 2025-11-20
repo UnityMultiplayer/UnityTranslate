@@ -1,6 +1,7 @@
 package xyz.bluspring.unitytranslate.client.gui
 
 //? if < 1.21.4 {
+import net.minecraft.util.FastColor.ARGB32 as ARGB
 //?} else {
 /*import net.minecraft.util.ARGB
 *///?}
@@ -16,7 +17,6 @@ import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 import xyz.bluspring.unitytranslate.network.UTClientNetworking
 import java.util.*
-import net.minecraft.util.FastColor.ARGB32 as ARGB
 
 class EditTranscriptBoxesScreen(val boxes: MutableList<TranscriptBox>, val parent: Screen? = null) : Screen(Component.empty()) {
     val CLOSE_BUTTON = UnityTranslate.id("textures/gui/close.png")
