@@ -6,15 +6,17 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kotlinx.coroutines.runBlocking
+//? if < 1.21.5 {
 import net.minecraft.util.random.Weight
 import net.minecraft.util.random.WeightedEntry
+//?}
 import xyz.bluspring.unitytranslate.Language
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.util.Flags
 import xyz.bluspring.unitytranslate.util.HttpHelper
 import java.net.URL
 
-open class LibreTranslateInstance(val url: String, private var weight: Int, val authKey: String? = null) : WeightedEntry {
+open class LibreTranslateInstance(val url: String, var weightage: Int, val authKey: String? = null) /*? if < 1.21.5 {*/: WeightedEntry/*?}*/ {
     private var cachedSupportedLanguages = HashMultimap.create<Language, Language>()
     var latency: Int = -1
         private set
@@ -137,9 +139,11 @@ open class LibreTranslateInstance(val url: String, private var weight: Int, val 
             .asJsonObject.get("translatedText").asString
     }
 
+    //? if < 1.21.5 {
     override fun getWeight(): Weight {
-        return Weight.of(weight)
+        return Weight.of(weightage)
     }
+    //?}
 
     companion object {
         const val MAX_CONCURRENT_TRANSLATIONS = 15

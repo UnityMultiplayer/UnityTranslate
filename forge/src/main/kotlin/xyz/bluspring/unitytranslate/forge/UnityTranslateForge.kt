@@ -23,12 +23,12 @@ class UnityTranslateForge(val container: KotlinModContainer, val eventBus: Event
         ForgeEvents.init()
 
         this.eventBus.register(this)
-        MinecraftForge.EVENT_BUS.register(UnityTranslateForgeClient)
     }
 
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     fun onClientLoading(ev: FMLClientSetupEvent) {
+        MinecraftForge.EVENT_BUS.register(UnityTranslateForgeClient)
         ConfigScreenHelper.createConfigScreen(this.container)
     }
 

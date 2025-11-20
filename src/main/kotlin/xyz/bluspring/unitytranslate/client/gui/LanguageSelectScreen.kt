@@ -6,6 +6,9 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.ObjectSelectionList
 import net.minecraft.client.gui.screens.Screen
+//? if >= 1.21.9 {
+/*import net.minecraft.client.input.MouseButtonEvent
+*///?}
 import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.util.FormattedCharSequence
@@ -13,6 +16,7 @@ import xyz.bluspring.unitytranslate.Language
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 import xyz.bluspring.unitytranslate.network.UTClientNetworking
+import xyz.bluspring.unitytranslate.util.multiversion.*
 
 class LanguageSelectScreen(val parent: Screen?, val type: LanguageSelectType) : Screen(Component.translatable("options.language")) {
     private lateinit var list: LanguageSelectionList
@@ -132,13 +136,25 @@ class LanguageSelectScreen(val parent: Screen?, val type: LanguageSelectType) : 
             internal val shouldBeDeactivated = type == LanguageSelectType.TRANSCRIPT_BOX && UnityTranslate.config.client.transcriptBoxes.any { it.language == language }
             private var lastClickTime: Long = 0L
 
+            //? if >= 1.21.9 {
+            /*override fun renderContent(
+                guiGraphics: GuiGraphics,
+                mouseX: Int, mouseY: Int,
+                isHovering: Boolean,
+                partialTick: Float
+            *///?} else {
             override fun render(
                 guiGraphics: GuiGraphics,
                 index: Int, top: Int, left: Int,
                 width: Int, height: Int,
                 mouseX: Int, mouseY: Int,
                 hovering: Boolean, partialTick: Float
+            //?}
             ) {
+                //? if >= 1.21.9 {
+                /*val top = this.y
+                *///?}
+
                 val color = if (shouldBeDeactivated) {
                     0x656565
                 } else 0xFFFFFF
@@ -154,7 +170,7 @@ class LanguageSelectScreen(val parent: Screen?, val type: LanguageSelectType) : 
                         if (!type.enabled)
                             continue
 
-                        guiGraphics.blit(UnityTranslate.id("textures/gui/transcriber/${type.name.lowercase()}.png"),
+                        guiGraphics.blitTexture(UnityTranslate.id("textures/gui/transcriber/${type.name.lowercase()}.png"),
                             x, top - 1, 0f, 0f, 16, 16, 16, 16
                         )
 
@@ -183,7 +199,12 @@ class LanguageSelectScreen(val parent: Screen?, val type: LanguageSelectType) : 
                 }
             }
 
+            //? if >= 1.21.9 {
+            /*override fun mouseClicked(event: MouseButtonEvent, isDoubleClick: Boolean): Boolean {
+                val button = event.button()
+            *///?} else {
             override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
+            //?}
                 if (shouldBeDeactivated)
                     return false
 

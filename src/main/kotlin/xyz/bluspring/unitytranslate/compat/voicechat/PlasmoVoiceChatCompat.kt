@@ -14,6 +14,7 @@ import su.plo.voice.api.server.PlasmoVoiceServer
 import su.plo.voice.api.server.audio.capture.ProximityServerActivationHelper
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
+import xyz.bluspring.unitytranslate.util.multiversion.*
 
 @Addon(
     id = "pv-unitytranslate-compat",

@@ -20,6 +20,7 @@ package xyz.bluspring.unitytranslate.network
  import xyz.bluspring.unitytranslate.translator.TranslatorManager
  import xyz.bluspring.unitytranslate.translator.library.TranslationModelDownloadQueue
  import xyz.bluspring.unitytranslate.translator.library.UnityTranslateLibInstance
+ import xyz.bluspring.unitytranslate.util.multiversion.*
  import java.util.*
  import java.util.concurrent.ConcurrentHashMap
  import java.util.concurrent.ConcurrentLinkedDeque
@@ -82,7 +83,7 @@ object UTServerNetworking {
                         translations[language] = translated
                         translationsToSend.add(language)
 
-                        ctx.player.server.execute {
+                        ctx.player.server!!.execute {
                             if (translationsToSend.isNotEmpty()) {
                                 broadcastTranslations(ctx.player, sourceLanguage, index, updateTime, translationsToSend, translations)
                                 translationsToSend.clear()

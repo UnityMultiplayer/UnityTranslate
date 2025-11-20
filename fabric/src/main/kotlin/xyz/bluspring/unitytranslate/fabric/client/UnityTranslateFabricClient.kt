@@ -36,7 +36,13 @@ class UnityTranslateFabricClient : ClientModInitializer {
         }
 
         HudRenderCallback.EVENT.register { guiGraphics, delta ->
-            instance.clientRenderHud(guiGraphics, delta)
+            instance.clientRenderHud(guiGraphics,
+                //? if >= 1.21.1 {
+                /*delta.getGameTimeDeltaPartialTick(true)
+                *///?} else {
+                delta
+                //?}
+            )
         }
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, registryAccess ->

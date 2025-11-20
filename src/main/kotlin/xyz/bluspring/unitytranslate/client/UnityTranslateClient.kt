@@ -200,13 +200,19 @@ class UnityTranslateClient {
                 return UnityTranslate.config.client.transcriptBoxes
             }
 
-        val CONFIGURE_BOXES = (KeyMapping("unitytranslate.configure_boxes", -1, "UnityTranslate"))
-        val TOGGLE_TRANSCRIPTION = (KeyMapping("unitytranslate.toggle_transcription", -1, "UnityTranslate"))
-        val TOGGLE_BOXES = (KeyMapping("unitytranslate.toggle_boxes", -1, "UnityTranslate"))
-        val SET_SPOKEN_LANGUAGE = (KeyMapping("unitytranslate.set_spoken_language", -1, "UnityTranslate"))
-        val CLEAR_TRANSCRIPTS = (KeyMapping("unitytranslate.clear_transcripts", -1, "UnityTranslate"))
-        //val TRANSLATE_SIGN = (KeyMapping("unitytranslate.translate_sign", InputConstants.KEY_F8, "UnityTranslate"))
-        val OPEN_CONFIG_GUI = (KeyMapping("unitytranslate.open_config", InputConstants.KEY_F7, "UnityTranslate"))
+        //? if >= 1.21.9 {
+        /*private val category = KeyMapping.Category(UnityTranslate.id("main"))
+        *///?} else {
+        private val category = "UnityTranslate"
+        //?}
+
+        val CONFIGURE_BOXES = (KeyMapping("unitytranslate.configure_boxes", -1, category))
+        val TOGGLE_TRANSCRIPTION = (KeyMapping("unitytranslate.toggle_transcription", -1, category))
+        val TOGGLE_BOXES = (KeyMapping("unitytranslate.toggle_boxes", -1, category))
+        val SET_SPOKEN_LANGUAGE = (KeyMapping("unitytranslate.set_spoken_language", -1, category))
+        val CLEAR_TRANSCRIPTS = (KeyMapping("unitytranslate.clear_transcripts", -1, category))
+        //val TRANSLATE_SIGN = (KeyMapping("unitytranslate.translate_sign", InputConstants.KEY_F8, category))
+        val OPEN_CONFIG_GUI = (KeyMapping("unitytranslate.open_config", InputConstants.KEY_F7, category))
 
         @JvmStatic
         val keys: List<KeyMapping> = listOf(CONFIGURE_BOXES, TOGGLE_TRANSCRIPTION, TOGGLE_BOXES, SET_SPOKEN_LANGUAGE, CLEAR_TRANSCRIPTS, OPEN_CONFIG_GUI)

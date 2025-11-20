@@ -19,6 +19,7 @@ import xyz.bluspring.unitytranslate.client.transcribers.SpeechTranscriber
 import xyz.bluspring.unitytranslate.client.transcribers.TranscriberType
 import xyz.bluspring.unitytranslate.config.UnityTranslateConfig
 import java.net.InetSocketAddress
+import java.net.URI
 
 class BrowserSpeechTranscriber(language: Language) : SpeechTranscriber(language) {
     val socketPort = HttpUtil.getAvailablePort()
@@ -90,7 +91,11 @@ class BrowserSpeechTranscriber(language: Language) : SpeechTranscriber(language)
 
             UnityTranslateClient.displayMessage(Component.translatable("unitytranslate.transcriber.disconnected")
                 .withStyle {
+                    //? if >= 1.21.5 {
+                    /*it.withClickEvent(ClickEvent.OpenUrl(URI("http://127.0.0.1:${serverPort}")))
+                    *///?} else {
                     it.withClickEvent(ClickEvent(ClickEvent.Action.OPEN_URL, "http://127.0.0.1:${serverPort}"))
+                    //?}
                 })
         }
 

@@ -74,7 +74,7 @@ object TranslatorManager {
     }
 
     fun detectLanguage(line: String): Language? {
-        val possible = instances.sortedByDescending { it.weight.asInt() }
+        val possible = instances.sortedByDescending { it.weightage }
 
         if (possible.isEmpty()) {
             UnityTranslate.logger.warn("No available instances available for detecting language for line \"$line\"!")
@@ -92,7 +92,7 @@ object TranslatorManager {
     }
 
     fun translateLine(line: String, from: Language, to: Language): String? {
-        val possible = instances.filter { it.supportsLanguage(from, to) }.sortedByDescending { it.weight.asInt() }
+        val possible = instances.filter { it.supportsLanguage(from, to) }.sortedByDescending { it.weightage }
 
         if (possible.isEmpty()) {
             UnityTranslate.logger.warn("No instances available for translating $from to $to!)")
@@ -125,7 +125,7 @@ object TranslatorManager {
     }
 
     suspend fun batchTranslateLines(lines: List<String>, from: Language, to: Language): List<String>? {
-        val possible = instances.filter { it.supportsLanguage(from, to) }.sortedByDescending { it.weight.asInt() }
+        val possible = instances.filter { it.supportsLanguage(from, to) }.sortedByDescending { it.weightage }
 
         if (possible.isEmpty()) {
             UnityTranslate.logger.warn("No instances available for translating $from to $to!)")

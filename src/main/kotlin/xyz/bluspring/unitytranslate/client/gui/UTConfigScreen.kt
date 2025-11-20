@@ -5,9 +5,16 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.*
 import net.minecraft.client.gui.screens.Screen
+//? if >= 1.21.9 {
+/*import net.minecraft.client.input.MouseButtonEvent
+*///?}
 import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
-import net.minecraft.util.FastColor
+//? if < 1.21.4 {
+import net.minecraft.util.FastColor.ARGB32 as ARGB
+//?} else {
+/*import net.minecraft.util.ARGB
+*///?}
 import net.minecraft.util.Mth
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
@@ -32,6 +39,12 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
         val ARROW_DOWN = UnityTranslate.id("textures/gui/sprites/arrow_down.png")
         //?}
     }
+
+    //? if >= 1.21.9 {
+    /*fun hasShiftDown(): Boolean {
+        return Minecraft.getInstance().hasShiftDown()
+    }
+    *///?}
     
     override fun init() {
         val width = (this.width / 4).coerceAtLeast(250)
@@ -70,7 +83,7 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
 
         super.render(guiGraphics, mouseX, mouseY, partialTick)
 
-        guiGraphics.fill(0, 50, this.width, this.height - 50, FastColor.ARGB32.color(150, 0, 0, 0))
+        guiGraphics.fill(0, 50, this.width, this.height - 50, ARGB.color(150, 0, 0, 0))
         guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 16777215)
 
         UnityTranslateClient.renderCreditText(guiGraphics)
@@ -117,8 +130,14 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
                 val name = StringWidget(Component.translatable("config.unitytranslate.$type.${member.name}"), font)
                 name.x = 35
                 name.y = y
+
+                // TODO: how do we do this on 1.21.9+?
+                //? if < 1.21.9 {
                 name.alignLeft()
-                name.tooltip = Tooltip.create(Component.translatable("config.unitytranslate.$type.${member.name}.desc"))
+                //?}
+
+                val tooltip = Tooltip.create(Component.translatable("config.unitytranslate.$type.${member.name}.desc"))
+                name.setTooltip(tooltip)
                 (name as ScrollableWidget).updateInitialPosition()
 
                 addRenderableWidget(name)
@@ -185,7 +204,7 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
 
                         val boxWidth = (Button.DEFAULT_WIDTH + 20).coerceAtMost(this.width / 3)
                         addRenderableWidget(EditBox(font, this.width / 2 - boxWidth - 5, y - (Button.DEFAULT_HEIGHT / 2) + 3, boxWidth, Button.DEFAULT_HEIGHT, Component.translatable("unitytranslate.value.none")).apply {
-                            this.tooltip = Tooltip.create(Component.translatable("config.unitytranslate.$type.${member.name}.website_url.desc"))
+                            this.setTooltip(Tooltip.create(Component.translatable("config.unitytranslate.$type.${member.name}.website_url.desc")))
                             this.value = server.url
                             this.setResponder {
                                 server.url = it
@@ -193,7 +212,7 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
                         })
 
                         addRenderableWidget(EditBox(font, this.width / 2 + 5, y - (Button.DEFAULT_HEIGHT / 2) + 3, boxWidth, Button.DEFAULT_HEIGHT, Component.translatable("unitytranslate.value.none")).apply {
-                            this.tooltip = Tooltip.create(Component.translatable("config.unitytranslate.$type.${member.name}.api_key.desc"))
+                            this.setTooltip(Tooltip.create(Component.translatable("config.unitytranslate.$type.${member.name}.api_key.desc")))
                             this.value = server.authKey ?: ""
                             this.setResponder {
                                 server.authKey = it
@@ -220,8 +239,11 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
                         val priorityName = StringWidget(text, font)
                         priorityName.x = this.width / 2 - (font.width(text) / 2)
                         priorityName.y = y
-                        priorityName.alignCenter()
-                        priorityName.tooltip = Tooltip.create(Component.translatable("config.unitytranslate.$type.${member.name}.${priority.name.lowercase()}.desc"))
+
+                        //? if < 1.21.9 {
+                        priorityName.alignCenter() // TODO: how do we do this on 1.21.9+?
+                        //?}
+                        priorityName.setTooltip(Tooltip.create(Component.translatable("config.unitytranslate.$type.${member.name}.${priority.name.lowercase()}.desc")))
                         (priorityName as ScrollableWidget).updateInitialPosition()
 
                         addRenderableWidget(priorityName)
@@ -235,7 +257,7 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
 
                     addRenderableWidget(EditBox(font, this.width - Button.SMALL_WIDTH - 20, y - (Button.DEFAULT_HEIGHT / 2) + 4, Button.SMALL_WIDTH, Button.DEFAULT_HEIGHT, Component.empty())
                         .apply {
-                            this.tooltip = Tooltip.create(Component.translatable("config.unitytranslate.$type.${member.name}.desc"))
+                            this.setTooltip(Tooltip.create(Component.translatable("config.unitytranslate.$type.${member.name}.desc")))
                             this.value = value.toString()
                             this.setFilter { it.toFloatOrNull() != null || it.isBlank() || it.contains('.') } // TODO: make adjustable via annotation
                             this.setResponder {
@@ -332,7 +354,7 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
 
                     addRenderableWidget(EditBox(font, this.width - Button.SMALL_WIDTH - 20, y - (Button.DEFAULT_HEIGHT / 2) + 4, Button.SMALL_WIDTH, Button.DEFAULT_HEIGHT, Component.empty())
                         .apply {
-                            this.tooltip = Tooltip.create(Component.translatable("config.unitytranslate.$type.${member.name}.desc"))
+                            this.setTooltip(Tooltip.create(Component.translatable("config.unitytranslate.$type.${member.name}.desc")))
                             this.value = value.toString()
                             this.setFilter { it.toIntOrNull() != null || it.isBlank() } // TODO: make adjustable via annotation
                             this.setResponder {
@@ -548,7 +570,7 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
             this.renderBackground(guiGraphics)
             //?}
 
-            guiGraphics.fill(0, 50, this.width, this.height - 50, FastColor.ARGB32.color(150, 0, 0, 0))
+            guiGraphics.fill(0, 50, this.width, this.height - 50, ARGB.color(150, 0, 0, 0))
             guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 16777215)
 
             guiGraphics.enableScissor(0, 50, this.width, this.height - 50)
@@ -594,8 +616,16 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
             updateScroll()
         }
 
+        //? if >= 1.21.9 {
+        /*override fun mouseDragged(event: MouseButtonEvent, mouseX: Double, mouseY: Double): Boolean {
+            val button = event.button()
+            val dragY = event.y
+
+            if (super.mouseDragged(event, mouseX, mouseY)) {
+        *///?} else {
         override fun mouseDragged(mouseX: Double, mouseY: Double, button: Int, dragX: Double, dragY: Double): Boolean {
             if (super.mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
+        //?}
                 return true
             } else if (button == 0 && scrolling) {
                 if (mouseY < 50) {
@@ -617,8 +647,17 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
             return false
         }
 
+        //? if >= 1.21.9 {
+        /*override fun mouseClicked(event: MouseButtonEvent, isDoubleClick: Boolean): Boolean {
+            val mouseX = event.x
+            val mouseY = event.y
+            val button = event.button()
+
+            if (super.mouseClicked(event, isDoubleClick)) {
+        *///?} else {
         override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
             if (super.mouseClicked(mouseX, mouseY, button)) {
+        //?}
                 return true
             }
 

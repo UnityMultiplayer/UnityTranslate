@@ -3,18 +3,23 @@ package xyz.bluspring.unitytranslate.client.gui
 //? if < 1.21.4 {
 import net.minecraft.util.FastColor.ARGB32 as ARGB
 //?} else {
-/*import net.minecraft.util.ARGB
+/*import com.mojang.blaze3d.platform.Window
+import net.minecraft.util.ARGB
 *///?}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.screens.Screen
+//? if >= 1.21.9 {
+/*import net.minecraft.client.input.MouseButtonEvent
+*///?}
 import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import org.lwjgl.glfw.GLFW
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
+import xyz.bluspring.unitytranslate.util.multiversion.*
 import xyz.bluspring.unitytranslate.network.UTClientNetworking
 import java.util.*
 
@@ -86,6 +91,11 @@ class EditTranscriptBoxesScreen(val boxes: MutableList<TranscriptBox>, val paren
         return currentCursor
     }
 
+    //? if >= 1.21.9 {
+    /*val Window.window: Long
+        get() = this.handle()
+    *///?}
+
     override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
         var inAnyBox = false
 
@@ -146,7 +156,7 @@ class EditTranscriptBoxesScreen(val boxes: MutableList<TranscriptBox>, val paren
                             GLFW.glfwSetCursor(this.minecraft!!.window.window, assignCursor(GLFW.GLFW_RESIZE_ALL_CURSOR))
                         }
 
-                        guiGraphics.blit(CLOSE_BUTTON, box.x + offset, box.y + offset, 0f, 0f, 16, 16, 16, 16)
+                        guiGraphics.blitTexture(CLOSE_BUTTON, box.x + offset, box.y + offset, 0f, 0f, 16, 16, 16, 16)
                     }
 
                     inAnyBox = true
@@ -171,8 +181,15 @@ class EditTranscriptBoxesScreen(val boxes: MutableList<TranscriptBox>, val paren
      }
     *///?}
 
+    //? if >= 1.21.9 {
+    /*override fun mouseClicked(event: MouseButtonEvent, isDoubleClick: Boolean): Boolean {
+        val result = super.mouseClicked(event, isDoubleClick)
+        val mouseX = event.x
+        val mouseY = event.y
+    *///?} else {
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
         val result = super.mouseClicked(mouseX, mouseY, button)
+    //?}
 
         if (result)
             return true
@@ -233,12 +250,20 @@ class EditTranscriptBoxesScreen(val boxes: MutableList<TranscriptBox>, val paren
         return false
     }
 
+    //? if >= 1.21.9 {
+    /*override fun mouseReleased(event: MouseButtonEvent): Boolean {
+    *///?} else {
     override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
+    //?}
         if (boxEditContext != null) {
             boxEditContext = null
         }
 
+        //? if >= 1.21.9 {
+        /*return super.mouseReleased(event)
+        *///?} else {
         return super.mouseReleased(mouseX, mouseY, button)
+        //?}
     }
 
     override fun mouseMoved(mx: Double, my: Double) {

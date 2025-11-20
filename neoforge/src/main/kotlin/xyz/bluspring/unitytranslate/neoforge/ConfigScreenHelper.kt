@@ -2,6 +2,7 @@ package xyz.bluspring.unitytranslate.neoforge
 
 import net.neoforged.fml.ModLoadingContext
 
+import xyz.bluspring.unitytranslate.client.gui.UTConfigScreen
 //? if >= 1.20.6 {
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory
 //?} else {

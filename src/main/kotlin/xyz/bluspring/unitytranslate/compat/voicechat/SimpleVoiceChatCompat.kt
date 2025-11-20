@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.player.Player
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
+import xyz.bluspring.unitytranslate.util.multiversion.*
 
 @ForgeVoicechatPlugin
 class SimpleVoiceChatCompat : VoicechatPlugin {

@@ -5,11 +5,19 @@ import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
-import net.minecraft.util.FastColor
+//? if < 1.21.4 {
+import net.minecraft.util.FastColor.ARGB32 as ARGB
+//?} else {
+/*import net.minecraft.util.ARGB
+*///?}
 import net.minecraft.util.Mth
+//? if >= 1.21.8 {
+/*import org.joml.Matrix3x2fStack
+*///?}
 import xyz.bluspring.unitytranslate.Language
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
+import xyz.bluspring.unitytranslate.util.multiversion.*
 import java.util.*
 
 @Serializable
@@ -59,6 +67,28 @@ data class TranscriptBox(
             }
         }
 
+    //? if >= 1.21.8 {
+    /*fun Matrix3x2fStack.pushPose() {
+        this.pushMatrix()
+    }
+
+    fun Matrix3x2fStack.translate(x: Double, y: Double, z: Double) {
+        this.translate(x.toFloat(), y.toFloat())
+    }
+
+    fun Matrix3x2fStack.translate(x: Float, y: Float, z: Float) {
+        this.translate(x, y)
+    }
+
+    fun Matrix3x2fStack.scale(x: Float, y: Float, z: Float) {
+        this.scale(x, y)
+    }
+
+    fun Matrix3x2fStack.popPose() {
+        this.popMatrix()
+    }
+    *///?}
+
     fun render(guiGraphics: GuiGraphics, partialTick: Float) {
         val holder = UnityTranslateClient.getTranscriptHolder(this.language) ?: return
 
@@ -67,12 +97,12 @@ data class TranscriptBox(
         guiGraphics.pose().translate(0.0, 0.0, -255.0)
         guiGraphics.enableScissor(x, y, x + width, y + height)
 
-        guiGraphics.fill(x, y, x + width, y + height, FastColor.ARGB32.color(opacity, 0, 0, 0))
+        guiGraphics.fill(x, y, x + width, y + height, ARGB.color(opacity, 0, 0, 0))
         guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.translatable("unitytranslate.transcript").append(" (${language.code.uppercase()})")
             .withStyle(ChatFormatting.UNDERLINE, ChatFormatting.BOLD), x + (width / 2), y + 5, 16777215)
 
         if (!UnityTranslateClient.shouldTranscribe) {
-            guiGraphics.blit(TRANSCRIPT_MUTED, x + width - 20, y + 2, 0f, 0f, 16, 16, 16, 16)
+            guiGraphics.blitTexture(TRANSCRIPT_MUTED, x + width - 20, y + 2, 0f, 0f, 16, 16, 16, 16)
         }
 
         guiGraphics.enableScissor(x, y + 15, x + width, y + height)
@@ -105,6 +135,8 @@ data class TranscriptBox(
 
             val currentTime = System.currentTimeMillis()
             val delay = (UnityTranslate.config.client.disappearingTextDelay * 1000L).toLong()
+
+            var alpha = 1f
             if (UnityTranslate.config.client.disappearingText && currentTime >= transcript.arrivalTime + delay) {
                 val fadeTime = (UnityTranslate.config.client.disappearingTextFade * 1000L).toLong()
 
@@ -112,22 +144,27 @@ data class TranscriptBox(
                 val fadeEnd = fadeStart + fadeTime
                 val fadeAmount = ((fadeEnd - currentTime).toFloat() / fadeTime.toFloat())
 
-                val alpha = Mth.clamp(fadeAmount, 0f, 1f)
-                guiGraphics.setColor(1f, 1f, 1f, alpha)
+                alpha = Mth.clamp(fadeAmount, 0f, 1f)
             }
 
             val split = font.split(component, ((width - 5) * invScale).toInt()).reversed()
+
+            //? if < 1.21.4 {
+            guiGraphics.setColor(1f, 1f, 1f, alpha)
+            //?}
 
             for (line in split) {
                 guiGraphics.pose().pushPose()
                 guiGraphics.pose().translate(x.toFloat(), currentY.toFloat(), 0f)
                 guiGraphics.pose().scale(scale, scale, scale)
-                guiGraphics.drawString(font, line, 4, 0, 16777215)
+                guiGraphics.drawString(font, line, 4, 0, ARGB.color((alpha * 255f).toInt(), 255, 255, 255))
                 currentY -= (font.lineHeight * scale).toInt()
                 guiGraphics.pose().popPose()
             }
 
+            //? if < 1.21.4 {
             guiGraphics.setColor(1f, 1f, 1f, 1f)
+            //?}
 
             currentY -= 4
         }
@@ -135,7 +172,7 @@ data class TranscriptBox(
         guiGraphics.disableScissor()
         guiGraphics.disableScissor()
 
-        guiGraphics.renderOutline(x, y, width, height, FastColor.ARGB32.color(100, 0, 0, 0))
+        guiGraphics.renderOutline(x, y, width, height, ARGB.color(100, 0, 0, 0))
 
         guiGraphics.pose().popPose()
     }
