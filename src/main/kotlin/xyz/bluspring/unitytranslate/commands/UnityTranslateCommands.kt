@@ -8,7 +8,7 @@ import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 import xyz.bluspring.unitytranslate.client.transcribers.browser.BrowserSpeechTranscriber
 import xyz.bluspring.unitytranslate.translator.TranslatorManager
-import xyz.bluspring.unitytranslate.translator.UnityTranslateLibInstance
+import xyz.bluspring.unitytranslate.translator.library.UnityTranslateLibInstance
 
 object UnityTranslateCommands {
     fun <S> register(dispatcher: CommandDispatcher<S>, root: String, isClient: Boolean, sender: (S, Component) -> Unit) {

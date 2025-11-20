@@ -18,6 +18,7 @@ import xyz.bluspring.unitytranslate.compat.voicechat.UTVoiceChatCompat
 import xyz.bluspring.unitytranslate.library.util.collect
 import xyz.bluspring.unitytranslate.library.util.concurrent
 import xyz.bluspring.unitytranslate.network.payloads.MarkIncompletePayload
+import xyz.bluspring.unitytranslate.translator.library.UnityTranslateLibInstance
 import xyz.bluspring.unitytranslate.util.nativeaccess.CudaState
 import xyz.bluspring.unitytranslate.util.nativeaccess.NativeAccess
 import java.util.*

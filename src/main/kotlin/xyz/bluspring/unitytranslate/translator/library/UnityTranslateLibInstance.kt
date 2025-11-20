@@ -1,14 +1,12 @@
-package xyz.bluspring.unitytranslate.translator
+package xyz.bluspring.unitytranslate.translator.library
 
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.runBlocking
-import net.fabricmc.loader.api.FabricLoader
 import xyz.bluspring.unitytranslate.Language
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.library.UnityTranslateLib
+import xyz.bluspring.unitytranslate.translator.LibreTranslateInstance
+import xyz.bluspring.unitytranslate.translator.TranslatorManager
 
 class UnityTranslateLibInstance private constructor(): LibreTranslateInstance("", 150) {
     override val supportedLanguages: Multimap<Language, Language>
@@ -55,28 +53,10 @@ class UnityTranslateLibInstance private constructor(): LibreTranslateInstance(""
             try {
                 library.load()
 
-                if (FabricLoader.getInstance().isDevelopmentEnvironment) {
-                    runBlocking(Dispatchers.IO) {
-                        for (index in library.packageIndex.indexList) {
-                            index.packages.chunked(10).asFlow().collect {
-                                // only download what's necessary for now
-                                UnityTranslate.logger.info("Downloading translation model for en -> es")
-                                index.getOrDownloadModelInfos("en", "es")
-
-                                UnityTranslate.logger.info("Downloading translation model for es -> en")
-                                index.getOrDownloadModelInfos("es", "en")
-
-                                UnityTranslate.logger.info("Downloaded all testing translation models!")
-                            }
-                        }
-                    }
-                }
-
                 instance = UnityTranslateLibInstance()
                 isLibraryLoaded = true
             } catch (e: Throwable) {
-                UnityTranslate.logger.error("Failed to load UnityTranslateLib!")
-                e.printStackTrace()
+                UnityTranslate.logger.error("Failed to load UnityTranslateLib!", e)
             }
         }
     }
