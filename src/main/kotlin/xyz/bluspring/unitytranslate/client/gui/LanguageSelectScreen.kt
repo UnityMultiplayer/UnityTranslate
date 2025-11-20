@@ -116,7 +116,7 @@ class LanguageSelectScreen(val parent: Screen?, val type: LanguageSelectType) : 
                 }
             }
 
-            for (language in Language.entries.sortedBy { it.name }) {
+            for (language in Language.entries.sortedBy { it.code }) {
                 val entry = Entry(language)
                 this.addEntry(entry)
 
@@ -128,7 +128,7 @@ class LanguageSelectScreen(val parent: Screen?, val type: LanguageSelectType) : 
             }
         }
 
-        inner class Entry(val language: Language, var isBalloonDefault: Boolean = true) : ObjectSelectionList.Entry<Entry>() {
+        inner class Entry(val language: Language, var isBalloonDefault: Boolean = false) : ObjectSelectionList.Entry<Entry>() {
             internal val shouldBeDeactivated = type == LanguageSelectType.TRANSCRIPT_BOX && UnityTranslate.config.client.transcriptBoxes.any { it.language == language }
             private var lastClickTime: Long = 0L
 
