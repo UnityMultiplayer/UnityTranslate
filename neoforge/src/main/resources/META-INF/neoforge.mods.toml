@@ -1,5 +1,5 @@
-modLoader = "kfl"
-loaderVersion = "[${kotlinlangforge_loader},)"
+modLoader = "klf"
+loaderVersion = "[1,)"
 license = "MIT"
 issueTrackerURL = "https://github.com/UnityMultiplayer/UnityTranslate/issues"
 
