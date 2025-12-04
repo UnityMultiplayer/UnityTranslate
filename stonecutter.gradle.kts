@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 plugins {
     id("dev.kikugie.stonecutter")
 
-    id("dev.architectury.loom") version "1.13.9999" apply false // TODO: using a local version of Arch Loom, switch to uploaded version when fixed
+    id("dev.architectury.loom") version "1.13-SNAPSHOT" apply false
     id("architectury-plugin") version "3.4-SNAPSHOT" apply false
 
     kotlin("jvm") version "2.2.21" apply false
