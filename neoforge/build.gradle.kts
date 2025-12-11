@@ -45,7 +45,7 @@ dependencies {
     commonBundle(project(common.path, "namedElements")) { isTransitive = false }
     shadowBundle(project(common.path, "transformProductionNeoForge")) { isTransitive = false }
 
-    modImplementation("dev.nyon:KotlinLangForge:${common.mod.dep("kotlinlangforge")}-${common.mod.dep("kotlinlangforge_loader")}+neoforge")
+    modImplementation("dev.nyon:KotlinLangForge:${common.mod.dep("kotlinlangforge")}-k${mod.dep("kotlin")}-${common.mod.dep("kotlinlangforge_loader")}+neoforge")
     modImplementation("xyz.bluspring.modernnetworking:modernnetworking-neoforge:${common.mod.dep("modernnetworking")}+${common.mod.dep("modernnetworking_mc")}")!!
 
     modOptional("maven.modrinth:plasmo-voice", "neoforge-${mod.commonDep("plasmo_mc", common.mod, minecraftVersion)}-${mod.commonDep("plasmo", common.mod)}", common.mod.prop("proximity_chat") == "plasmo")

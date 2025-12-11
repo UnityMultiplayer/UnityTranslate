@@ -42,7 +42,7 @@ repositories {
 dependencies {
     modImplementation("net.fabricmc:fabric-loader:${common.mod.dep("fabric_loader")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${common.mod.dep("fabric_api")}")
-    modImplementation("net.fabricmc:fabric-language-kotlin:${common.mod.dep("fabric_kotlin")}")
+    modImplementation("net.fabricmc:fabric-language-kotlin:${common.mod.dep("fabric_kotlin")}+kotlin.${mod.dep("kotlin")}")
 
     modImplementation("com.terraformersmc:modmenu:${common.mod.dep("modmenu")}")
 
@@ -57,7 +57,6 @@ dependencies {
     shadowBundle(project(common.path, "transformProductionFabric")) { isTransitive = false }
 
     modImplementation("xyz.bluspring.modernnetworking:modernnetworking-fabric:${common.mod.dep("modernnetworking")}+${common.mod.dep("modernnetworking_mc")}")!!
-    modImplementation("net.fabricmc:fabric-language-kotlin:${common.mod.dep("fabric_kotlin")}")
 
     modOptional("maven.modrinth:plasmo-voice", "fabric-${mod.commonDep("plasmo_mc", common.mod, minecraftVersion)}-${mod.commonDep("plasmo", common.mod)}", common.mod.prop("proximity_chat") == "plasmo")
     modOptional("maven.modrinth:simple-voice-chat", "fabric-$minecraftVersion-${mod.commonDep("voicechat", common.mod)}", common.mod.prop("proximity_chat") == "svc")

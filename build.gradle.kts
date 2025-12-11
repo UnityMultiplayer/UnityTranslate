@@ -14,7 +14,7 @@ architectury.common(stonecutter.tree.branches.mapNotNull {
 
 dependencies {
     modCompileOnly("net.fabricmc:fabric-loader:${mod.dep("fabric_loader")}")
-    modCompileOnly("net.fabricmc:fabric-language-kotlin:${mod.dep("fabric_kotlin")}")
+    modCompileOnly("net.fabricmc:fabric-language-kotlin:${mod.dep("fabric_kotlin")}+kotlin.${mod.dep("kotlin")}")
 
     implementation("de.maxhenkel.voicechat:voicechat-api:${mod.dep("voicechat_api")}")
     compileOnly("su.plo.voice.api:server:${mod.dep("plasmo_api")}")
