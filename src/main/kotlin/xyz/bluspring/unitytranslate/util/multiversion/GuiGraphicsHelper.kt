@@ -7,7 +7,7 @@ import net.minecraft.client.gui.GuiGraphics
 *///?} else {
 import net.minecraft.client.renderer.RenderType
 //?}
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources./*? if < 1.21.11 {*/ResourceLocation/*?} else {*//*Identifier as ResourceLocation*//*?}*/
 import net.minecraft.util.FormattedCharSequence
 
 fun GuiGraphics.blitTexture(texture: ResourceLocation, x: Int, y: Int, u: Float, v: Float, uWidth: Int, vHeight: Int, textureWidth: Int, textureHeight: Int) {
@@ -20,7 +20,7 @@ fun GuiGraphics.blitTexture(texture: ResourceLocation, x: Int, y: Int, u: Float,
     //?}
 }
 
-//? if >= 1.21.9 {
+//? if >= 1.21.9 && < 1.21.11 {
 /*fun GuiGraphics.renderOutline(x: Int, y: Int, width: Int, height: Int, color: Int) {
     this.submitOutline(x, y, width, height, color)
 }

@@ -1,6 +1,10 @@
 package xyz.bluspring.unitytranslate.util.nativeaccess
 
+//? if < 1.21.11 {
 import net.minecraft.Util
+//?} else {
+/*import net.minecraft.util.Util
+*///?}
 import org.jetbrains.annotations.ApiStatus.Internal
 import org.lwjgl.system.APIUtil
 import org.lwjgl.system.JNI

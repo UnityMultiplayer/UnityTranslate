@@ -1,7 +1,6 @@
 pluginManagement {
     repositories {
         maven("https://maven.fabricmc.net")
-        maven("https://maven.architectury.dev")
         maven("https://maven.neoforged.net/releases")
         maven("https://maven.minecraftforge.net")
         maven("https://maven.kikugie.dev/releases")
@@ -12,8 +11,8 @@ pluginManagement {
     }
 
     plugins {
-        kotlin("jvm") version("2.2.21")
-        kotlin("plugin.serialization") version("2.2.21")
+        kotlin("jvm") version("2.3.0")
+        kotlin("plugin.serialization") version("2.3.0")
     }
 }
 
@@ -25,7 +24,7 @@ stonecutter {
     centralScript = "build.gradle.kts"
     kotlinController = true
 
-    val versions = listOf("1.20.1", "1.21.1", "1.21.4", "1.21.5", "1.21.8", "1.21.10")
+    val versions = listOf("1.20.1", "1.21.1", "1.21.4", "1.21.5", "1.21.8", "1.21.10", "1.21.11")
 
     create(rootProject) {
         versions(versions)

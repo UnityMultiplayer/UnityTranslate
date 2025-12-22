@@ -607,8 +607,13 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
             }
         }
 
+        //? if >= 1.21.11 {
+        /*override fun resize(width: Int, height: Int) {
+            super.resize(width, height)
+        *///?} else {
         override fun resize(minecraft: Minecraft, width: Int, height: Int) {
             super.resize(minecraft, width, height)
+        //?}
 
             if (this.scrollAmount > this.maxScroll)
                 this.scrollAmount = this.maxScroll.toDouble()

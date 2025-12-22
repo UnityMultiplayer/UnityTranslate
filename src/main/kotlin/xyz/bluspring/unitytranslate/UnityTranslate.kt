@@ -1,7 +1,7 @@
 package xyz.bluspring.unitytranslate
 
 import kotlinx.serialization.json.Json
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources./*? if < 1.21.11 {*/ResourceLocation/*?} else {*//*Identifier as ResourceLocation*//*?}*/
 import org.slf4j.LoggerFactory
 import xyz.bluspring.unitytranslate.compat.voicechat.PlasmoVoiceChatCompat
 import xyz.bluspring.unitytranslate.compat.voicechat.UTVoiceChatCompat

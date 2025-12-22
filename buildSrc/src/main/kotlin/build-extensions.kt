@@ -23,6 +23,26 @@ fun DependencyHandler.modOptional(notation: String, version: String, enabled: Bo
     }
 }
 
+fun DependencyHandler.optional(notation: String, version: String, enabled: Boolean = true) {
+    if (version != "[UNSUPPORTED]") {
+        if (enabled) {
+            add("api", "$notation:$version")
+        } else {
+            add("compileOnly", "$notation:$version")
+        }
+    }
+}
+
+fun DependencyHandler.optional(notation: String, version: String, enabled: Boolean = true, builder: (String) -> Any) {
+    if (version != "[UNSUPPORTED]") {
+        if (enabled) {
+            add("api", builder.invoke("$notation:$version"))
+        } else {
+            add("compileOnly", builder.invoke("$notation:$version"))
+        }
+    }
+}
+
 fun ProcessResources.properties(files: Iterable<String>, vararg properties: Pair<String, Any>) {
     for ((name, value) in properties) inputs.property(name, value)
     filesMatching(files) {

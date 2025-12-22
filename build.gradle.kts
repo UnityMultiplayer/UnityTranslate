@@ -1,19 +1,23 @@
 plugins {
-    id("architectury-plugin")
-    id("dev.architectury.loom")
+    id("fabric-loom")
     kotlin("jvm")
     kotlin("plugin.serialization")
 }
 
 val minecraftVersion = stonecutter.current.version
 
-architectury.common(stonecutter.tree.branches.mapNotNull {
-    if (stonecutter.current.project !in it) null
-    else it.project.prop("loom.platform")
-})
+fun loaderDep(dep: String): Any {
+    return mod.dep(dep, "[UNSUPPORTED]")
+}
 
 dependencies {
-    modCompileOnly("net.fabricmc:fabric-loader:${mod.dep("fabric_loader")}")
+    minecraft("com.mojang:minecraft:$minecraftVersion")
+    mappings(loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${loaderDep("parchment_version")}:${loaderDep("parchment_snapshot")}@zip")
+    })
+
+    modImplementation("net.fabricmc:fabric-loader:${mod.dep("fabric_loader")}")
     modCompileOnly("net.fabricmc:fabric-language-kotlin:${mod.dep("fabric_kotlin")}+kotlin.${mod.dep("kotlin")}")
 
     implementation("de.maxhenkel.voicechat:voicechat-api:${mod.dep("voicechat_api")}")

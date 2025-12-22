@@ -1,6 +1,10 @@
 package xyz.bluspring.unitytranslate.client.gui
 
+//? if < 1.21.11 {
 import net.minecraft.Util
+//?} else {
+/*import net.minecraft.util.Util
+*///?}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.Button

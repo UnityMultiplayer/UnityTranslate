@@ -1,9 +1,10 @@
 @file:Suppress("UnstableApiUsage")
 
+import net.fabricmc.loom.task.RemapJarTask
+
 
 plugins {
-    id("dev.architectury.loom")
-    id("architectury-plugin")
+    id("fabric-loom")
     id("com.gradleup.shadow")
 }
 
@@ -11,11 +12,6 @@ val loader = prop("loom.platform")!!
 val minecraftVersion: String = stonecutter.current.version
 val common: Project = requireNotNull(stonecutter.node.sibling("")?.project) {
     "No common project for $project"
-}
-
-architectury {
-    platformSetupLoomIde()
-    fabric()
 }
 
 val commonBundle: Configuration by configurations.creating {
@@ -31,7 +27,7 @@ val shadowBundle: Configuration by configurations.creating {
 configurations {
     compileClasspath.get().extendsFrom(commonBundle)
     runtimeClasspath.get().extendsFrom(commonBundle)
-    get("developmentFabric").extendsFrom(commonBundle)
+//    get("developmentFabric").extendsFrom(commonBundle)
 }
 
 repositories {
@@ -39,7 +35,17 @@ repositories {
     maven("https://maven.nucleoid.xyz/") // Not sure why but we need this
 }
 
+fun loaderDep(dep: String): Any {
+    return common?.project?.mod?.dep(dep) ?: mod.dep(dep, "[UNSUPPORTED]")
+}
+
 dependencies {
+    minecraft("com.mojang:minecraft:$minecraftVersion")
+    mappings(loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${loaderDep("parchment_version")}:${loaderDep("parchment_snapshot")}@zip")
+    })
+
     modImplementation("net.fabricmc:fabric-loader:${common.mod.dep("fabric_loader")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${common.mod.dep("fabric_api")}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${common.mod.dep("fabric_kotlin")}+kotlin.${mod.dep("kotlin")}")
@@ -68,6 +74,15 @@ dependencies {
     shadowBundle("xyz.bluspring.unitytranslate:UnityTranslateLib:${mod.commonDep("unitytranslatelib", common.mod)}")
     shadowBundle("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-windows-amd64:${mod.commonDep("unitytranslatelib", common.mod)}")
     shadowBundle("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-linux-amd64:${mod.commonDep("unitytranslatelib", common.mod)}")
+}
+
+loom.mixin.useLegacyMixinAp = false
+
+tasks.named<RemapJarTask>("remapJar") {
+//    injectAccessWidener = true
+    input = tasks.named<Jar>("shadowJar").get().archiveFile
+    archiveClassifier = null
+    dependsOn(tasks.named<Jar>("shadowJar"))
 }
 
 tasks.shadowJar {

@@ -20,9 +20,9 @@ class NeoForgePlatformProxy : PlatformProxy {
     override fun isClient(): Boolean {
         //? if > 1.21.8 {
         return FMLEnvironment.getDist() == Dist.CLIENT
-        //? } else {
+        //?} else {
         /*return FMLEnvironment.dist == Dist.CLIENT
-        *///? }
+        *///?}
     }
 
     override val modVersion: String
@@ -38,9 +38,9 @@ class NeoForgePlatformProxy : PlatformProxy {
         get() {
             //? if > 1.21.8 {
             return !FMLEnvironment.isProduction()
-            //? } else {
+            //?} else {
             /*return !FMLEnvironment.production
-            *///? }
+            *///?}
         }
 
     override fun hasTranscriptPermission(player: Player): Boolean {

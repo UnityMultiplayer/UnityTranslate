@@ -3,7 +3,11 @@ package xyz.bluspring.unitytranslate.client.transcribers.browser
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.sun.net.httpserver.HttpServer
+//? if < 1.21.11 {
 import net.minecraft.Util
+//?} else {
+/*import net.minecraft.util.Util
+*///?}
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component

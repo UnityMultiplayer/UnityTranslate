@@ -14,8 +14,8 @@ class UnityTranslateLibInstance private constructor(): LibreTranslateInstance(""
             if (cachedSupportedLanguages.isEmpty) {
                 for (index in library.packageIndex.indexList) {
                     for (pkg in index.packages) {
-                        val fromLang = Language.findLibreLang(pkg.fromCode)
-                        val toLang = Language.findLibreLang(pkg.toCode)
+                        val fromLang = Language.findLibreLang(pkg.fromCode) ?: continue
+                        val toLang = Language.findLibreLang(pkg.toCode) ?: continue
 
                         cachedSupportedLanguages.put(fromLang, toLang)
                     }

@@ -5,15 +5,18 @@ import net.fabricmc.loom.task.RemapJarTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 
 plugins {
+    id("idea")
     id("dev.kikugie.stonecutter")
 
-    id("dev.architectury.loom") version "1.13-SNAPSHOT" apply false
-    id("architectury-plugin") version "3.4-SNAPSHOT" apply false
+    // Architectury Loom was becoming annoying.
+    id("fabric-loom") apply false
+//    id("net.neoforged.gradle.userdev") version "7.1.12" apply false
+    id("net.neoforged.moddev") version "2.0.134" apply false
 
-    kotlin("jvm") version "2.2.21" apply false
-    kotlin("plugin.serialization") version "2.2.21" apply false
+    kotlin("jvm") version "2.3.0" apply false
+    kotlin("plugin.serialization") version "2.3.0" apply false
 
-    id("com.gradleup.shadow") version "8.3.5" apply false
+    id("com.gradleup.shadow") version "9.3.0" apply false
     id("me.modmuss50.mod-publish-plugin") version "0.7.+" apply false
 }
 
@@ -58,10 +61,9 @@ allprojects {
     val sc = project.extensions.getByType<StonecutterBuildExtension>()
     val common = sc.node.sibling("")
 
+    apply(plugin = "idea")
     apply(plugin = "java")
     apply(plugin = "org.jetbrains.kotlin.jvm")
-    apply(plugin = "architectury-plugin")
-    apply(plugin = "dev.architectury.loom")
     apply(plugin = "com.gradleup.shadow")
 
     val minecraftVersion = sc.current.version
@@ -81,29 +83,14 @@ allprojects {
 
     sc.constants["forge_like"] = loader == "forge" || loader == "neoforge"
 
-    val loom = project.extensions.getByName<LoomGradleExtensionAPI>("loom")
-
-    loom.silentMojangMappingsLicense()
-    loom.decompilers {
-        get("vineflower").apply { // Adds names to lambdas - useful for mixins
-            options.put("mark-corresponding-synthetics", "1")
-        }
-    }
-
-    loom.mixin.useLegacyMixinAp = false
-
     fun loaderDep(dep: String): Any {
         return common?.project?.mod?.dep(dep) ?: mod.dep(dep, "[UNSUPPORTED]")
     }
 
     dependencies {
-        "minecraft"("com.mojang:minecraft:$minecraftVersion")
-        "mappings"(loom.layered() {
-            officialMojangMappings()
-            parchment("org.parchmentmc.data:parchment-${loaderDep("parchment_version")}:${loaderDep("parchment_snapshot")}@zip")
-        })
-
-        "implementation"("org.java-websocket:Java-WebSocket:${loaderDep("java_websocket")}")
+        "implementation"("org.java-websocket:Java-WebSocket:${loaderDep("java_websocket")}") {
+            exclude("org.slf4j", "slf4j-api")
+        }
         "implementation"("com.squareup.okhttp3:okhttp:${loaderDep("okhttp")}") {
             exclude("kotlin")
             exclude("org.jetbrains")
@@ -152,11 +139,12 @@ allprojects {
         }
     }
 
-    tasks.named<RemapJarTask>("remapJar") {
-        injectAccessWidener = true
-        input = tasks.named<Jar>("shadowJar").get().archiveFile
-        archiveClassifier = null
-        dependsOn(tasks.named<Jar>("shadowJar"))
+    // IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
+    idea {
+        module {
+            isDownloadSources = true
+            isDownloadJavadoc = true
+        }
     }
 }
 

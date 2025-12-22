@@ -1,6 +1,10 @@
 package xyz.bluspring.unitytranslate.client.transcribers.windows.sapi5
 
+//? if < 1.21.11 {
 import net.minecraft.Util
+//?} else {
+/*import net.minecraft.util.Util
+*///?}
 import org.lwjgl.system.APIUtil
 import org.lwjgl.system.SharedLibrary
 import xyz.bluspring.unitytranslate.Language

@@ -1,6 +1,5 @@
 plugins {
-    id("dev.architectury.loom")
-    id("architectury-plugin")
+    id("net.neoforged.moddev.legacyforge")
     id("com.gradleup.shadow")
 }
 
@@ -11,9 +10,33 @@ val common: Project = requireNotNull(stonecutter.node.sibling("")?.project) {
     "No common project for $project"
 }
 
-architectury {
-    platformSetupLoomIde()
-    forge()
+legacyForge.version = "$minecraftVersion-${common.mod.dep("forge")}"
+
+fun loaderDep(dep: String): Any {
+    return common?.project?.mod?.dep(dep) ?: mod.dep(dep, "[UNSUPPORTED]")
+}
+
+legacyForge {
+    parchment {
+        minecraftVersion.set(loaderDep("parchment_version") as String)
+        mappingsVersion.set(loaderDep("parchment_snapshot") as String)
+    }
+
+    runs {
+        create("client") {
+            client()
+        }
+
+        create("server") {
+            server()
+        }
+    }
+
+    mods {
+        create("unitytranslate") {
+            sourceSet(sourceSets.main.get())
+        }
+    }
 }
 
 val commonBundle: Configuration by configurations.creating {
@@ -29,7 +52,12 @@ val shadowBundle: Configuration by configurations.creating {
 configurations {
     compileClasspath.get().extendsFrom(commonBundle)
     runtimeClasspath.get().extendsFrom(commonBundle)
-    get("developmentForge").extendsFrom(commonBundle)
+//    get("developmentForge").extendsFrom(commonBundle)
+}
+
+mixin {
+    add(sourceSets.main.get(), "mixins.unitytranslate.refmap.json")
+    config("unitytranslate.mixins.json")
 }
 
 repositories {
@@ -37,7 +65,7 @@ repositories {
 }
 
 dependencies {
-    "forge"("net.minecraftforge:forge:$minecraftVersion-${common.mod.dep("forge")}")
+    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 
     modImplementation("maven.modrinth:talk-balloons:${common.mod.dep("talk_balloons")}+${common.mod.dep("talk_balloons_mc")}-forge")
     modImplementation("me.shedaniel.cloth:cloth-config-forge:${common.mod.dep("cloth_config")}")
@@ -51,23 +79,31 @@ dependencies {
     modOptional("maven.modrinth:plasmo-voice", "forge-${mod.commonDep("plasmo_mc", common.mod, minecraftVersion)}-${mod.commonDep("plasmo", common.mod)}", common.mod.prop("proximity_chat") == "plasmo")
     modOptional("maven.modrinth:simple-voice-chat", "forge-$minecraftVersion-${mod.commonDep("voicechat", common.mod)}", common.mod.prop("proximity_chat") == "svc")
 
-    minecraftRuntimeLibraries(shadowBundle("org.java-websocket:Java-WebSocket:${mod.commonDep("java_websocket", common.mod)}")!!)
-    minecraftRuntimeLibraries(shadowBundle("com.squareup.okhttp3:okhttp:${mod.commonDep("okhttp", common.mod)}")  {
+    add("additionalRuntimeClasspath", shadowBundle("org.java-websocket:Java-WebSocket:${mod.commonDep("java_websocket", common.mod)}")!!)
+    add("additionalRuntimeClasspath", shadowBundle("com.squareup.okhttp3:okhttp:${mod.commonDep("okhttp", common.mod)}")  {
         exclude("org.jetbrains")
         exclude("kotlin")
     })
-    minecraftRuntimeLibraries(shadowBundle("com.github.jnr:jnr-ffi:${mod.commonDep("jnr", common.mod)}")!!)
+    add("additionalRuntimeClasspath", shadowBundle("com.github.jnr:jnr-ffi:${mod.commonDep("jnr", common.mod)}")!!)
 
     shadowBundle("xyz.bluspring.unitytranslate:UnityTranslateLib:${mod.commonDep("unitytranslatelib", common.mod)}")
     shadowBundle("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-windows-amd64:${mod.commonDep("unitytranslatelib", common.mod)}")
     shadowBundle("xyz.bluspring.unitytranslate:UnityTranslateLib-natives-linux-amd64:${mod.commonDep("unitytranslatelib", common.mod)}")
 }
 
-loom {
-    runConfigs.all {
-        isIdeConfigGenerated = true
-        runDir = "../../../run"
-        vmArgs("-Dmixin.debug.export=true", "-XX:+AllowEnhancedClassRedefinition")
+//loom {
+//    runConfigs.all {
+//        isIdeConfigGenerated = true
+//        runDir = "../../../run"
+//        vmArgs("-Dmixin.debug.export=true", "-XX:+AllowEnhancedClassRedefinition")
+//    }
+//}
+
+tasks.jar {
+    manifest {
+        attributes(mapOf(
+            "MixinConfigs" to "unitytranslate.mixins.json"
+        ))
     }
 }
 
@@ -75,6 +111,10 @@ tasks.shadowJar {
     configurations = listOf(shadowBundle)
     archiveClassifier = "dev-shadow"
     exclude("fabric.mod.json", "architectury.common.json")
+}
+
+obfuscation {
+    reobfuscate(tasks.shadowJar, sourceSets.main.get())
 }
 
 tasks.processResources {
@@ -98,10 +138,10 @@ tasks.build {
     description = "Must run through 'chiseledBuild'"
 }
 
-tasks.register<Copy>("buildAndCollect") {
-    group = "versioned"
-    description = "Must run through 'chiseledBuild'"
-    from(tasks.remapJar.get().archiveFile, tasks.remapSourcesJar.get().archiveFile)
-    into(rootProject.layout.buildDirectory.file("libs/${mod.version}/$loader"))
-    dependsOn("build")
-}
+//tasks.register<Copy>("buildAndCollect") {
+//    group = "versioned"
+//    description = "Must run through 'chiseledBuild'"
+//    from(tasks.reobfJar.get().archiveFile, tasks.sourcesJar.get().archiveFile)
+//    into(rootProject.layout.buildDirectory.file("libs/${mod.version}/$loader"))
+//    dependsOn("build")
+//}
