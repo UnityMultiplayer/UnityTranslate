@@ -56,8 +56,8 @@ configurations {
 }
 
 mixin {
-    add(sourceSets.main.get(), "mixins.unitytranslate.refmap.json")
     config("unitytranslate.mixins.json")
+    add(sourceSets.main.get(), "mixins.unitytranslate.refmap.json")
 }
 
 repositories {
@@ -71,7 +71,7 @@ dependencies {
     modImplementation("me.shedaniel.cloth:cloth-config-forge:${common.mod.dep("cloth_config")}")
 
     commonBundle(project(common.path, "namedElements")) { isTransitive = false }
-    shadowBundle(project(common.path, "transformProductionForge")) { isTransitive = false }
+    shadowBundle(project(common.path, "namedElements")) { isTransitive = false }
 
     modImplementation("dev.nyon:KotlinLangForge:${common.mod.dep("kotlinlangforge")}-k${mod.dep("kotlin")}-${common.mod.dep("kotlinlangforge_loader")}+forge")
     modImplementation("xyz.bluspring.modernnetworking:modernnetworking-forge:${common.mod.dep("modernnetworking")}+${common.mod.dep("modernnetworking_mc")}")!!

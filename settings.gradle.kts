@@ -31,9 +31,11 @@ stonecutter {
         vcsVersion = "1.20.1"
 
         branch("fabric")
-        branch("forge") {
-            versions(versions.filterIndexed { i, _ -> i <= versions.indexOf("1.20.1") })
-        }
+        // TODO: until someone figures out MDG Legacy + mixin in a multi-loader setup, this is what we're going to settle with.
+        //       Or until Architectury Loom updates to 1.14, though idk.
+//        branch("forge") {
+//            versions(versions.filterIndexed { i, _ -> i <= versions.indexOf("1.20.1") })
+//        }
         branch("neoforge") {
             versions(versions.filterIndexed { i, _ -> i >= versions.indexOf("1.21.1") })
         }

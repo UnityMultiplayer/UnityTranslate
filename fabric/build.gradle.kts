@@ -60,7 +60,7 @@ dependencies {
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:${common.mod.dep("cloth_config")}")
 
     commonBundle(project(common.path, "namedElements")) { isTransitive = false }
-    shadowBundle(project(common.path, "transformProductionFabric")) { isTransitive = false }
+    shadowBundle(project(common.path)) { isTransitive = false }
 
     modImplementation("xyz.bluspring.modernnetworking:modernnetworking-fabric:${common.mod.dep("modernnetworking")}+${common.mod.dep("modernnetworking_mc")}")!!
 

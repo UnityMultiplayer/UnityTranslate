@@ -64,7 +64,7 @@ dependencies {
     api("me.shedaniel.cloth:cloth-config-neoforge:${common.mod.dep("cloth_config")}")
 
     commonBundle(project(common.path, "namedElements")) { isTransitive = false }
-//    shadowBundle(project(common.path, "transformProductionNeoForge")) { isTransitive = false }
+    shadowBundle(project(common.path, "namedElements")) { isTransitive = false }
 
     api("dev.nyon:KotlinLangForge:${common.mod.dep("kotlinlangforge")}-k${mod.dep("kotlin")}-${common.mod.dep("kotlinlangforge_loader")}+neoforge")
     api("xyz.bluspring.modernnetworking:modernnetworking-neoforge:${common.mod.dep("modernnetworking")}+${common.mod.dep("modernnetworking_mc")}")!!
