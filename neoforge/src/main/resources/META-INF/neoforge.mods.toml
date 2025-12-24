@@ -28,12 +28,12 @@ issueTrackerURL = "https://github.com/UnityMultiplayer/UnityTranslate/issues"
     ordering = "NONE"
     side = "BOTH"
 
-[[dependencies.${mod_id}]]
-    modId = "klf"
-    type = "required"
-    versionRange = "[${kotlinlangforge_version},)"
-    ordering="NONE"
-    side="BOTH"
+#[[dependencies.${mod_id}]]
+#    modId = "klf"
+#    type = "required"
+#    versionRange = "[${kotlinlangforge_version},)"
+#    ordering="NONE"
+#    side="BOTH"
 
 [[dependencies.${mod_id}]]
     modId = "modernnetworking"
