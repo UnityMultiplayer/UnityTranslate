@@ -22,6 +22,7 @@ import xyz.bluspring.unitytranslate.client.gui.OpenBrowserScreen
 import xyz.bluspring.unitytranslate.client.transcribers.SpeechTranscriber
 import xyz.bluspring.unitytranslate.client.transcribers.TranscriberType
 import xyz.bluspring.unitytranslate.config.UnityTranslateConfig
+import xyz.bluspring.unitytranslate.util.openScreen
 import java.net.InetSocketAddress
 import java.net.URI
 
@@ -53,7 +54,7 @@ class BrowserSpeechTranscriber(language: Language) : SpeechTranscriber(language)
                 Util.getPlatform().openUri("http://127.0.0.1:$serverPort")
             } else if (UnityTranslate.config.client.openBrowserWithoutPromptV2 == UnityTranslateConfig.TriState.DEFAULT) {
                 Minecraft.getInstance().execute {
-                    mc.setScreen(OpenBrowserScreen("http://127.0.0.1:$serverPort"))
+                    mc.openScreen(OpenBrowserScreen("http://127.0.0.1:$serverPort"))
                 }
             }
         }

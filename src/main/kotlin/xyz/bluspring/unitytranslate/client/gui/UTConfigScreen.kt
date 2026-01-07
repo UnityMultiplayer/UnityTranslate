@@ -22,6 +22,7 @@ import xyz.bluspring.unitytranslate.config.*
 import xyz.bluspring.unitytranslate.config.IntRange
 import xyz.bluspring.unitytranslate.duck.ScrollableWidget
 import xyz.bluspring.unitytranslate.mixin.AbstractWidgetAccessor
+import xyz.bluspring.unitytranslate.util.openScreen
 import kotlin.math.absoluteValue
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
@@ -51,7 +52,7 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
 
         addRenderableWidget(
             Button.builder(Component.translatable("gui.unitytranslate.config.client")) {
-                Minecraft.getInstance().setScreen(UTConfigSubScreen(UnityTranslate.config.client::class, UnityTranslate.config.client, "client"))
+                Minecraft.getInstance().openScreen(UTConfigSubScreen(UnityTranslate.config.client::class, UnityTranslate.config.client, "client"))
             }
                 .pos(this.width / 2 - (width / 2), 75)
                 .size(width, Button.DEFAULT_HEIGHT)
@@ -60,7 +61,7 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
 
         addRenderableWidget(
             Button.builder(Component.translatable("gui.unitytranslate.config.common")) {
-                Minecraft.getInstance().setScreen(UTConfigSubScreen(UnityTranslate.config.server::class, UnityTranslate.config.server, "common"))
+                Minecraft.getInstance().openScreen(UTConfigSubScreen(UnityTranslate.config.server::class, UnityTranslate.config.server, "common"))
             }
                 .pos(this.width / 2 - (width / 2), 75 + Button.DEFAULT_HEIGHT + 5)
                 .size(width, Button.DEFAULT_HEIGHT)
@@ -90,7 +91,7 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
     }
 
     override fun onClose() {
-        Minecraft.getInstance().setScreen(parent)
+        Minecraft.getInstance().openScreen(parent)
     }
 
     inner class UTConfigSubScreen<T : Any>(val configClass: KClass<out T>, val instance: T, val type: String) : Screen(Component.translatable("gui.unitytranslate.config.$type")) {
@@ -438,7 +439,7 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
 
             if (type == "client") { // Special case
                 addRenderableWidget(Button.builder(Component.translatable("unitytranslate.configure_boxes")) {
-                    Minecraft.getInstance().setScreen(EditTranscriptBoxesScreen(UnityTranslateClient.languageBoxes, this@UTConfigSubScreen))
+                    Minecraft.getInstance().openScreen(EditTranscriptBoxesScreen(UnityTranslateClient.languageBoxes, this@UTConfigSubScreen))
                 }
                     .pos(this.width / 2 - (Button.DEFAULT_WIDTH / 2), y)
                     .build()
@@ -450,7 +451,7 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
                 y += 30
 
                 addRenderableWidget(Button.builder(Component.translatable("unitytranslate.set_spoken_language")) {
-                    Minecraft.getInstance().setScreen(LanguageSelectScreen(this@UTConfigSubScreen, LanguageSelectType.SPOKEN))
+                    Minecraft.getInstance().openScreen(LanguageSelectScreen(this@UTConfigSubScreen, LanguageSelectType.SPOKEN))
                 }
                     .pos(this.width / 2 - (Button.DEFAULT_WIDTH / 2), y)
                     .build()
@@ -463,7 +464,7 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
 
                 if (UnityTranslate.instance.proxy.isModLoaded("talk_balloons")) {
                     addRenderableWidget(Button.builder(Component.translatable("unitytranslate.set_balloon_language")) {
-                        Minecraft.getInstance().setScreen(LanguageSelectScreen(this@UTConfigSubScreen, LanguageSelectType.BALLOON))
+                        Minecraft.getInstance().openScreen(LanguageSelectScreen(this@UTConfigSubScreen, LanguageSelectType.BALLOON))
                     }
                         .pos(this.width / 2 - (Button.DEFAULT_WIDTH / 2), y)
                         .build()
@@ -688,7 +689,7 @@ class UTConfigScreen(private val parent: Screen?) : Screen(Component.literal("Un
         }
 
         override fun onClose() {
-            Minecraft.getInstance().setScreen(this@UTConfigScreen)
+            Minecraft.getInstance().openScreen(this@UTConfigScreen)
             UnityTranslate.saveConfig()
         }
     }

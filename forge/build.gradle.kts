@@ -55,10 +55,10 @@ configurations {
 //    get("developmentForge").extendsFrom(commonBundle)
 }
 
-mixin {
-    config("unitytranslate.mixins.json")
-    add(sourceSets.main.get(), "mixins.unitytranslate.refmap.json")
-}
+//mixin {
+//    config("unitytranslate.mixins.json")
+//    add(sourceSets.main.get(), "mixins.unitytranslate.refmap.json")
+//}
 
 repositories {
     maven("https://maven.minecraftforge.net/")

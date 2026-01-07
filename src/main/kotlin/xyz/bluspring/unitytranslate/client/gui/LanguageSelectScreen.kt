@@ -21,6 +21,7 @@ import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 import xyz.bluspring.unitytranslate.network.UTClientNetworking
 import xyz.bluspring.unitytranslate.util.multiversion.*
+import xyz.bluspring.unitytranslate.util.openScreen
 
 class LanguageSelectScreen(val parent: Screen?, val type: LanguageSelectType) : Screen(Component.translatable("options.language")) {
     private lateinit var list: LanguageSelectionList
@@ -40,7 +41,7 @@ class LanguageSelectScreen(val parent: Screen?, val type: LanguageSelectType) : 
     }
 
     override fun onClose() {
-        Minecraft.getInstance().setScreen(parent)
+        Minecraft.getInstance().openScreen(parent)
     }
 
     override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {

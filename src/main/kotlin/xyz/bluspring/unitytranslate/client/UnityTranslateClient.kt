@@ -21,6 +21,7 @@ import xyz.bluspring.unitytranslate.network.UTClientNetworking
 import xyz.bluspring.unitytranslate.network.payloads.SendTranscriptToServerPayload
 import xyz.bluspring.unitytranslate.transcript.TranscriptHolder
 import xyz.bluspring.unitytranslate.translator.TranslatorManager
+import xyz.bluspring.unitytranslate.util.openScreen
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -51,7 +52,7 @@ class UnityTranslateClient {
 
     fun clientTick(mc: Minecraft) {
         if (CONFIGURE_BOXES.consumeClick()) {
-            mc.setScreen(EditTranscriptBoxesScreen(languageBoxes))
+            mc.openScreen(EditTranscriptBoxesScreen(languageBoxes))
         }
 
         if (TOGGLE_TRANSCRIPTION.consumeClick()) {
@@ -74,7 +75,7 @@ class UnityTranslateClient {
         }
 
         if (SET_SPOKEN_LANGUAGE.consumeClick() && mc.screen == null) {
-            mc.setScreen(LanguageSelectScreen(null, LanguageSelectType.SPOKEN))
+            mc.openScreen(LanguageSelectScreen(null, LanguageSelectType.SPOKEN))
         }
 
         if (CLEAR_TRANSCRIPTS.consumeClick()) {
@@ -84,7 +85,7 @@ class UnityTranslateClient {
         }
 
         if (OPEN_CONFIG_GUI.consumeClick()) {
-            mc.setScreen(UTConfigScreen(null))
+            mc.openScreen(UTConfigScreen(null))
         }
 
         /*if (TRANSLATE_SIGN.consumeClick()) {

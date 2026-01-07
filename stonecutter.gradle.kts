@@ -10,7 +10,7 @@ plugins {
 
     // Architectury Loom was becoming annoying.
     id("fabric-loom") apply false
-//    id("net.neoforged.gradle.userdev") version "7.1.12" apply false
+//    id("net.minecraftforge.gradle") version "[6.0,6.2)" apply false
     id("net.neoforged.moddev") version "2.0.134" apply false
 
     kotlin("jvm") version "2.3.0" apply false
