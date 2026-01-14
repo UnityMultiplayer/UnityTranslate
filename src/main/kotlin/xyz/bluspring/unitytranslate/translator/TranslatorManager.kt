@@ -200,6 +200,7 @@ object TranslatorManager {
 
     fun init() {
         loadFromConfig()
+        installLibreTranslate()
     }
 
     fun serverStarting(server: MinecraftServer) {
