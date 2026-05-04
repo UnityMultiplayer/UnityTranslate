@@ -16,7 +16,7 @@ import kotlin.io.path.*
  * Utilities to allow for downloading files in parallel without worrying about having to manage it yourself.
  */
 object DownloadHelper {
-    @JvmField val MAX_DOWNLOAD_THREADS = Runtime.getRuntime().availableProcessors().coerceAtMost(4)
+    @JvmField val MAX_DOWNLOAD_THREADS = Runtime.getRuntime().availableProcessors().coerceAtMost(8)
     private val context = Dispatchers.IO.limitedParallelism(MAX_DOWNLOAD_THREADS) + CoroutineName("UnityTranslate Download Helper")
     private val scope = CoroutineScope(context)
     private val logger: Logger = LoggerFactory.getLogger("UnityTranslate Download Helper")
