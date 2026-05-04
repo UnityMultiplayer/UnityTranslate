@@ -11,7 +11,7 @@
     "sources": "${mod_sources}",
     "issues": "${mod_sources}/issues"
   },
-  "license": "MIT",
+  "license": "Artistic-2.0",
   "icon": "icon.png",
   "environment": "*",
   "entrypoints": {

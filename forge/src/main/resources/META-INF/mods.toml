@@ -1,6 +1,6 @@
 modLoader="klf"
 loaderVersion="[1,)"
-license="MIT"
+license="Artistic-2.0"
 issueTrackerURL="${mod_sources}/issues"
 
 [[mods]]
