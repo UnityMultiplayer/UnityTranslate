@@ -9,13 +9,15 @@ import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadHelper
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadHelper.bytesToNearestLarge
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadInfo
+import xyz.bluspring.unitytranslate.standalone.HandledException
 import xyz.bluspring.unitytranslate.standalone.Metadata
 import xyz.bluspring.unitytranslate.standalone.StandaloneConstants
-import xyz.bluspring.unitytranslate.standalone.UnityTranslateStandalone
 import java.awt.Dimension
 import java.awt.GraphicsEnvironment
 import java.awt.Toolkit
 import java.net.URI
+import java.net.URLClassLoader
+import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -34,7 +36,7 @@ private fun displayError(message: String) {
     val optionPane = JOptionPane(message, JOptionPane.ERROR_MESSAGE)
     val dialog = optionPane.createDialog("UnityTranslate")
 
-    dialog.setIconImage(ImageIO.read(UnityTranslateStandalone.ICON))
+    dialog.setIconImage(ImageIO.read(StandaloneConstants.ICON))
     dialog.isVisible = true
     dialog.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     exitProcess(1)
@@ -49,15 +51,33 @@ fun main() {
 
     try {
         runBlocking {
-            tryDownloadLibraries()
+            // Download all libraries and everything will be fine :D
+            val libraries = tryDownloadLibraries()
+
+            // See, told you it'd be fine! Time to load all the libraries and launch.
+            val urls = listOf(
+                UnityTranslate::class.java.protectionDomain.codeSource.location,
+                StandaloneConstants::class.java.protectionDomain.codeSource.location,
+            )
+            val classLoader = URLClassLoader((libraries.map { it.toUri().toURL() } + urls).toTypedArray(), FilteredClassLoader)
+
+            Thread.currentThread().contextClassLoader = classLoader
+
+            // We're gonna use reflection to launch, so we are able to use the correct class loader.
+            val standaloneClass = classLoader.loadClass("xyz.bluspring.unitytranslate.standalone.UnityTranslateStandalone")
+            standaloneClass.getDeclaredMethod("init").invoke(null)
         }
+    } catch (e: HandledException) {
+        UnityTranslate.logger.error("UnityTranslate has crashed!", e)
+        exitProcess(1)
     } catch (e: Throwable) {
+        // it wasn't fine D:
         UnityTranslate.logger.error("An error occurred whilst launching UnityTranslate!", e)
         displayError("An error occurred whilst launching UnityTranslate!\n\nError: ${e::class.java.name}: ${e.message ?: e.localizedMessage}")
     }
 }
 
-suspend fun tryDownloadLibraries() {
+suspend fun tryDownloadLibraries(): Collection<Path> {
     val mcVersion = metadata.minecraftVersion
     val mcMetaPath = metaPath / "${mcVersion}.json"
     if (!mcMetaPath.exists()) {
@@ -92,16 +112,18 @@ suspend fun tryDownloadLibraries() {
     }.asJsonObject
     val downloadInfos = mutableListOf<DownloadInfo>()
 
-    coroutineScope {
-        val clientJarInfo = ArtifactInfo.CODEC.decode(JsonOps.INSTANCE, metadata.getAsJsonObject("downloads").getAsJsonObject("client"))
-            .orThrow.first
-        val clientJarDownload = DownloadHelper.queue(clientJarInfo.url.toURL(), librariesPath / "com/mojang/minecraft/${mcVersion}/minecraft-$mcVersion.jar", sha1 = clientJarInfo.sha1)
-        downloadInfos.add(clientJarDownload)
+    val libraries = mutableListOf<Path>()
+    val clientJarInfo = ArtifactInfo.CODEC.decode(JsonOps.INSTANCE, metadata.getAsJsonObject("downloads").getAsJsonObject("client"))
+        .orThrow.first
+    val clientJarPath = librariesPath / "com/mojang/minecraft/${mcVersion}/minecraft-$mcVersion.jar"
+    val clientJarDownload = DownloadHelper.queue(clientJarInfo.url.toURL(), clientJarPath, sha1 = clientJarInfo.sha1)
+    downloadInfos.add(clientJarDownload)
+    libraries.add(clientJarPath)
 
-        libraries@for (element in metadata.getAsJsonArray("libraries")) {
-            val libMeta = element.asJsonObject
+    libraries@for (element in metadata.getAsJsonArray("libraries")) {
+        val libMeta = element.asJsonObject
 
-            // TODO: actually handle rules
+        // TODO: actually handle rules
 //            if (libMeta.has("rules")) {
 //                for (ruleJson in libMeta.getAsJsonArray("rules")) {
 //                    val rule = ruleJson.asJsonObject
@@ -111,13 +133,17 @@ suspend fun tryDownloadLibraries() {
 //                }
 //            }
 
-            val downloadData = ArtifactInfo.CODEC.decode(JsonOps.INSTANCE, libMeta.getAsJsonObject("downloads").getAsJsonObject("artifact"))
-                .orThrow.first
+        val downloadData = ArtifactInfo.CODEC.decode(JsonOps.INSTANCE, libMeta.getAsJsonObject("downloads").getAsJsonObject("artifact"))
+            .orThrow.first
 
-            val libraryDownload = DownloadHelper.queue(downloadData.url.toURL(), librariesPath / downloadData.path.orElseThrow(), sha1 = downloadData.sha1)
-            downloadInfos.add(libraryDownload)
-        }
+        val libraryPath = librariesPath / downloadData.path.orElseThrow()
+        val libraryDownload = DownloadHelper.queue(downloadData.url.toURL(), libraryPath, sha1 = downloadData.sha1)
+        downloadInfos.add(libraryDownload)
 
+        libraries.add(libraryPath)
+    }
+
+    coroutineScope {
         // If we have anything we need to download, let's create a thread for making a UI.
         if (downloadInfos.any { !it.isComplete }) {
             // Launch UI thread specifically to display download progress.
@@ -139,7 +165,7 @@ suspend fun tryDownloadLibraries() {
                 launch(Dispatchers.Default) {
                     val frame = JFrame("UnityTranslate")
                     frame.iconImage = withContext(Dispatchers.IO) {
-                        ImageIO.read(UnityTranslateStandalone.ICON)
+                        ImageIO.read(StandaloneConstants.ICON)
                     }
 
                     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
@@ -205,6 +231,8 @@ suspend fun tryDownloadLibraries() {
 
         downloadInfos.map { it.deferred }.awaitAll()
     }
+
+    return libraries
 }
 
 @JvmRecord
