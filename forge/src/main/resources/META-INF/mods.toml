@@ -1,0 +1,34 @@
+modLoader="klf"
+loaderVersion="[1,)"
+license="MIT"
+issueTrackerURL="${mod_sources}/issues"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+logoFile="icon.png"
+authors="BluSpring"
+description='''
+    ${mod_description}
+    '''
+
+[[dependencies.${mod_id}]]
+modId="forge"
+mandatory=true
+versionRange="[1,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="minecraft"
+mandatory=true
+versionRange="${minecraft_version_range_forge}"
+ordering="NONE"
+side="BOTH"
+
+[[mixins]]
+config = "${mod_id}.mixins.json"
+
+[[mixins]]
+config = "${mod_id}.forge.mixins.json"

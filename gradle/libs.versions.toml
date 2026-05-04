@@ -1,0 +1,82 @@
+[versions]
+# https://fabricmc.net/develop/
+fabric-loom = "1.16.+"
+# https://projects.neoforged.net/neoforged/moddevgradle
+moddevgradle = "2.0.141"
+# https://codeberg.org/stonecutter/fletching-table/src/branch/main/build.gradle.kts#L18
+fletching-table = "0.1.0-alpha.22"
+# https://stonecutter.kikugie.dev/
+stonecutter = "0.9.+"
+# https://github.com/GradleUp/shadow/releases
+shadow = "9.4.0"
+# https://github.com/modmuss50/mod-publish-plugin/blob/main/build.gradle.kts#L13
+mod-publish = "1.1.0"
+
+minecraft-standalone = "26.1.2" # The MC version for the standalone JAR
+datafixerupper = "9.0.19" # When updating MC for standalone, make sure to bump this too!
+
+# https://github.com/FabricMC/Mixin/blob/main/gradle.properties#L7
+mixin = "0.8.7"
+# https://github.com/LlamaLad7/MixinExtras/releases
+mixinextras = "0.5.4"
+
+# https://fabricmc.net/develop/
+fabric-loader = "0.19.2"
+# https://modrinth.com/mod/fabric-language-kotlin/versions
+fabric-kotlin = "1.13.11+kotlin.2.3.21"
+
+# https://modrinth.com/mod/kotlin-lang-forge/versions
+kotlinlangforge = "2.11.2-k2.3.21"
+
+# https://kotlinlang.org/docs/releases.html
+kotlin = "2.3.21"
+kotlinx-coroutines = "1.10.2"
+kotlinx-serialization = "1.8.1"
+
+# https://www.slf4j.org/download.html
+slf4j = "2.0.17"
+# https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j
+log4j = "2.25.4"
+# https://github.com/Minecrell/TerminalConsoleAppender
+terminalconsoleappender = "1.3.0"
+
+[bundles]
+kotlin = [
+    "kotlinx-coroutines-core", "kotlinx-coroutines-core-jvm", "kotlinx-coroutines-jdk8", "kotlinx-serialization-json"
+]
+logging = [
+    "slf4j-api", "slf4j-log4j",
+    "log4j-api", "log4j-core",
+    "terminalconsoleappender"
+]
+
+[libraries]
+fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-loader" }
+fabric-kotlin = { module = "net.fabricmc:fabric-language-kotlin", version.ref = "fabric-kotlin" }
+
+mixin = { module = "org.spongepowered:mixin", version.ref = "mixin" }
+mixinextras-common = { module = "io.github.llamalad7:mixinextras-common", version.ref = "mixinextras" }
+mixinextras-fabric = { module = "io.github.llamalad7:mixinextras-fabric", version.ref = "mixinextras" }
+mixinextras-forge = { module = "io.github.llamalad7:mixinextras-forge", version.ref = "mixinextras" }
+
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-core-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "kotlinx-coroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+slf4j-log4j = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.ref = "log4j" }
+log4j-api = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4j" }
+log4j-core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
+terminalconsoleappender = { module = "net.minecrell:terminalconsoleappender", version.ref = "terminalconsoleappender" }
+
+datafixerupper = { module = "com.mojang:datafixerupper", version.ref = "datafixerupper" }
+
+[plugins]
+moddevgradle = { id = "net.neoforged.moddev" }
+moddevgradle-legacy = { id = "net.neoforged.moddev.legacyforge" }
+kotlin = { id = "org.jetbrains.kotlin.jvm" }
+fletching-table = { id = "dev.kikugie.fletching-table", version.ref = "fletching-table" }
+shadow = { id = "com.gradleup.shadow" }
+mod-publish = { id = "me.modmuss50.mod-publish-plugin" }
+fabric-loom = { id = "net.fabricmc.fabric-loom" }

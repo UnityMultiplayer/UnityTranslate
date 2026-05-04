@@ -1,0 +1,6 @@
+{
+  "version": "${version}",
+  "minecraft_version": "${minecraft_version}",
+  "build_time": ${build_time},
+  "build_hash": "${build_hash}"
+}

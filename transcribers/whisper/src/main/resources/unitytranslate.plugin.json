@@ -1,0 +1,7 @@
+{
+  "name": "UnityTranslate Whisper Transcriber",
+  "group": "xyz.bluspring.unitytranslate",
+  "id": "whisper_transcriber",
+  "version": "${version}",
+  "authors": ["BluSpring", "CADIndie"]
+}

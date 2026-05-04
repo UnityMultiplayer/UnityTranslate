@@ -1,0 +1,16 @@
+--sun-misc-unsafe-memory-access=allow
+--enable-native-access=ALL-UNNAMED
+-Djava.library.path=${natives_directory}
+-Djna.tmpdir=${natives_directory}
+-Dorg.lwjgl.system.SharedLibraryExtractPath=${natives_directory}
+-Dio.netty.native.workdir=${natives_directory}
+
+-Xmx2G
+-XX:+UseStringDeduplication
+-XX:+UseCompactObjectHeaders
+
+# windows
+-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump
+
+# macos
+-XstartOnFirstThread
