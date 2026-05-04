@@ -28,7 +28,7 @@ object DownloadHelper {
         createTemp: Boolean = true,
         overwrite: Boolean = false,
     ): DownloadInfo {
-        val info = DownloadInfo.Mutable()
+        val info = DownloadInfo.Mutable(path, url)
 
         if (!overwrite && path.exists()) {
             logger.debug("Already downloaded ${path.absolutePathString()}, no need to download it again.")
@@ -44,6 +44,9 @@ object DownloadHelper {
             val startTime = System.currentTimeMillis()
 
             try {
+                info.onStartDownload.invoker().run()
+                info.hasStarted = true
+
                 logger.debug("Started download of {} to {}, {}.",
                     url,
                     path.absolutePathString(),
@@ -93,8 +96,30 @@ object DownloadHelper {
                 logger.error("Failed to download $url into ${path.absolutePathString()}!", e)
                 throw e
             }
+        }.apply {
+            invokeOnCompletion {
+                info.onFinishDownload.invoker().run()
+            }
         }
 
         return info
+    }
+
+    fun Long.bytesToNearestLarge(): String {
+        var value = this.toDouble()
+        var type = "KiB"
+
+        if (value <= 1024.0 * 1024) {
+            value /= 1024.0
+            type = "KiB"
+        } else if (value <= 1024.0 * 1024 * 1024) {
+            value /= 1024.0 * 1024.0
+            type = "MiB"
+        } else if (value <= 1024.0 * 1024 * 1024 * 1024) {
+            value /= 1024.0 * 1024.0 * 1024.0
+            type = "GiB"
+        }
+
+        return "%.2f $type".format(value)
     }
 }

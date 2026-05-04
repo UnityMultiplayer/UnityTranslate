@@ -7,18 +7,20 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import kotlinx.coroutines.*
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadHelper
+import xyz.bluspring.unitytranslate.api.v2.download.DownloadHelper.bytesToNearestLarge
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadInfo
 import xyz.bluspring.unitytranslate.standalone.Metadata
 import xyz.bluspring.unitytranslate.standalone.StandaloneConstants
 import xyz.bluspring.unitytranslate.standalone.UnityTranslateStandalone
+import java.awt.Dimension
 import java.awt.GraphicsEnvironment
 import java.awt.Toolkit
 import java.net.URI
 import java.nio.file.StandardOpenOption
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import javax.imageio.ImageIO
-import javax.swing.JOptionPane
-import javax.swing.WindowConstants
+import javax.swing.*
 import kotlin.io.path.*
 import kotlin.system.exitProcess
 
@@ -114,6 +116,91 @@ suspend fun tryDownloadLibraries() {
 
             val libraryDownload = DownloadHelper.queue(downloadData.url.toURL(), librariesPath / downloadData.path.orElseThrow(), sha1 = downloadData.sha1)
             downloadInfos.add(libraryDownload)
+        }
+
+        // If we have anything we need to download, let's create a thread for making a UI.
+        if (downloadInfos.any { !it.isComplete }) {
+            // Launch UI thread specifically to display download progress.
+            coroutineScope {
+                val infosToBars = ConcurrentHashMap<DownloadInfo, Pair<JProgressBar, JLabel>>()
+
+                launch(Dispatchers.Default) {
+                    while (downloadInfos.any { !it.isComplete }) {
+                        for ((info, pair) in infosToBars) {
+                            val (bar, label) = pair
+
+                            bar.string = "test"
+                            bar.value = (info.progress * 100.0).toInt()
+                            label.text = "${info.downloadedBytes.bytesToNearestLarge()} / ${info.totalBytes.bytesToNearestLarge()}"
+                        }
+                    }
+                }
+
+                launch(Dispatchers.Default) {
+                    val frame = JFrame("UnityTranslate")
+                    frame.iconImage = withContext(Dispatchers.IO) {
+                        ImageIO.read(UnityTranslateStandalone.ICON)
+                    }
+
+                    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+                    frame.minimumSize = Dimension(600, 200)
+                    frame.preferredSize = Dimension(600, 200)
+                    frame.maximumSize = Dimension(600, 600)
+                    frame.setLocationRelativeTo(null)
+
+                    val panel = JPanel()
+                    panel.isOpaque = false
+                    panel.layout = BoxLayout(panel, BoxLayout.Y_AXIS)
+                    panel.border = BorderFactory.createEmptyBorder(8, 8, 8, 8)
+
+                    val mainPanel = JScrollPane(panel)
+                    mainPanel.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+                    frame.contentPane.add(mainPanel)
+
+                    for (info in downloadInfos) {
+                        // We don't need to create something for this.
+                        if (info.isComplete)
+                            continue
+
+                        val downloadPanel = JPanel()
+                        downloadPanel.isOpaque = false
+                        downloadPanel.layout = BoxLayout(downloadPanel, BoxLayout.Y_AXIS)
+                        downloadPanel.isVisible = info.hasStarted
+
+                        val label = JLabel("Downloading ${info.url}...")
+                        label.maximumSize = Dimension(550, 20)
+                        downloadPanel.add(label)
+
+                        val progressBar = JProgressBar(0, 100)
+                        progressBar.maximumSize = Dimension(1024, 20)
+                        downloadPanel.add(progressBar)
+
+                        val progressLabel = JLabel("0.00 KiB / 0.00 KiB")
+                        downloadPanel.add(progressLabel)
+
+                        infosToBars[info] = progressBar to progressLabel
+
+                        info.onStartDownload.register {
+                            downloadPanel.isVisible = true
+                        }
+
+                        info.onFinishDownload.register {
+                            downloadPanel.isVisible = false
+                            frame.remove(downloadPanel)
+
+                            if (downloadInfos.all { it.isComplete }) {
+                                frame.isVisible = false
+                                frame.dispose()
+                            }
+                        }
+
+                        panel.add(downloadPanel)
+                    }
+
+                    frame.pack()
+                    frame.isVisible = true
+                }
+            }
         }
 
         downloadInfos.map { it.deferred }.awaitAll()

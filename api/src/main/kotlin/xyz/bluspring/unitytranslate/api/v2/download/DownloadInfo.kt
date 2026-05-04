@@ -3,11 +3,24 @@ package xyz.bluspring.unitytranslate.api.v2.download
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 import org.jetbrains.annotations.ApiStatus
+import xyz.bluspring.unitytranslate.api.v2.event.Event
+import java.net.URL
+import java.nio.file.Path
 
 /**
  * Provides information towards the current download.
  */
 sealed interface DownloadInfo {
+    /**
+     * The file path of the download.
+     */
+    val path: Path
+
+    /**
+     * The URL of the download.
+     */
+    val url: URL
+
     /**
      * Total amount of data downloaded, in bytes.
      */
@@ -26,7 +39,7 @@ sealed interface DownloadInfo {
      */
     val remainingBytes: Long
         get() {
-            if (deferred.isCompleted && !deferred.isCancelled)
+            if (isComplete)
                 return 0
 
             if (totalBytes < 0)
@@ -41,23 +54,47 @@ sealed interface DownloadInfo {
      */
     val progress: Double
         get() {
-            if (deferred.isCompleted && !deferred.isCancelled)
+            if (isComplete)
                 return 1.0
 
-            if (totalBytes < 0)
+            if (totalBytes <= 0)
                 return 0.0
 
-            return (downloadedBytes / totalBytes).toDouble()
+            return (downloadedBytes.toDouble() / totalBytes.toDouble())
         }
 
     /**
      * A [CompletableDeferred] to attach to for automatically detecting when the download is completed.
      * It is highly recommended to use this for detecting a completed download, and only use the other values as information to display to the user.
+     *
+     * Do not call complete on this value manually. This must be handled by the downloader itself.
      */
     val deferred: Deferred<Unit>
 
+    /**
+     * Returns as completed if the [deferred] is completed.
+     */
+    val isComplete: Boolean
+        get() = deferred.isCompleted && !deferred.isCancelled
+
+    /**
+     * Has the download started already?
+     * Returns true if the
+     */
+    val hasStarted: Boolean
+
+    /**
+     * Represents an event that will get called when this download starts.
+     */
+    val onStartDownload: Event<Runnable>
+
+    /**
+     * Represents an event that will get called when this download finishes. Whether it completed in a failure or not is handled by [deferred].
+     */
+    val onFinishDownload: Event<Runnable>
+
     @ApiStatus.Internal
-    open class Mutable : DownloadInfo {
+    open class Mutable(override val path: Path, override val url: URL) : DownloadInfo {
         override var downloadedBytes: Long = 0
             internal set
 
@@ -66,5 +103,23 @@ sealed interface DownloadInfo {
 
         override lateinit var deferred: Deferred<Unit>
             internal set
+
+        override var hasStarted: Boolean = false
+
+        override val onStartDownload: Event<Runnable> = Event(Runnable::class.java) { values ->
+            Runnable {
+                for (runnable in values) {
+                    runnable.run()
+                }
+            }
+        }
+
+        override val onFinishDownload: Event<Runnable> = Event(Runnable::class.java) { values ->
+            Runnable {
+                for (runnable in values) {
+                    runnable.run()
+                }
+            }
+        }
     }
 }
