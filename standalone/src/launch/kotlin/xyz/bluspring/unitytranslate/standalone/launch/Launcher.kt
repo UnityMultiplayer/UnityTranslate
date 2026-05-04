@@ -73,6 +73,8 @@ suspend fun tryDownloadLibraries() {
             throw IllegalStateException("Failed to find metadata for Minecraft version ${mcVersion}!")
         }
 
+        mcMetaPath.createParentDirectories()
+
         val metadataUrl = URI.create(versionData.get("url").asString).toURL()
         withContext(Dispatchers.IO) {
             metadataUrl.openStream().use {
@@ -87,12 +89,11 @@ suspend fun tryDownloadLibraries() {
         }
     }.asJsonObject
     val downloadInfos = mutableListOf<DownloadInfo>()
-    val parentDeferred = CompletableDeferred<Unit>()
 
     coroutineScope {
         val clientJarInfo = ArtifactInfo.CODEC.decode(JsonOps.INSTANCE, metadata.getAsJsonObject("downloads").getAsJsonObject("client"))
             .orThrow.first
-        val clientJarDownload = DownloadHelper.queue(clientJarInfo.url.toURL(), librariesPath / "com/mojang/minecraft/${mcVersion}/minecraft-$mcVersion.jar", sha1 = clientJarInfo.sha1, parentDeferred = parentDeferred)
+        val clientJarDownload = DownloadHelper.queue(clientJarInfo.url.toURL(), librariesPath / "com/mojang/minecraft/${mcVersion}/minecraft-$mcVersion.jar", sha1 = clientJarInfo.sha1)
         downloadInfos.add(clientJarDownload)
 
         libraries@for (element in metadata.getAsJsonArray("libraries")) {
@@ -111,9 +112,11 @@ suspend fun tryDownloadLibraries() {
             val downloadData = ArtifactInfo.CODEC.decode(JsonOps.INSTANCE, libMeta.getAsJsonObject("downloads").getAsJsonObject("artifact"))
                 .orThrow.first
 
-            val libraryDownload = DownloadHelper.queue(downloadData.url.toURL(), librariesPath / downloadData.path.orElseThrow(), sha1 = downloadData.sha1, parentDeferred = parentDeferred)
+            val libraryDownload = DownloadHelper.queue(downloadData.url.toURL(), librariesPath / downloadData.path.orElseThrow(), sha1 = downloadData.sha1)
             downloadInfos.add(libraryDownload)
         }
+
+        downloadInfos.map { it.deferred }.awaitAll()
     }
 }
 

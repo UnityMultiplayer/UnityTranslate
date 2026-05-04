@@ -1,6 +1,7 @@
 package xyz.bluspring.unitytranslate.api.v2.download
 
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
 import org.jetbrains.annotations.ApiStatus
 
 /**
@@ -53,16 +54,17 @@ sealed interface DownloadInfo {
      * A [CompletableDeferred] to attach to for automatically detecting when the download is completed.
      * It is highly recommended to use this for detecting a completed download, and only use the other values as information to display to the user.
      */
-    val deferred: CompletableDeferred<Unit>
+    val deferred: Deferred<Unit>
 
     @ApiStatus.Internal
-    open class Mutable(parentDeferred: CompletableDeferred<Unit>? = null) : DownloadInfo {
+    open class Mutable : DownloadInfo {
         override var downloadedBytes: Long = 0
             internal set
 
         override var totalBytes: Long = 0
             internal set
 
-        override val deferred: CompletableDeferred<Unit> = CompletableDeferred(parentDeferred)
+        override lateinit var deferred: Deferred<Unit>
+            internal set
     }
 }
