@@ -34,8 +34,7 @@ UnityTranslate is licensed under the [Artistic License 2.0](LICENSE), with a few
   - A modified build of UnityTranslate built for Hytale.
   - A modified build of UnityTranslate built for Minecraft 26w14a.
   - A modified build of UnityTranslate built for Minecraft 26.2 Snapshot 3.
-  - A modified build of UnityTranslate Standalone built for PowerPC systems. 
-
+  - A modified build of UnityTranslate Standalone built for PowerPC systems.
   <br>
   
   Consequently, you will not be able to release:
@@ -43,10 +42,11 @@ UnityTranslate is licensed under the [Artistic License 2.0](LICENSE), with a few
   - A separated software built on top of UnityTranslate.
 
   <br>
-
   If UnityTranslate did not already exist for the platform or version at the time of your modified project's publication, but was then officially released
   after your project's publication, you may continue maintaining your modified project without any repercussions.
-  <br>
+  <br><br>
   For example: If a modified UnityTranslate project named LegacyTranslate is published for Minecraft 1.13.1 on the 4th of June 2026, and UnityTranslate
   releases an official build for Minecraft 1.13.1 on the 12th of July 2027, both LegacyTranslate and UnityTranslate are allowed to continue
   co-existing with each other.
+
+These terms do not apply to UnityTranslate versions prior to v2.0, which is licensed under the MIT license.
