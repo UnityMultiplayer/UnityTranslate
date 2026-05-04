@@ -14,8 +14,6 @@ object UnityTranslate {
     val logger: Logger = LoggerFactory.getLogger("UnityTranslate")
 
     fun init() {
-
-
         PluginManager.loadPlugins()
     }
 

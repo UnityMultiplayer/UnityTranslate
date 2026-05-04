@@ -6,7 +6,11 @@ object FilteredClassLoader : ClassLoader() {
     }
 
     override fun loadClass(name: String, resolve: Boolean): Class<*>? {
-        if ((name.startsWith("xyz.bluspring.unitytranslate.") || name.startsWith("xyz/bluspring/unitytranslate/")) && !(name.startsWith("xyz.bluspring.unitytranslate.library.") || name.startsWith("xyz/bluspring/unitytranslate/library/")))
+        if (
+            (name.startsWith("xyz.bluspring.unitytranslate.") || name.startsWith("xyz/bluspring/unitytranslate/"))
+                && !(name.startsWith("xyz.bluspring.unitytranslate.library.") || name.startsWith("xyz/bluspring/unitytranslate/library/"))
+                && !(name.startsWith("xyz.bluspring.unitytranslate.transcriber.") || name.startsWith("xyz/bluspring/unitytranslate/transcriber/"))
+        )
             throw ClassNotFoundException(name)
 
         return super.loadClass(name, resolve)

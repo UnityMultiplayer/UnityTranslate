@@ -6,6 +6,7 @@ import com.mojang.serialization.JsonOps
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import kotlinx.coroutines.*
 import xyz.bluspring.unitytranslate.UnityTranslate
+import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadHelper
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadHelper.bytesToNearestLarge
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadInfo
@@ -56,6 +57,7 @@ fun main() {
 
             // See, told you it'd be fine! Time to load all the libraries and launch.
             val urls = listOf(
+                UnityTranslateApi::class.java.protectionDomain.codeSource.location,
                 UnityTranslate::class.java.protectionDomain.codeSource.location,
                 StandaloneConstants::class.java.protectionDomain.codeSource.location,
             )
