@@ -161,6 +161,8 @@ fun Project.setupCommonUnmodded(module: String, commonProj: Project? = null, jav
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         if (commonProj != null)
             from(zipTree(commonProj.tasks.named<Jar>("jar").get().archiveFile))
+
+        relocate("gg.essential", "xyz.bluspring.unitytranslate.shaded.essential")
     }
 
     tasks.named<ProcessResources>("processResources") {
