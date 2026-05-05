@@ -44,4 +44,12 @@ include(":standalone")
 include(":transcribers", ":transcribers:google", ":transcribers:whisper")
 include(":relay")
 
+includeBuild(".")
+includeBuild("elementa") {
+    dependencySubstitution {
+        substitute(module("gg.essential:elementa")).using(project(":"))
+        substitute(module("gg.essential:elementa-unstable-layoutdsl")).using(project(":unstable:layoutdsl"))
+    }
+}
+
 rootProject.name = "UnityTranslate"

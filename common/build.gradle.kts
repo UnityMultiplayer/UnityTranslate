@@ -37,4 +37,5 @@ dependencies {
     api(libs.fabric.kotlin) // Provides all the Kotlin stuff we'd ever need
 //    annotationProcessor(libs.mixinextras.common) // MixinExtras
     api(libs.mixinextras.common)
+    api(libs.bundles.elementa)
 }

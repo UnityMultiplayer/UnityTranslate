@@ -44,6 +44,9 @@ dependencies {
     shadedDep(libs.slf4j.api.get())
     "launchImplementation"(libs.bundles.logging)
     shadedDep(libs.bundles.logging)
+
+    api(libs.bundles.elementa)
+    shadedDep(libs.bundles.elementa)
 }
 
 tasks {

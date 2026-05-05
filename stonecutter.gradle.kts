@@ -23,6 +23,7 @@ allprojects {
         maven("https://maven.fabricmc.net")
         maven("https://libraries.minecraft.net")
         maven("https://mvn.devos.one/releases")
+        maven("https://repo.essential.gg/repository/maven-public")
     }
 
     group = mod.group
