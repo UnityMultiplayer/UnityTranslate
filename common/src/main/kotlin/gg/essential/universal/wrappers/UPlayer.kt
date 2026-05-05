@@ -17,7 +17,7 @@ object UPlayer {
 
     @JvmStatic
     fun sendClientSideMessage(message: Component) {
-        UMinecraft.getMinecraft().gui.hud.chat.addClientSystemMessage(message)
+//        UMinecraft.getMinecraft().gui.hud.chat.addClientSystemMessage(message)
     }
 
     @JvmStatic

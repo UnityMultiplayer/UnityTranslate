@@ -1,12 +1,12 @@
 package gg.essential.universal.render
 
-import com.mojang.blaze3d.GpuFormat
 import com.mojang.blaze3d.buffers.GpuBuffer
 import com.mojang.blaze3d.opengl.GlTexture
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.AddressMode
 import com.mojang.blaze3d.textures.FilterMode
+import com.mojang.blaze3d.textures.TextureFormat
 import gg.essential.universal.vertex.UBuiltBuffer
 import gg.essential.universal.vertex.UBuiltBufferInternal
 import net.minecraft.client.Minecraft
@@ -36,7 +36,7 @@ internal class URenderPass : AutoCloseable {
         val mc: RenderPass
         init {
             val dynamicUniforms = RenderSystem.getDynamicUniforms().writeTransform(
-                RenderSystem.getModelViewMatrixCopy(),
+                RenderSystem.getModelViewMatrix(),
                 org.joml.Vector4f(1f, 1f, 1f, 1f),
                 org.joml.Vector3f(),
                 org.joml.Matrix4f(),
@@ -96,7 +96,7 @@ internal class URenderPass : AutoCloseable {
         }
 
         override fun texture(name: String, textureGlId: Int): DrawCallBuilder = apply {
-            val texture = object : GlTexture(USAGE_TEXTURE_BINDING, "", GpuFormat.RGBA8_UNORM, 0, 0, 0, 1, textureGlId) {
+            val texture = object : GlTexture(USAGE_TEXTURE_BINDING, "", TextureFormat.RGBA8, 0, 0, 0, 1, textureGlId) {
             }
             val sampler = RenderSystem.getSamplerCache().getSampler(AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE, FilterMode.LINEAR, FilterMode.NEAREST, true)
             mc.bindTexture(name, RenderSystem.getDevice().createTextureView(texture), sampler)

@@ -58,15 +58,15 @@ object UMinecraft {
 
     @JvmStatic
     fun getChatGUI(): ChatComponent? =
-        getMinecraft().gui.hud.chat
+        getMinecraft().gui.chat
 
     @JvmStatic
     fun getSettings(): Options = getMinecraft().options
 
     @JvmStatic
     var currentScreenObj: Any?
-        get() = getMinecraft().gui.screen()
-        set(value) = getMinecraft().gui.setScreen(value as Screen?)
+        get() = getMinecraft().screen
+        set(value) = getMinecraft().setScreen(value as Screen?)
 
 
     @JvmStatic

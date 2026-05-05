@@ -47,7 +47,7 @@ internal class AdvancedDrawContext : AutoCloseable {
             0f, width.toFloat() / scaleFactor,
             height.toFloat() / scaleFactor, 0f,
             1000f, 21000f,
-            RenderSystem.getDevice().deviceInfo.isZZeroToOne,
+            RenderSystem.getDevice().isZZeroToOne,
         )
         val projectionMatrixBuffer = projectionMatrix.getBuffer(projection)
         RenderSystem.setProjectionMatrix(projectionMatrixBuffer, ProjectionType.ORTHOGRAPHIC)

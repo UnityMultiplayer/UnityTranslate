@@ -1,8 +1,8 @@
 package gg.essential.universal.utils
 
-import com.mojang.blaze3d.GpuFormat
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.GpuTexture
+import com.mojang.blaze3d.textures.TextureFormat
 
 /**
  * Allocates temporary textures, which are valid for one frame, from a pool.
@@ -68,7 +68,7 @@ internal class TemporaryTextureAllocator(
         var texture = gpuDevice.createTexture(
             { "Pre-rendered texture" },
             GpuTexture.USAGE_COPY_DST or GpuTexture.USAGE_COPY_SRC or GpuTexture.USAGE_RENDER_ATTACHMENT or GpuTexture.USAGE_TEXTURE_BINDING,
-            GpuFormat.RGBA8_UNORM,
+            TextureFormat.RGBA8,
             width,
             height,
             1,
@@ -78,7 +78,7 @@ internal class TemporaryTextureAllocator(
         var depthTexture = gpuDevice.createTexture(
             { "Pre-rendered depth texture" },
             GpuTexture.USAGE_COPY_DST or GpuTexture.USAGE_COPY_SRC or GpuTexture.USAGE_RENDER_ATTACHMENT,
-            GpuFormat.D32_FLOAT,
+            TextureFormat.DEPTH32,
             width,
             height,
             1,

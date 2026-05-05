@@ -1,7 +1,7 @@
 package gg.essential.universal.shader
 
-
-import com.mojang.blaze3d.platform.BlendFactor
+import com.mojang.blaze3d.platform.DestFactor
+import com.mojang.blaze3d.platform.SourceFactor
 import gg.essential.universal.UGraphics
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
@@ -83,21 +83,32 @@ data class BlendState(
         ONE_MINUS_DST_ALPHA("1-dstalpha", GL11.GL_ONE_MINUS_DST_ALPHA),
         ;
 
-        internal val mcSourceFactor: BlendFactor
+        internal val mcSourceFactor: SourceFactor
             get() = when (this) {
-                ZERO -> BlendFactor.ZERO
-                ONE -> BlendFactor.ONE
-                SRC_COLOR -> BlendFactor.SRC_COLOR
-                ONE_MINUS_SRC_COLOR -> BlendFactor.ONE_MINUS_SRC_COLOR
-                DST_COLOR -> BlendFactor.DST_COLOR
-                ONE_MINUS_DST_COLOR -> BlendFactor.ONE_MINUS_DST_COLOR
-                SRC_ALPHA -> BlendFactor.SRC_ALPHA
-                ONE_MINUS_SRC_ALPHA -> BlendFactor.ONE_MINUS_SRC_ALPHA
-                DST_ALPHA -> BlendFactor.DST_ALPHA
-                ONE_MINUS_DST_ALPHA -> BlendFactor.ONE_MINUS_DST_ALPHA
+                ZERO -> SourceFactor.ZERO
+                ONE -> SourceFactor.ONE
+                SRC_COLOR -> SourceFactor.SRC_COLOR
+                ONE_MINUS_SRC_COLOR -> SourceFactor.ONE_MINUS_SRC_COLOR
+                DST_COLOR -> SourceFactor.DST_COLOR
+                ONE_MINUS_DST_COLOR -> SourceFactor.ONE_MINUS_DST_COLOR
+                SRC_ALPHA -> SourceFactor.SRC_ALPHA
+                ONE_MINUS_SRC_ALPHA -> SourceFactor.ONE_MINUS_SRC_ALPHA
+                DST_ALPHA -> SourceFactor.DST_ALPHA
+                ONE_MINUS_DST_ALPHA -> SourceFactor.ONE_MINUS_DST_ALPHA
             }
-        internal val mcDestFactor: BlendFactor
-            get() = mcSourceFactor
+        internal val mcDestFactor: DestFactor
+            get() = when (this) {
+                ZERO -> DestFactor.ZERO
+                ONE -> DestFactor.ONE
+                SRC_COLOR -> DestFactor.SRC_COLOR
+                ONE_MINUS_SRC_COLOR -> DestFactor.ONE_MINUS_SRC_COLOR
+                DST_COLOR -> DestFactor.DST_COLOR
+                ONE_MINUS_DST_COLOR -> DestFactor.ONE_MINUS_DST_COLOR
+                SRC_ALPHA -> DestFactor.SRC_ALPHA
+                ONE_MINUS_SRC_ALPHA -> DestFactor.ONE_MINUS_SRC_ALPHA
+                DST_ALPHA -> DestFactor.DST_ALPHA
+                ONE_MINUS_DST_ALPHA -> DestFactor.ONE_MINUS_DST_ALPHA
+            }
 
         companion object {
             private val byGlId = values().associateBy { it.glId }
