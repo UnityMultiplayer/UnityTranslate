@@ -102,7 +102,7 @@ fun main() {
                 val minecraftVersion = metadata.minecraftVersion
 
                 // We're most likely in the development environment, let's set up for that.
-                tryDownloadLibraries(minecraftVersion)
+                tryDownloadLibraries(metadata.version, minecraftVersion, false)
             } else {
                 // We're not in a development environment, let's make sure everything is correct first.
                 var needsJava = false

@@ -21,7 +21,7 @@ data class Metadata(
                     .forGetter(Metadata::minecraftVersion),
                 Codec.LONG.fieldOf("build_time")
                     .forGetter(Metadata::buildTime),
-                Codec.STRING.fieldOf("build_has")
+                Codec.STRING.fieldOf("build_hash")
                     .forGetter(Metadata::buildHash),
             )
                 .apply(instance, ::Metadata)
