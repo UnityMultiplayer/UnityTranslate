@@ -172,6 +172,7 @@ suspend fun tryDownloadLibraries(unityTranslateVersion: String?, minecraftVersio
     var mcVersion = minecraftVersion
     var utVersion = unityTranslateVersion
     val downloadInfos = mutableListOf<DownloadInfo>()
+    val libraries = mutableListOf<Path>()
 
     val hasUpdate = try {
         UpdateHelper.checkHasUpdate(unityTranslateVersion)
@@ -189,8 +190,15 @@ suspend fun tryDownloadLibraries(unityTranslateVersion: String?, minecraftVersio
         if (javaUrlString != null) {
             val javaUrl = URI.create(javaUrlString).toURL()
             val hash = URI.create("$javaUrlString.sha256sum.txt").toURL().readText().take(64)
+            val info = DownloadHelper.queue(javaUrl, runtimePath / "microsoft-${LauncherMeta.javaVersion}${if (javaUrlString.endsWith(".zip")) ".zip" else ".tar.gz"}", hash = DownloadHash.Sha256(hash))
 
-            downloadInfos.add(DownloadHelper.queue(javaUrl, runtimePath / "microsoft-${LauncherMeta.javaVersion}", hash = DownloadHash.Sha256(hash)))
+            info.onFinishDownload.register {
+                if (!info.deferred.isCancelled && info.downloadedBytes > 0) {
+                    // TODO: unzip Java
+                }
+            }
+
+            downloadInfos.add(info)
         } else {
             logger.warn("Could not find a suitable Java version to download! You're on your own here!")
         }
@@ -218,7 +226,9 @@ suspend fun tryDownloadLibraries(unityTranslateVersion: String?, minecraftVersio
 
             if (url != null && utVersion != null) {
                 logger.info("Downloading UnityTranslate Standalone v${utVersion}...")
-                downloadInfos.add(DownloadHelper.queue(url.url, buildUnityTranslatePath(utVersion), sha1 = url.sha1.orElse(null)))
+                val utPath = buildUnityTranslatePath(utVersion)
+                downloadInfos.add(DownloadHelper.queue(url.url, utPath, sha1 = url.sha1.orElse(null)))
+                libraries.add(utPath)
             }
         }
     }
@@ -262,7 +272,6 @@ suspend fun tryDownloadLibraries(unityTranslateVersion: String?, minecraftVersio
         }
     }.asJsonObject
 
-    val libraries = mutableListOf<Path>()
     val clientJarInfo = ArtifactInfo.CODEC.decode(JsonOps.INSTANCE, metadata.getAsJsonObject("downloads").getAsJsonObject("client"))
         .orThrow.first
     val clientJarPath = librariesPath / "com/mojang/minecraft/${mcVersion}/minecraft-$mcVersion.jar"
