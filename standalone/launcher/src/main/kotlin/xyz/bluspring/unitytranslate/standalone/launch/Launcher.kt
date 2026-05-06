@@ -91,7 +91,8 @@ fun main() {
 
     try {
         runBlocking {
-            val unityTranslateClass = runCatching { Class.forName("xyz.bluspring.unitytranslate.UnityTranslate") }.getOrNull()
+            val appClassLoader = FilteredClassLoader::class.java.classLoader
+            val unityTranslateClass = runCatching { Class.forName("xyz.bluspring.unitytranslate.UnityTranslate", false, appClassLoader) }.getOrNull()
             var javaPath: String = ProcessHandle.current().info().command().orElseThrow()
             lateinit var metadata: Metadata
 
@@ -133,9 +134,9 @@ fun main() {
                 val urls = listOfNotNull(
                     UnityTranslateApi::class.java.protectionDomain.codeSource.location,
 
-                    runCatching { Class.forName("xyz.bluspring.unitytranslate.shared.Constants") }.getOrNull()?.protectionDomain?.codeSource?.location,
+                    Class.forName("xyz.bluspring.unitytranslate.shared.Constants", false, appClassLoader).protectionDomain.codeSource.location,
                     unityTranslateClass.protectionDomain.codeSource.location,
-                    runCatching { Class.forName("xyz.bluspring.unitytranslate.standalone.UnityTranslateStandalone") }.getOrNull()?.protectionDomain?.codeSource?.location,
+                    Class.forName("xyz.bluspring.unitytranslate.standalone.StandalonePlatformProxy", false, appClassLoader).protectionDomain.codeSource.location,
                 )
                 val classLoader = URLClassLoader((urls + libraries.paths.map { it.toUri().toURL() }).toTypedArray(), FilteredClassLoader)
 
