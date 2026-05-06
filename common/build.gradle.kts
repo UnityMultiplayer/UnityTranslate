@@ -33,6 +33,10 @@ dependencies {
         isTransitive = false
     }
 
+    api(project(":shared")) {
+        isTransitive = false
+    }
+
     api(libs.mixin) // Mixin
     api(libs.fabric.kotlin) // Provides all the Kotlin stuff we'd ever need
 //    annotationProcessor(libs.mixinextras.common) // MixinExtras

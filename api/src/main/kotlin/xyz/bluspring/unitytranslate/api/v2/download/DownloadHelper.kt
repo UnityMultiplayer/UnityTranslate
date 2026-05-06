@@ -9,7 +9,6 @@ import java.nio.file.OpenOption
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import java.security.DigestOutputStream
-import java.security.MessageDigest
 import kotlin.io.path.*
 
 /**
@@ -21,10 +20,70 @@ object DownloadHelper {
     private val scope = CoroutineScope(context)
     private val logger: Logger = LoggerFactory.getLogger("UnityTranslate Download Helper")
 
+    @JvmStatic
+    fun <T : URLProvider> findSuitableUrl(urls: Collection<T>): T? {
+        if (urls.isEmpty())
+            throw IllegalArgumentException("URLs cannot be empty!")
+
+        if (urls.size == 1)
+            return urls.first()
+
+        for (url in urls) {
+            try {
+                val connection = url.url.openConnection() as HttpURLConnection
+                try {
+                    connection.requestMethod = "HEAD"
+                    if (connection.responseCode == 200)
+                        return url
+                } finally {
+                    connection.disconnect()
+                }
+            } catch (_: Throwable) {}
+        }
+
+        return null
+    }
+
+    @JvmStatic
+    fun findSuitableUrl(urls: Collection<URL>): URL? {
+        if (urls.isEmpty())
+            throw IllegalArgumentException("URLs cannot be empty!")
+
+        if (urls.size == 1)
+            return urls.first()
+
+        for (url in urls) {
+            try {
+                val connection = url.openConnection() as HttpURLConnection
+                try {
+                    connection.requestMethod = "HEAD"
+                    if (connection.responseCode == 200)
+                        return url
+                } finally {
+                    connection.disconnect()
+                }
+            } catch (_: Throwable) {}
+        }
+
+        return null
+    }
+
+    @JvmStatic
     fun queue(
         url: URL, path: Path,
         vararg options: OpenOption = arrayOf(StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING),
         sha1: String? = null,
+        createTemp: Boolean = true,
+        overwrite: Boolean = false,
+    ): DownloadInfo {
+        return queue(url, path, hash = if (sha1 != null) DownloadHash.Sha1(sha1) else null, createTemp = createTemp, overwrite = overwrite, options = options)
+    }
+
+    @JvmStatic
+    fun queue(
+        url: URL, path: Path,
+        vararg options: OpenOption = arrayOf(StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING),
+        hash: DownloadHash? = null,
         createTemp: Boolean = true,
         overwrite: Boolean = false,
     ): DownloadInfo {
@@ -54,7 +113,7 @@ object DownloadHelper {
                 )
                 path.createParentDirectories() // Just in case...
 
-                val digest = if (sha1 != null) MessageDigest.getInstance("SHA-1") else null
+                val digest = hash?.createDigest()
 
                 tempPath.outputStream(*options).use { fileStream ->
                     val actualStream = DigestOutputStream(fileStream, digest)
@@ -77,10 +136,10 @@ object DownloadHelper {
                 }
 
                 // Time to validate the file and make sure it's correct.
-                if (sha1 != null && digest != null) {
+                if (hash?.hash != null && digest != null) {
                     val actualHash = digest.digest().toHexString(HexFormat.Default)
-                    if (actualHash != sha1) {
-                        throw SecurityException("Invalid SHA-1 hash for ${path.name}! (expected: $sha1, got: $actualHash)")
+                    if (actualHash != hash.hash) {
+                        throw SecurityException("Invalid ${hash.type} hash for ${path.name}! (expected: ${hash.hash}, got: $actualHash)")
                     }
                 }
 
@@ -105,6 +164,7 @@ object DownloadHelper {
         return info
     }
 
+    @JvmStatic
     fun Long.bytesToNearestLarge(): String {
         var value = this.toDouble()
         var type = "KiB"

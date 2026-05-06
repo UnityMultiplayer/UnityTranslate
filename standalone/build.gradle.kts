@@ -14,36 +14,41 @@ val buildHash = try {
 }
 
 setupCommonUnmodded("standalone", javaVersion = 25)
-val shadedDep by configurations.getting
 
-val launch by sourceSets.creating
+allprojects {
+    apply(plugin = "java")
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "com.gradleup.shadow")
 
-afterEvaluate {
-    sourceSets {
-        launch.compileClasspath += configurations.getByName("minecraftNamedCompile")
+    if (project.name == "launcher")
+        setupCommonUnmodded("launcher", javaVersion = if (System.getenv("GITHUB_RUN_NUMBER") == null) 25 else 17)
+
+    dependencies {
+        val libs = rootProject.project.libs
+        shadedDep(implementation(project(":api"))!!)
+        shadedDep(implementation(project(":shared"))!!)
+
+        implementation(libs.bundles.kotlin)
+        shadedDep(libs.bundles.kotlin)
+
+        shadedDep(implementation(libs.datafixerupper.get())!!)
+
+        implementation(libs.bundles.logging)
+        shadedDep(libs.bundles.logging)
     }
 }
 
 dependencies {
+    val shadedDep by configurations.getting
+
     minecraft("com.mojang:minecraft:${libs.versions.minecraft.standalone.get()}")
 
-    shadedDep("launchImplementation"(implementation(project(":api"))!!)!!)
-    shadedDep("launchImplementation"(implementation(project(":common:26.1")) {
+    shadedDep(implementation(project(":common:26.1")) {
         isTransitive = false
-    })!!)
+    })
+
     shadedDep(implementation(project(":transcribers:google"))!!)
     shadedDep(implementation(project(":transcribers:whisper"))!!)
-
-    "launchImplementation"(sourceSets.main.get().output)
-
-    implementation(libs.bundles.kotlin)
-    "launchImplementation"(libs.bundles.kotlin)
-    shadedDep(libs.bundles.kotlin)
-
-    shadedDep(libs.datafixerupper.get())
-    shadedDep(libs.slf4j.api.get())
-    "launchImplementation"(libs.bundles.logging)
-    shadedDep(libs.bundles.logging)
 
     api(libs.bundles.elementa)
     shadedDep(libs.bundles.elementa)

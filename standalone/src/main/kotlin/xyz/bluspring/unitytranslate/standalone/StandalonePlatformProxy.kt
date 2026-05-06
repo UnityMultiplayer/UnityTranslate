@@ -5,6 +5,6 @@ import java.nio.file.Path
 import kotlin.io.path.Path
 
 class StandalonePlatformProxy : PlatformProxy {
-    override val version: String = Metadata.get().version
+    override val version: String = UnityTranslateStandalone.metadata.version
     override val pluginsDir: Path = Path("plugins")
 }

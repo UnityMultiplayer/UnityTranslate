@@ -40,7 +40,8 @@ stonecutter {
 }
 
 include(":api")
-include(":standalone")
+include(":shared")
+include(":standalone", ":standalone:launcher")
 include(":transcribers", ":transcribers:google", ":transcribers:whisper")
 include(":relay")
 

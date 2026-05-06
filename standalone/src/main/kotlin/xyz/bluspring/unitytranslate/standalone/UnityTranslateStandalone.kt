@@ -1,5 +1,6 @@
 package xyz.bluspring.unitytranslate.standalone
 
+import com.google.gson.JsonParser
 import com.mojang.blaze3d.opengl.GlBackend
 import com.mojang.blaze3d.platform.BackendOptions
 import com.mojang.blaze3d.platform.DisplayData
@@ -8,9 +9,12 @@ import com.mojang.blaze3d.platform.WindowEventHandler
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.util.Util
 import xyz.bluspring.unitytranslate.UnityTranslate
+import xyz.bluspring.unitytranslate.shared.HandledException
+import xyz.bluspring.unitytranslate.shared.Metadata
 import java.util.*
 
 object UnityTranslateStandalone : WindowEventHandler {
+    val metadata = Metadata.parse(JsonParser.parseString(this::class.java.getResource("/metadata.json")!!.readText()).asJsonObject)
     val window: Window
     val timeSource = RenderSystem.initBackendSystem(BackendOptions(false))
 

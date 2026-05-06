@@ -44,6 +44,9 @@ terminalconsoleappender = "1.3.0"
 elementa = "743"
 universalcraft = "491"
 
+# https://github.com/google/gson
+gson = "2.14.0"
+
 [bundles]
 kotlin = [
     "kotlinx-coroutines-core", "kotlinx-coroutines-core-jvm", "kotlinx-coroutines-jdk8", "kotlinx-serialization-json"
@@ -81,6 +84,8 @@ datafixerupper = { module = "com.mojang:datafixerupper", version.ref = "datafixe
 
 elementa = { module = "gg.essential:elementa", version.ref = "elementa" }
 elementa-unstable-layoutdsl = { module = "gg.essential:elementa-unstable-layoutdsl", version.ref = "elementa" }
+
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 
 [plugins]
 moddevgradle = { id = "net.neoforged.moddev" }

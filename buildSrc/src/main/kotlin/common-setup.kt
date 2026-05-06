@@ -222,8 +222,10 @@ fun tryFindNeoFormVersion(version: String): String? {
             }
         }
 
+        println(versions)
         null
-    } catch (_: Throwable) {
+    } catch (e: Throwable) {
+        e.printStackTrace()
         null
     }
 }

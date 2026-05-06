@@ -1,0 +1,5 @@
+{
+  "version": "${version}",
+  "build_hash": "${build_hash}",
+  "java_version": "25.0.3"
+}
