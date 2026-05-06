@@ -145,7 +145,7 @@ fun main() {
                 val standaloneClass = classLoader.loadClass("xyz.bluspring.unitytranslate.standalone.UnityTranslateStandalone")
                 standaloneClass.getDeclaredMethod("init").invoke(null)
             } else {
-
+                // TODO: actually set up loading in production
             }
         }
     } catch (e: NeedsUpdateException) {
