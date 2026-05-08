@@ -18,6 +18,7 @@ import java.awt.Dimension
 import java.awt.GraphicsEnvironment
 import java.awt.Toolkit
 import java.io.File
+import java.lang.reflect.InvocationTargetException
 import java.net.URI
 import java.net.URLClassLoader
 import java.nio.file.Path
@@ -90,6 +91,8 @@ fun main() {
     logger.info("Installed UnityTranslate version: ${downloadedData?.currentVersion ?: "(none)"}")
     logger.info("Installed Minecraft version: ${downloadedData?.minecraftVersion ?: "(none)"}")
 
+    var hasLaunched = false
+
     try {
         runBlocking {
             val appClassLoader = FilteredClassLoader::class.java.classLoader
@@ -144,6 +147,7 @@ fun main() {
                 val classLoader = URLClassLoader((urls + libraries.paths.map { it.toUri().toURL() }).toTypedArray() + currentClassPath.toTypedArray(), FilteredClassLoader)
 
                 Thread.currentThread().contextClassLoader = classLoader
+                hasLaunched = true
 
                 // We're gonna use reflection to launch, so we are able to use the correct class loader.
                 val standaloneClass = classLoader.loadClass("xyz.bluspring.unitytranslate.standalone.UnityTranslateStandalone")
@@ -155,13 +159,20 @@ fun main() {
     } catch (e: NeedsUpdateException) {
         logger.error("UnityTranslate Launcher requires an update!", e)
         displayUpdateError(e.message ?: e.localizedMessage, e.url)
-    } catch (e: HandledException) {
-        logger.error("UnityTranslate has crashed!", e)
-        exitProcess(1)
     } catch (e: Throwable) {
-        // it wasn't fine D:
-        logger.error("An error occurred whilst launching UnityTranslate!", e)
-        displayError("An error occurred whilst launching UnityTranslate!\n\nError: ${e::class.java.name}: ${e.message ?: e.localizedMessage}")
+        if (!hasLaunched) {
+            // it wasn't fine D:
+            logger.error("An error occurred whilst launching UnityTranslate!", e)
+            displayError("An error occurred whilst launching UnityTranslate! Please report this to the GitHub or the Discord with your log file!\n\nError: ${e::class.java.name}: ${e.message ?: e.localizedMessage}")
+            return
+        }
+
+        var actualException = e.cause ?: (e as? InvocationTargetException)?.targetException ?: e
+        if (actualException::class.java.name == HandledException::class.java.name) // can't do an instanceof here, because they're *technically* two different classes
+            actualException = actualException.cause ?: actualException
+
+        logger.error("UnityTranslate has crashed!", actualException)
+        displayError("UnityTranslate has crashed! Please report this to the GitHub or the Discord with your log file!\n\nError: ${actualException::class.java.name}: ${actualException.message ?: actualException.localizedMessage}")
     }
 }
 
