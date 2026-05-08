@@ -53,7 +53,7 @@ object UnityTranslateStandalone : ReentrantBlockableEventLoop<Runnable>("UnityTr
                 GLFW.glfwDefaultWindowHints()
                 GLFW.glfwWindowHint(GLFW.GLFW_TRANSPARENT_FRAMEBUFFER, GLFW.GLFW_TRUE) // transparent background :D
 //                GLFW.glfwWindowHint(GLFW.GLFW_DECORATED, GLFW.GLFW_FALSE) // Borderless window
-                GLFW.glfwWindowHint(GLFW.GLFW_MOUSE_PASSTHROUGH, GLFW.GLFW_TRUE) // Allow clicking the mouse through the window
+//                GLFW.glfwWindowHint(GLFW.GLFW_MOUSE_PASSTHROUGH, GLFW.GLFW_TRUE) // Allow clicking the mouse through the window
 
                 window = Window(this, DisplayData(843, 600, OptionalInt.empty(), OptionalInt.empty(), false), null, "UnityTranslate", backend)
                 device = window.backend().createDevice(window.handle(),
