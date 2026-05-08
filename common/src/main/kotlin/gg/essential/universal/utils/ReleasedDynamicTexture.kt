@@ -1,9 +1,14 @@
 package gg.essential.universal.utils
 
+
+import com.mojang.blaze3d.GpuFormat
 import com.mojang.blaze3d.opengl.GlTexture
 import com.mojang.blaze3d.platform.NativeImage
 import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.textures.*
+import com.mojang.blaze3d.textures.AddressMode
+import com.mojang.blaze3d.textures.FilterMode
+import com.mojang.blaze3d.textures.GpuTexture
+import com.mojang.blaze3d.textures.GpuTextureView
 import net.minecraft.client.renderer.texture.AbstractTexture
 import java.io.Closeable
 import java.lang.ref.PhantomReference
@@ -40,7 +45,7 @@ class ReleasedDynamicTexture private constructor(
         if (!uploaded) {
             val device = RenderSystem.getDevice()
             val usage = GpuTexture.USAGE_TEXTURE_BINDING or GpuTexture.USAGE_COPY_SRC or GpuTexture.USAGE_COPY_DST
-            val texture = device.createTexture(null as String?, usage, TextureFormat.RGBA8, width, height, 1, 1)
+            val texture = device.createTexture(null as String?, usage, GpuFormat.RGBA8_UNORM, width, height, 1, 1)
             sampler = RenderSystem.getSamplerCache().getSampler(AddressMode.REPEAT, AddressMode.REPEAT, FilterMode.LINEAR, FilterMode.NEAREST, true);
             device.createCommandEncoder().writeToTexture(texture, textureData!!)
             textureData = null

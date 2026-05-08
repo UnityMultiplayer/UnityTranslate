@@ -42,4 +42,7 @@ dependencies {
 //    annotationProcessor(libs.mixinextras.common) // MixinExtras
     api(libs.mixinextras.common)
     api(libs.bundles.elementa)
+    api(libs.unitytranslatelib) {
+        exclude(group = "org.slf4j") // because NeoForge panics otherwise
+    }
 }

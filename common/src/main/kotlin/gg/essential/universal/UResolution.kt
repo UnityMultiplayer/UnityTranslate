@@ -1,49 +1,50 @@
 package gg.essential.universal
 
+import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
+
 
 object UResolution {
 
     @JvmStatic
     val windowWidth: Int
         get() {
-            return UMinecraft.getMinecraft().window.screenWidth
+            return ClientPlatformProxy.instance.windowWidth
         }
 
     @JvmStatic
     val windowHeight: Int
         get() {
-            return UMinecraft.getMinecraft().window.screenHeight
+            return ClientPlatformProxy.instance.windowHeight
         }
 
     @JvmStatic
     val viewportWidth: Int
         get() {
-            return UMinecraft.getMinecraft().window.width
+            return ClientPlatformProxy.instance.viewportWidth
         }
 
     @JvmStatic
     val viewportHeight: Int
         get() {
-            return UMinecraft.getMinecraft().window.height
+            return ClientPlatformProxy.instance.viewportHeight
         }
 
 
     @JvmStatic
     val scaledWidth: Int
         get() {
-            return UMinecraft.getMinecraft().window.guiScaledWidth
+            return (ClientPlatformProxy.instance.windowWidth / scaleFactor).toInt()
         }
 
     @JvmStatic
     val scaledHeight: Int
         get() {
-            return UMinecraft.getMinecraft().window.guiScaledHeight
+            return (ClientPlatformProxy.instance.windowHeight / scaleFactor).toInt()
         }
 
     @JvmStatic
     val scaleFactor: Double
         get() {
-            return UMinecraft.getMinecraft().window.guiScale
-                .toDouble()
+            return ClientPlatformProxy.instance.guiScale
         }
 }

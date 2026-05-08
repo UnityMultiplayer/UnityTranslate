@@ -1,6 +1,7 @@
 package gg.essential.universal
 
 
+import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import kotlin.math.max
 
 object UMouse {
@@ -8,13 +9,13 @@ object UMouse {
         @JvmStatic
         val x: Double
             get() {
-                return UMinecraft.getMinecraft().mouseHandler.xpos()
+                return ClientPlatformProxy.instance.mouseX
             }
 
         @JvmStatic
         val y: Double
             get() {
-                return UMinecraft.getMinecraft().mouseHandler.ypos()
+                return ClientPlatformProxy.instance.mouseY
             }
     }
 

@@ -17,6 +17,7 @@ import xyz.bluspring.unitytranslate.shared.update.UpdateHelper
 import java.awt.Dimension
 import java.awt.GraphicsEnvironment
 import java.awt.Toolkit
+import java.io.File
 import java.net.URI
 import java.net.URLClassLoader
 import java.nio.file.Path
@@ -138,7 +139,9 @@ fun main() {
                     unityTranslateClass.protectionDomain.codeSource.location,
                     Class.forName("xyz.bluspring.unitytranslate.standalone.StandalonePlatformProxy", false, appClassLoader).protectionDomain.codeSource.location,
                 )
-                val classLoader = URLClassLoader((urls + libraries.paths.map { it.toUri().toURL() }).toTypedArray(), FilteredClassLoader)
+                val currentClassPath = System.getProperty("java.class.path").split(File.pathSeparator).map { Path(it).toUri().toURL() }
+
+                val classLoader = URLClassLoader((urls + libraries.paths.map { it.toUri().toURL() }).toTypedArray() + currentClassPath.toTypedArray(), FilteredClassLoader)
 
                 Thread.currentThread().contextClassLoader = classLoader
 

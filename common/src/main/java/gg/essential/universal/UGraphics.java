@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.opengl.GlTexture;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
@@ -41,6 +42,7 @@ import gg.essential.universal.vertex.UVertexConsumer;
 import org.jetbrains.annotations.ApiStatus;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
+import xyz.bluspring.unitytranslate.client.renderer.BatchedGuiRenderer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.StringSplitter;
@@ -327,7 +329,7 @@ public class UGraphics {
                 flush();
                 pipeline = drawable.guiPipeline();
                 texture = drawable.textureView();
-                bufferBuilder = new BufferBuilder(ALLOCATOR, pipeline.getVertexFormatMode(), pipeline.getVertexFormat());
+                bufferBuilder = new BufferBuilder(ALLOCATOR, pipeline.getPrimitiveTopology(), pipeline.getVertexFormatBinding(0));
             }
             drawable.render(matrix, bufferBuilder, light, false);
         }
@@ -499,26 +501,30 @@ public class UGraphics {
         ;
 
         public final int glMode;
-        public final VertexFormat.Mode mcMode;
+        //? if > 26.1 {
+        public final PrimitiveTopology mcMode;
+        //? } else {
+        /*public final VertexFormat.Mode mcMode;
+        *///? }
 
         DrawMode(int glMode) {
             this.glMode = glMode;
             this.mcMode = glToMcDrawMode(glMode);
         }
 
-        private static VertexFormat.Mode glToMcDrawMode(int glMode) {
+        private static /*? if > 26.1 { */PrimitiveTopology/*? } else { *//*VertexFormat.Mode*//*? }*/ glToMcDrawMode(int glMode) {
             switch (glMode) {
-                case GL11.GL_LINES: return VertexFormat.Mode.LINES;
-                case GL11.GL_LINE_STRIP: return VertexFormat.Mode.DEBUG_LINE_STRIP;
-                case GL11.GL_TRIANGLES: return VertexFormat.Mode.TRIANGLES;
-                case GL11.GL_TRIANGLE_STRIP: return VertexFormat.Mode.TRIANGLE_STRIP;
-                case GL11.GL_TRIANGLE_FAN: return VertexFormat.Mode.TRIANGLE_FAN;
-                case GL11.GL_QUADS: return VertexFormat.Mode.QUADS;
+                case GL11.GL_LINES: return /*? if > 26.1 { */PrimitiveTopology/*? } else { *//*VertexFormat.Mode*//*? }*/.LINES;
+                case GL11.GL_LINE_STRIP: return /*? if > 26.1 { */PrimitiveTopology/*? } else { *//*VertexFormat.Mode*//*? }*/.DEBUG_LINE_STRIP;
+                case GL11.GL_TRIANGLES: return /*? if > 26.1 { */PrimitiveTopology/*? } else { *//*VertexFormat.Mode*//*? }*/.TRIANGLES;
+                case GL11.GL_TRIANGLE_STRIP: return /*? if > 26.1 { */PrimitiveTopology/*? } else { *//*VertexFormat.Mode*//*? }*/.TRIANGLE_STRIP;
+                case GL11.GL_TRIANGLE_FAN: return /*? if > 26.1 { */PrimitiveTopology/*? } else { *//*VertexFormat.Mode*//*? }*/.TRIANGLE_FAN;
+                case GL11.GL_QUADS: return /*? if > 26.1 { */PrimitiveTopology/*? } else { *//*VertexFormat.Mode*//*? }*/.QUADS;
                 default: throw new IllegalArgumentException("Unsupported draw mode " + glMode);
             }
         }
 
-        private static DrawMode fromMc(VertexFormat.Mode mcMode) {
+        private static DrawMode fromMc(/*? if > 26.1 { */PrimitiveTopology/*? } else { *//*VertexFormat.Mode*//*? }*/ mcMode) {
             switch (mcMode) {
                 case LINES: return DrawMode.LINES;
                 case DEBUG_LINE_STRIP: return DrawMode.LINE_STRIP;
@@ -543,7 +549,7 @@ public class UGraphics {
         }
 
         public static DrawMode fromRenderLayer(RenderType renderLayer) {
-            return fromMc(renderLayer.mode());
+            return fromMc(renderLayer./*? if > 26.1 { */primitiveTopology/*? } else { *//*mode*//*? }*/());
         }
     }
 
@@ -635,7 +641,11 @@ public class UGraphics {
         MeshData builtBuffer = instance.build();
         if (builtBuffer == null) return;
         if (renderLayer != null) {
-            renderLayer.draw(builtBuffer);
+            //? if <= 26.1 {
+            /*renderLayer.draw(builtBuffer);
+            *///? } else {
+            BatchedGuiRenderer.INSTANCE.queue(renderLayer.prepare(), builtBuffer);
+            //? }
             return;
         }
         doDraw(
@@ -648,7 +658,11 @@ public class UGraphics {
         if (builtBuffer == null) return;
         builtBuffer.sortQuads(ALLOCATOR, RenderSystem.getProjectionType().vertexSorting());
         if (renderLayer != null) {
-            renderLayer.draw(builtBuffer);
+            //? if <= 26.1 {
+            /*renderLayer.draw(builtBuffer);
+             *///? } else {
+            BatchedGuiRenderer.INSTANCE.queue(renderLayer.prepare(), builtBuffer);
+            //? }
             return;
         }
         // Sorting handled above.

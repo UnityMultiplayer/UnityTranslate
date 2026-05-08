@@ -1,16 +1,15 @@
 package gg.essential.universal.render
 
 import com.mojang.blaze3d.buffers.GpuBuffer
-import com.mojang.blaze3d.opengl.GlTexture
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.AddressMode
 import com.mojang.blaze3d.textures.FilterMode
-import com.mojang.blaze3d.textures.TextureFormat
 import gg.essential.universal.vertex.UBuiltBuffer
 import gg.essential.universal.vertex.UBuiltBufferInternal
 import net.minecraft.client.Minecraft
 import org.lwjgl.system.MemoryStack
+import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import java.util.*
 
 // Kept internal for now because I'm not yet sure how Mojang will evolve their RenderPass.
@@ -36,30 +35,30 @@ internal class URenderPass : AutoCloseable {
         val mc: RenderPass
         init {
             val dynamicUniforms = RenderSystem.getDynamicUniforms().writeTransform(
-                RenderSystem.getModelViewMatrix(),
+                RenderSystem.getModelViewMatrixCopy(),
                 org.joml.Vector4f(1f, 1f, 1f, 1f),
                 org.joml.Vector3f(),
                 org.joml.Matrix4f(),
             )
             val builtBuffer = builtBuffer.mc
-            val vertexBuffer = pipeline.format.uploadImmediateVertexBuffer(builtBuffer.vertexBuffer())
+            val vertexBuffer = RenderSystem.getDevice().createBuffer({ "UI Vertex Buffer" }, GpuBuffer.USAGE_VERTEX, builtBuffer.vertexBuffer())
             val sortedBuffer = builtBuffer.indexBuffer()
             val (indexBuffer, indexType) = if (sortedBuffer != null) {
-                pipeline.format.uploadImmediateIndexBuffer(sortedBuffer) to builtBuffer.drawState().indexType()
+                RenderSystem.getDevice().createBuffer({ "UI Index Buffer" }, GpuBuffer.USAGE_INDEX, sortedBuffer) to builtBuffer.drawState().indexType()
             } else {
-                val shapeIndexBuffer = RenderSystem.getSequentialBuffer(builtBuffer.drawState().mode())
+                val shapeIndexBuffer = RenderSystem.getSequentialBuffer(builtBuffer.drawState().primitiveTopology)
                 shapeIndexBuffer.getBuffer(builtBuffer.drawState().indexCount()) to shapeIndexBuffer.type()
             }
-            mc = Minecraft.getInstance().mainRenderTarget.let { fb ->
+            mc = Minecraft.getInstance().gameRenderer.mainRenderTarget().let { fb ->
                 RenderSystem.getDevice().createCommandEncoder().createRenderPass(
                     { "Immediate draw for $pipeline" },
                     RenderSystem.outputColorTextureOverride ?: fb.colorTextureView!!,
-                    OptionalInt.empty(),
+                    Optional.empty(),
                     RenderSystem.outputDepthTextureOverride ?: fb.depthTextureView,
                     OptionalDouble.empty(),
                 )
             }
-            mc.setVertexBuffer(0, vertexBuffer)
+            mc.setVertexBuffer(0, vertexBuffer.slice())
             mc.setIndexBuffer(indexBuffer, indexType)
             RenderSystem.bindDefaultUniforms(mc)
             mc.setUniform("DynamicTransforms", dynamicUniforms);
@@ -96,14 +95,13 @@ internal class URenderPass : AutoCloseable {
         }
 
         override fun texture(name: String, textureGlId: Int): DrawCallBuilder = apply {
-            val texture = object : GlTexture(USAGE_TEXTURE_BINDING, "", TextureFormat.RGBA8, 0, 0, 0, 1, textureGlId) {
-            }
+            val texture = ClientPlatformProxy.instance.getTexture(textureGlId)
             val sampler = RenderSystem.getSamplerCache().getSampler(AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE, FilterMode.LINEAR, FilterMode.NEAREST, true)
             mc.bindTexture(name, RenderSystem.getDevice().createTextureView(texture), sampler)
         }
 
         override fun texture(index: Int, textureGlId: Int): DrawCallBuilder = apply {
-            texture(pipeline.mcRenderPipeline.samplers[index], textureGlId)
+            texture(pipeline.mcRenderPipeline.bindGroupLayouts[0].samplers[index], textureGlId)
         }
 
         fun submit() {

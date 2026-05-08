@@ -16,7 +16,7 @@ plugins {
     id("dev.kikugie.stonecutter") version "0.9.+" // https://stonecutter.kikugie.dev/
 }
 
-val versions = listOf("1.20.1", "1.21.1", "1.21.4", "1.21.8", "26.1")
+val versions = listOf("1.20.1", "1.21.1", "1.21.4", "1.21.8", "26.1", "26.2-snapshot-6")
 
 stonecutter {
     centralScript = "build.gradle.kts"
@@ -30,7 +30,10 @@ stonecutter {
         branch("fabric")
         branch("neoforge") {
             // NeoForge doesn't exist for <=1.20.1
-            versions(versions.filter { stonecutter.eval(it, ">1.20.1") })
+            versions(versions.filter {
+                stonecutter.eval(it, ">1.20.1") &&
+                    stonecutter.eval(it, "<=26.1") // Neo doesn't support snapshots
+            })
         }
         branch("forge") {
             // KLF doesn't exist for >=1.20.5, don't bother

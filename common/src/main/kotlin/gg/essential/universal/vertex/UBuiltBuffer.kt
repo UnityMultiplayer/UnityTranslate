@@ -6,6 +6,7 @@ import gg.essential.universal.render.URenderPass
 import gg.essential.universal.render.URenderPipeline
 import net.minecraft.client.renderer.rendertype.RenderType
 import org.jetbrains.annotations.ApiStatus.NonExtendable
+import xyz.bluspring.unitytranslate.client.renderer.BatchedGuiRenderer
 
 /**
  * A list of vertices to be rendered.
@@ -29,7 +30,7 @@ interface UBuiltBuffer : AutoCloseable {
 
     fun draw(renderLayer: RenderType) {
         val mc = (this as UBuiltBufferInternal).mc
-        renderLayer.draw(mc)
+        BatchedGuiRenderer.queue(renderLayer.prepare(), mc)
     }
 
     companion object {

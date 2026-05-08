@@ -59,7 +59,7 @@ internal class ShaderTransformer(private val vertexFormat: VertexFormat?, privat
             replaceAttribute(newAttributes, "gl_MultiTexCoord2.st", "vec2", "uc_UV2")
 
             if (vertexFormat != null) {
-                newAttributes.sortedBy { vertexFormat.elementAttributeNames.indexOf(it.first.removePrefix("uc_")) }
+                newAttributes.sortedBy { vertexFormat.elements.indexOfFirst { b -> b.name == it.first.removePrefix("uc_") } }
                     .forEach {
                         attributes.add(it.first)
                         transformed.add(it.second)

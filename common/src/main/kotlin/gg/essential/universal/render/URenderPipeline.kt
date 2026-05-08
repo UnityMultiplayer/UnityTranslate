@@ -1,9 +1,7 @@
 package gg.essential.universal.render
 
-import com.mojang.blaze3d.pipeline.BlendFunction
-import com.mojang.blaze3d.pipeline.ColorTargetState
-import com.mojang.blaze3d.pipeline.DepthStencilState
-import com.mojang.blaze3d.pipeline.RenderPipeline
+import com.mojang.blaze3d.GpuFormat
+import com.mojang.blaze3d.pipeline.*
 import com.mojang.blaze3d.platform.CompareOp
 import com.mojang.blaze3d.shaders.ShaderType
 import com.mojang.blaze3d.shaders.UniformType
@@ -11,7 +9,6 @@ import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.MeshData
 import com.mojang.blaze3d.vertex.VertexFormat
-import com.mojang.blaze3d.vertex.VertexFormatElement
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UGraphics.CommonVertexFormats
 import gg.essential.universal.UGraphics.DrawMode
@@ -123,7 +120,8 @@ class URenderPipeline private constructor(
             var shaderSourceGetter: ShaderSourceGetter? = null
             var mcRenderPipeline = RenderPipeline.builder().apply {
                 withLocation(id)
-                withVertexFormat(format, drawMode.mcMode)
+                withVertexBinding(0, format)
+                withPrimitiveTopology(drawMode.mcMode)
                 when (shader) {
                     is ShaderSupplier.LegacySource -> {
                         val transformer = ShaderTransformer(format, 150)
@@ -145,32 +143,36 @@ class URenderPipeline private constructor(
                         withVertexShader(vertId)
                         withFragmentShader(fragId)
 
-                        transformer.samplers.forEach { withSampler(it) }
-                        transformer.uniforms.forEach { withUniform(it.key, it.value.mc) }
+                        val bindGroupBuilder = BindGroupLayout.builder()
+                        transformer.samplers.forEach { bindGroupBuilder.withSampler(it) }
+                        transformer.uniforms.forEach { bindGroupBuilder.withUniform(it.key, it.value.mc) }
+                        withBindGroupLayout(bindGroupBuilder.build())
 
                         // ShaderProgram calls glBindAttribLocation using the names in the VertexFormat so we need to
                         // construct a custom one based on the original but with our prefixed names
-                        val builder = VertexFormat.builder()
+                        val builder = VertexFormat.builder(0)
                         var expectedOffset = 0
-                        format.elements.mapIndexed { index, element ->
-                            val offset = format.getOffset(element)
+                        format.elements.forEachIndexed { index, element ->
+                            val offset = element.offset
                             val padding = offset - expectedOffset
                             if (padding > 0) {
                                 expectedOffset += padding
-                                builder.padding(padding)
                             }
-                            expectedOffset += element.byteSize()
-                            val name = transformer.attributes.getOrNull(index) ?: format.getElementName(element)
-                            builder.add(name, element)
+                            expectedOffset += element.format.pixelSize()
+                            val name = transformer.attributes.getOrNull(index) ?: element.name
+                            builder.addAttribute(name, padding, element.format)
                         }
-                        withVertexFormat(builder.build(), drawMode.mcMode)
+                        withVertexBinding(0, builder.build())
+                        withPrimitiveTopology(drawMode.mcMode)
                     }
                     is ShaderSupplier.Mc -> {
                         withVertexShader(shader.vert)
                         withFragmentShader(shader.frag)
 
-                        shader.samplers.forEach { withSampler(it) }
-                        shader.uniforms.forEach { withUniform(it.key, it.value) }
+                        val bindGroupBuilder = BindGroupLayout.builder()
+                        shader.samplers.forEach { bindGroupBuilder.withSampler(it) }
+                        shader.uniforms.forEach { bindGroupBuilder.withUniform(it.key, it.value) }
+                        withBindGroupLayout(bindGroupBuilder.build())
                     }
                 }
                 if (depthTest != DepthTest.Disabled) {
@@ -194,6 +196,7 @@ class URenderPipeline private constructor(
                         blendState.srcAlpha.mcSourceFactor,
                         blendState.dstAlpha.mcDestFactor,
                     ) else null),
+                    GpuFormat.RGBA8_UNORM,
                     colorMask.let { (colorMask, alphaMask) ->
                         var flags = 0
                         if (colorMask) flags += ColorTargetState.WRITE_COLOR
@@ -219,7 +222,7 @@ class URenderPipeline private constructor(
 
         @JvmStatic
         fun wrap(mc: RenderPipeline): URenderPipeline =
-            URenderPipeline(mc.location, mc.vertexFormat, null, mc)
+            URenderPipeline(mc.location, mc.getVertexFormatBinding(0)!!, null, mc)
         fun builder(id: Identifier, drawMode: DrawMode, format: VertexFormat, vert: Identifier, frag: Identifier, samplers: List<String>, uniforms: Map<String, UniformType>): Builder {
             return BuilderImpl(id, drawMode, format, ShaderSupplier.Mc(vert, frag, samplers, uniforms))
         }
@@ -230,7 +233,7 @@ class URenderPipeline private constructor(
                 ?: throw IllegalArgumentException("No default shader for $format.")
             val shaderId = Identifier.withDefaultNamespace(shader)
             val samplers = List(format.mc.elements.count {
-                it == VertexFormatElement.UV0 || it == VertexFormatElement.UV1 || it == VertexFormatElement.UV2
+                it.name == "UV0" || it.name == "UV1" || it.name == "UV2"
             }) { i -> "Sampler$i" }
             val uniforms = mapOf(
                 "DynamicTransforms" to UniformType.UNIFORM_BUFFER,

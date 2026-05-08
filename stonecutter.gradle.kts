@@ -10,7 +10,7 @@ plugins {
     id("idea")
 }
 
-stonecutter active "26.1"
+stonecutter active "26.2-snapshot-6"
 
 
 allprojects {
@@ -18,6 +18,7 @@ allprojects {
 
     repositories {
         mavenCentral()
+        mavenLocal()
         maven("https://maven.parchmentmc.org")
         maven("https://repo.nyon.dev/releases")
         maven("https://maven.fabricmc.net")

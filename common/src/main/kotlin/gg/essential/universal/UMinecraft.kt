@@ -5,10 +5,10 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.Options
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.components.ChatComponent
-import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.multiplayer.ClientPacketListener
 import net.minecraft.client.player.LocalPlayer
+import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 
 object UMinecraft {
     private var guiScaleValue: Int
@@ -58,19 +58,20 @@ object UMinecraft {
 
     @JvmStatic
     fun getChatGUI(): ChatComponent? =
-        getMinecraft().gui.chat
+        getMinecraft().gui.hud.chat
 
     @JvmStatic
     fun getSettings(): Options = getMinecraft().options
 
+    // TODO: make this work
     @JvmStatic
     var currentScreenObj: Any?
-        get() = getMinecraft().screen
-        set(value) = getMinecraft().setScreen(value as Screen?)
+        get() = null//getMinecraft().gui.screen()
+        set(value) {}//getMinecraft().gui.setScreen(value as Screen?)
 
 
     @JvmStatic
     fun isCallingFromMinecraftThread(): Boolean {
-        return Minecraft.getInstance().isSameThread
+        return ClientPlatformProxy.instance.renderThread == Thread.currentThread()
     }
 }

@@ -258,10 +258,10 @@ abstract class UScreen(
     open fun onDrawBackground(matrixStack: UMatrixStack, tint: Int) {
         withDrawContext(matrixStack) { drawContext ->
             drawContext.nextStratum()
-            val orgProjectionMatrixBuffer = RenderSystem.getProjectionMatrixBuffer()!!
+            val orgProjectionMatrixBuffer = RenderSystem.getProjectionMatrixBuffer()
             val orgProjectionType = RenderSystem.getProjectionType()
             super.extractBackground(drawContext, lastBackgroundMouseX, lastBackgroundMouseY, lastBackgroundDelta)
-            RenderSystem.setProjectionMatrix(orgProjectionMatrixBuffer, orgProjectionType)
+            RenderSystem.setProjectionMatrix(orgProjectionMatrixBuffer!!, orgProjectionType)
             drawContext.nextStratum()
         }
     }

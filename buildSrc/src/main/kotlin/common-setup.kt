@@ -231,7 +231,7 @@ fun tryFindNeoFormVersion(version: String): String? {
 }
 
 fun Project.shouldRemap(): Boolean {
-    val stonecutter = this.extensions.getByType<StonecutterBuildExtension>()
+    val stonecutter = this.extensions.findByType<StonecutterBuildExtension>() ?: return false
     return stonecutter.eval(stonecutter.current.version, "<=1.21.11")
 }
 
