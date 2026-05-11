@@ -135,6 +135,8 @@ object UnityTranslateStandalone : ReentrantBlockableEventLoop<Runnable>("UnityTr
                     throw e
                 }
             }
+
+            UnityTranslate.logger.info("Exited from main loop.")
         } catch (e: Throwable) {
             throw HandledException(e)
         }
@@ -229,6 +231,7 @@ object UnityTranslateStandalone : ReentrantBlockableEventLoop<Runnable>("UnityTr
 
     fun stop() {
         this.running = false
+        UnityTranslate.logger.info("Stopping!")
     }
 
     override fun framebufferSizeChanged() {
