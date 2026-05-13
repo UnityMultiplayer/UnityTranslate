@@ -3,15 +3,21 @@ package xyz.bluspring.unitytranslate.client.renderer
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.components.Window
 import gg.essential.elementa.constraints.animation.AnimationStrategy
+import gg.essential.elementa.dsl.childOf
 import gg.essential.universal.UKeyboard
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UMouse
+import xyz.bluspring.unitytranslate.client.gui.HomeScreen
 import java.awt.Color
 import kotlin.math.floor
 import kotlin.reflect.KMutableProperty0
 
 object UnityTranslateElementaGui {
     val window = Window(ElementaVersion.V11)
+
+    init {
+        HomeScreen() childOf window
+    }
 
     fun render(matrixStack: UMatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float): Boolean {
         // Render after

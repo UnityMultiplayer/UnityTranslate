@@ -24,7 +24,6 @@ import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.opengl.GlTexture;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTextureView;
@@ -34,11 +33,9 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import gg.essential.universal.render.ScissorState;
-import gg.essential.universal.render.URenderPass;
-import gg.essential.universal.render.URenderPipeline;
 import gg.essential.universal.utils.ReleasedDynamicTexture;
-import gg.essential.universal.vertex.UBuiltBuffer;
 import gg.essential.universal.vertex.UVertexConsumer;
+import kotlin.Unit;
 import org.jetbrains.annotations.ApiStatus;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
@@ -48,6 +45,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.StringSplitter;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.font.TextRenderable;
+import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.SimpleTexture;
@@ -312,15 +310,10 @@ public class UGraphics {
 
             try (MeshData builtBuffer = bufferBuilder.build()) {
                 if (builtBuffer == null) return;
-                GpuTextureView lightTexture = Minecraft.getInstance().gameRenderer.lightmap();
-                try (URenderPass renderPass = new URenderPass()) {
-                    renderPass.draw(UBuiltBuffer.wrap(builtBuffer), URenderPipeline.wrap(pipeline), builder -> {
-                        RenderPass mcRenderPass = ((URenderPass.DrawCallBuilderImpl) builder).getMc();
-                        mcRenderPass.bindTexture("Sampler0", texture, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
-                        mcRenderPass.bindTexture("Sampler2", lightTexture, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR));
-                        return kotlin.Unit.INSTANCE;
-                    });
-                }
+                BatchedGuiRenderer.INSTANCE.queue(pipeline, TextureSetup.singleTextureWithLightmap(texture, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST)), null, consumer -> {
+                    BatchedGuiRenderer.copyBuffer(builtBuffer, consumer);
+                    return Unit.INSTANCE;
+                });
             }
         }
 

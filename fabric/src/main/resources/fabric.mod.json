@@ -1,30 +1,35 @@
 {
-  "schemaVersion": 1,
-  "id": "${mod_id}",
-  "version": "${mod_version}",
-  "name": "${mod_name}",
-  "description": "${mod_description}",
-  "authors": [
-    "BluSpring"
-  ],
-  "contact": {
-    "sources": "${mod_sources}",
-    "issues": "${mod_sources}/issues"
-  },
-  "license": "Artistic-2.0",
-  "icon": "icon.png",
-  "environment": "*",
-  "entrypoints": {
-    "main": [
-      "xyz.bluspring.template.fabric.KotlinStonecutterTemplateFabric"
-    ]
-  },
-  "mixins": [
-  ],
-  "depends": {
-    "fabricloader": "*",
-    "fabric-api": "*",
-    "minecraft": "${minecraft_version_range_fabric}",
-    "fabric-language-kotlin": "*"
-  }
+    "schemaVersion": 1,
+    "id": "${mod_id}",
+    "version": "${mod_version}",
+    "name": "${mod_name}",
+    "description": "${mod_description}",
+    "authors": [
+        "BluSpring"
+    ],
+    "contact": {
+        "sources": "${mod_sources}",
+        "issues": "${mod_sources}/issues"
+    },
+    "license": "Artistic-2.0",
+    "icon": "icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "xyz.bluspring.unitytranslate.fabric.UnityTranslateFabric"
+        ],
+        "client": [
+            "xyz.bluspring.unitytranslate.fabric.client.UnityTranslateFabricClient"
+        ]
+    },
+    "mixins": [
+        "${mod_id}.mixins.json",
+        "${mod_id}.fabric.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": "*",
+        "fabric-api": "*",
+        "minecraft": "${minecraft_version_range_fabric}",
+        "fabric-language-kotlin": "*"
+    }
 }

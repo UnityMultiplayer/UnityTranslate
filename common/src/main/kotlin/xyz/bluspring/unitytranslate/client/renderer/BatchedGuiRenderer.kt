@@ -49,21 +49,26 @@ object BatchedGuiRenderer {
         ), if (prepared.scissorState.enabled())
             ScreenRectangle(prepared.scissorState.x(), prepared.scissorState.y(), prepared.scissorState.width(), prepared.scissorState.height())
         else null) { consumer ->
-            val vertexBuffer = buffer.vertexBuffer()
+           copyBuffer(buffer, consumer)
+        }
+    }
 
-            for (vtxId in 0 until buffer.drawState().vertexCount) {
-                val stride = vtxId * buffer.drawState().format.vertexSize
+    @JvmStatic
+    fun copyBuffer(builtBuffer: MeshData, consumer: VertexConsumer) {
+        val vertexBuffer = builtBuffer.vertexBuffer()
 
-                for (element in buffer.drawState().format.elements) {
-                    when (element.name) {
-                        "Position" -> consumer.addVertex(vertexBuffer.getVector3f(stride + element.offset))
-                        "Color" -> consumer.setColor(vertexBuffer.getInt(stride + element.offset))
-                        "UV0" -> consumer.setUv(vertexBuffer.getFloat(stride + element.offset), vertexBuffer.getFloat(stride + element.offset + 4))
-                        "UV1" -> consumer.setUv1(vertexBuffer.getInt(stride + element.offset), vertexBuffer.getInt(stride + element.offset + 4))
-                        "UV2" -> consumer.setUv2(vertexBuffer.getInt(stride + element.offset), vertexBuffer.getInt(stride + element.offset + 4))
-                        "Normal" -> consumer.setNormal(vertexBuffer.getFloat(stride + element.offset), vertexBuffer.getFloat(stride + element.offset + 4), vertexBuffer.getFloat(stride + element.offset + 8))
-                        "LineWidth" -> consumer.setLineWidth(vertexBuffer.getFloat(stride + element.offset))
-                    }
+        for (vtxId in 0 until builtBuffer.drawState().vertexCount) {
+            val stride = vtxId * builtBuffer.drawState().format.vertexSize
+
+            for (element in builtBuffer.drawState().format.elements) {
+                when (element.name) {
+                    "Position" -> consumer.addVertex(vertexBuffer.getVector3f(stride + element.offset))
+                    "Color" -> consumer.setColor(vertexBuffer.getInt(stride + element.offset))
+                    "UV0" -> consumer.setUv(vertexBuffer.getFloat(stride + element.offset), vertexBuffer.getFloat(stride + element.offset + 4))
+                    "UV1" -> consumer.setUv1(vertexBuffer.getInt(stride + element.offset), vertexBuffer.getInt(stride + element.offset + 4))
+                    "UV2" -> consumer.setUv2(vertexBuffer.getInt(stride + element.offset), vertexBuffer.getInt(stride + element.offset + 4))
+                    "Normal" -> consumer.setNormal(vertexBuffer.getFloat(stride + element.offset), vertexBuffer.getFloat(stride + element.offset + 4), vertexBuffer.getFloat(stride + element.offset + 8))
+                    "LineWidth" -> consumer.setLineWidth(vertexBuffer.getFloat(stride + element.offset))
                 }
             }
         }
@@ -88,6 +93,15 @@ object BatchedGuiRenderer {
         val profiler = Profiler.get()
 
         profiler.push("prepare")
+        val pipeline = this.lastPipeline
+        val textureSetup = this.lastTextureSetup
+        val scissorArea = this.lastScissorArea
+
+        if (pipeline != null && textureSetup != null) {
+            this.lastDraw = this.vertexBuffer.appendDraw(pipeline.getVertexFormatBinding(0)!!, pipeline.primitiveTopology)
+            this.draws.add(QueuedDraw(this.lastDraw!!, pipeline, textureSetup, scissorArea))
+        }
+
         if (ClientPlatformProxy.instance.renderGui()) {
             profiler.popPush("upload")
             this.vertexBuffer.upload()
@@ -100,6 +114,12 @@ object BatchedGuiRenderer {
         this.vertexBuffer.endDraw()
         this.vertexBuffer.endFrame()
         this.draws.clear()
+
+        // reset
+        this.lastDraw = null
+        this.lastPipeline = null
+        this.lastScissorArea = null
+        this.lastTextureSetup = null
 
         profiler.pop()
     }
