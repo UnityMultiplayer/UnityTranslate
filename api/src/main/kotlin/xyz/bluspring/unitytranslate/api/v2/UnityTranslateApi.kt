@@ -2,6 +2,7 @@ package xyz.bluspring.unitytranslate.api.v2
 
 import xyz.bluspring.unitytranslate.api.v2.plugin.PluginMetadata
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
+import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
 import java.util.*
 
 /**
@@ -12,6 +13,15 @@ interface UnityTranslateApi {
      * Registers a speech transcriber into UnityTranslate. The [id] must be unique, and it is recommended to at least prefix the ID with your plugin's ID.
      */
     fun registerTranscriber(id: String, transcriber: SpeechTranscriber)
+
+    /**
+     * Retrieves a [TranscriptHolder] if one is available under the given language code,
+     * otherwise creates a new holder.
+     *
+     * If you want to keep reusing this holder, make sure you always hold a reference to it,
+     * as the holder is stored in a [WeakHashMap].
+     */
+    fun getOrCreateTranscriptHolder(languageCode: String): TranscriptHolder
 
     fun hasPlugin(group: String, id: String): Boolean = hasPlugin("$group.$id")
     fun hasPlugin(id: String): Boolean

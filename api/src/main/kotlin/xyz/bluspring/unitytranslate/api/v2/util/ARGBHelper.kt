@@ -1,5 +1,8 @@
 package xyz.bluspring.unitytranslate.api.v2.util
 
+/**
+ * ARGB colour math helpers.
+ */
 object ARGBHelper {
     const val MAX_COMPONENT_SIZE = 0xFF
 

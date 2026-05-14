@@ -5,6 +5,9 @@ import com.mojang.serialization.DataResult
 import com.mojang.serialization.MapCodec
 import java.util.*
 
+/**
+ * Some additional codecs that may be useful.
+ */
 object AdditionalCodecs {
     /**
      * A color codec that allows both an ARGB integer and an RGB or ARGB int array.
@@ -27,6 +30,9 @@ object AdditionalCodecs {
             })
     )
 
+    /**
+     * A quick and easy codec for handling enums.
+     */
     @JvmStatic
     fun <E : Enum<E>> enumCodec(nameGetter: (String) -> E): Codec<E> {
         return Codec.STRING.comapFlatMap({ name ->
@@ -40,6 +46,10 @@ object AdditionalCodecs {
         })
     }
 
+    /**
+     * Represents the same behaviour as a normal [Codec.optionalFieldOf], except uses a getter for the default value
+     * for any objects that may be mutable.
+     */
     @JvmStatic
     fun <T : Any> Codec<T>.optionalFieldOf(name: String, defaultGetter: () -> T): MapCodec<T> {
         return Codec.optionalField(name, this, false)

@@ -1,7 +1,7 @@
 package xyz.bluspring.unitytranslate.client.gui.hud
 
 import gg.essential.elementa.components.UIRoundedRectangle
-import gg.essential.elementa.constraints.RainbowColorConstraint
+import gg.essential.elementa.constraints.ConstantColorConstraint
 import gg.essential.elementa.dsl.effect
 import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.effects.RoundedOutlineEffect
@@ -15,14 +15,15 @@ class TranscriptBoxContainer(
     val holder: TranscriptHolder,
     val config: TranscriptBoxConfig
 ) : UIRoundedRectangle(config.cornerRadius) {
+    // TODO: these should not be dependent on solid colours.
     private val roundedEffect = RoundedOutlineEffect(config.outline.thickness, config.cornerRadius, Color((config.outline.color as ColorConfig.Solid).color, true))
 
     init {
         effect(roundedEffect)
-        this.update()
+        this.updateConfig()
     }
 
-    fun update() {
+    fun updateConfig() {
         val screenWidth = ClientPlatformProxy.instance.windowWidth
         val screenHeight = ClientPlatformProxy.instance.windowHeight
 
@@ -34,9 +35,11 @@ class TranscriptBoxContainer(
         this.constraints.width = (dimensions.right - dimensions.left).pixels
         this.constraints.height = (dimensions.bottom - dimensions.top).pixels
         this.setRadius(config.cornerRadius.pixels)
-        this.constraints.color = RainbowColorConstraint()
+        this.constraints.color = ConstantColorConstraint(Color(((config.background as TranscriptBoxConfig.Background.Color).color as ColorConfig.Solid).color, true))
         this.roundedEffect.thickness = config.outline.thickness
         this.roundedEffect.color = Color((config.outline.color as ColorConfig.Solid).color, true)
         this.roundedEffect.radius = config.cornerRadius
     }
+
+
 }
