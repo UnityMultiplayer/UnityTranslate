@@ -6,6 +6,6 @@ import xyz.bluspring.unitytranslate.api.v2.plugin.PluginMetadata
 
 class WhisperTranscriberPlugin : UnityTranslatePlugin {
     override fun onLoadPlugin(api: UnityTranslateApi, metadata: PluginMetadata) {
-        api.registerTranscriber("unitytranslate_whisper", WhisperTranscriber())
+        api.registerTranscriber("unitytranslate_whisper", WhisperTranscriber.CODEC)
     }
 }

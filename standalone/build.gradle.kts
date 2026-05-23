@@ -49,10 +49,9 @@ dependencies {
 
     shadedDep(implementation(project(":transcribers:google"))!!)
     shadedDep(implementation(project(":transcribers:whisper"))!!)
-
-    api(libs.bundles.elementa)
-    shadedDep(libs.bundles.elementa)
 }
+
+setupElementa(libs.versions.minecraft.standalone.get())
 
 tasks {
     processResources {

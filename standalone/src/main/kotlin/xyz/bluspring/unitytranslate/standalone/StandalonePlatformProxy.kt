@@ -2,15 +2,14 @@ package xyz.bluspring.unitytranslate.standalone
 
 import com.mojang.blaze3d.pipeline.RenderTarget
 import com.mojang.blaze3d.textures.GpuTexture
-import gg.essential.universal.UMatrixStack
+import gg.essential.elementa.renderer.ElementaClientPlatformProxy
 import xyz.bluspring.unitytranslate.PlatformProxy
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
-import xyz.bluspring.unitytranslate.client.renderer.UnityTranslateElementaGui
 import xyz.bluspring.unitytranslate.standalone.input.Mouse
 import java.nio.file.Path
 import kotlin.io.path.Path
 
-class StandalonePlatformProxy : PlatformProxy, ClientPlatformProxy {
+class StandalonePlatformProxy : PlatformProxy, ClientPlatformProxy, ElementaClientPlatformProxy {
     override val version: String = UnityTranslateStandalone.metadata.version
     override val pluginsDir: Path = Path("plugins")
     override val nativesDir: Path = Path("natives")
@@ -38,7 +37,8 @@ class StandalonePlatformProxy : PlatformProxy, ClientPlatformProxy {
     override val guiScale: Double
         get() = UnityTranslateStandalone.window.guiScale.toDouble()
 
-    override fun renderGui(): Boolean {
-        return UnityTranslateElementaGui.render(UMatrixStack(), Mouse.x.toInt(), Mouse.y.toInt(), UnityTranslateStandalone.deltaTracker.getGameTimeDeltaPartialTick(true))
-    }
+    override val shouldRenderGui: Boolean
+        get() {
+            return true
+        }
 }

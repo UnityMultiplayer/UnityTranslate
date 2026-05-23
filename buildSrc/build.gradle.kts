@@ -19,4 +19,5 @@ dependencies {
     implementation("dev.kikugie:stonecutter:${libs.versions.stonecutter.get()}")
     implementation("me.modmuss50:mod-publish-plugin:${libs.versions.mod.publish.get()}")
     implementation("com.gradleup.shadow:shadow-gradle-plugin:${libs.versions.shadow.get()}")
+    implementation("com.google.guava:guava:33.0.0-jre")
 }

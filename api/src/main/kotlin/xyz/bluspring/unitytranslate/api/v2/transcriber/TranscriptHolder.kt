@@ -1,5 +1,7 @@
 package xyz.bluspring.unitytranslate.api.v2.transcriber
 
+import java.util.*
+
 /**
  * A transcript holder, holding a list of [transcripts]. Used by both transcript boxes and the Talk Balloons integration.
  */
@@ -17,5 +19,5 @@ data class TranscriptHolder(
      * Note that transcripts will be automatically removed after either a user-configurable amount of time
      * or a user-configurable amount has been reached.
      */
-    val transcripts: MutableList<TranscriptData>,
+    val transcripts: MutableCollection<TranscriptData> = Collections.synchronizedList(mutableListOf()),
 )

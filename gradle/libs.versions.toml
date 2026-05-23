@@ -59,7 +59,7 @@ logging = [
     "terminalconsoleappender"
 ]
 elementa = [
-    "elementa", "elementa-unstable-layoutdsl"
+#    "elementa", "elementa-unstable-layoutdsl"
 ]
 
 [libraries]
@@ -84,8 +84,8 @@ terminalconsoleappender = { module = "net.minecrell:terminalconsoleappender", ve
 
 datafixerupper = { module = "com.mojang:datafixerupper", version.ref = "datafixerupper" }
 
-elementa = { module = "gg.essential:elementa", version.ref = "elementa" }
-elementa-unstable-layoutdsl = { module = "gg.essential:elementa-unstable-layoutdsl", version.ref = "elementa" }
+elementa = { module = "xyz.bluspring.fork.essential:elementa", version.ref = "elementa" }
+elementa-unstable-layoutdsl = { module = "xyz.bluspring.fork.essential:elementa-unstable-layoutdsl", version.ref = "elementa" }
 
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 

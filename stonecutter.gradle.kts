@@ -12,7 +12,6 @@ plugins {
 
 stonecutter active "26.2-snapshot-6"
 
-
 allprojects {
     apply(plugin = "idea")
 

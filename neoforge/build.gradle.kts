@@ -20,3 +20,5 @@ val shadedDep by configurations.named("shadedDep")
 dependencies {
     api("dev.nyon:KotlinLangForge:${libs.versions.kotlinlangforge.get()}-${klfLangVersion}+neoforge")
 }
+
+setupElementa(stonecutter.current.version)

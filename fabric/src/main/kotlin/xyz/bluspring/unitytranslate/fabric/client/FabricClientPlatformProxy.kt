@@ -3,15 +3,17 @@ package xyz.bluspring.unitytranslate.fabric.client
 import com.mojang.blaze3d.pipeline.RenderTarget
 import com.mojang.blaze3d.textures.GpuTexture
 import net.minecraft.client.Minecraft
+import xyz.bluspring.fork.elementa.ElementaClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 
-class FabricClientPlatformProxy : ClientPlatformProxy {
+class FabricClientPlatformProxy : ClientPlatformProxy, ElementaClientPlatformProxy {
     override val framebuffer: RenderTarget
         get() = Minecraft.getInstance().gameRenderer.mainRenderTarget()
 
-    override fun renderGui(): Boolean {
-        return !Minecraft.getInstance().gameRenderer.gameRenderState().guiRenderState.isHudHidden
-    }
+    override val shouldRenderGui: Boolean
+        get() {
+            return !Minecraft.getInstance().gameRenderer.gameRenderState().guiRenderState.isHudHidden
+        }
 
     override fun getTexture(id: Int): GpuTexture {
         TODO("Not yet implemented")

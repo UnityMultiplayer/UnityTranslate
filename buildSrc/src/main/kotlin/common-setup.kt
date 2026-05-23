@@ -1,6 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.google.gson.JsonParser
 import dev.kikugie.stonecutter.build.StonecutterBuildExtension
+import egt.RelocationTransform
 import groovy.xml.XmlSlurper
 import groovy.xml.slurpersupport.NodeChildren
 import me.modmuss50.mpp.ModPublishExtension
@@ -8,11 +9,14 @@ import me.modmuss50.mpp.ReleaseType
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.BasePluginExtension
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.*
 import org.gradle.language.jvm.tasks.ProcessResources
@@ -28,7 +32,7 @@ fun Project.setupCommon(module: String, isMod: Boolean = true) {
         "common" // do not use lmao
     )
 
-    if (module != "common") {
+    if (module != "common" && module != "elementa") {
         val common = stonecutter.node.sibling("") ?: return
         val commonProj = project.project(":common:${stonecutter.current.version}")
 
@@ -252,4 +256,10 @@ val Project.minimumJavaVersion: Int
 
 fun Project.shadedDep(notation: Any): Dependency? {
     return this.dependencies.add("shadedDep", notation)
+}
+
+fun Project.setupElementa(mcVersion: String) {
+    dependencies {
+        "api"(project(":elementa:$mcVersion"))
+    }
 }

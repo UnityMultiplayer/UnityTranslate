@@ -28,7 +28,7 @@ fun Project.setupCommonLoom(module: String) {
         }
     }
 
-    if (module != "common") {
+    if (module != "common" && module != "elementa") {
         if (shouldRemap()) {
             tasks.named<RemapJarTask>("remapJar") {
                 dependsOn("shadowJar")
