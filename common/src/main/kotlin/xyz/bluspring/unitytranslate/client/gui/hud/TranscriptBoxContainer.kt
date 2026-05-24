@@ -3,20 +3,18 @@ package xyz.bluspring.unitytranslate.client.gui.hud
 import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.constraints.ConstantColorConstraint
-import gg.essential.elementa.dsl.childOf
-import gg.essential.elementa.dsl.constrain
-import gg.essential.elementa.dsl.effect
-import gg.essential.elementa.dsl.pixels
+import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.RoundedOutlineEffect
 import gg.essential.universal.UMatrixStack
 import xyz.bluspring.fork.elementa.ElementaClientPlatformProxy
+import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
 import xyz.bluspring.unitytranslate.client.config.ColorConfig
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
 import java.awt.Color
 
 class TranscriptBoxContainer(
-    val holder: TranscriptHolder,
+    var holder: TranscriptHolder,
     val config: TranscriptBoxConfig
 ) : UIRoundedRectangle(config.cornerRadius) {
     // TODO: these should not be dependent on solid colours.
@@ -32,6 +30,9 @@ class TranscriptBoxContainer(
     }
 
     fun updateConfig() {
+        if (this.holder.languageCode != this.config.languageCode)
+            this.holder = UnityTranslateApi.instance.getOrCreateTranscriptHolder(this.config.languageCode)
+
         val screenWidth = ElementaClientPlatformProxy.instance.windowWidth
         val screenHeight = ElementaClientPlatformProxy.instance.windowHeight
 
@@ -55,7 +56,8 @@ class TranscriptBoxContainer(
         this.clearChildren()
 
         UIText(this.config.header.display.text(this.holder.languageCode).copy().withStyle(this.config.header.style)).constrain {
-
+            x = 50.percent
+            y = 0.percent
         } childOf this
     }
 

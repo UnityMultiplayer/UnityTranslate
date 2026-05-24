@@ -1,12 +1,13 @@
 package xyz.bluspring.unitytranslate.api.v2.transcriber
 
+import org.jetbrains.annotations.ApiStatus
 import java.util.*
 
 /**
  * A transcript holder, holding a list of [transcripts]. Used by both transcript boxes and the Talk Balloons integration.
  */
 @JvmRecord
-data class TranscriptHolder(
+data class TranscriptHolder @ApiStatus.Internal constructor(
     /**
      * The language code that is used by this transcript holder.
      * This means that transcripts will be translated to this language when provided,

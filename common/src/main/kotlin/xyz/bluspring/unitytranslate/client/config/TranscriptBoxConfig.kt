@@ -3,7 +3,6 @@ package xyz.bluspring.unitytranslate.client.config
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import gg.essential.elementa.components.GradientComponent
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
@@ -15,6 +14,7 @@ import xyz.bluspring.unitytranslate.util.Box2f
 import xyz.bluspring.unitytranslate.util.ScreenUtil
 
 data class TranscriptBoxConfig(
+    var languageCode: String,
     val transforms: Transforms,
 
     val outline: Outline = Outline(),
@@ -35,6 +35,8 @@ data class TranscriptBoxConfig(
         @JvmField
         val CODEC: Codec<TranscriptBoxConfig> = RecordCodecBuilder.create { instance ->
             instance.group(
+                Codec.STRING.fieldOf("language")
+                    .forGetter(TranscriptBoxConfig::languageCode),
                 Transforms.CODEC.fieldOf("transforms")
                     .forGetter(TranscriptBoxConfig::transforms),
                 Outline.CODEC.optionalFieldOf("outline", ::Outline)
@@ -258,10 +260,12 @@ data class TranscriptBoxConfig(
         companion object {
             @JvmStatic
             fun default(): Background = Color(
-                ColorConfig.Gradient(GradientComponent.GradientDirection.TOP_TO_BOTTOM,
+                ColorConfig.Solid(ARGBHelper.color(128, 0, 0, 0)),
+/*                ColorConfig.Gradient(GradientComponent.GradientDirection.TOP_TO_BOTTOM,
                 ARGBHelper.color(128, 0, 0, 0),
                 ARGBHelper.color(172, 0, 0, 0)
-            ))
+                )*/
+            )
 
             @JvmField
             val CODEC: Codec<Background> = Codec.STRING.dispatch("type", Background::type) { type ->
