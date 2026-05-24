@@ -257,9 +257,3 @@ val Project.minimumJavaVersion: Int
 fun Project.shadedDep(notation: Any): Dependency? {
     return this.dependencies.add("shadedDep", notation)
 }
-
-fun Project.setupElementa(mcVersion: String) {
-    dependencies {
-        "api"(project(":elementa:$mcVersion"))
-    }
-}

@@ -3,10 +3,9 @@ package xyz.bluspring.unitytranslate.fabric.client
 import com.mojang.blaze3d.pipeline.RenderTarget
 import com.mojang.blaze3d.textures.GpuTexture
 import net.minecraft.client.Minecraft
-import xyz.bluspring.fork.elementa.ElementaClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 
-class FabricClientPlatformProxy : ClientPlatformProxy, ElementaClientPlatformProxy {
+class FabricClientPlatformProxy : ClientPlatformProxy {
     override val framebuffer: RenderTarget
         get() = Minecraft.getInstance().gameRenderer.mainRenderTarget()
 

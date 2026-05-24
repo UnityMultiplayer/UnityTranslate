@@ -3,6 +3,10 @@ package xyz.bluspring.unitytranslate.api.v2.util
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.MapCodec
+import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.alpha
+import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.blue
+import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.green
+import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.red
 import java.util.*
 
 /**
@@ -22,10 +26,10 @@ object AdditionalCodecs {
                     ARGBHelper.color(it[0], it[1], it[2], it[3])
             }, {
                 listOf(
-                    ARGBHelper.alpha(it),
-                    ARGBHelper.red(it),
-                    ARGBHelper.green(it),
-                    ARGBHelper.blue(it),
+                    it.alpha(),
+                    it.red(),
+                    it.green(),
+                    it.blue(),
                 )
             })
     )

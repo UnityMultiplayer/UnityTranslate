@@ -45,5 +45,3 @@ dependencies {
         exclude(group = "org.slf4j") // because NeoForge panics otherwise
     }
 }
-
-setupElementa(stonecutter.current.version)

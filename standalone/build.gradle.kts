@@ -51,8 +51,6 @@ dependencies {
     shadedDep(implementation(project(":transcribers:whisper"))!!)
 }
 
-setupElementa(libs.versions.minecraft.standalone.get())
-
 tasks {
     processResources {
         properties(listOf("metadata.json"),

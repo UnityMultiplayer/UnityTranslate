@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.chat.Style
 import org.joml.Vector2f
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptData
@@ -26,6 +27,8 @@ data class TranscriptBoxConfig(
 
     var header: Header = Header.default(),
     var transcriptDisplay: TranscriptDisplay = TranscriptDisplay.default(),
+
+    var padding: Padding = Padding.default(),
 ) {
     companion object {
         @JvmField val DEFAULT_TEXT_COLOR = ARGBHelper.color(255, 255, 255, 255)
@@ -54,9 +57,39 @@ data class TranscriptBoxConfig(
                 Header.CODEC.optionalFieldOf("header", Header::default)
                     .forGetter(TranscriptBoxConfig::header),
                 TranscriptDisplay.CODEC.optionalFieldOf("transcript_display", TranscriptDisplay::default)
-                    .forGetter(TranscriptBoxConfig::transcriptDisplay)
+                    .forGetter(TranscriptBoxConfig::transcriptDisplay),
+                Padding.CODEC.optionalFieldOf("padding", Padding::default)
+                    .forGetter(TranscriptBoxConfig::padding),
             )
                 .apply(instance, ::TranscriptBoxConfig)
+        }
+    }
+
+    data class Padding(
+        var left: Float,
+        var right: Float,
+        var top: Float,
+        var bottom: Float,
+    ) {
+        constructor(padding: Float) : this(padding, padding, padding, padding)
+
+        companion object {
+            fun default(): Padding = Padding(2f)
+
+            @JvmField
+            val CODEC: Codec<Padding> = RecordCodecBuilder.create { instance ->
+                instance.group(
+                    Codec.FLOAT.optionalFieldOf("left", 0f)
+                        .forGetter(Padding::left),
+                    Codec.FLOAT.optionalFieldOf("right", 0f)
+                        .forGetter(Padding::right),
+                    Codec.FLOAT.optionalFieldOf("top", 0f)
+                        .forGetter(Padding::top),
+                    Codec.FLOAT.optionalFieldOf("bottom", 0f)
+                        .forGetter(Padding::bottom),
+                )
+                    .apply(instance, ::Padding)
+            }
         }
     }
 
@@ -260,11 +293,10 @@ data class TranscriptBoxConfig(
         companion object {
             @JvmStatic
             fun default(): Background = Color(
-                ColorConfig.Solid(ARGBHelper.color(128, 0, 0, 0)),
-/*                ColorConfig.Gradient(GradientComponent.GradientDirection.TOP_TO_BOTTOM,
+                ColorConfig.Gradient(ColorConfig.Gradient.GradientDirection.BOTTOM,
                 ARGBHelper.color(128, 0, 0, 0),
                 ARGBHelper.color(172, 0, 0, 0)
-                )*/
+                )
             )
 
             @JvmField
@@ -295,23 +327,193 @@ data class TranscriptBoxConfig(
     }
 
     data class Header(
-        var display: HeaderDisplay = HeaderDisplay.LangCodeUppercase,
+        var display: HeaderDisplay = HeaderDisplay.Transcript,
         var style: Style = DEFAULT_STYLE,
+        var langDisplay: LanguageDisplay = LanguageDisplay.LangCodeUppercase,
+        var langStyle: Style = DEFAULT_LANG_STYLE,
+        var langDecoration: LanguageDecoration = LanguageDecoration.None,
+        var alignX: HorizontalAlignment = HorizontalAlignment.Center(false),
+        var alignY: VerticalAlignment = VerticalAlignment.Top,
+        var hasShadow: Boolean = false,
     ) {
+        fun text(languageCode: String): Component
+            = this.display.text(this.langDecoration.decorate(this.langDisplay.text(languageCode).copy().withStyle(this.langStyle))).copy().withStyle(this.style)
+
         companion object {
-            @JvmField val DEFAULT_STYLE = Style.EMPTY.withColor(ChatFormatting.WHITE).withBold(true).withUnderlined(true)
+            @JvmField val DEFAULT_STYLE = Style.EMPTY.withColor(ChatFormatting.WHITE).withBold(true)
+            @JvmField val DEFAULT_LANG_STYLE = Style.EMPTY.withColor(ChatFormatting.GRAY).withBold(true)
             fun default(): Header = Header()
 
             @JvmField
             val CODEC: Codec<Header> = RecordCodecBuilder.create { instance ->
                 instance.group(
-                    HeaderDisplay.CODEC.optionalFieldOf("display", HeaderDisplay.LangCodeUppercase)
+                    HeaderDisplay.CODEC.optionalFieldOf("display", HeaderDisplay.Transcript)
                         .forGetter(Header::display),
                     Style.Serializer.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
-                        .forGetter(Header::style)
+                        .forGetter(Header::style),
+                    LanguageDisplay.CODEC.optionalFieldOf("lang_display", LanguageDisplay.LangCodeUppercase)
+                        .forGetter(Header::langDisplay),
+                    Style.Serializer.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
+                        .forGetter(Header::langStyle),
+                    LanguageDecoration.CODEC.optionalFieldOf("lang_decoration", LanguageDecoration.None)
+                        .forGetter(Header::langDecoration),
+                    HorizontalAlignment.CODEC.optionalFieldOf("align_x", HorizontalAlignment.Center(false))
+                        .forGetter(Header::alignX),
+                    VerticalAlignment.CODEC.optionalFieldOf("align_y", VerticalAlignment.Top)
+                        .forGetter(Header::alignY),
+                    Codec.BOOL.optionalFieldOf("has_shadow", false)
+                        .forGetter(Header::hasShadow),
                 )
                     .apply(instance, ::Header)
             }
+        }
+
+        sealed class HorizontalAlignment(val type: String) {
+            companion object {
+                @JvmField val CODEC: Codec<HorizontalAlignment> = Codec.STRING.dispatch("type", HorizontalAlignment::type) { type ->
+                    when (type) {
+                        "left" -> Left.CODEC
+                        "center" -> Center.CODEC
+                        "right" -> Right.CODEC
+                        else -> throw IllegalArgumentException("No horizontal alignment found by type $type!")
+                    }
+                }
+            }
+
+            abstract fun align(width: Float, headerLength: Int, langLength: Int): Float
+
+            object Left : HorizontalAlignment("left") {
+                @JvmField val CODEC: MapCodec<Left> = MapCodec.unit(Left)
+
+                override fun align(width: Float, headerLength: Int, langLength: Int): Float = 0f
+            }
+
+            data class Center(val includesLang: Boolean) : HorizontalAlignment("center") {
+                companion object {
+                    @JvmField val CODEC: MapCodec<Center> = RecordCodecBuilder.mapCodec { instance ->
+                        instance.group(
+                            Codec.BOOL.optionalFieldOf("include_lang", true)
+                                .forGetter(Center::includesLang)
+                        )
+                            .apply(instance, ::Center)
+                    }
+                }
+
+                override fun align(width: Float, headerLength: Int, langLength: Int): Float = if (includesLang)
+                    width / 2f - ((headerLength + langLength) / 2f)
+                else
+                    width / 2f - (headerLength / 2f)
+            }
+
+            object Right : HorizontalAlignment("right") {
+                @JvmField val CODEC: MapCodec<Right> = MapCodec.unit(Right)
+
+                override fun align(width: Float, headerLength: Int, langLength: Int): Float = (width - headerLength - langLength)
+            }
+        }
+
+        sealed class VerticalAlignment(val type: String) {
+            companion object {
+                @JvmField val CODEC: Codec<VerticalAlignment> = Codec.STRING.dispatch("type", VerticalAlignment::type) { type ->
+                    when (type) {
+                        "top" -> Top.CODEC
+                        "bottom" -> Bottom.CODEC
+                        else -> throw IllegalArgumentException("No vertical alignment found by type $type!")
+                    }
+                }
+            }
+
+            abstract fun align(height: Float): Float
+
+            object Top : VerticalAlignment("top") {
+                @JvmField val CODEC: MapCodec<Top> = MapCodec.unit(Top)
+
+                override fun align(height: Float): Float = 0f
+            }
+
+            object Bottom : VerticalAlignment("bottom") {
+                @JvmField val CODEC: MapCodec<Bottom> = MapCodec.unit(Bottom)
+
+                override fun align(height: Float): Float = height - 10
+            }
+        }
+    }
+
+    sealed class LanguageDecoration(val type: String) {
+        companion object {
+            const val DECORATION_KEY = "unitytranslate.transcript.decoration"
+
+            @JvmField val CODEC: Codec<LanguageDecoration> = Codec.STRING.dispatch("type", LanguageDecoration::type) { type ->
+                when (type) {
+                    "none" -> None.CODEC
+                    "parentheses" -> Parentheses.CODEC
+                    "brackets" -> Brackets.CODEC
+                    else -> throw IllegalArgumentException("No language decoration found by type $type!")
+                }
+            }
+        }
+
+        abstract fun decorate(languageDisplay: Component): Component
+
+        object None : LanguageDecoration("none") {
+            @JvmField val CODEC: MapCodec<None> = MapCodec.unit(None)
+
+            override fun decorate(languageDisplay: Component): Component = languageDisplay
+        }
+
+        object Parentheses : LanguageDecoration("parentheses") {
+            @JvmField val CODEC: MapCodec<Parentheses> = MapCodec.unit(Parentheses)
+
+            override fun decorate(languageDisplay: Component): Component = Component.translatable("$DECORATION_KEY.parentheses", languageDisplay)
+        }
+
+        object Brackets : LanguageDecoration("brackets") {
+            @JvmField val CODEC: MapCodec<Brackets> = MapCodec.unit(Brackets)
+
+            override fun decorate(languageDisplay: Component): Component = Component.translatable("$DECORATION_KEY.brackets", languageDisplay)
+        }
+    }
+
+    sealed class LanguageDisplay(val type: String) {
+        companion object {
+            @JvmField val CODEC: Codec<LanguageDisplay> = Codec.STRING.dispatch("type", LanguageDisplay::type) { type ->
+                when (type) {
+                    "none" -> None.CODEC
+                    "lang_code" -> LangCode.CODEC
+                    "lang_code_uppercase" -> LangCodeUppercase.CODEC
+                    "lang_name" -> LangName.CODEC
+                    else -> throw IllegalArgumentException("No language display found by type $type!")
+                }
+            }
+        }
+
+        abstract fun text(languageCode: String): Component
+
+        object None : LanguageDisplay("none") {
+            @JvmField val CODEC: MapCodec<None> = MapCodec.unit(None)
+
+            override fun text(languageCode: String): Component = Component.empty()
+        }
+
+        object LangCode : LanguageDisplay("lang_code") {
+            @JvmField val CODEC: MapCodec<LangCode> = MapCodec.unit(LangCode)
+
+            // Transcript en
+            override fun text(languageCode: String): Component = Component.literal(languageCode)
+        }
+
+        object LangCodeUppercase : LanguageDisplay("lang_code_uppercase") {
+            @JvmField val CODEC: MapCodec<LangCodeUppercase> = MapCodec.unit(LangCodeUppercase)
+
+            // Transcript EN
+            override fun text(languageCode: String): Component = Component.literal(languageCode.uppercase())
+        }
+
+        object LangName : LanguageDisplay("lang_name") {
+            @JvmField val CODEC: MapCodec<LangName> = MapCodec.unit(LangName)
+
+            // Transcript English
+            override fun text(languageCode: String): Component = Component.translatableWithFallback("unitytranslate.language.$languageCode", languageCode.uppercase())
         }
     }
 
@@ -322,50 +524,93 @@ data class TranscriptBoxConfig(
             @JvmField val CODEC: Codec<HeaderDisplay> = Codec.STRING.dispatch("type", HeaderDisplay::type) { type ->
                 when (type) {
                     "none" -> None.CODEC
-                    "lang_code" -> LangCode.CODEC
-                    "lang_code_uppercase" -> LangCodeUppercase.CODEC
-                    "lang_name" -> LangName.CODEC
+                    "transcript" -> Transcript.CODEC
+                    "translation" -> Translation.CODEC
+                    "translations" -> Translations.CODEC
+                    "mod_translation" -> UTTranslation.CODEC
+                    "mod_translations" -> UTTranslations.CODEC
                     "custom" -> Custom.CODEC
+                    "custom_rich" -> CustomRich.CODEC
                     else -> throw IllegalArgumentException("No header display found by type $type!")
                 }
             }
         }
 
-        abstract fun text(languageCode: String): Component
+        abstract fun text(languageDisplay: Component): Component
 
         object None : HeaderDisplay("none") {
             @JvmField val CODEC: MapCodec<None> = MapCodec.unit(None)
 
-            override fun text(languageCode: String): Component = Component.empty()
+            override fun text(languageDisplay: Component): Component = Component.empty().append(languageDisplay)
         }
 
-        object LangCode : HeaderDisplay("lang_code") {
-            @JvmField val CODEC: MapCodec<LangCode> = MapCodec.unit(LangCode)
+        object Transcript : HeaderDisplay("transcript") {
+            @JvmField val CODEC: MapCodec<Transcript> = MapCodec.unit(Transcript)
 
-            // Transcript (en)
-            override fun text(languageCode: String): Component = Component.translatable(HEADER_LANG, languageCode)
+            override fun text(languageDisplay: Component): Component = Component.translatable("$HEADER_LANG.transcript", languageDisplay)
         }
 
-        object LangCodeUppercase : HeaderDisplay("lang_code_uppercase") {
-            @JvmField val CODEC: MapCodec<LangCodeUppercase> = MapCodec.unit(LangCodeUppercase)
+        object Translation : HeaderDisplay("translation") {
+            @JvmField val CODEC: MapCodec<Translation> = MapCodec.unit(Translation)
 
-            // Transcript (EN)
-            override fun text(languageCode: String): Component = Component.translatable(HEADER_LANG, languageCode.uppercase())
+            override fun text(languageDisplay: Component): Component = Component.translatable("$HEADER_LANG.translation", languageDisplay)
         }
 
-        object LangName : HeaderDisplay("lang_name") {
-            @JvmField val CODEC: MapCodec<LangName> = MapCodec.unit(LangName)
+        object Translations : HeaderDisplay("translations") {
+            @JvmField val CODEC: MapCodec<Translations> = MapCodec.unit(Translations)
 
-            // Transcript (English)
-            override fun text(languageCode: String): Component = Component.translatable(HEADER_LANG, Component.translatableWithFallback("unitytranslate.language.$languageCode", languageCode))
+            override fun text(languageDisplay: Component): Component = Component.translatable("$HEADER_LANG.translations", languageDisplay)
         }
 
-        data class Custom(val text: String) : HeaderDisplay("custom") {
-            override fun text(languageCode: String): Component = Component.literal(this.text)
+        object UTTranslation : HeaderDisplay("mod_translation") {
+            @JvmField val CODEC: MapCodec<UTTranslation> = MapCodec.unit(UTTranslation)
+
+            override fun text(languageDisplay: Component): Component = Component.translatable("$HEADER_LANG.mod_translation", languageDisplay)
+        }
+
+        object UTTranslations : HeaderDisplay("mod_translations") {
+            @JvmField val CODEC: MapCodec<UTTranslations> = MapCodec.unit(UTTranslations)
+
+            override fun text(languageDisplay: Component): Component = Component.translatable("$HEADER_LANG.mod_translations", languageDisplay)
+        }
+
+        data class Custom(val text: String, val appendLanguage: Boolean) : HeaderDisplay("custom") {
+            override fun text(languageDisplay: Component): Component = Component.literal(this.text).run {
+                if (appendLanguage)
+                    this.append(" ").append(languageDisplay)
+                else this
+            }
 
             companion object {
-                @JvmField val CODEC: MapCodec<Custom> = Codec.STRING.fieldOf("text")
-                    .xmap(::Custom, Custom::text)
+                @JvmField val CODEC: MapCodec<Custom> = RecordCodecBuilder.mapCodec { instance ->
+                    instance.group(
+                        Codec.STRING.fieldOf("text")
+                            .forGetter(Custom::text),
+                        Codec.BOOL.optionalFieldOf("append_language", true)
+                            .forGetter(Custom::appendLanguage),
+                    )
+                        .apply(instance, ::Custom)
+                }
+            }
+        }
+
+        data class CustomRich(val text: Component, val appendLanguage: Boolean) : HeaderDisplay("custom_rich") {
+            override fun text(languageDisplay: Component): Component = this.text.copy().run {
+                if (appendLanguage)
+                    this.append(" ").append(languageDisplay)
+                else this
+            }
+
+            companion object {
+                @JvmField val CODEC: MapCodec<CustomRich> = RecordCodecBuilder.mapCodec { instance ->
+                    instance.group(
+                        ComponentSerialization.CODEC.fieldOf("text")
+                            .forGetter(CustomRich::text),
+                        Codec.BOOL.optionalFieldOf("append_language", true)
+                            .forGetter(CustomRich::appendLanguage),
+                    )
+                        .apply(instance, ::CustomRich)
+                }
             }
         }
     }

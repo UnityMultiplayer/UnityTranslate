@@ -3,8 +3,9 @@ package xyz.bluspring.unitytranslate.client.config
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import gg.essential.elementa.components.GradientComponent
+import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 import xyz.bluspring.unitytranslate.api.v2.util.AdditionalCodecs
+import xyz.bluspring.unitytranslate.client.config.ColorConfig.Gradient.GradientDirection.*
 
 sealed class ColorConfig(val type: String) {
     companion object {
@@ -30,12 +31,48 @@ sealed class ColorConfig(val type: String) {
         }
     }
 
-    data class Gradient(val direction: GradientComponent.GradientDirection, val fromColor: Int, val toColor: Int) : ColorConfig("gradient") {
+    data class Gradient(val direction: GradientDirection, val fromColor: Int, val toColor: Int) : ColorConfig("gradient") {
+        // top left  |  top right  |  bottom left  |  bottom right
+        val colors = when (this.direction) {
+            TOP_LEFT -> intArrayOf(
+                toColor, ARGBHelper.srgbLerp(toColor, fromColor, 0.5f),
+                ARGBHelper.srgbLerp(toColor, fromColor, 0.5f), fromColor
+            )
+            TOP -> intArrayOf(
+                toColor, toColor,
+                fromColor, fromColor
+            )
+            TOP_RIGHT -> intArrayOf(
+                ARGBHelper.srgbLerp(fromColor, toColor, 0.5f), toColor,
+                fromColor, ARGBHelper.srgbLerp(fromColor, toColor, 0.5f)
+            )
+            LEFT -> intArrayOf(
+                toColor, fromColor,
+                toColor, fromColor
+            )
+            RIGHT -> intArrayOf(
+                fromColor, toColor,
+                fromColor, toColor
+            )
+            BOTTOM_LEFT -> intArrayOf(
+                fromColor, ARGBHelper.srgbLerp(fromColor, toColor, 0.5f),
+                toColor, ARGBHelper.srgbLerp(fromColor, toColor, 0.5f)
+            )
+            BOTTOM -> intArrayOf(
+                fromColor, fromColor,
+                toColor, toColor,
+            )
+            BOTTOM_RIGHT -> intArrayOf(
+                fromColor, ARGBHelper.srgbLerp(fromColor, toColor, 0.5f),
+                ARGBHelper.srgbLerp(fromColor, toColor, 0.5f), toColor
+            )
+        }
+
         companion object {
             @JvmField
             val CODEC: MapCodec<Gradient> = RecordCodecBuilder.mapCodec { instance ->
                 instance.group(
-                    AdditionalCodecs.enumCodec(GradientComponent.GradientDirection::valueOf)
+                    AdditionalCodecs.enumCodec(GradientDirection::valueOf)
                         .fieldOf("direction")
                         .forGetter(Gradient::direction),
                     AdditionalCodecs.COLOR_ARGB.fieldOf("from_color")
@@ -45,6 +82,12 @@ sealed class ColorConfig(val type: String) {
                 )
                     .apply(instance, ::Gradient)
             }
+        }
+
+        enum class GradientDirection {
+            TOP_LEFT,    TOP,    TOP_RIGHT,
+            LEFT,                RIGHT,
+            BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT
         }
     }
 }

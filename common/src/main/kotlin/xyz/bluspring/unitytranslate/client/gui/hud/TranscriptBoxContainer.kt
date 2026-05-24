@@ -1,71 +1,75 @@
 package xyz.bluspring.unitytranslate.client.gui.hud
 
-import gg.essential.elementa.components.UIRoundedRectangle
-import gg.essential.elementa.components.UIText
-import gg.essential.elementa.constraints.ConstantColorConstraint
-import gg.essential.elementa.dsl.*
-import gg.essential.elementa.effects.RoundedOutlineEffect
-import gg.essential.universal.UMatrixStack
-import xyz.bluspring.fork.elementa.ElementaClientPlatformProxy
+import com.mojang.blaze3d.vertex.PoseStack
+import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.RenderPipelines
+import net.minecraft.network.chat.Component
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
+import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.ColorConfig
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
-import java.awt.Color
+import xyz.bluspring.unitytranslate.client.renderer.BatchedGuiRenderer
+import xyz.bluspring.unitytranslate.client.renderer.UIGraphics
 
-class TranscriptBoxContainer(
-    var holder: TranscriptHolder,
-    val config: TranscriptBoxConfig
-) : UIRoundedRectangle(config.cornerRadius) {
-    // TODO: these should not be dependent on solid colours.
-    private val roundedEffect = RoundedOutlineEffect(
-        config.outline.thickness,
-        config.cornerRadius,
-        Color((config.outline.color as ColorConfig.Solid).color, true)
-    )
+class TranscriptBoxContainer(var holder: TranscriptHolder, val config: TranscriptBoxConfig) {
+    var x = 0f
+    var y = 0f
+    var width = 0f
+    var height = 0f
+    var font = Minecraft.getInstance().font
 
-    init {
-        effect(roundedEffect)
-        this.updateConfig()
+    fun submit(poseStack: PoseStack, partialTick: Float) {
+        poseStack.pushPose()
+        poseStack.translate(this.x, this.y, 0f)
+
+        // Background
+        poseStack.pushPose()
+        poseStack.translate(0f, 0f, 1f)
+
+        val background = this.config.background
+        if (background is TranscriptBoxConfig.Background.Color) {
+            val color = background.color
+            val topLeft = if (color is ColorConfig.Solid) color.color else if (color is ColorConfig.Gradient) color.colors[0] else -1
+            val topRight = if (color is ColorConfig.Solid) color.color else if (color is ColorConfig.Gradient) color.colors[1] else -1
+            val bottomLeft = if (color is ColorConfig.Solid) color.color else if (color is ColorConfig.Gradient) color.colors[2] else -1
+            val bottomRight = if (color is ColorConfig.Solid) color.color else if (color is ColorConfig.Gradient) color.colors[3] else -1
+
+            val buffer = BatchedGuiRenderer.getBuffer(RenderPipelines.GUI)
+            buffer.addVertex(poseStack.last(), -this.config.padding.left, -this.config.padding.top, 0f).setColor(topLeft)
+            buffer.addVertex(poseStack.last(), -this.config.padding.left, height + this.config.padding.bottom, 0f).setColor(bottomLeft)
+            buffer.addVertex(poseStack.last(), width + this.config.padding.right, height + this.config.padding.bottom, 0f).setColor(bottomRight)
+            buffer.addVertex(poseStack.last(), width + this.config.padding.right, -this.config.padding.bottom, 0f).setColor(topRight)
+        }
+        poseStack.popPose()
+
+        // Header
+        poseStack.pushPose()
+        poseStack.translate(0f, 0f, 2f)
+
+        val headerText = this.config.header.text(this.holder.languageCode)
+        val headerLength = font.width(this.config.header.display.text(Component.empty()))
+        val languageLength = font.width(this.config.header.langDecoration.decorate(this.config.header.langDisplay.text(this.holder.languageCode)))
+
+        UIGraphics.drawString(poseStack.last(), font, headerText.visualOrderText, this.config.header.alignX.align(this.width, headerLength, languageLength), this.config.header.alignY.align(this.height), -1, this.config.header.hasShadow)
+        poseStack.popPose()
+
+        poseStack.popPose()
     }
 
     fun updateConfig() {
         if (this.holder.languageCode != this.config.languageCode)
             this.holder = UnityTranslateApi.instance.getOrCreateTranscriptHolder(this.config.languageCode)
 
-        val screenWidth = ElementaClientPlatformProxy.instance.windowWidth
-        val screenHeight = ElementaClientPlatformProxy.instance.windowHeight
+        val screenWidth = ClientPlatformProxy.instance.windowWidth
+        val screenHeight = ClientPlatformProxy.instance.windowHeight
 
         val pos = config.transforms.position.calculatePos(screenWidth, screenHeight)
         val dimensions = config.transforms.size.calculateDimensions(pos, screenWidth, screenHeight)
 
-        this.constraints.x = (pos.x - dimensions.left).pixels
-        this.constraints.y = (pos.y - dimensions.top).pixels
-        this.constraints.width = (dimensions.right - dimensions.left).pixels
-        this.constraints.height = (dimensions.bottom - dimensions.top).pixels
-        this.setRadius(config.cornerRadius.pixels)
-        this.constraints.color = ConstantColorConstraint(
-            Color(
-                ((config.background as TranscriptBoxConfig.Background.Color).color as ColorConfig.Solid).color,
-                true
-            )
-        )
-        this.roundedEffect.thickness = config.outline.thickness
-        this.roundedEffect.color = Color((config.outline.color as ColorConfig.Solid).color, true)
-        this.roundedEffect.radius = config.cornerRadius
-        this.clearChildren()
-
-        UIText(this.config.header.display.text(this.holder.languageCode).copy().withStyle(this.config.header.style)).constrain {
-            x = 50.percent
-            y = 0.percent
-        } childOf this
-    }
-
-    override fun beforeDraw(matrixStack: UMatrixStack) {
-        for (data in this.holder.transcripts) {
-
-        }
-
-        super.beforeDraw(matrixStack)
+        this.x = pos.x - dimensions.left
+        this.y = pos.y - dimensions.top
+        this.width = dimensions.right - dimensions.left
+        this.height = dimensions.bottom - dimensions.top
     }
 }

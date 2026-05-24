@@ -43,15 +43,6 @@ stonecutter {
 //            // KLF doesn't exist for >=1.20.5, don't bother
 //            versions(supportedVersions.filter { stonecutter.eval(it, "<1.20.5") })
 //        }
-        branch("elementa")
-    }
-}
-
-dependencyResolutionManagement {
-    versionCatalogs {
-        create("elementa") {
-            from(files("elementa/gradle/libs.versions.toml"))
-        }
     }
 }
 

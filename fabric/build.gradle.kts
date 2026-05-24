@@ -38,5 +38,3 @@ dependencies {
     annotationProcessor(libs.mixinextras.fabric)
     moddedApi("net.fabricmc.fabric-api:fabric-api:${common?.mod?.dep("fabric_api") ?: mod.dep("fabric_api")}")
 }
-
-setupElementa(stonecutter.current.version)
