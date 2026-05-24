@@ -61,14 +61,14 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
         if (this.holder.languageCode != this.config.languageCode)
             this.holder = UnityTranslateApi.instance.getOrCreateTranscriptHolder(this.config.languageCode)
 
-        val screenWidth = ClientPlatformProxy.instance.windowWidth
-        val screenHeight = ClientPlatformProxy.instance.windowHeight
+        val screenWidth = (ClientPlatformProxy.instance.windowWidth / ClientPlatformProxy.instance.guiScale).toInt()
+        val screenHeight = (ClientPlatformProxy.instance.windowHeight / ClientPlatformProxy.instance.guiScale).toInt()
 
         val pos = config.transforms.position.calculatePos(screenWidth, screenHeight)
         val dimensions = config.transforms.size.calculateDimensions(pos, screenWidth, screenHeight)
 
-        this.x = pos.x - dimensions.left
-        this.y = pos.y - dimensions.top
+        this.x = dimensions.left
+        this.y = dimensions.top
         this.width = dimensions.right - dimensions.left
         this.height = dimensions.bottom - dimensions.top
     }
