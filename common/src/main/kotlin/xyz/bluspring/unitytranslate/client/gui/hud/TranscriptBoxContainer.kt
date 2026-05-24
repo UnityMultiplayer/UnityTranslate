@@ -19,6 +19,10 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
     var height = 0f
     var font = Minecraft.getInstance().font
 
+    private var headerText: Component = Component.empty()
+    private var headerX: Float = 0f
+    private var headerY: Float = 0f
+
     fun submit(poseStack: PoseStack, partialTick: Float) {
         poseStack.pushPose()
         poseStack.translate(this.x, this.y, 0f)
@@ -47,11 +51,7 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
         poseStack.pushPose()
         poseStack.translate(0f, 0f, 2f)
 
-        val headerText = this.config.header.text(this.holder.languageCode)
-        val headerLength = font.width(this.config.header.display.text(Component.empty()))
-        val languageLength = font.width(this.config.header.langDecoration.decorate(this.config.header.langDisplay.text(this.holder.languageCode)))
-
-        UIGraphics.drawString(poseStack.last(), font, headerText.visualOrderText, this.config.header.alignX.align(this.width, headerLength, languageLength), this.config.header.alignY.align(this.height), -1, this.config.header.hasShadow)
+        UIGraphics.drawString(poseStack.last(), font, headerText.visualOrderText, this.headerX, this.headerY, -1, this.config.header.hasShadow)
         poseStack.popPose()
 
         poseStack.popPose()
@@ -71,5 +71,12 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
         this.y = dimensions.top
         this.width = dimensions.right - dimensions.left
         this.height = dimensions.bottom - dimensions.top
+
+        this.headerText = this.config.header.text(this.holder.languageCode)
+        val headerLength = font.width(this.config.header.display.text(Component.empty()))
+        val languageLength = font.width(this.config.header.langDecoration.decorate(this.config.header.langDisplay.text(this.holder.languageCode)))
+
+        this.headerX = this.config.header.alignX.align(this.width, headerLength, languageLength)
+        this.headerY = this.config.header.alignY.align(this.height)
     }
 }
