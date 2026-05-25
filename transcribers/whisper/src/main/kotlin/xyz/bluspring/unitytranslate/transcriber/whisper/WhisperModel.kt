@@ -1,5 +1,8 @@
 package xyz.bluspring.unitytranslate.transcriber.whisper
 
+import com.mojang.serialization.Codec
+import xyz.bluspring.unitytranslate.api.v2.util.AdditionalCodecs
+
 enum class WhisperModel(val url: String, val minimumBytes: Long, val minimumMemoryBytes: Long) {
     TINY("https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.bin", 45613056, 286261248), // 43.5 MiB, 273 MiB
     BASE("https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin", 155189248, 406847488), // 148 MiB, 388 MiB
@@ -12,4 +15,8 @@ enum class WhisperModel(val url: String, val minimumBytes: Long, val minimumMemo
     // OpenAI models: https://github.com/openai/whisper/blob/main/whisper/__init__.py#L17-L30
     // GGML models: https://huggingface.co/ggerganov/whisper.cpp/tree/main
     // Memory usage reference: https://github.com/ggml-org/whisper.cpp#memory-usage
+
+    companion object {
+        @JvmField val CODEC: Codec<WhisperModel> = AdditionalCodecs.enumCodec(WhisperModel::valueOf)
+    }
 }

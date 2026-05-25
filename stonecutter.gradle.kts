@@ -16,14 +16,24 @@ allprojects {
     apply(plugin = "idea")
 
     repositories {
+        fun mavenProviding(url: String, vararg groups: String) {
+            exclusiveContent {
+                forRepositories(maven(url)).filter {
+                    for (group in groups) {
+                        includeGroupAndSubgroups(group)
+                    }
+                }
+            }
+        }
+
         mavenCentral()
         mavenLocal()
-        maven("https://maven.parchmentmc.org")
-        maven("https://repo.nyon.dev/releases")
-        maven("https://maven.fabricmc.net")
-        maven("https://libraries.minecraft.net")
-        maven("https://mvn.devos.one/releases")
-        maven("https://repo.essential.gg/repository/maven-public")
+        mavenProviding("https://maven.parchmentmc.org", "org.parchmentmc.data")
+        mavenProviding("https://repo.nyon.dev/releases", "dev.nyon")
+        mavenProviding("https://maven.fabricmc.net", "net.fabricmc")
+        mavenProviding("https://libraries.minecraft.net", "com.mojang")
+//        mavenProviding("https://mvn.devos.one/releases", "xyz.bluspring.unitytranslate")
+        mavenProviding("https://mvn.devos.one/snapshots", "dev.cadindie")
     }
 
     group = mod.group
