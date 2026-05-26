@@ -44,4 +44,6 @@ dependencies {
     api(libs.unitytranslatelib) {
         exclude(group = "org.slf4j") // because NeoForge panics otherwise
     }
+    api(libs.voicechat.api)
+    api(libs.sunset)
 }

@@ -6,8 +6,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import xyz.bluspring.unitytranslate.PlatformProxy
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
-import xyz.bluspring.unitytranslate.api.v2.UnityTranslatePlugin
 import xyz.bluspring.unitytranslate.api.v2.plugin.PluginMetadata
+import xyz.bluspring.unitytranslate.api.v2.plugin.UnityTranslatePlugin
 import java.net.URLClassLoader
 import java.nio.file.Path
 import java.util.*

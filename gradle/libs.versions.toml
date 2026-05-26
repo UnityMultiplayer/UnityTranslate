@@ -45,7 +45,14 @@ gson = "2.14.0"
 
 unitytranslatelib = "1.0.0"
 
+# https://github.com/BluSpring/SunsetConfig/blob/main/build.gradle.kts#L23
+sunset = "1.2.0"
+
+# https://mvn.devos.one/#/snapshots/dev/cadindie/whisper4j
 whisper4j = "1.0.0"
+
+# https://maven.maxhenkel.de/#/releases/de/maxhenkel/voicechat/voicechat-api
+voicechat-api = "2.6.13"
 
 [bundles]
 kotlin = [
@@ -86,6 +93,9 @@ gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 
 unitytranslatelib = { module = "xyz.bluspring.unitytranslate:unitytranslate-library", version.ref = "unitytranslatelib" }
 whisper4j = { module = "dev.cadindie:whisper4j", version.ref = "whisper4j" }
+
+voicechat-api = { module = "de.maxhenkel.voicechat:voicechat-api", version.ref = "voicechat-api" }
+sunset = { module = "xyz.bluspring.sunset:sunset-config", version.ref = "sunset" }
 
 [plugins]
 moddevgradle = { id = "net.neoforged.moddev" }

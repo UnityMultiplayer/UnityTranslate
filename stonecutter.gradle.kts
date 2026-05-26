@@ -32,8 +32,9 @@ allprojects {
         mavenProviding("https://repo.nyon.dev/releases", "dev.nyon")
         mavenProviding("https://maven.fabricmc.net", "net.fabricmc")
         mavenProviding("https://libraries.minecraft.net", "com.mojang")
-//        mavenProviding("https://mvn.devos.one/releases", "xyz.bluspring.unitytranslate")
+        mavenProviding("https://mvn.devos.one/releases", "xyz.bluspring.sunset")
         mavenProviding("https://mvn.devos.one/snapshots", "dev.cadindie")
+        mavenProviding("https://maven.maxhenkel.de/releases", "de.maxhenkel")
     }
 
     group = mod.group

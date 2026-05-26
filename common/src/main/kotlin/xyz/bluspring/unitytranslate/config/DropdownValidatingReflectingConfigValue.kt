@@ -1,0 +1,8 @@
+package xyz.bluspring.unitytranslate.config
+
+import com.mojang.serialization.Codec
+import xyz.bluspring.unitytranslate.api.v2.config.ConfigValueBuilder
+import kotlin.reflect.KMutableProperty
+
+open class DropdownValidatingReflectingConfigValue<T>(id: String, val values: Collection<T>, codec: Codec<T>, property: KMutableProperty<T>, owner: Any? = null, validator: ConfigValueBuilder<T>) : ValidatingReflectingConfigValue<T>(id, codec, property, owner, validator) {
+}

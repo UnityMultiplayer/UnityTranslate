@@ -5,6 +5,7 @@ import java.util.*
 
 interface PlatformProxy {
     val version: String
+    val rootDir: Path
     val pluginsDir: Path
     val nativesDir: Path
 

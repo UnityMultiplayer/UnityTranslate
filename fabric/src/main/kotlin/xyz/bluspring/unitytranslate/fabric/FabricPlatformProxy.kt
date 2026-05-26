@@ -9,4 +9,5 @@ class FabricPlatformProxy : PlatformProxy {
     override val version: String = FabricLoader.getInstance().getModContainer(UnityTranslate.MOD_ID).orElseThrow().metadata.version.friendlyString
     override val pluginsDir: Path = FabricLoader.getInstance().gameDir.resolve("unitytranslate/plugins")
     override val nativesDir: Path = FabricLoader.getInstance().gameDir.resolve("unitytranslate/natives")
+    override val rootDir: Path = FabricLoader.getInstance().gameDir
 }
