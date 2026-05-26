@@ -35,6 +35,11 @@ interface UnityTranslateApi {
     fun getTranscriberId(transcriber: SpeechTranscriber): String
 
     /**
+     * Gets a [SpeechTranscriber] by ID. Defaults to [InactiveTranscriber] if none exists.
+     */
+    fun getTranscriber(id: String): SpeechTranscriber
+
+    /**
      * Gets the currently active [SpeechTranscriber].
      * If no transcriber is active, it will default to [InactiveTranscriber]
      */

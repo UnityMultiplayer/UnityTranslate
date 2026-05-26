@@ -1,19 +1,19 @@
 package xyz.bluspring.unitytranslate.client.gui
 
-import com.mojang.blaze3d.vertex.PoseStack
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
 import xyz.bluspring.unitytranslate.client.gui.hud.TranscriptBoxContainer
+import xyz.bluspring.unitytranslate.client.renderer.UIGraphics
 
 class TranscriptBoxRenderer {
     val containers = mutableListOf<TranscriptBoxContainer>()
 
-    fun submit(poseStack: PoseStack, partialTick: Float) {
+    fun submit(graphics: UIGraphics, partialTick: Float) {
         for ((index, container) in this.containers.withIndex()) {
-            poseStack.pushPose()
-            poseStack.translate(0f, 0f, index * 100f)
-            container.submit(poseStack, partialTick)
-            poseStack.popPose()
+            graphics.poseStack.pushPose()
+            graphics.poseStack.translate(0f, 0f, index * 100f)
+            container.submit(graphics, partialTick)
+            graphics.poseStack.popPose()
         }
     }
 

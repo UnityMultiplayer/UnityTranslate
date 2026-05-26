@@ -1,6 +1,5 @@
 package xyz.bluspring.unitytranslate.client.gui.hud
 
-import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.network.chat.Component
@@ -23,13 +22,13 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
     private var headerX: Float = 0f
     private var headerY: Float = 0f
 
-    fun submit(poseStack: PoseStack, partialTick: Float) {
-        poseStack.pushPose()
-        poseStack.translate(this.x, this.y, 0f)
+    fun submit(graphics: UIGraphics, partialTick: Float) {
+        graphics.poseStack.pushPose()
+        graphics.poseStack.translate(this.x, this.y, 0f)
 
         // Background
-        poseStack.pushPose()
-        poseStack.translate(0f, 0f, 1f)
+        graphics.poseStack.pushPose()
+        graphics.poseStack.translate(0f, 0f, 1f)
 
         val background = this.config.background
         if (background is TranscriptBoxConfig.Background.Color) {
@@ -40,21 +39,21 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
             val bottomRight = if (color is ColorConfig.Solid) color.color else if (color is ColorConfig.Gradient) color.colors[3] else -1
 
             val buffer = BatchedGuiRenderer.getBuffer(RenderPipelines.GUI)
-            buffer.addVertex(poseStack.last(), -this.config.padding.left, -this.config.padding.top, 0f).setColor(topLeft)
-            buffer.addVertex(poseStack.last(), -this.config.padding.left, height + this.config.padding.bottom, 0f).setColor(bottomLeft)
-            buffer.addVertex(poseStack.last(), width + this.config.padding.right, height + this.config.padding.bottom, 0f).setColor(bottomRight)
-            buffer.addVertex(poseStack.last(), width + this.config.padding.right, -this.config.padding.bottom, 0f).setColor(topRight)
+            buffer.addVertex(graphics.poseStack.last(), -this.config.padding.left, -this.config.padding.top, 0f).setColor(topLeft)
+            buffer.addVertex(graphics.poseStack.last(), -this.config.padding.left, height + this.config.padding.bottom, 0f).setColor(bottomLeft)
+            buffer.addVertex(graphics.poseStack.last(), width + this.config.padding.right, height + this.config.padding.bottom, 0f).setColor(bottomRight)
+            buffer.addVertex(graphics.poseStack.last(), width + this.config.padding.right, -this.config.padding.bottom, 0f).setColor(topRight)
         }
-        poseStack.popPose()
+        graphics.poseStack.popPose()
 
         // Header
-        poseStack.pushPose()
-        poseStack.translate(0f, 0f, 2f)
+        graphics.poseStack.pushPose()
+        graphics.poseStack.translate(0f, 0f, 2f)
 
-        UIGraphics.drawString(poseStack.last(), font, headerText.visualOrderText, this.headerX, this.headerY, -1, this.config.header.hasShadow)
-        poseStack.popPose()
+        graphics.drawString(font, headerText.visualOrderText, this.headerX, this.headerY, -1, this.config.header.hasShadow)
+        graphics.poseStack.popPose()
 
-        poseStack.popPose()
+        graphics.poseStack.popPose()
     }
 
     fun updateConfig() {

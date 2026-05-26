@@ -17,6 +17,13 @@ object UnityTranslateApiImpl : UnityTranslateApi {
     val transcriptHolders: MutableMap<String, TranscriptHolder> = WeakHashMap()
 
     override var activeTranscriber: SpeechTranscriber = InactiveTranscriber
+        private set
+
+    suspend fun setActiveTranscriber(transcriber: SpeechTranscriber) {
+        this.activeTranscriber.close()
+        transcriber.initialSetup.await()
+        this.activeTranscriber = transcriber
+    }
 
     override val configPath: Path
         get() = PlatformProxy.instance.rootDir.resolve("config/unitytranslate")
@@ -42,6 +49,10 @@ object UnityTranslateApiImpl : UnityTranslateApi {
 
     override fun getTranscriberId(transcriber: SpeechTranscriber): String {
         return this.transcribers.filterValues { it == transcriber }.keys.first()
+    }
+
+    override fun getTranscriber(id: String): SpeechTranscriber {
+        return this.transcribers[id] ?: InactiveTranscriber
     }
 
     override fun getOrCreateTranscriptHolder(languageCode: String): TranscriptHolder {

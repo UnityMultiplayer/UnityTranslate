@@ -4,11 +4,13 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.font.TextRenderable
 import net.minecraft.client.gui.navigation.ScreenRectangle
+import net.minecraft.network.chat.Component
 import net.minecraft.util.FormattedCharSequence
 import net.minecraft.util.LightCoordsUtil
 import java.util.*
 
-object UIGraphics {
+class UIGraphics {
+    val poseStack = PoseStack()
     private val scissorState = Stack<ScreenRectangle>()
 
     fun enableScissor(x: Int, y: Int, width: Int, height: Int) {
@@ -19,7 +21,11 @@ object UIGraphics {
         this.scissorState.pop()
     }
 
-    fun drawString(pose: PoseStack.Pose, font: Font, text: FormattedCharSequence, x: Float, y: Float, color: Int, dropShadow: Boolean) {
+    fun drawString(font: Font, text: Component, x: Float, y: Float, color: Int, dropShadow: Boolean)
+        = drawString(font, text.visualOrderText, x, y, color, dropShadow)
+
+    fun drawString(font: Font, text: FormattedCharSequence, x: Float, y: Float, color: Int, dropShadow: Boolean) {
+        val pose = poseStack.last()
         val prepared = font.prepareText(text, x, y, color, dropShadow, true, 0)
         prepared.visit(object : Font.GlyphVisitor {
             override fun acceptEffect(effect: TextRenderable) {

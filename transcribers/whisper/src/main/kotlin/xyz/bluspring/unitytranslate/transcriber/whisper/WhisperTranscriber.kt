@@ -40,6 +40,7 @@ object WhisperTranscriber : SpeechTranscriber() {
 
     private val whisperInstances = Collections.synchronizedMap(mutableMapOf<String, Whisper>())
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override val initialSetup: Deferred<Unit>
         get() = CoroutineScope(Dispatchers.IO).async {
             model.path.createParentDirectories()
@@ -64,11 +65,6 @@ object WhisperTranscriber : SpeechTranscriber() {
 
             download.deferred.await()
         }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun onSelected() {
-        super.onSelected()
-    }
 
     override fun transcribeSamples(samples: FloatArray, langCode: String): Deferred<String> {
         return this.scope.async(this.context) {
