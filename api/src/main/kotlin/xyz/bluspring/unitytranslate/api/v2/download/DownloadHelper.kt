@@ -68,24 +68,34 @@ object DownloadHelper {
         return null
     }
 
-    @JvmStatic
+    @JvmStatic @JvmOverloads
+    fun queue(
+        entry: DownloadableEntry,
+        createTemp: Boolean = true,
+        overwrite: Boolean = false,
+        vararg options: OpenOption = arrayOf(StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING),
+    ): DownloadInfo {
+        return queue(entry.uri.toURL(), entry.path, entry.expectedHash, createTemp, overwrite, options = options)
+    }
+
+    @JvmStatic @JvmOverloads
     fun queue(
         url: URL, path: Path,
-        vararg options: OpenOption = arrayOf(StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING),
         sha1: String? = null,
         createTemp: Boolean = true,
         overwrite: Boolean = false,
+        vararg options: OpenOption = arrayOf(StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING),
     ): DownloadInfo {
         return queue(url, path, hash = if (sha1 != null) DownloadHash.Sha1(sha1) else null, createTemp = createTemp, overwrite = overwrite, options = options)
     }
 
-    @JvmStatic
+    @JvmStatic @JvmOverloads
     fun queue(
         url: URL, path: Path,
-        vararg options: OpenOption = arrayOf(StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING),
         hash: DownloadHash? = null,
         createTemp: Boolean = true,
         overwrite: Boolean = false,
+        vararg options: OpenOption = arrayOf(StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING),
     ): DownloadInfo {
         val info = DownloadInfo.Mutable(path, url)
 

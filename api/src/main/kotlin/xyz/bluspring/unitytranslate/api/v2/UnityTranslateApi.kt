@@ -2,6 +2,7 @@ package xyz.bluspring.unitytranslate.api.v2
 
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigBuilder
 import xyz.bluspring.unitytranslate.api.v2.plugin.PluginMetadata
+import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
 import java.nio.file.Path
@@ -35,8 +36,9 @@ interface UnityTranslateApi {
 
     /**
      * Gets the currently active [SpeechTranscriber].
+     * If no transcriber is active, it will default to [InactiveTranscriber]
      */
-    val activeTranscriber: SpeechTranscriber?
+    val activeTranscriber: SpeechTranscriber
 
     /**
      * Retrieves a [TranscriptHolder] if one is available under the given language code,

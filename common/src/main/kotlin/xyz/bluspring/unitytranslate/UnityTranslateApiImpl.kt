@@ -4,6 +4,7 @@ import xyz.bluspring.sunset.SunsetConfig
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigBuilder
 import xyz.bluspring.unitytranslate.api.v2.plugin.PluginMetadata
+import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
 import xyz.bluspring.unitytranslate.config.SunsetWrappedConfigBuilder
@@ -15,7 +16,7 @@ object UnityTranslateApiImpl : UnityTranslateApi {
     val transcriberConfigs: MutableMap<String, SunsetConfig> = mutableMapOf()
     val transcriptHolders: MutableMap<String, TranscriptHolder> = WeakHashMap()
 
-    override var activeTranscriber: SpeechTranscriber? = null
+    override var activeTranscriber: SpeechTranscriber = InactiveTranscriber
 
     override val configPath: Path
         get() = PlatformProxy.instance.rootDir.resolve("config/unitytranslate")
