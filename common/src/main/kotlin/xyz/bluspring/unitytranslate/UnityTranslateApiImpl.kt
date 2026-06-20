@@ -7,7 +7,7 @@ import xyz.bluspring.unitytranslate.api.v2.plugin.PluginMetadata
 import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
-import xyz.bluspring.unitytranslate.config.SunsetWrappedConfigBuilder
+import xyz.bluspring.unitytranslate.config.builders.SunsetWrappedConfigBuilder
 import java.nio.file.Path
 import java.util.*
 

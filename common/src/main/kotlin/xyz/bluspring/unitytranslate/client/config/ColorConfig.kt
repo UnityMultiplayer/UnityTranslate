@@ -9,6 +9,8 @@ import xyz.bluspring.unitytranslate.client.config.ColorConfig.Gradient.GradientD
 
 sealed class ColorConfig(val type: String) {
     companion object {
+        @JvmField val TYPES = listOf("none", "solid", "gradient")
+
         @JvmField
         val CODEC: Codec<ColorConfig> = Codec.STRING.dispatch("type", ColorConfig::type) { type ->
             when (type) {

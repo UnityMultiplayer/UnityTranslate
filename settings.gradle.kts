@@ -18,7 +18,7 @@ plugins {
 
 val supportedVersions = listOf(
 //    "1.21.1", "1.21.4", "1.21.5", "1.21.8", "1.21.10", "1.21.11", "26.1", // TODO: we'll work backwards
-    "26.2-snapshot-6"
+    "26.2"
 )
 
 stonecutter {
@@ -27,7 +27,7 @@ stonecutter {
 
     create(rootProject) {
         versions(supportedVersions)
-        vcsVersion = "26.2-snapshot-6"
+        vcsVersion = "26.2"
 
         branch("common")
         branch("fabric")
@@ -48,6 +48,7 @@ stonecutter {
 
 include(":api")
 include(":shared")
+//include(":bukkit") // TODO: enough separation for Bukkit
 include(":standalone", ":standalone:launcher")
 include(":transcribers", ":transcribers:google", ":transcribers:whisper")
 include(":relay")

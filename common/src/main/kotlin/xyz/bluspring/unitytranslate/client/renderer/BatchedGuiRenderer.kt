@@ -116,7 +116,7 @@ object BatchedGuiRenderer {
                                     renderPass.setUniform(name, uniformBuffer)
                                 }
 
-                                renderPass.drawIndexed(0, 0, buffer.drawState().indexCount, 1)
+                                renderPass.drawIndexed(buffer.drawState().indexCount, 1, 0, 0, 0)
 
                                 for ((_, uniformBuffer) in uniforms) {
                                     uniformBuffer.close()

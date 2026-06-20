@@ -10,26 +10,92 @@ import net.minecraft.network.chat.Style
 import org.joml.Vector2f
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptData
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
-import xyz.bluspring.unitytranslate.api.v2.util.AdditionalCodecs.optionalFieldOf
 import xyz.bluspring.unitytranslate.util.Box2f
 import xyz.bluspring.unitytranslate.util.ScreenUtil
+import java.util.*
 
-data class TranscriptBoxConfig(
+class TranscriptBoxConfig(
     var languageCode: String,
     val transforms: Transforms,
 
-    val outline: Outline = Outline(),
-    var background: Background = Background.default(),
-    var textColor: Int = DEFAULT_TEXT_COLOR,
-    var shadowColor: Int = DEFAULT_SHADOW_COLOR,
-    var fontScale: Float = -1f, // -1 = MC GUI scale
-    var cornerRadius: Float = DEFAULT_CORNER_RADIUS,
+    private var _outline: Optional<Outline>,
+    private var _background: Optional<Background>,
+    private var _textColor: Optional<Int>,
+    private var _shadowColor: Optional<Int>,
+    private var _fontScale: Optional<Float>,
+    private var _cornerRadius: Optional<Float>,
+    private var _header: Optional<Header>,
+    private var _transcriptDisplay: Optional<TranscriptDisplay>,
+    private var _padding: Optional<Padding>,
+) : TranscriptBoxConfigHolder {
+    object Defaults : TranscriptBoxConfigHolder {
+        override var outline: Outline = Outline()
+        override var background: Background = Background.default()
+        override var textColor: Int = DEFAULT_TEXT_COLOR
+        override var shadowColor: Int = DEFAULT_SHADOW_COLOR
+        override var fontScale: Float = -1f // -1 = MC GUI scale
+        override var cornerRadius: Float = DEFAULT_CORNER_RADIUS
 
-    var header: Header = Header.default(),
-    var transcriptDisplay: TranscriptDisplay = TranscriptDisplay.default(),
+        override var header: Header = Header.default()
+        override var transcriptDisplay: TranscriptDisplay = TranscriptDisplay.default()
 
-    var padding: Padding = Padding.default(),
-) {
+        override var padding: Padding = Padding.default()
+    }
+
+    override var outline: Outline
+        get() = _outline.orElse(Defaults.outline)!!
+        set(value) {
+            _outline = Optional.of(value)
+        }
+
+    override var background: Background
+        get() = _background.orElse(Defaults.background)!!
+        set(value) {
+            _background = Optional.of(value)
+        }
+
+    override var textColor: Int
+        get() = _textColor.orElse(Defaults.textColor)!!
+        set(value) {
+            _textColor = Optional.of(value)
+        }
+
+    override var shadowColor: Int
+        get() = _shadowColor.orElse(Defaults.shadowColor)!!
+        set(value) {
+            _shadowColor = Optional.of(value)
+        }
+
+    override var fontScale: Float
+        get() = _fontScale.orElse(Defaults.fontScale)!!
+        set(value) {
+            _fontScale = Optional.of(value)
+        }
+
+    override var cornerRadius: Float
+        get() = _cornerRadius.orElse(Defaults.cornerRadius)!!
+        set(value) {
+            _cornerRadius = Optional.of(value)
+        }
+
+    override var header: Header
+        get() = _header.orElse(Defaults.header)!!
+        set(value) {
+            _header = Optional.of(value)
+        }
+
+    override var transcriptDisplay: TranscriptDisplay
+        get() = _transcriptDisplay.orElse(Defaults.transcriptDisplay)!!
+        set(value) {
+            _transcriptDisplay = Optional.of(value)
+        }
+
+    override var padding: Padding
+        get() = _padding.orElse(Defaults.padding)!!
+        set(value) {
+            _padding = Optional.of(value)
+        }
+
     companion object {
         @JvmField val DEFAULT_TEXT_COLOR = ARGBHelper.color(255, 255, 255, 255)
         @JvmField val DEFAULT_SHADOW_COLOR = ARGBHelper.color(255, 0, 0, 0)
@@ -42,24 +108,25 @@ data class TranscriptBoxConfig(
                     .forGetter(TranscriptBoxConfig::languageCode),
                 Transforms.CODEC.fieldOf("transforms")
                     .forGetter(TranscriptBoxConfig::transforms),
-                Outline.CODEC.optionalFieldOf("outline", ::Outline)
-                    .forGetter(TranscriptBoxConfig::outline),
-                Background.CODEC.optionalFieldOf("background", Background::default)
-                    .forGetter(TranscriptBoxConfig::background),
-                Codec.INT.optionalFieldOf("text_color", DEFAULT_TEXT_COLOR)
-                    .forGetter(TranscriptBoxConfig::textColor),
-                Codec.INT.optionalFieldOf("shadow_color", DEFAULT_SHADOW_COLOR)
-                    .forGetter(TranscriptBoxConfig::shadowColor),
-                Codec.FLOAT.optionalFieldOf("font_scale", -1f)
-                    .forGetter(TranscriptBoxConfig::fontScale),
-                Codec.FLOAT.optionalFieldOf("corner_radius", DEFAULT_CORNER_RADIUS)
-                    .forGetter(TranscriptBoxConfig::cornerRadius),
-                Header.CODEC.optionalFieldOf("header", Header::default)
-                    .forGetter(TranscriptBoxConfig::header),
-                TranscriptDisplay.CODEC.optionalFieldOf("transcript_display", TranscriptDisplay::default)
-                    .forGetter(TranscriptBoxConfig::transcriptDisplay),
-                Padding.CODEC.optionalFieldOf("padding", Padding::default)
-                    .forGetter(TranscriptBoxConfig::padding),
+
+                Outline.CODEC.optionalFieldOf("outline")
+                    .forGetter(TranscriptBoxConfig::_outline),
+                Background.CODEC.optionalFieldOf("background")
+                    .forGetter(TranscriptBoxConfig::_background),
+                Codec.INT.optionalFieldOf("text_color")
+                    .forGetter(TranscriptBoxConfig::_textColor),
+                Codec.INT.optionalFieldOf("shadow_color")
+                    .forGetter(TranscriptBoxConfig::_shadowColor),
+                Codec.FLOAT.optionalFieldOf("font_scale")
+                    .forGetter(TranscriptBoxConfig::_fontScale),
+                Codec.FLOAT.optionalFieldOf("corner_radius")
+                    .forGetter(TranscriptBoxConfig::_cornerRadius),
+                Header.CODEC.optionalFieldOf("header")
+                    .forGetter(TranscriptBoxConfig::_header),
+                TranscriptDisplay.CODEC.optionalFieldOf("transcript_display")
+                    .forGetter(TranscriptBoxConfig::_transcriptDisplay),
+                Padding.CODEC.optionalFieldOf("padding")
+                    .forGetter(TranscriptBoxConfig::_padding),
             )
                 .apply(instance, ::TranscriptBoxConfig)
         }

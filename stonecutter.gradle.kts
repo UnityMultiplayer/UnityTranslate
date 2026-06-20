@@ -10,7 +10,7 @@ plugins {
     id("idea")
 }
 
-stonecutter active "26.2-snapshot-6"
+stonecutter active "26.2"
 
 allprojects {
     apply(plugin = "idea")

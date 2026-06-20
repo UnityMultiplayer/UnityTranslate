@@ -1,14 +1,12 @@
 package xyz.bluspring.unitytranslate.client.gui.hud
 
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.network.chat.Component
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.ColorConfig
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
-import xyz.bluspring.unitytranslate.client.renderer.BatchedGuiRenderer
 import xyz.bluspring.unitytranslate.client.renderer.UIGraphics
 
 class TranscriptBoxContainer(var holder: TranscriptHolder, val config: TranscriptBoxConfig) {
@@ -38,11 +36,7 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
             val bottomLeft = if (color is ColorConfig.Solid) color.color else if (color is ColorConfig.Gradient) color.colors[2] else -1
             val bottomRight = if (color is ColorConfig.Solid) color.color else if (color is ColorConfig.Gradient) color.colors[3] else -1
 
-            val buffer = BatchedGuiRenderer.getBuffer(RenderPipelines.GUI)
-            buffer.addVertex(graphics.poseStack.last(), -this.config.padding.left, -this.config.padding.top, 0f).setColor(topLeft)
-            buffer.addVertex(graphics.poseStack.last(), -this.config.padding.left, height + this.config.padding.bottom, 0f).setColor(bottomLeft)
-            buffer.addVertex(graphics.poseStack.last(), width + this.config.padding.right, height + this.config.padding.bottom, 0f).setColor(bottomRight)
-            buffer.addVertex(graphics.poseStack.last(), width + this.config.padding.right, -this.config.padding.bottom, 0f).setColor(topRight)
+            graphics.fill(-this.config.padding.left, -this.config.padding.top, width + this.config.padding.right, height + this.config.padding.bottom, topLeft, topRight, bottomLeft, bottomRight)
         }
         graphics.poseStack.popPose()
 

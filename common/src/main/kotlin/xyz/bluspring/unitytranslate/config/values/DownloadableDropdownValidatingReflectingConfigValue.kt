@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.config
+package xyz.bluspring.unitytranslate.config.values
 
 import com.mojang.serialization.Codec
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigValueBuilder
