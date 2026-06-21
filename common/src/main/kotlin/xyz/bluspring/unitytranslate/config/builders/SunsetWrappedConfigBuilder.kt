@@ -1,6 +1,7 @@
 package xyz.bluspring.unitytranslate.config.builders
 
 import com.mojang.serialization.Codec
+import net.minecraft.network.chat.Component
 import xyz.bluspring.sunset.SunsetConfig
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigBuilder
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigButtonBuilder
@@ -147,6 +148,17 @@ class SunsetWrappedConfigBuilder(val wrapped: SunsetConfig.CategoryBuilder) : Co
         )
     }
 
+    override fun string(
+        id: String,
+        property: KMutableProperty<String>,
+        owner: Any?,
+        builder: ConfigValueBuilder<String>.() -> Unit
+    ) {
+        this.wrapped.custom(ValidatingReflectingConfigValue<String>(
+            id, Codec.STRING, property, owner, ConfigValueBuilderImpl<String>(id).apply(builder)
+        ))
+    }
+
     override fun <T> dropdown(
         id: String,
         values: Collection<T>,
@@ -199,5 +211,18 @@ class SunsetWrappedConfigBuilder(val wrapped: SunsetConfig.CategoryBuilder) : Co
 
     override fun label(id: String, builder: ConfigValueBuilder<Unit>.() -> Unit) {
         this.wrapped.custom(UnitConfigValue(id, ConfigValueBuilderImpl<Unit>(id).apply(builder)))
+    }
+
+    override fun intColor(
+        id: String,
+        property: KMutableProperty<Int>,
+        owner: Any?,
+        builder: ConfigValueBuilder<Int>.() -> Unit
+    ) {
+        this.wrapped.custom(IntColorConfigValue(id, property, owner, ConfigValueBuilderImpl<Int>(id).apply {
+            formatting {
+                Component.literal("#%08x".format(it))
+            }
+        }.apply(builder)))
     }
 }

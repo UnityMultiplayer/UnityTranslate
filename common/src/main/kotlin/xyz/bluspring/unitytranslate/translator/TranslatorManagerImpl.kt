@@ -5,6 +5,7 @@ import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorManager
 import xyz.bluspring.unitytranslate.library.util.LangPair
+import xyz.bluspring.unitytranslate.translator.instance.UnityTranslateLibTranslatorInstance
 import java.util.Queue
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -24,8 +25,9 @@ object TranslatorManagerImpl : TranslatorManager {
         this.updateConfig()
     }
 
-    override val instances: Collection<TranslatorInstance>
-        get() = UnityTranslateApiImpl.translators.values
+    override var instances = mutableListOf<TranslatorInstance>(
+        UnityTranslateLibTranslatorInstance,
+    )
 
     override fun getInstanceById(id: String): TranslatorInstance? {
         return UnityTranslateApiImpl.translators[id]
@@ -61,7 +63,7 @@ object TranslatorManagerImpl : TranslatorManager {
         return deferred
     }
 
-    fun tick() {
+    suspend fun tick() {
         this.updateConfig()
 
         // just to try to collect enough to even batch translate.
@@ -74,7 +76,7 @@ object TranslatorManagerImpl : TranslatorManager {
                 continue
 
             val instance = this.instances.firstOrNull {
-                it.isAvailable && it.supportsLanguage(langPair)
+                it.isAvailable() && it.supportsLanguage(langPair)
             }
 
             if (instance == null)

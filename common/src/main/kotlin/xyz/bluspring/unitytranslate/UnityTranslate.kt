@@ -1,17 +1,22 @@
 package xyz.bluspring.unitytranslate
 
+import com.mojang.serialization.Codec
+import com.mojang.serialization.MapCodec
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import net.minecraft.resources.Identifier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
+import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.client.config.ClientConfig
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
 import xyz.bluspring.unitytranslate.plugin.PluginManager
 import xyz.bluspring.unitytranslate.shared.Constants
 import xyz.bluspring.unitytranslate.translator.TranslatorManagerImpl
+import xyz.bluspring.unitytranslate.translator.instance.InactiveTranslatorInstance
+import xyz.bluspring.unitytranslate.translator.instance.LibreTranslateTranslatorInstance
 import xyz.bluspring.unitytranslate.translator.instance.UnityTranslateLibTranslatorInstance
 
 object UnityTranslate {
@@ -95,12 +100,23 @@ object UnityTranslate {
                     integer("max_threads", 1, Runtime.getRuntime().availableProcessors(), 1, TranslatorManagerImpl.Config::maxThreads)
                     integer("batch_size", 1, 50, 1, TranslatorManagerImpl.Config::batchSize)
                     integer("delay_between_batches", 0, 5000, 250, TranslatorManagerImpl.Config::delayBetweenBatches)
+
+                    listValue("instances", Codec.STRING.dispatch("type", { UnityTranslateApiImpl.getTranslatorId(it) }, {
+                        MapCodec.unit { UnityTranslateApiImpl.getTranslator(it) }
+                    }), TranslatorManagerImpl::instances)
                 }
             }
         }
 
+        UnityTranslateApi.instance.registerTranscriber("inactive", InactiveTranscriber) {}
+        UnityTranslateApi.instance.registerTranslator("inactive", InactiveTranslatorInstance) {}
+
         UnityTranslateApi.instance.registerTranslator("unitytranslatelib", UnityTranslateLibTranslatorInstance) {
             boolean("enable_gpu", UnityTranslateLibTranslatorInstance::enableGpu)
+        }
+
+        UnityTranslateApi.instance.registerTranslator("libretranslate", LibreTranslateTranslatorInstance) {
+            listValue("entries", LibreTranslateTranslatorInstance.Entry.CODEC, LibreTranslateTranslatorInstance::entries)
         }
 
         PluginManager.loadPlugins()

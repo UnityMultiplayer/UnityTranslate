@@ -12,6 +12,7 @@ import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorManager
 import xyz.bluspring.unitytranslate.config.builders.SunsetWrappedConfigBuilder
 import xyz.bluspring.unitytranslate.translator.TranslatorManagerImpl
+import xyz.bluspring.unitytranslate.translator.instance.InactiveTranslatorInstance
 import java.nio.file.Path
 import java.util.*
 
@@ -80,6 +81,14 @@ object UnityTranslateApiImpl : UnityTranslateApi {
 
     override fun getTranscriber(id: String): SpeechTranscriber {
         return this.transcribers[id] ?: InactiveTranscriber
+    }
+
+    fun getTranslator(id: String): TranslatorInstance {
+        return this.translators[id] ?: InactiveTranslatorInstance
+    }
+
+    fun getTranslatorId(translator: TranslatorInstance): String {
+        return this.translators.filterValues { it == translator }.keys.first()
     }
 
     override fun getOrCreateTranscriptHolder(languageCode: String): TranscriptHolder {

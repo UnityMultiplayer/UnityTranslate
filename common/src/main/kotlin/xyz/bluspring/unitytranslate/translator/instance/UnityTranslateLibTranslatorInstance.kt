@@ -19,10 +19,9 @@ object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
 
     private val gpuEnabledLock = Mutex()
 
-    override val isAvailable: Boolean
-        get() = UnityTranslateLib.isAvailable()
+    override suspend fun isAvailable(): Boolean = UnityTranslateLib.isAvailable()
 
-    override fun supportsLanguage(langPair: LangPair): Boolean {
+    override suspend fun supportsLanguage(langPair: LangPair): Boolean {
         return true
     }
 
