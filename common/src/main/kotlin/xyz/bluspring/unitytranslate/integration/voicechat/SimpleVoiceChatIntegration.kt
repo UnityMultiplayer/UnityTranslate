@@ -6,7 +6,7 @@ import de.maxhenkel.voicechat.api.events.EventRegistration
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.api.v2.util.AudioConverters
 
-class UTSimpleVoiceChatIntegration : VoicechatPlugin {
+class SimpleVoiceChatIntegration : VoicechatPlugin {
     override fun getPluginId(): String = UnityTranslate.MOD_ID
 
     override fun registerEvents(registration: EventRegistration) {

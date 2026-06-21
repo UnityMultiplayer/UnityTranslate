@@ -46,4 +46,6 @@ dependencies {
     }
     api(libs.voicechat.api)
     api(libs.sunset)
+
+    api("maven.modrinth:talk-balloons:${libs.versions.talk.balloons.get()}+${mcVersion}-neoforge")
 }

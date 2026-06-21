@@ -37,4 +37,6 @@ dependencies {
     api(libs.mixinextras.fabric)
     annotationProcessor(libs.mixinextras.fabric)
     moddedApi("net.fabricmc.fabric-api:fabric-api:${common?.mod?.dep("fabric_api") ?: mod.dep("fabric_api")}")
+
+    moddedApi("maven.modrinth:talk-balloons:${libs.versions.talk.balloons.get()}+${stonecutter.current.version}-fabric")
 }

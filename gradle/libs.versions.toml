@@ -45,6 +45,9 @@ gson = "2.14.0"
 
 unitytranslatelib = "1.0.0"
 
+# https://modrinth.com/mod/talk-balloons/versions
+talk-balloons = "1.5.3"
+
 # https://github.com/BluSpring/SunsetConfig/blob/main/build.gradle.kts#L23
 sunset = "1.2.0"
 

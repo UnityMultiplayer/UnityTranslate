@@ -4,12 +4,7 @@ import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 
 object ClientConfig {
-    val language: LanguageConfig = LanguageConfig("en", "en")
+    var spokenLanguage: String = "en"
     var transcriptBoxes: MutableList<TranscriptBoxConfig> = mutableListOf()
     var transcriber: SpeechTranscriber = InactiveTranscriber
-
-    data class LanguageConfig(
-        var spoken: String,
-        var balloon: String,
-    )
 }

@@ -33,7 +33,7 @@ class TranscriptBoxConfig(
         override var background: Background = Background.default()
         override var textColor: Int = DEFAULT_TEXT_COLOR
         override var shadowColor: Int = DEFAULT_SHADOW_COLOR
-        override var fontScale: Float = -1f // -1 = MC GUI scale
+        override var fontScale: Float = 0f // 0 = MC GUI scale
         override var cornerRadius: Float = DEFAULT_CORNER_RADIUS
 
         override var header: Header = Header.default()

@@ -43,6 +43,24 @@ class SunsetWrappedConfigBuilder(val wrapped: SunsetConfig.CategoryBuilder) : Co
         )
     }
 
+    override fun <T> listValue(
+        id: String,
+        codec: Codec<T>,
+        property: KMutableProperty<MutableList<T>>,
+        owner: Any?,
+        builder: ConfigValueBuilder<MutableList<T>>.() -> Unit
+    ) {
+        this.wrapped.custom(
+            ValidatingReflectingListConfigValue(
+                id,
+                codec,
+                property,
+                owner,
+                ConfigValueBuilderImpl<MutableList<T>>(id).apply(builder)
+            )
+        )
+    }
+
     override fun integer(
         id: String,
         min: Int,

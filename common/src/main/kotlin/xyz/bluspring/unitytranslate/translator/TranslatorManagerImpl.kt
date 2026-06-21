@@ -1,24 +1,35 @@
 package xyz.bluspring.unitytranslate.translator
 
 import kotlinx.coroutines.*
+import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
+import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
+import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorManager
 import xyz.bluspring.unitytranslate.library.util.LangPair
-import xyz.bluspring.unitytranslate.translator.instance.TranslatorInstance
-import xyz.bluspring.unitytranslate.translator.instance.UnityTranslateLibTranslatorInstance
 import java.util.Queue
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.coroutines.CoroutineContext
 
-class TranslatorManager(
-    val maxThreads: Int = 3.coerceAtMost(Runtime.getRuntime().availableProcessors()),
-    val batchSize: Int = 15,
-    val delayBetweenBatches: Int = 500,
-) {
-    private val context = Dispatchers.Default.limitedParallelism(maxThreads) + CoroutineName("UnityTranslate Translator Manager")
-    private val scope = CoroutineScope(context)
+object TranslatorManagerImpl : TranslatorManager {
+    object Config {
+        var maxThreads: Int = 3.coerceAtMost(Runtime.getRuntime().availableProcessors())
+        var batchSize: Int = 15
+        var delayBetweenBatches: Int = 500
+    }
 
-    val instances = listOf<TranslatorInstance>(
-        UnityTranslateLibTranslatorInstance
-    )
+    private lateinit var context: CoroutineContext
+    private lateinit var scope: CoroutineScope
+
+    init {
+        this.updateConfig()
+    }
+
+    override val instances: Collection<TranslatorInstance>
+        get() = UnityTranslateApiImpl.translators.values
+
+    override fun getInstanceById(id: String): TranslatorInstance? {
+        return UnityTranslateApiImpl.translators[id]
+    }
 
     private val queued = ConcurrentHashMap<LangPair, Queue<Entry>>()
     private var lastBatchTime: Long = 0L
@@ -29,17 +40,32 @@ class TranslatorManager(
         val deferred: CompletableDeferred<String>
     )
 
-    fun queue(text: String, fromLang: String, toLang: String): Deferred<String> {
+    private var lastMaxThreads = -1
+
+    private fun updateConfig() {
+        if (this.lastMaxThreads != Config.maxThreads) {
+            this.scope.cancel("Thread count updated (${this.lastMaxThreads} -> ${Config.maxThreads})")
+
+            this.context = Dispatchers.Default.limitedParallelism(Config.maxThreads) + CoroutineName("UnityTranslate Translator Manager")
+            this.scope = CoroutineScope(this.context)
+
+            this.lastMaxThreads = Config.maxThreads
+        }
+    }
+
+    override fun queue(text: String, langPair: LangPair): Deferred<String> {
         val deferred: CompletableDeferred<String> = CompletableDeferred()
-        this.queued.computeIfAbsent(LangPair(fromLang, toLang)) { ConcurrentLinkedQueue() }
+        this.queued.computeIfAbsent(langPair) { ConcurrentLinkedQueue() }
             .add(Entry(text, deferred))
 
         return deferred
     }
 
     fun tick() {
+        this.updateConfig()
+
         // just to try to collect enough to even batch translate.
-        if (System.currentTimeMillis() - this.lastBatchTime <= this.delayBetweenBatches)
+        if (System.currentTimeMillis() - this.lastBatchTime <= Config.delayBetweenBatches)
             return
 
         var anyTranslationsQueued = false
@@ -54,7 +80,7 @@ class TranslatorManager(
             if (instance == null)
                 continue
 
-            val entries = ArrayList<Entry>(this.batchSize)
+            val entries = ArrayList<Entry>(Config.batchSize)
             while (queue.isNotEmpty()) {
                 val entry = queue.poll()!!
 
@@ -64,7 +90,7 @@ class TranslatorManager(
 
                 entries.add(entry)
 
-                if (entries.size >= this.batchSize)
+                if (entries.size >= Config.batchSize)
                     break
             }
 

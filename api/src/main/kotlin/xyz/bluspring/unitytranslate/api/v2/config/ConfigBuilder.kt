@@ -9,6 +9,7 @@ interface ConfigBuilder {
 
     fun validator(validator: () -> Boolean)
     fun <T> value(id: String, codec: Codec<T>, property: KMutableProperty<T>, owner: Any? = null, builder: ConfigValueBuilder<T>.() -> Unit = {})
+    fun <T> listValue(id: String, codec: Codec<T>, property: KMutableProperty<MutableList<T>>, owner: Any? = null, builder: ConfigValueBuilder<MutableList<T>>.() -> Unit = {})
     fun integer(id: String, min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE, step: Int = 1, property: KMutableProperty<Int>, owner: Any? = null, builder: ConfigValueBuilder<Int>.() -> Unit = {})
     fun boolean(id: String, property: KMutableProperty<Boolean>, owner: Any? = null, builder: ConfigValueBuilder<Boolean>.() -> Unit = {})
     fun float(id: String, min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE, step: Float = 0.1f, property: KMutableProperty<Float>, owner: Any? = null, builder: ConfigValueBuilder<Float>.() -> Unit = {})

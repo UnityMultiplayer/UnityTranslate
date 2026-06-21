@@ -9,6 +9,8 @@ interface PlatformProxy {
     val pluginsDir: Path
     val nativesDir: Path
 
+    fun isModLoaded(id: String): Boolean
+
     companion object {
         val instance: PlatformProxy = ServiceLoader.load(PlatformProxy::class.java).first()
     }

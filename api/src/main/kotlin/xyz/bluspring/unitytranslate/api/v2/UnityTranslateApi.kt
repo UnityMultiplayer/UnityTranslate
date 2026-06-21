@@ -5,6 +5,8 @@ import xyz.bluspring.unitytranslate.api.v2.plugin.PluginMetadata
 import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
+import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
+import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorManager
 import java.nio.file.Path
 import java.util.*
 
@@ -23,6 +25,16 @@ interface UnityTranslateApi {
      * May not exist, you may need to create it yourself.
      */
     val configPath: Path
+
+    /**
+     * Registers a translator into UnityTranslate. The [id] must be unique, and it is recommended to at least prefix the ID with your plugin's ID.
+     */
+    fun <T : TranslatorInstance> registerTranslator(id: String, value: T, configBuilder: ConfigBuilder.() -> Unit)
+
+    /**
+     * Gets the translator manager.
+     */
+    val translatorManager: TranslatorManager
 
     /**
      * Registers a speech transcriber into UnityTranslate. The [id] must be unique, and it is recommended to at least prefix the ID with your plugin's ID.
@@ -62,6 +74,14 @@ interface UnityTranslateApi {
 
     fun registerConfig(group: String, id: String, builder: ConfigBuilder.() -> Unit) = registerConfig("$group.$id", builder)
     fun registerConfig(id: String, builder: ConfigBuilder.() -> Unit)
+
+    fun registerOutputLanguage(group: String, id: String): LanguageHolder = registerOutputLanguage("$group.$id")
+    fun registerOutputLanguage(id: String): LanguageHolder
+
+    /**
+     * Gets the current spoken language. This is typically used as the default output language if none is set.
+     */
+    val currentSpokenLanguage: String
 
     companion object {
         @JvmStatic

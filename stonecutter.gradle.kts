@@ -35,6 +35,7 @@ allprojects {
         mavenProviding("https://mvn.devos.one/releases", "xyz.bluspring.sunset")
         mavenProviding("https://mvn.devos.one/snapshots", "dev.cadindie")
         mavenProviding("https://maven.maxhenkel.de/releases", "de.maxhenkel")
+        mavenProviding("https://api.modrinth.com/maven", "maven.modrinth")
     }
 
     group = mod.group
