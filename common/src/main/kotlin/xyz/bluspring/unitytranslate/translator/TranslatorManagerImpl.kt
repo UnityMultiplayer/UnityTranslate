@@ -46,7 +46,9 @@ object TranslatorManagerImpl : TranslatorManager {
 
     private fun updateConfig() {
         if (this.lastMaxThreads != Config.maxThreads) {
-            this.scope.cancel("Thread count updated (${this.lastMaxThreads} -> ${Config.maxThreads})")
+            if (this::scope.isInitialized) {
+                this.scope.cancel("Thread count updated (${this.lastMaxThreads} -> ${Config.maxThreads})")
+            }
 
             this.context = Dispatchers.Default.limitedParallelism(Config.maxThreads) + CoroutineName("UnityTranslate Translator Manager")
             this.scope = CoroutineScope(this.context)

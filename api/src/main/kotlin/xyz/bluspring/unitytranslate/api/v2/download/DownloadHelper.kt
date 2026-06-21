@@ -78,7 +78,7 @@ object DownloadHelper {
         return queue(entry.uri.toURL(), entry.path, entry.expectedHash, createTemp, overwrite, options = options)
     }
 
-    @JvmStatic @JvmOverloads
+    // This only works for the Kotlin code, so.
     fun queue(
         url: URL, path: Path,
         sha1: String? = null,

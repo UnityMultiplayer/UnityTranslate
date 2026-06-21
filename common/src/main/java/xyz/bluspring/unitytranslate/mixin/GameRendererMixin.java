@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.GameRenderer;
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;render()V"))
-    private void renderElementaGui(DeltaTracker deltaTracker, boolean advanceGameTime, CallbackInfo ci) {
+    private void renderBatchedGui(DeltaTracker deltaTracker, boolean advanceGameTime, CallbackInfo ci) {
         BatchedGuiRenderer.INSTANCE.render();
     }
 }

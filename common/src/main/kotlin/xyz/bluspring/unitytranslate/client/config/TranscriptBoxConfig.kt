@@ -18,15 +18,15 @@ class TranscriptBoxConfig(
     var languageCode: String,
     val transforms: Transforms,
 
-    private var _outline: Optional<Outline>,
-    private var _background: Optional<Background>,
-    private var _textColor: Optional<Int>,
-    private var _shadowColor: Optional<Int>,
-    private var _fontScale: Optional<Float>,
-    private var _cornerRadius: Optional<Float>,
-    private var _header: Optional<Header>,
-    private var _transcriptDisplay: Optional<TranscriptDisplay>,
-    private var _padding: Optional<Padding>,
+    private var _outline: Optional<Outline> = Optional.empty(),
+    private var _background: Optional<Background> = Optional.empty(),
+    private var _textColor: Optional<Int> = Optional.empty(),
+    private var _shadowColor: Optional<Int> = Optional.empty(),
+    private var _fontScale: Optional<Float> = Optional.empty(),
+    private var _cornerRadius: Optional<Float> = Optional.empty(),
+    private var _header: Optional<Header> = Optional.empty(),
+    private var _transcriptDisplay: Optional<TranscriptDisplay> = Optional.empty(),
+    private var _padding: Optional<Padding> = Optional.empty(),
 ) : TranscriptBoxConfigHolder {
     object Defaults : TranscriptBoxConfigHolder {
         override var outline: Outline = Outline()

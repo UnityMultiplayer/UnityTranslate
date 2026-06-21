@@ -85,6 +85,6 @@ interface UnityTranslateApi {
 
     companion object {
         @JvmStatic
-        val instance: UnityTranslateApi = ServiceLoader.load(UnityTranslateApi::class.java).first()
+        val instance: UnityTranslateApi = Class.forName("xyz.bluspring.unitytranslate.UnityTranslateApiImpl").getField("INSTANCE").get(null) as UnityTranslateApi
     }
 }

@@ -26,7 +26,8 @@ object UnityTranslateApiImpl : UnityTranslateApi {
 
     val outputLanguages: MutableMap<String, LanguageHolder> = mutableMapOf()
     override var currentSpokenLanguage: String = "en"
-    override val translatorManager: TranslatorManager = TranslatorManagerImpl
+    override val translatorManager: TranslatorManager
+        get() = TranslatorManagerImpl // Don't inline this! You're gonna run into a bunch of headaches otherwise.
 
     override var activeTranscriber: SpeechTranscriber = InactiveTranscriber
         private set
