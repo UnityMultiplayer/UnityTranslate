@@ -15,3 +15,9 @@ The complete text for each software license can be found in the directory "third
 * License: MIT (SPDX: MIT)
 * Original Source:
     * https://github.com/argosopentech/argos-translate
+
+## Java FLAC Encoder by Preston Lacey / plwww
+* Copyright © 2017 Preston Lacey
+* License: GNU Lesser General Public License v2.1 (SPDX: LGPL-2.1)
+* Original Source:
+    * https://sourceforge.net/projects/javaflacencoder/files/

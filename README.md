@@ -50,3 +50,5 @@ UnityTranslate is licensed under the [Artistic License 2.0](LICENSE), with a few
   co-existing with each other.
 
 These terms do not apply to UnityTranslate versions prior to v2.0, which is licensed under the MIT license.
+
+This project also bundles open-source third-party projects. The third-party software notice can be found [here](thirdparty/NOTICE.md). 

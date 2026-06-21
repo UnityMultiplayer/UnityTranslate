@@ -57,6 +57,9 @@ whisper4j = "1.0.0"
 # https://maven.maxhenkel.de/#/releases/de/maxhenkel/voicechat/voicechat-api
 voicechat-api = "2.6.13"
 
+# https://mvnrepository.com/artifact/net.sourceforge.javaflacencoder/java-flac-encoder
+javaflacencoder = "0.3.7"
+
 [bundles]
 kotlin = [
     "kotlinx-coroutines-core", "kotlinx-coroutines-core-jvm", "kotlinx-coroutines-jdk8", "kotlinx-serialization-json"
@@ -65,9 +68,6 @@ logging = [
     "slf4j-api", "slf4j-log4j",
     "log4j-api", "log4j-core",
     "terminalconsoleappender"
-]
-elementa = [
-#    "elementa", "elementa-unstable-layoutdsl"
 ]
 
 [libraries]
@@ -99,6 +99,8 @@ whisper4j = { module = "dev.cadindie:whisper4j", version.ref = "whisper4j" }
 
 voicechat-api = { module = "de.maxhenkel.voicechat:voicechat-api", version.ref = "voicechat-api" }
 sunset = { module = "xyz.bluspring.sunset:sunset-config", version.ref = "sunset" }
+
+javaflacencoder = { module = "net.sourceforge.javaflacencoder:java-flac-encoder", version.ref = "javaflacencoder" }
 
 [plugins]
 moddevgradle = { id = "net.neoforged.moddev" }

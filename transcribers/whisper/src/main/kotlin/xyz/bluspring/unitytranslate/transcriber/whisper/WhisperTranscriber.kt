@@ -21,8 +21,8 @@ object WhisperTranscriber : SpeechTranscriber() {
     var maxWhisperThreads: Int = 3
         set(value) {
             field = value
-            this.context.runCatching { cancel() }
             this.scope.runCatching { cancel("Threads adjusted") }
+            this.context.runCatching { cancel() }
             this.context = this.createContextThreads() // Recreate the coroutine contexts
             this.scope = CoroutineScope(this.context)
         }
@@ -65,6 +65,10 @@ object WhisperTranscriber : SpeechTranscriber() {
 
             download.deferred.await()
         }
+
+    override suspend fun supportsLanguage(langCode: String): Boolean {
+        return true
+    }
 
     override fun transcribeSamples(samples: FloatArray, langCode: String): Deferred<String> {
         return this.scope.async(this.context) {
