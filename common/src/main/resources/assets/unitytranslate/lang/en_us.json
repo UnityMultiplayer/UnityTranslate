@@ -51,5 +51,19 @@
     "unitytranslate.language.ro": "Română (Romanian)",
     "unitytranslate.language.sk": "Slovenčina (Slovak)",
     "unitytranslate.language.sl": "Slovenščina (Slovenian)",
-    "unitytranslate.language.ur": "اردو (Urdu)"
+    "unitytranslate.language.ur": "اردو (Urdu)",
+
+    "config.unitytranslate.unitytranslate": "UnityTranslate",
+    "config.unitytranslate.unitytranslate.hud": "HUD",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings": "Default Box Settings",
+    "config.unitytranslate.unitytranslate.hud.transcript_boxes": "Transcript Boxes",
+    "config.unitytranslate.unitytranslate.transcriber": "Transcriber",
+    "config.unitytranslate.unitytranslate.languages": "Languages",
+    "config.unitytranslate.unitytranslate.languages.spoken": "Spoken Language",
+    "config.unitytranslate.unitytranslate.languages.balloon": "Balloon Language",
+    "config.unitytranslate.unitytranslate.translator": "Translator",
+    "config.unitytranslate.unitytranslate.translator.max_threads": "Max Threads",
+    "config.unitytranslate.unitytranslate.translator.batch_size": "Batch Size",
+    "config.unitytranslate.unitytranslate.translator.delay_between_batches": "Delay Between Batches",
+    "config.unitytranslate.unitytranslate.translator.instances": "Translation Instances"
 }

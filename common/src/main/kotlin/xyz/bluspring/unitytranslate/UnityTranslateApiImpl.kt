@@ -24,6 +24,8 @@ object UnityTranslateApiImpl : UnityTranslateApi {
     val translators: MutableMap<String, TranslatorInstance> = mutableMapOf()
     val translatorConfigs: MutableMap<String, SunsetConfig> = mutableMapOf()
 
+    val configs: MutableMap<String, SunsetConfig> = mutableMapOf()
+
     val outputLanguages: MutableMap<String, LanguageHolder> = mutableMapOf()
     override var currentSpokenLanguage: String = "en"
     override val translatorManager: TranslatorManager
@@ -105,7 +107,10 @@ object UnityTranslateApiImpl : UnityTranslateApi {
     }
 
     override fun registerConfig(id: String, builder: ConfigBuilder.() -> Unit) {
-        SunsetConfig.create(UnityTranslateApi.instance.configPath.resolve("plugins/$id.json")) {
+        if (this.configs.contains(id))
+            throw IllegalArgumentException("A config already exists by ID $id!")
+
+        this.configs[id] = SunsetConfig.create(UnityTranslateApi.instance.configPath.resolve("plugins/$id.json")) {
             val configBuilder = SunsetWrappedConfigBuilder(this)
             builder.invoke(configBuilder)
         }

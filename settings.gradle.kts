@@ -13,11 +13,11 @@ pluginManagement {
 // make sure to update it there too tho.
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0" // https://plugins.gradle.org/plugin/org.gradle.toolchains.foojay-resolver-convention
-    id("dev.kikugie.stonecutter") version "0.9.4" // https://stonecutter.kikugie.dev/
+    id("dev.kikugie.stonecutter") version "0.9.6" // https://stonecutter.kikugie.dev/
 }
 
 val supportedVersions = listOf(
-//    "1.21.1", "1.21.4", "1.21.5", "1.21.8", "1.21.10", "1.21.11", "26.1", // TODO: we'll work backwards
+//    "1.21.1", "1.21.4", "1.21.5", "1.21.8", "1.21.10", "1.21.11", "26.1.2", // TODO: we'll work backwards
     "26.2"
 )
 

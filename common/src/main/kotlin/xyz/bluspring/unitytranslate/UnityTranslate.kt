@@ -12,6 +12,7 @@ import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.client.config.ClientConfig
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
+import xyz.bluspring.unitytranslate.integration.UnityTranslateIntegration
 import xyz.bluspring.unitytranslate.plugin.PluginManager
 import xyz.bluspring.unitytranslate.shared.Constants
 import xyz.bluspring.unitytranslate.translator.TranslatorManagerImpl
@@ -24,8 +25,22 @@ object UnityTranslate {
     val logger: Logger = LoggerFactory.getLogger("UnityTranslate")
 
     fun init() {
+        UnityTranslateApi.instance.registerTranscriber("inactive", InactiveTranscriber) {}
+        UnityTranslateApi.instance.registerTranslator("inactive", InactiveTranslatorInstance) {}
+
+        UnityTranslateApi.instance.registerTranslator("unitytranslatelib", UnityTranslateLibTranslatorInstance) {
+            boolean("enable_gpu", UnityTranslateLibTranslatorInstance::enableGpu)
+        }
+
+        UnityTranslateApi.instance.registerTranslator("libretranslate", LibreTranslateTranslatorInstance) {
+            listValue("entries", LibreTranslateTranslatorInstance.Entry.CODEC, LibreTranslateTranslatorInstance::entries)
+        }
+
+        UnityTranslateIntegration.setup()
+        PluginManager.loadPlugins()
+
         UnityTranslateApi.instance.registerConfig("unitytranslate") {
-            category("client") {
+            category("hud") {
                 category("default_box_settings") {
                     intColor("text", TranscriptBoxConfig.Defaults::textColor)
                     intColor("shadow", TranscriptBoxConfig.Defaults::shadowColor)
@@ -35,36 +50,36 @@ object UnityTranslate {
                     value("transcript_display", TranscriptBoxConfig.TranscriptDisplay.CODEC, TranscriptBoxConfig.Defaults::transcriptDisplay)
 
                     category("header") {
-                        value("display", TranscriptBoxConfig.HeaderDisplay.CODEC, TranscriptBoxConfig.Defaults.header::display, TranscriptBoxConfig.Defaults.header)
-                        value("style", Style.Serializer.CODEC, TranscriptBoxConfig.Defaults.header::style, TranscriptBoxConfig.Defaults.header)
-                        value("lang_display", TranscriptBoxConfig.LanguageDisplay.CODEC, TranscriptBoxConfig.Defaults.header::langDisplay, TranscriptBoxConfig.Defaults.header)
-                        value("lang_style", Style.Serializer.CODEC, TranscriptBoxConfig.Defaults.header::langStyle, TranscriptBoxConfig.Defaults.header)
-                        value("lang_decoration", TranscriptBoxConfig.LanguageDecoration.CODEC, TranscriptBoxConfig.Defaults.header::langDecoration, TranscriptBoxConfig.Defaults.header)
-                        value("align_x", TranscriptBoxConfig.Header.HorizontalAlignment.CODEC, TranscriptBoxConfig.Defaults.header::alignX, TranscriptBoxConfig.Defaults.header)
-                        value("align_y", TranscriptBoxConfig.Header.VerticalAlignment.CODEC, TranscriptBoxConfig.Defaults.header::alignY, TranscriptBoxConfig.Defaults.header)
-                        boolean("has_shadow", TranscriptBoxConfig.Defaults.header::hasShadow, TranscriptBoxConfig.Defaults.header)
+                        value("display", TranscriptBoxConfig.HeaderDisplay.CODEC, TranscriptBoxConfig.Defaults.header::display)
+                        value("style", Style.Serializer.CODEC, TranscriptBoxConfig.Defaults.header::style)
+                        value("lang_display", TranscriptBoxConfig.LanguageDisplay.CODEC, TranscriptBoxConfig.Defaults.header::langDisplay)
+                        value("lang_style", Style.Serializer.CODEC, TranscriptBoxConfig.Defaults.header::langStyle)
+                        value("lang_decoration", TranscriptBoxConfig.LanguageDecoration.CODEC, TranscriptBoxConfig.Defaults.header::langDecoration)
+                        value("align_x", TranscriptBoxConfig.Header.HorizontalAlignment.CODEC, TranscriptBoxConfig.Defaults.header::alignX)
+                        value("align_y", TranscriptBoxConfig.Header.VerticalAlignment.CODEC, TranscriptBoxConfig.Defaults.header::alignY)
+                        boolean("has_shadow", TranscriptBoxConfig.Defaults.header::hasShadow)
                     }
 
                     category("padding") {
-                        float("left", 0f, 32f, step = 0.1f, property = TranscriptBoxConfig.Defaults.padding::left, owner = TranscriptBoxConfig.Defaults.padding) {
+                        float("left", 0f, 32f, step = 0.1f, property = TranscriptBoxConfig.Defaults.padding::left) {
                             formatting {
                                 Component.literal("${"%.1f".format(it)} px")
                             }
                         }
 
-                        float("right", 0f, 32f, step = 0.1f, property = TranscriptBoxConfig.Defaults.padding::right, owner = TranscriptBoxConfig.Defaults.padding) {
+                        float("right", 0f, 32f, step = 0.1f, property = TranscriptBoxConfig.Defaults.padding::right) {
                             formatting {
                                 Component.literal("${"%.1f".format(it)} px")
                             }
                         }
 
-                        float("top", 0f, step = 0.1f, property = TranscriptBoxConfig.Defaults.padding::top, owner = TranscriptBoxConfig.Defaults.padding) {
+                        float("top", 0f, step = 0.1f, property = TranscriptBoxConfig.Defaults.padding::top) {
                             formatting {
                                 Component.literal("${"%.1f".format(it)} px")
                             }
                         }
 
-                        float("bottom", 0f, step = 0.1f, property = TranscriptBoxConfig.Defaults.padding::bottom, owner = TranscriptBoxConfig.Defaults.padding) {
+                        float("bottom", 0f, step = 0.1f, property = TranscriptBoxConfig.Defaults.padding::bottom) {
                             formatting {
                                 Component.literal("${"%.1f".format(it)} px")
                             }
@@ -87,39 +102,29 @@ object UnityTranslate {
                     }
                 }
 
-                category("language") {
-                    string("spoken", ClientConfig::spokenLanguage)
-                }
-
-                value("transcriber", SpeechTranscriber.CODEC, ClientConfig::transcriber)
                 listValue("transcript_boxes", TranscriptBoxConfig.CODEC, ClientConfig::transcriptBoxes)
             }
 
-            category("common") {
-                category("translator") {
-                    integer("max_threads", 1, Runtime.getRuntime().availableProcessors(), 1, TranslatorManagerImpl.Config::maxThreads)
-                    integer("batch_size", 1, 50, 1, TranslatorManagerImpl.Config::batchSize)
-                    integer("delay_between_batches", 0, 5000, 250, TranslatorManagerImpl.Config::delayBetweenBatches)
+            value("transcriber", SpeechTranscriber.CODEC, ClientConfig::transcriber)
 
-                    listValue("instances", Codec.STRING.dispatch("type", { UnityTranslateApiImpl.getTranslatorId(it) }, {
-                        MapCodec.unit { UnityTranslateApiImpl.getTranslator(it) }
-                    }), TranslatorManagerImpl::instances)
+            category("languages") {
+                string("spoken", ClientConfig::spokenLanguage)
+
+                for ((langKey, langHolder) in UnityTranslateApiImpl.outputLanguages) {
+                    string(langKey, langHolder::languageCode)
                 }
             }
+
+            category("translator") {
+                integer("max_threads", 1, Runtime.getRuntime().availableProcessors(), 1, TranslatorManagerImpl.Config::maxThreads)
+                integer("batch_size", 1, 50, 1, TranslatorManagerImpl.Config::batchSize)
+                integer("delay_between_batches", 0, 5000, 250, TranslatorManagerImpl.Config::delayBetweenBatches)
+
+                listValue("instances", Codec.STRING.dispatch("type", { UnityTranslateApiImpl.getTranslatorId(it) }, {
+                    MapCodec.unit { UnityTranslateApiImpl.getTranslator(it) }
+                }), TranslatorManagerImpl::instances)
+            }
         }
-
-        UnityTranslateApi.instance.registerTranscriber("inactive", InactiveTranscriber) {}
-        UnityTranslateApi.instance.registerTranslator("inactive", InactiveTranslatorInstance) {}
-
-        UnityTranslateApi.instance.registerTranslator("unitytranslatelib", UnityTranslateLibTranslatorInstance) {
-            boolean("enable_gpu", UnityTranslateLibTranslatorInstance::enableGpu)
-        }
-
-        UnityTranslateApi.instance.registerTranslator("libretranslate", LibreTranslateTranslatorInstance) {
-            listValue("entries", LibreTranslateTranslatorInstance.Entry.CODEC, LibreTranslateTranslatorInstance::entries)
-        }
-
-        PluginManager.loadPlugins()
     }
 
     @JvmStatic

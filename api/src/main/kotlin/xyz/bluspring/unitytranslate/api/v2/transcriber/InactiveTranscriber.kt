@@ -8,9 +8,8 @@ import kotlinx.coroutines.Deferred
  * Used as a fallback when a transcriber fails to load.
  */
 object InactiveTranscriber : SpeechTranscriber() {
-    override fun transcribeSamples(samples: FloatArray, langCode: String): Deferred<String> {
-        return CompletableDeferred("")
-    }
+    override suspend fun supportsLanguage(langCode: String): Boolean = true
+    override fun transcribeSamples(samples: FloatArray, langCode: String): Deferred<String> = CompletableDeferred("")
 
     override fun close() {
     }

@@ -7,7 +7,7 @@ val mcVersion = stonecutter.current.version
 val common = stonecutter.node.sibling("")!!
 
 neoForge {
-    version = mod.dep("neoforge", common.project.mod.dep("neoforge")) as String
+    version = property("neoforge") as String
 
     configureModDev(this, "neoforge")
 }

@@ -1,5 +1,6 @@
 package xyz.bluspring.unitytranslate.fabric
 
+import net.fabricmc.api.EnvType
 import net.fabricmc.loader.api.FabricLoader
 import xyz.bluspring.unitytranslate.PlatformProxy
 import xyz.bluspring.unitytranslate.UnityTranslate
@@ -10,6 +11,7 @@ class FabricPlatformProxy : PlatformProxy {
     override val pluginsDir: Path = FabricLoader.getInstance().gameDir.resolve("unitytranslate/plugins")
     override val nativesDir: Path = FabricLoader.getInstance().gameDir.resolve("unitytranslate/natives")
     override val rootDir: Path = FabricLoader.getInstance().gameDir
+    override val isClient: Boolean = FabricLoader.getInstance().environmentType == EnvType.CLIENT
 
     override fun isModLoaded(id: String): Boolean = FabricLoader.getInstance().isModLoaded(id)
 }

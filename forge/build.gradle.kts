@@ -7,7 +7,7 @@ val mcVersion = stonecutter.current.version
 val common = stonecutter.node.sibling("")!!
 
 legacyForge {
-    version = "$mcVersion-${mod.dep("forge", common.project.mod.dep("forge"))}"
+    version = "$mcVersion-${property("forge")}"
 
     configureModDev(this, "forge")
 }

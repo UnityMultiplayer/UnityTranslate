@@ -19,6 +19,7 @@ class SunsetWrappedConfigBuilder(val wrapped: SunsetConfig.CategoryBuilder) : Co
     ) {
         this.wrapped.category(id) {
             SunsetWrappedConfigBuilder(this)
+                .builder()
         }
     }
 

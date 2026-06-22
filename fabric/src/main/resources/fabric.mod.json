@@ -20,6 +20,12 @@
         ],
         "client": [
             "xyz.bluspring.unitytranslate.fabric.client.UnityTranslateFabricClient"
+        ],
+        "modmenu": [
+            "xyz.bluspring.unitytranslate.fabric.integration.modmenu.ModMenuIntegration"
+        ],
+        "voicechat": [
+            "xyz.bluspring.unitytranslate.integration.voicechat.SimpleVoiceChatIntegration"
         ]
     },
     "mixins": [

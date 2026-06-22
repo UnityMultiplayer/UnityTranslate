@@ -31,6 +31,12 @@ class UIGraphics {
         this.scissorState.pop()
     }
 
+    fun drawCenteredString(font: Font, text: Component, x: Float, y: Float, color: Int, dropShadow: Boolean)
+        = drawString(font, text.visualOrderText, x - (font.width(text) / 2f), y, color, dropShadow)
+
+    fun drawCenteredString(font: Font, text: FormattedCharSequence, x: Float, y: Float, color: Int, dropShadow: Boolean)
+        = drawString(font, text, x - (font.width(text) / 2f), y, color, dropShadow)
+
     fun drawString(font: Font, text: Component, x: Float, y: Float, color: Int, dropShadow: Boolean)
         = drawString(font, text.visualOrderText, x, y, color, dropShadow)
 
