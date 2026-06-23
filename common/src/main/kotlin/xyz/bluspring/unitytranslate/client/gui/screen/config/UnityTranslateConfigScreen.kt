@@ -1,54 +1,51 @@
 package xyz.bluspring.unitytranslate.client.gui.screen.config
 
+import it.unimi.dsi.fastutil.objects.ReferenceArraySet
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Font
-import net.minecraft.network.chat.Component
 import xyz.bluspring.sunset.SunsetConfig
-import xyz.bluspring.sunset.values.ConfigCategory
 import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
+import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 import xyz.bluspring.unitytranslate.client.gui.screen.UTScreen
 import xyz.bluspring.unitytranslate.client.renderer.UIGraphics
 
 class UnityTranslateConfigScreen : UTScreen() {
-    override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
-        val font = Minecraft.getInstance().font
+    private val sections = mutableListOf<ConfigSection>()
+
+    val focused = ReferenceArraySet<ConfigSection>()
+
+    init {
+        this.sections += ConfigSection("unitytranslate", listOf(UnityTranslateApiImpl.configs["unitytranslate"]!!))
 
         val keys = UnityTranslateApiImpl.configs.keys.toMutableList()
         keys.remove("unitytranslate")
+        val pluginConfigs = mutableListOf<SunsetConfig>()
 
-        var offsetY = 16f
-
-        graphics.drawCenteredString(font, Component.translatable("config.unitytranslate.unitytranslate").withStyle { it.withBold(true) }, graphics.width / 8f, offsetY, -1, true)
-        offsetY += 16
-
-        offsetY = this.drawSection(graphics, "unitytranslate", UnityTranslateApiImpl.configs["unitytranslate"]!!, font, offsetY)
-
-        if (keys.isNotEmpty()) {
-            offsetY += 12
-            graphics.drawCenteredString(font, Component.translatable("config.unitytranslate.plugins").withStyle { it.withBold(true) }, graphics.width / 8f, offsetY, -1, true)
-            offsetY += 16
-
-            for (key in keys.sorted()) {
-                offsetY = this.drawSection(graphics, key, UnityTranslateApiImpl.configs[key]!!, font, offsetY)
-            }
+        for (key in keys.sorted()) {
+            pluginConfigs += UnityTranslateApiImpl.configs[key]!!
         }
+
+        this.sections += ConfigSection("plugins", pluginConfigs)
     }
 
-    private fun drawSection(graphics: UIGraphics, sectionId: String, configSection: SunsetConfig, font: Font, offsetYFinal: Float): Float {
-        var offsetY = offsetYFinal
+    override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
+        graphics.fill(0f, 0f, graphics.width.toFloat(), graphics.height.toFloat(),
+            ARGBHelper.colorFromFloat(0.2f, 0f, 0f, 0f),
+            ARGBHelper.colorFromFloat(0.6f, 0f, 0f, 0f)
+        )
 
-        for (configValue in configSection.rootCategory.value) {
-            graphics.drawString(font, Component.translatable("config.unitytranslate.$sectionId${configValue.fullId}"), 8f, offsetY, -1, true)
-            offsetY += font.lineHeight + 4
+        val font = Minecraft.getInstance().font
 
-            if (configValue is ConfigCategory) {
-                for (configValue2 in configValue.value) {
-                    graphics.drawString(font, Component.translatable("config.unitytranslate.$sectionId${configValue2.fullId}"), 16f, offsetY, -1, true)
-                    offsetY += font.lineHeight + 4
-                }
-            }
+        val sectionHeight = this.sections.sumOf { it.calculateSidebarHeight(font).toDouble() + 8.0 }.toFloat() + 16f // Kotlin why do you not permit floats in this?
+
+        graphics.poseStack.pushPose()
+        graphics.poseStack.translate(0f, graphics.height / 2f - (sectionHeight / 2f), 0f)
+
+        var offsetY = 0f
+        for (section in this.sections) {
+            offsetY += 8f
+            offsetY = section.submitSidebar(graphics, font, partialTick, offsetY)
         }
 
-        return offsetY
+        graphics.poseStack.popPose()
     }
 }

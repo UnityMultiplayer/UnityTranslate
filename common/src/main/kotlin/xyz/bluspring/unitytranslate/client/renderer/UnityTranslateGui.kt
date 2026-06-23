@@ -34,6 +34,6 @@ object UnityTranslateGui {
             this.lastGui = ClientPlatformProxy.instance.guiScale
         }
 
-        this.transcriptRenderer.submit(UIGraphics(), partialTick)
+        this.transcriptRenderer.submit(UIGraphics(BatchedGuiRenderer.DrawLayer.IN_GAME), partialTick)
     }
 }

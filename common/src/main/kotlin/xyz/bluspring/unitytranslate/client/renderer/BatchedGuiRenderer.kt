@@ -21,17 +21,18 @@ import java.util.*
 
 object BatchedGuiRenderer {
     private val bufferBuilders = WeakHashMap<QueuedDraw, ByteBufferBuilder>()
-    private val buffers = mutableMapOf<QueuedDraw, BufferBuilder>()
+    private val gameBuffers = mutableMapOf<QueuedDraw, BufferBuilder>()
+    private val screenBuffers = mutableMapOf<QueuedDraw, BufferBuilder>()
     private val projection = Projection()
     private val projectionBuffer = ProjectionMatrixBuffer("unitytranslate_gui")
 
     @JvmStatic @JvmOverloads
-    fun getBuffer(type: RenderType, scissor: ScreenRectangle? = null): VertexConsumer {
+    fun getBuffer(type: RenderType, scissor: ScreenRectangle? = null, layer: DrawLayer = DrawLayer.IN_GAME): VertexConsumer {
         val prepared = type.prepare()
         val draw = QueuedDraw(RenderSetupInfo(prepared.pipeline, prepared.textures.map {
             Texture(it.name, it.textureView, it.sampler)
-        }), scissor)
-        return this.buffers.computeIfAbsent(draw) {
+        }), scissor, layer)
+        return layer.buffers.computeIfAbsent(draw) {
             BufferBuilder(this.getBufferBuilder(draw), type.primitiveTopology(), type.format())
         }
     }
@@ -41,10 +42,11 @@ object BatchedGuiRenderer {
                   textures: List<Texture> = listOf(),
                   scissor: ScreenRectangle? = null,
                   uniforms: Map<String, ByteBuffer> = mapOf(),
+                  layer: DrawLayer = DrawLayer.IN_GAME
     ): VertexConsumer {
-        val draw = QueuedDraw(RenderSetupInfo(pipeline, textures, uniforms), scissor)
+        val draw = QueuedDraw(RenderSetupInfo(pipeline, textures, uniforms), scissor, layer)
 
-        return this.buffers.computeIfAbsent(draw) {
+        return layer.buffers.computeIfAbsent(draw) {
             BufferBuilder(this.getBufferBuilder(draw), pipeline.primitiveTopology, pipeline.getVertexFormatBinding(0)!!)
         }
     }
@@ -61,11 +63,12 @@ object BatchedGuiRenderer {
         const val UNIFORM = GpuBuffer.USAGE_UNIFORM
     }
 
-    fun render() {
-        if (this.buffers.isEmpty())
+    fun render(layer: DrawLayer = DrawLayer.IN_GAME) {
+        val buffers = layer.buffers
+        if (buffers.isEmpty())
             return
 
-        val draws = this.buffers.mapValues { it.value.build() }
+        val draws = buffers.mapValues { it.value.build() }
 
         val framebuffer = ClientPlatformProxy.instance.framebuffer
         this.projection.setupOrtho(1000f, 11000f, framebuffer.width.toFloat() / ClientPlatformProxy.instance.guiScale.toFloat(), framebuffer.height.toFloat() / ClientPlatformProxy.instance.guiScale.toFloat(), true)
@@ -128,7 +131,7 @@ object BatchedGuiRenderer {
                 }
             }
 
-        this.buffers.clear()
+        buffers.clear()
     }
 
     @JvmRecord
@@ -146,5 +149,10 @@ object BatchedGuiRenderer {
     )
 
     @JvmRecord
-    private data class QueuedDraw(val setup: RenderSetupInfo, val scissorArea: ScreenRectangle?)
+    internal data class QueuedDraw(val setup: RenderSetupInfo, val scissorArea: ScreenRectangle?, val layer: DrawLayer)
+
+    enum class DrawLayer(internal val buffers: MutableMap<QueuedDraw, BufferBuilder>) {
+        IN_GAME(gameBuffers),
+        SCREEN(screenBuffers),
+    }
 }

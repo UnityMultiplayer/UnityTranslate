@@ -13,6 +13,11 @@ import net.minecraft.client.renderer.GameRenderer;
 public abstract class GameRendererMixin {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;render()V"))
     private void renderBatchedGui(DeltaTracker deltaTracker, boolean advanceGameTime, CallbackInfo ci) {
-        BatchedGuiRenderer.INSTANCE.render();
+        BatchedGuiRenderer.INSTANCE.render(BatchedGuiRenderer.DrawLayer.IN_GAME);
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;render()V", shift = At.Shift.AFTER))
+    private void renderBatchedScreen(DeltaTracker deltaTracker, boolean advanceGameTime, CallbackInfo ci) {
+        BatchedGuiRenderer.INSTANCE.render(BatchedGuiRenderer.DrawLayer.SCREEN);
     }
 }

@@ -55,7 +55,30 @@
 
     "config.unitytranslate.unitytranslate": "UnityTranslate",
     "config.unitytranslate.unitytranslate.hud": "HUD",
+
     "config.unitytranslate.unitytranslate.hud.default_box_settings": "Default Box Settings",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.text": "Text Color",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.shadow": "Shadow Color",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.outline": "Outline",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.background": "Background",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.transcript_display": "Transcript Display",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.header": "Header",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.header.display": "Header Display",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.header.style": "Header Style",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.header.lang_display": "Language Display",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.header.lang_style": "Language Style",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.header.lang_decoration": "Language Decoration",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.header.align_x": "X Align",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.header.align_y": "Y Align",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.header.has_shadow": "Has Shadow?",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.padding": "Padding",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.padding.left": "Left",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.padding.right": "Right",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.padding.top": "Top",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.padding.bottom": "Bottom",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.corner_radius": "Corner Radius",
+    "config.unitytranslate.unitytranslate.hud.default_box_settings.font_scale": "Font Scale",
+
     "config.unitytranslate.unitytranslate.hud.transcript_boxes": "Transcript Boxes",
     "config.unitytranslate.unitytranslate.transcriber": "Transcriber",
     "config.unitytranslate.unitytranslate.languages": "Languages",
@@ -65,5 +88,7 @@
     "config.unitytranslate.unitytranslate.translator.max_threads": "Max Threads",
     "config.unitytranslate.unitytranslate.translator.batch_size": "Batch Size",
     "config.unitytranslate.unitytranslate.translator.delay_between_batches": "Delay Between Batches",
-    "config.unitytranslate.unitytranslate.translator.instances": "Translation Instances"
+    "config.unitytranslate.unitytranslate.translator.instances": "Translation Instances",
+
+    "config.unitytranslate.plugins": "Plugins"
 }

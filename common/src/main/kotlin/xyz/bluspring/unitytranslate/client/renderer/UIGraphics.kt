@@ -5,13 +5,15 @@ import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.font.TextRenderable
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.renderer.RenderPipelines
+import net.minecraft.locale.Language
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.FormattedText
 import net.minecraft.util.FormattedCharSequence
 import net.minecraft.util.LightCoordsUtil
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import java.util.*
 
-class UIGraphics {
+class UIGraphics(private val layer: BatchedGuiRenderer.DrawLayer) {
     val poseStack = PoseStack()
     private val scissorState = Stack<ScreenRectangle>()
     private val currentScissor: ScreenRectangle?
@@ -40,6 +42,9 @@ class UIGraphics {
     fun drawString(font: Font, text: Component, x: Float, y: Float, color: Int, dropShadow: Boolean)
         = drawString(font, text.visualOrderText, x, y, color, dropShadow)
 
+    fun drawString(font: Font, text: FormattedText, x: Float, y: Float, color: Int, dropShadow: Boolean)
+        = drawString(font, Language.getInstance().getVisualOrder(text), x, y, color, dropShadow)
+
     fun drawString(font: Font, text: FormattedCharSequence, x: Float, y: Float, color: Int, dropShadow: Boolean) {
         val pose = poseStack.last()
         val prepared = font.prepareText(text, x, y, color, dropShadow, true, 0)
@@ -55,7 +60,7 @@ class UIGraphics {
             private fun accept(glyph: TextRenderable) {
                 val consumer = BatchedGuiRenderer.getBuffer(glyph.guiPipeline(), textures = listOf(
                     BatchedGuiRenderer.Texture("Sampler0", glyph.textureView())
-                ), scissor = currentScissor)
+                ), scissor = currentScissor, layer = this@UIGraphics.layer)
                 glyph.render(pose.pose(), consumer, LightCoordsUtil.FULL_BRIGHT, false)
             }
         })
@@ -66,7 +71,7 @@ class UIGraphics {
 
     fun fill(x1: Float, y1: Float, x2: Float, y2: Float, colorTopLeft: Int, colorTopRight: Int, colorBottomLeft: Int, colorBottomRight: Int) {
         val pose = poseStack.last()
-        val buffer = BatchedGuiRenderer.getBuffer(RenderPipelines.GUI)
+        val buffer = BatchedGuiRenderer.getBuffer(RenderPipelines.GUI, layer = this.layer)
         buffer.addVertex(pose, x1, y1, 0f).setColor(colorTopLeft)
         buffer.addVertex(pose, x1, y2, 0f).setColor(colorBottomLeft)
         buffer.addVertex(pose, x2, y2, 0f).setColor(colorBottomRight)
