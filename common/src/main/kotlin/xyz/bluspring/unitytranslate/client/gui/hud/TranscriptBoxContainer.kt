@@ -37,6 +37,19 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
 
             graphics.fill(-this.config.padding.left, -this.config.padding.top, width + this.config.padding.right, height + this.config.padding.bottom, topLeft, topRight, bottomLeft, bottomRight)
         }
+
+        val outline = this.config.outline
+        if (outline.thickness > 0) {
+            val color = outline.color
+            val thickness = outline.thickness
+            val topLeft = if (color is ColorConfig.Solid) color.color else if (color is ColorConfig.Gradient) color.colors[0] else -1
+            val topRight = if (color is ColorConfig.Solid) color.color else if (color is ColorConfig.Gradient) color.colors[1] else -1
+            val bottomLeft = if (color is ColorConfig.Solid) color.color else if (color is ColorConfig.Gradient) color.colors[2] else -1
+            val bottomRight = if (color is ColorConfig.Solid) color.color else if (color is ColorConfig.Gradient) color.colors[3] else -1
+
+            graphics.outline(-this.config.padding.left - thickness, -this.config.padding.top - thickness, width + this.config.padding.right + thickness, height + this.config.padding.bottom + thickness, thickness, topLeft, topRight, bottomLeft, bottomRight)
+        }
+
         graphics.popMatrix()
 
         // Header

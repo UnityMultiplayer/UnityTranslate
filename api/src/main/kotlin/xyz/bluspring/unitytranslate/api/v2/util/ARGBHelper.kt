@@ -48,6 +48,14 @@ object ARGBHelper {
         return color(a, r, g, b)
     }
 
+    @JvmStatic
+    fun matrixSrgbLerp(argbTopLeft: Int, argbTopRight: Int, argbBottomLeft: Int, argbBottomRight: Int, deltaX: Float, deltaY: Float): Int {
+        val topXLerp = srgbLerp(argbTopLeft, argbTopRight, deltaX)
+        val bottomXLerp = srgbLerp(argbBottomLeft, argbBottomRight, deltaX)
+
+        return srgbLerp(topXLerp, bottomXLerp, deltaY)
+    }
+
     private fun lerp(from: Int, to: Int, delta: Float): Int {
         return from + floor(delta * (to - from).toFloat()).toInt()
     }

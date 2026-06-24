@@ -340,7 +340,7 @@ class TranscriptBoxConfig(
         var thickness: Float = DEFAULT_THICKNESS
     ) {
         companion object {
-            @JvmField val DEFAULT_COLOR = ColorConfig.Solid(ARGBHelper.color(200, 0, 0, 0))
+            @JvmField val DEFAULT_COLOR = ColorConfig.Gradient(ColorConfig.Gradient.GradientDirection.BOTTOM, ARGBHelper.color(172, 0, 0, 0), ARGBHelper.color(200, 0, 0, 0))
             const val DEFAULT_THICKNESS = 1f
 
             @JvmField
