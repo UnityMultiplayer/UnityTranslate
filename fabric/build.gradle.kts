@@ -1,3 +1,4 @@
+import dev.kikugie.fletching_table.extension.FletchingTableExtension.Companion.relocate
 import egt.RelocationTransform.Companion.registerRelocationAttribute
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 
@@ -21,6 +22,10 @@ val loom = extensions.getByType<LoomGradleExtensionAPI>()
 val shadedDep by configurations.named("shadedDep")
 val common = stonecutter.node.sibling("")?.project
 
+loom.accessWidenerPath = "fabric/src/main/resources/unitytranslate_${if (shouldRemap()) "obf" else "unobf"}.aw".run {
+    rootProject.file(this)
+}
+
 val elementaConfig by configurations.creating {
     val relocated = registerRelocationAttribute("elementa-relocated") {
         relocate("gg.essential", "xyz.bluspring.unitytranslate.fork.elementa")
@@ -40,4 +45,10 @@ dependencies {
     moddedApi(fletchingTable.modrinth("modmenu", stonecutter.current.version, "fabric"))
 
     moddedApi("maven.modrinth:talk-balloons:${libs.versions.talk.balloons.get()}+${stonecutter.current.version}-fabric")
+}
+
+tasks.processResources {
+    relocate("unitytranslate_${if (shouldRemap()) "obf" else "unobf"}.aw") {
+        this.name = "unitytranslate.aw"
+    }
 }

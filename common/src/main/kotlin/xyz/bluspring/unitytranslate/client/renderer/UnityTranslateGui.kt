@@ -3,7 +3,7 @@ package xyz.bluspring.unitytranslate.client.renderer
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
 import xyz.bluspring.unitytranslate.client.gui.TranscriptBoxRenderer
-import xyz.bluspring.unitytranslate.client.renderer.ui.BatchedUIGraphics
+import xyz.bluspring.unitytranslate.client.renderer.ui.UIGraphics
 
 object UnityTranslateGui {
     val transcriptRenderer = TranscriptBoxRenderer()
@@ -27,7 +27,7 @@ object UnityTranslateGui {
     private var lastHeight = 0
     private var lastGui = 0.0
 
-    fun submit(partialTick: Float) {
+    fun submit(uiGraphics: UIGraphics, partialTick: Float) {
         if (ClientPlatformProxy.instance.windowWidth != lastWidth || ClientPlatformProxy.instance.windowHeight != lastHeight || ClientPlatformProxy.instance.guiScale != lastGui) {
             this.resize()
             this.lastWidth = ClientPlatformProxy.instance.windowWidth
@@ -35,6 +35,6 @@ object UnityTranslateGui {
             this.lastGui = ClientPlatformProxy.instance.guiScale
         }
 
-        this.transcriptRenderer.submit(BatchedUIGraphics(BatchedGuiRenderer.DrawLayer.IN_GAME), partialTick)
+        this.transcriptRenderer.submit(uiGraphics, partialTick)
     }
 }

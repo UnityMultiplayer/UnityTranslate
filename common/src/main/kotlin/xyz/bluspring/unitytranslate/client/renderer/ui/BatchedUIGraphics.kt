@@ -12,7 +12,7 @@ import xyz.bluspring.unitytranslate.client.renderer.BatchedGuiRenderer
 import java.util.*
 
 class BatchedUIGraphics(private val layer: BatchedGuiRenderer.DrawLayer) : UIGraphics {
-    override val poseStack = PoseStack()
+    val poseStack = PoseStack()
     private val scissorState = Stack<ScreenRectangle>()
     private val currentScissor: ScreenRectangle?
         get() = if (this.scissorState.isEmpty()) null else this.scissorState.peek()
@@ -60,5 +60,10 @@ class BatchedUIGraphics(private val layer: BatchedGuiRenderer.DrawLayer) : UIGra
         buffer.addVertex(pose, x2, y2, 0f).setColor(colorBottomRight)
         buffer.addVertex(pose, x2, y1, 0f).setColor(colorTopRight)
     }
+
+    override fun pushMatrix() = this.poseStack.pushPose()
+    override fun translate(x: Float, y: Float) = this.poseStack.translate(x, y, 0f)
+    override fun scale(x: Float, y: Float) = this.poseStack.scale(x, y, 1f)
+    override fun popMatrix() = this.poseStack.popPose()
 }
 

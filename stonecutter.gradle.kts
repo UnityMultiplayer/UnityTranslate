@@ -65,7 +65,7 @@ subprojects {
 
     project.extensions.configure<FletchingTableExtension>("fletchingTable") {
         j52j.register("main") {
-            extension("json", "*.mixins.json5")
+            extension("json", "*.mixins.json5", "*.mod.json5")
         }
     }
 

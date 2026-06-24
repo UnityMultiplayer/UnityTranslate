@@ -37,8 +37,8 @@ class UnityTranslateConfigScreen : UTScreen() {
 
         val sectionHeight = this.sections.sumOf { it.calculateSidebarHeight(font).toDouble() + 8.0 }.toFloat() + 16f // Kotlin why do you not permit floats in this?
 
-        graphics.poseStack.pushPose()
-        graphics.poseStack.translate(0f, graphics.height / 2f - (sectionHeight / 2f), 0f)
+        graphics.pushMatrix()
+        graphics.translate(0f, graphics.height / 2f - (sectionHeight / 2f))
 
         var offsetY = 0f
         for (section in this.sections) {
@@ -46,6 +46,6 @@ class UnityTranslateConfigScreen : UTScreen() {
             offsetY = section.submitSidebar(graphics, font, partialTick, offsetY)
         }
 
-        graphics.poseStack.popPose()
+        graphics.popMatrix()
     }
 }

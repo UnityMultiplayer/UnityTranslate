@@ -19,8 +19,8 @@ open class ConfigCategoryEntry(category: ConfigCategory) : ConfigEntry<List<Conf
         var offsetY = this.submitAndGetHeightOffset(graphics, partialTick, areaWidth, mouseX, mouseY)
 
         for (entry in entries) {
-            graphics.poseStack.pushPose()
-            graphics.poseStack.translate(0f, offsetY, 0f)
+            graphics.pushMatrix()
+            graphics.translate(0f, offsetY)
             val entryHeight = entry.submit(graphics, partialTick, areaWidth, mouseX, mouseY)
             this.storedHeights[entry] = entryHeight
 
@@ -29,7 +29,7 @@ open class ConfigCategoryEntry(category: ConfigCategory) : ConfigEntry<List<Conf
             }
 
             offsetY += entryHeight
-            graphics.poseStack.popPose()
+            graphics.popMatrix()
         }
 
         return offsetY.toInt()

@@ -21,12 +21,11 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
     private var headerY: Float = 0f
 
     fun submit(graphics: UIGraphics, partialTick: Float) {
-        graphics.poseStack.pushPose()
-        graphics.poseStack.translate(this.x, this.y, 0f)
+        graphics.pushMatrix()
+        graphics.translate(this.x, this.y)
 
         // Background
-        graphics.poseStack.pushPose()
-        graphics.poseStack.translate(0f, 0f, 1f)
+        graphics.pushMatrix()
 
         val background = this.config.background
         if (background is TranscriptBoxConfig.Background.Color) {
@@ -38,16 +37,12 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
 
             graphics.fill(-this.config.padding.left, -this.config.padding.top, width + this.config.padding.right, height + this.config.padding.bottom, topLeft, topRight, bottomLeft, bottomRight)
         }
-        graphics.poseStack.popPose()
+        graphics.popMatrix()
 
         // Header
-        graphics.poseStack.pushPose()
-        graphics.poseStack.translate(0f, 0f, 2f)
-
         graphics.drawString(font, headerText.visualOrderText, this.headerX, this.headerY, -1, this.config.header.hasShadow)
-        graphics.poseStack.popPose()
 
-        graphics.poseStack.popPose()
+        graphics.popMatrix()
     }
 
     fun updateConfig() {

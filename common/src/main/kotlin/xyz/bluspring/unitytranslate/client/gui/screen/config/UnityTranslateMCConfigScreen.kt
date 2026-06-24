@@ -3,8 +3,7 @@ package xyz.bluspring.unitytranslate.client.gui.screen.config
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
-import xyz.bluspring.unitytranslate.client.renderer.BatchedGuiRenderer
-import xyz.bluspring.unitytranslate.client.renderer.ui.BatchedUIGraphics
+import xyz.bluspring.unitytranslate.client.renderer.ui.MinecraftUIGraphics
 
 class UnityTranslateMCConfigScreen(private val parent: Screen) : Screen(Component.empty()) {
     val actualScreen = UnityTranslateConfigScreen()
@@ -19,6 +18,6 @@ class UnityTranslateMCConfigScreen(private val parent: Screen) : Screen(Componen
     }
 
     override fun extractRenderState(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, a: Float) {
-        actualScreen.submit(BatchedUIGraphics(BatchedGuiRenderer.DrawLayer.SCREEN), a, mouseX, mouseY)
+        actualScreen.submit(MinecraftUIGraphics(graphics), a, mouseX, mouseY)
     }
 }

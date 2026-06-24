@@ -15,6 +15,10 @@ if (stonecutter.eval(mcVersion, "<=1.20.1")) {
     project.extensions.configure<LegacyForgeExtension> {
         mcpVersion = mcVersion
 
+        accessTransformers {
+            from(rootProject.file("common/src/main/resources/META-INF/accesstransformer.cfg"))
+        }
+
         configureModDev(this, "common")
     }
 } else {
@@ -22,6 +26,12 @@ if (stonecutter.eval(mcVersion, "<=1.20.1")) {
 
     project.extensions.configure<NeoForgeExtension> {
         neoFormVersion = tryFindNeoFormVersion(mcVersion)!!
+
+        accessTransformers {
+            from(rootProject.file("common/src/main/resources/META-INF/accesstransformer.cfg"))
+        }
+
+        configureModDev(this, "common")
     }
 }
 

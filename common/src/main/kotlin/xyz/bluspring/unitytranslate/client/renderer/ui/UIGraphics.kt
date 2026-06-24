@@ -1,6 +1,5 @@
 package xyz.bluspring.unitytranslate.client.renderer.ui
 
-import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.Font
 import net.minecraft.locale.Language
 import net.minecraft.network.chat.Component
@@ -8,7 +7,6 @@ import net.minecraft.network.chat.FormattedText
 import net.minecraft.util.FormattedCharSequence
 
 interface UIGraphics {
-    val poseStack: PoseStack
     val width: Int
     val height: Int
     fun enableScissor(x: Int, y: Int, width: Int, height: Int)
@@ -42,4 +40,9 @@ interface UIGraphics {
         this.fill(x1, y1 + thickness, x1 + thickness, y2 - thickness, color)
         this.fill(x2 - thickness, y1 + thickness, x2, y2 - thickness, color)
     }
+
+    fun pushMatrix()
+    fun translate(x: Float, y: Float)
+    fun scale(x: Float, y: Float)
+    fun popMatrix()
 }

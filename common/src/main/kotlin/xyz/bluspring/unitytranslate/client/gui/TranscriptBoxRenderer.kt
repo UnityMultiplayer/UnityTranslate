@@ -9,11 +9,8 @@ class TranscriptBoxRenderer {
     val containers = mutableListOf<TranscriptBoxContainer>()
 
     fun submit(graphics: UIGraphics, partialTick: Float) {
-        for ((index, container) in this.containers.withIndex()) {
-            graphics.poseStack.pushPose()
-            graphics.poseStack.translate(0f, 0f, index * 100f)
+        for (container in this.containers) {
             container.submit(graphics, partialTick)
-            graphics.poseStack.popPose()
         }
     }
 
