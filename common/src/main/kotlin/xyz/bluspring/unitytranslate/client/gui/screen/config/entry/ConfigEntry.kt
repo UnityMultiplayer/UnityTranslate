@@ -5,7 +5,7 @@ import net.minecraft.network.chat.Component
 import xyz.bluspring.sunset.values.ConfigValue
 import xyz.bluspring.sunset.values.RangedConfigValue
 import xyz.bluspring.unitytranslate.client.gui.GuiColors
-import xyz.bluspring.unitytranslate.client.renderer.UIGraphics
+import xyz.bluspring.unitytranslate.client.renderer.ui.UIGraphics
 import xyz.bluspring.unitytranslate.config.values.DropdownValidatingReflectingConfigValue
 
 abstract class ConfigEntry<E, T : ConfigValue<E>>(val value: T) {

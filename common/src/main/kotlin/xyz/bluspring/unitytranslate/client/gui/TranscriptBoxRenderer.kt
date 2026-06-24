@@ -3,7 +3,7 @@ package xyz.bluspring.unitytranslate.client.gui
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
 import xyz.bluspring.unitytranslate.client.gui.hud.TranscriptBoxContainer
-import xyz.bluspring.unitytranslate.client.renderer.UIGraphics
+import xyz.bluspring.unitytranslate.client.renderer.ui.UIGraphics
 
 class TranscriptBoxRenderer {
     val containers = mutableListOf<TranscriptBoxContainer>()

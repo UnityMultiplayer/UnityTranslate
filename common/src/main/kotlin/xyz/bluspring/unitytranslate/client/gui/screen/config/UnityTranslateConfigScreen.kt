@@ -6,7 +6,7 @@ import xyz.bluspring.sunset.SunsetConfig
 import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 import xyz.bluspring.unitytranslate.client.gui.screen.UTScreen
-import xyz.bluspring.unitytranslate.client.renderer.UIGraphics
+import xyz.bluspring.unitytranslate.client.renderer.ui.UIGraphics
 
 class UnityTranslateConfigScreen : UTScreen() {
     private val sections = mutableListOf<ConfigSection>()

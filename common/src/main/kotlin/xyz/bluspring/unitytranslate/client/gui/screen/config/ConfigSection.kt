@@ -5,7 +5,7 @@ import net.minecraft.network.chat.Component
 import xyz.bluspring.sunset.SunsetConfig
 import xyz.bluspring.sunset.values.ConfigCategory
 import xyz.bluspring.sunset.values.ConfigValue
-import xyz.bluspring.unitytranslate.client.renderer.UIGraphics
+import xyz.bluspring.unitytranslate.client.renderer.ui.UIGraphics
 
 class ConfigSection(val id: String, val config: Collection<SunsetConfig>) {
     fun calculateSidebarHeight(font: Font): Float {

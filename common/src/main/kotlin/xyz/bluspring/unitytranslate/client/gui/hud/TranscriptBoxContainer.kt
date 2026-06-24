@@ -7,7 +7,7 @@ import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.ColorConfig
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
-import xyz.bluspring.unitytranslate.client.renderer.UIGraphics
+import xyz.bluspring.unitytranslate.client.renderer.ui.UIGraphics
 
 class TranscriptBoxContainer(var holder: TranscriptHolder, val config: TranscriptBoxConfig) {
     var x = 0f

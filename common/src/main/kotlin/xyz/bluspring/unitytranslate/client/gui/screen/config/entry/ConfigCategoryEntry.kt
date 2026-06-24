@@ -3,7 +3,7 @@ package xyz.bluspring.unitytranslate.client.gui.screen.config.entry
 import it.unimi.dsi.fastutil.objects.Reference2IntLinkedOpenHashMap
 import xyz.bluspring.sunset.values.ConfigCategory
 import xyz.bluspring.sunset.values.ConfigValue
-import xyz.bluspring.unitytranslate.client.renderer.UIGraphics
+import xyz.bluspring.unitytranslate.client.renderer.ui.UIGraphics
 
 open class ConfigCategoryEntry(category: ConfigCategory) : ConfigEntry<List<ConfigValue<*>>, ConfigCategory>(category) {
     val entries = category.value.map(Companion::fromValue)
