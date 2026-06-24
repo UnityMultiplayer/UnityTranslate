@@ -690,9 +690,10 @@ class TranscriptBoxConfig(
             @JvmField val DEFAULT_STYLE = Style.EMPTY.withColor(ChatFormatting.GREEN)
             @JvmField val CODEC: Codec<TranscriptDisplay> = Codec.STRING.dispatch("type", TranscriptDisplay::type) { type ->
                 when (type) {
-                    "lang_code" -> LangCode.CODEC
-                    "lang_code_uppercase" -> LangCodeUppercase.CODEC
-                    "lang_name" -> LangName.CODEC
+                    "lang_code/lowercase" -> LangCode.CODEC
+                    "lang_code/uppercase" -> LangCodeUppercase.CODEC
+                    "lang_name/native" -> LangNameNative.CODEC
+                    "lang_name/localized" -> LangNameLocalized.CODEC
                     else -> throw IllegalArgumentException("No transcript display found by type $type!")
                 }
             }
@@ -702,7 +703,7 @@ class TranscriptBoxConfig(
 
         abstract fun text(data: TranscriptData): Component
 
-        data class LangCode(val style: Style = DEFAULT_STYLE) : TranscriptDisplay("lang_code") {
+        data class LangCode(val style: Style = DEFAULT_STYLE) : TranscriptDisplay("lang_code/lowercase") {
             // <BluSpring (en)> Hi
             override fun text(data: TranscriptData): Component = Component.translatable(MESSAGE_LANG, data.sender.displayName,
                 Component.translatable(LANGUAGE_LANG, data.languageCode).withStyle(this.style),
@@ -715,7 +716,7 @@ class TranscriptBoxConfig(
             }
         }
 
-        data class LangCodeUppercase(val style: Style = DEFAULT_STYLE) : TranscriptDisplay("lang_code_uppercase") {
+        data class LangCodeUppercase(val style: Style = DEFAULT_STYLE) : TranscriptDisplay("lang_code/uppercase") {
             // <BluSpring (EN)> Hi
             override fun text(data: TranscriptData): Component = Component.translatable(MESSAGE_LANG, data.sender.displayName,
                 Component.translatable(LANGUAGE_LANG, data.languageCode.uppercase()).withStyle(this.style),
@@ -728,16 +729,29 @@ class TranscriptBoxConfig(
             }
         }
 
-        data class LangName(val style: Style = DEFAULT_STYLE) : TranscriptDisplay("lang_code") {
-            // <BluSpring (English)> Hi
+        data class LangNameNative(val style: Style = DEFAULT_STYLE) : TranscriptDisplay("lang_name/native") {
+            // <BluSpring (Español)> Hi
             override fun text(data: TranscriptData): Component = Component.translatable(MESSAGE_LANG, data.sender.displayName,
-                Component.translatable(LANGUAGE_LANG, Component.translatableWithFallback("unitytranslate.language.${data.languageCode}", data.languageCode)).withStyle(this.style),
+                Component.translatable(LANGUAGE_LANG, Component.translatableWithFallback("unitytranslate.language.${data.languageCode}.native", data.languageCode)).withStyle(this.style),
                 data.message
             )
 
             companion object {
-                @JvmField val CODEC: MapCodec<LangName> = Style.Serializer.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
-                    .xmap(::LangName, LangName::style)
+                @JvmField val CODEC: MapCodec<LangNameNative> = Style.Serializer.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
+                    .xmap(::LangNameNative, LangNameNative::style)
+            }
+        }
+
+        data class LangNameLocalized(val style: Style = DEFAULT_STYLE) : TranscriptDisplay("lang_name/localized") {
+            // <BluSpring (Spanish)> Hi
+            override fun text(data: TranscriptData): Component = Component.translatable(MESSAGE_LANG, data.sender.displayName,
+                Component.translatable(LANGUAGE_LANG, Component.translatableWithFallback("unitytranslate.language.${data.languageCode}.localized", data.languageCode)).withStyle(this.style),
+                data.message
+            )
+
+            companion object {
+                @JvmField val CODEC: MapCodec<LangNameNative> = Style.Serializer.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
+                    .xmap(::LangNameNative, LangNameNative::style)
             }
         }
     }
