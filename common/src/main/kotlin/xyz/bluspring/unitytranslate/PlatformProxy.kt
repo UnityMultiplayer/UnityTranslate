@@ -10,6 +10,7 @@ interface PlatformProxy {
     val nativesDir: Path
     val isClient: Boolean
 
+    fun isStandalone(): Boolean = false
     fun isModLoaded(id: String): Boolean
 
     companion object {

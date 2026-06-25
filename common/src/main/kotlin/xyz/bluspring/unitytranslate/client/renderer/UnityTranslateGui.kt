@@ -7,6 +7,7 @@ import xyz.bluspring.unitytranslate.client.renderer.ui.UIGraphics
 
 object UnityTranslateGui {
     val transcriptRenderer = TranscriptBoxRenderer()
+    
 
     init {
         transcriptRenderer.updateConfig(listOf(
@@ -27,14 +28,21 @@ object UnityTranslateGui {
     private var lastHeight = 0
     private var lastGui = 0.0
 
-    fun submit(uiGraphics: UIGraphics, partialTick: Float) {
+    private fun updateSizes() {
         if (ClientPlatformProxy.instance.windowWidth != lastWidth || ClientPlatformProxy.instance.windowHeight != lastHeight || ClientPlatformProxy.instance.guiScale != lastGui) {
             this.resize()
             this.lastWidth = ClientPlatformProxy.instance.windowWidth
             this.lastHeight = ClientPlatformProxy.instance.windowHeight
             this.lastGui = ClientPlatformProxy.instance.guiScale
         }
+    }
 
+    fun submit(uiGraphics: UIGraphics, partialTick: Float) {
+        updateSizes()
         this.transcriptRenderer.submit(uiGraphics, partialTick)
+    }
+
+    fun submitLate(graphics: UIGraphics, partialTick: Float) {
+        updateSizes()
     }
 }

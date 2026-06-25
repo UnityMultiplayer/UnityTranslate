@@ -10,8 +10,11 @@ import org.slf4j.LoggerFactory
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
+import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 import xyz.bluspring.unitytranslate.client.config.ClientConfig
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
+import xyz.bluspring.unitytranslate.config.builders.SunsetWrappedConfigBuilder
+import xyz.bluspring.unitytranslate.config.values.HiddenReflectingConfigValue
 import xyz.bluspring.unitytranslate.integration.UnityTranslateIntegration
 import xyz.bluspring.unitytranslate.plugin.PluginManager
 import xyz.bluspring.unitytranslate.shared.Constants
@@ -123,6 +126,10 @@ object UnityTranslate {
                 listValue("instances", Codec.STRING.dispatch("type", { UnityTranslateApiImpl.getTranslatorId(it) }, {
                     MapCodec.unit { UnityTranslateApiImpl.getTranslator(it) }
                 }), TranslatorManagerImpl::instances)
+            }
+
+            if (this is SunsetWrappedConfigBuilder) {
+                this.wrapped.custom(HiddenReflectingConfigValue("handled_first_join", Codec.BOOL, UnityTranslateClient::handledFirstJoin))
             }
         }
     }

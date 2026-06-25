@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.FormattedText
 import net.minecraft.util.FormattedCharSequence
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
+import xyz.bluspring.unitytranslate.client.renderer.ui.texture.TextureReference
 
 interface UIGraphics {
     val width: Int
@@ -66,6 +67,12 @@ interface UIGraphics {
         this.fill(x1, y1 + thickness, x1 + thickness, y2 - thickness, colorOuterLowerTopLeft, colorInnerLowerTopLeft, colorOuterUpperBottomLeft, colorInnerUpperBottomLeft) // left
         this.fill(x2 - thickness, y1 + thickness, x2, y2 - thickness, colorInnerLowerTopRight, colorOuterLowerTopRight, colorInnerUpperBottomRight, colorOuterUpperBottomRight) // right
     }
+
+    fun blit(x: Float, y: Float, width: Float, height: Float, u: Float, v: Float, uWidth: Float, vHeight: Float, texture: TextureReference)
+        = this.blitWithColor(x, y, width, height, u, v, uWidth, vHeight, texture, -1, -1)
+    fun blitWithColor(x: Float, y: Float, width: Float, height: Float, u: Float, v: Float, uWidth: Float, vHeight: Float, texture: TextureReference, colorFrom: Int, colorTo: Int)
+        = this.blitWithColor(x, y, width, height, u, v, uWidth, vHeight, texture, colorFrom, colorFrom, colorTo, colorTo)
+    fun blitWithColor(x: Float, y: Float, width: Float, height: Float, u: Float, v: Float, uWidth: Float, vHeight: Float, texture: TextureReference, colorTopLeft: Int, colorTopRight: Int, colorBottomLeft: Int, colorBottomRight: Int)
 
     fun pushMatrix()
     fun translate(x: Float, y: Float)

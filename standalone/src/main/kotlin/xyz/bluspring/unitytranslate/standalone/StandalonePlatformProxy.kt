@@ -2,14 +2,13 @@ package xyz.bluspring.unitytranslate.standalone
 
 import com.mojang.blaze3d.pipeline.RenderTarget
 import com.mojang.blaze3d.textures.GpuTexture
-import gg.essential.elementa.renderer.ElementaClientPlatformProxy
 import xyz.bluspring.unitytranslate.PlatformProxy
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.standalone.input.Mouse
 import java.nio.file.Path
 import kotlin.io.path.Path
 
-class StandalonePlatformProxy : PlatformProxy, ClientPlatformProxy, ElementaClientPlatformProxy {
+class StandalonePlatformProxy : PlatformProxy, ClientPlatformProxy {
     override val version: String = UnityTranslateStandalone.metadata.version
     override val pluginsDir: Path = Path("plugins")
     override val nativesDir: Path = Path("natives")
@@ -19,6 +18,8 @@ class StandalonePlatformProxy : PlatformProxy, ClientPlatformProxy, ElementaClie
     override fun getTexture(id: Int): GpuTexture {
         TODO("Not yet implemented")
     }
+
+    override fun isStandalone(): Boolean = true
 
     override val renderThread: Thread
         get() = UnityTranslateStandalone.gameThread

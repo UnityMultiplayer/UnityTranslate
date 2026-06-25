@@ -1,6 +1,7 @@
 package xyz.bluspring.unitytranslate.client.gui.screen.config
 
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet
+import kotlinx.coroutines.Deferred
 import net.minecraft.client.Minecraft
 import xyz.bluspring.sunset.SunsetConfig
 import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
@@ -12,6 +13,7 @@ class UnityTranslateConfigScreen : UTScreen() {
     private val sections = mutableListOf<ConfigSection>()
 
     val focused = ReferenceArraySet<ConfigSection>()
+    val queuedTasks = mutableMapOf<String, Deferred<*>>()
 
     init {
         this.sections += ConfigSection("unitytranslate", listOf(UnityTranslateApiImpl.configs["unitytranslate"]!!))

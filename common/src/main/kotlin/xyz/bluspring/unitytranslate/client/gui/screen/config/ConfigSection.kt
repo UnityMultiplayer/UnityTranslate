@@ -6,6 +6,7 @@ import xyz.bluspring.sunset.SunsetConfig
 import xyz.bluspring.sunset.values.ConfigCategory
 import xyz.bluspring.sunset.values.ConfigValue
 import xyz.bluspring.unitytranslate.client.renderer.ui.UIGraphics
+import xyz.bluspring.unitytranslate.config.values.HiddenConfigValue
 
 class ConfigSection(val id: String, val config: Collection<SunsetConfig>) {
     fun calculateSidebarHeight(font: Font): Float {
@@ -22,6 +23,8 @@ class ConfigSection(val id: String, val config: Collection<SunsetConfig>) {
     }
 
     private fun recursiveCalculateSidebarHeight(font: Font, value: ConfigValue<*>): Float {
+        if (value is HiddenConfigValue) return 0f
+
         var offsetY = 0f
         offsetY += font.lineHeight + 4
 
@@ -42,8 +45,9 @@ class ConfigSection(val id: String, val config: Collection<SunsetConfig>) {
 
         for (config in this.config) {
             for (configValue in config.rootCategory.value) {
-                offsetY += 2
+                if (configValue is HiddenConfigValue) continue
 
+                offsetY += 2
                 offsetY = this.recursiveSubmitSidebarEntry(graphics, font, configValue, 8, offsetY)
             }
         }
@@ -52,6 +56,8 @@ class ConfigSection(val id: String, val config: Collection<SunsetConfig>) {
     }
 
     private fun recursiveSubmitSidebarEntry(graphics: UIGraphics, font: Font, value: ConfigValue<*>, offsetX: Int, offsetYFinal: Float): Float {
+        if (value is HiddenConfigValue) return 0f
+
         var offsetY = offsetYFinal
 
         graphics.drawString(font, font.substrByWidth(Component.translatable("config.unitytranslate.$id${value.fullId}"), 175 - offsetX), offsetX.toFloat(), offsetY, -1, true)
@@ -59,6 +65,7 @@ class ConfigSection(val id: String, val config: Collection<SunsetConfig>) {
 
         if (value is ConfigCategory) {
             for (configValue in value.value) {
+                if (configValue is HiddenConfigValue) continue
                 offsetY = recursiveSubmitSidebarEntry(graphics, font, configValue, offsetX + 16, offsetY)
             }
         }

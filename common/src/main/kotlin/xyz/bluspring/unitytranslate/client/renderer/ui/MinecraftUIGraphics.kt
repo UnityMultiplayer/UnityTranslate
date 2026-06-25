@@ -1,5 +1,7 @@
 package xyz.bluspring.unitytranslate.client.renderer.ui
 
+import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.textures.FilterMode
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.navigation.ScreenRectangle
@@ -8,7 +10,9 @@ import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.util.FormattedCharSequence
 import org.joml.Matrix3x2f
+import xyz.bluspring.unitytranslate.client.renderer.ui.minecraft.ColoredBlitRenderState
 import xyz.bluspring.unitytranslate.client.renderer.ui.minecraft.GradientedFillRenderState
+import xyz.bluspring.unitytranslate.client.renderer.ui.texture.TextureReference
 import xyz.bluspring.unitytranslate.mixin.accessor.GuiGraphicsExtractorAccessor
 
 class MinecraftUIGraphics(private val graphics: GuiGraphicsExtractor) : UIGraphics {
@@ -50,6 +54,25 @@ class MinecraftUIGraphics(private val graphics: GuiGraphicsExtractor) : UIGraphi
             graphics.scissor,
             x1, y1, x2, y2,
             colorTopLeft, colorTopRight, colorBottomLeft, colorBottomRight
+        ))
+    }
+
+    override fun blitWithColor(
+        x: Float, y: Float, width: Float, height: Float,
+        u: Float, v: Float, uWidth: Float, vHeight: Float,
+        texture: TextureReference,
+        colorTopLeft: Int, colorTopRight: Int, colorBottomLeft: Int, colorBottomRight: Int
+    ) {
+        graphics.guiRenderState.addGuiElement(ColoredBlitRenderState(RenderPipelines.GUI_TEXTURED, TextureSetup.singleTexture(texture.textureView, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST)),
+            Matrix3x2f(graphics.pose()),
+            graphics.scissor,
+            x, y, x + width, y + height,
+
+            colorTopLeft, colorTopRight,
+            colorBottomLeft, colorBottomRight,
+
+            ((u * texture.width) + (texture.u0 * texture.imageWidth)) / texture.imageWidth, ((v * texture.height) + (texture.v0 * texture.imageHeight)) / texture.imageHeight,
+            (((u + uWidth) * texture.width) + (texture.u1 * texture.imageWidth)) / texture.imageWidth, (((v + vHeight) * texture.height) + (texture.v1 * texture.imageHeight)) / texture.imageHeight
         ))
     }
 
