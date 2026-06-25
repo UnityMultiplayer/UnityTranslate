@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Style
 import org.joml.Vector2f
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptData
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
+import xyz.bluspring.unitytranslate.client.renderer.ui.texture.TextureReference
 import xyz.bluspring.unitytranslate.util.Box2f
 import xyz.bluspring.unitytranslate.util.ScreenUtil
 import java.util.*
@@ -371,6 +372,7 @@ class TranscriptBoxConfig(
                 when (type) {
                     "color" -> Color.CODEC
                     "image" -> Image.CODEC
+                    "image_overlay" -> ImageWithOverlay.CODEC
                     else -> throw IllegalArgumentException("No background found by type $type!")
                 }
             }
@@ -384,11 +386,46 @@ class TranscriptBoxConfig(
             }
         }
 
-        data class Image(var path: String) : Background("image") {
+        data class Image(
+            var texture: TextureReference,
+            var u: Float, var v: Float,
+            var uWidth: Float, var vHeight: Float,
+        ) : Background("image") {
             companion object {
                 @JvmField
-                val CODEC: MapCodec<Image> = Codec.STRING.fieldOf("path")
-                    .xmap(::Image, Image::path)
+                val CODEC: MapCodec<Image> = RecordCodecBuilder.mapCodec { instance ->
+                    instance.group(
+                        TextureReference.CODEC.fieldOf("texture")
+                            .forGetter(Image::texture),
+                        Codec.FLOAT.fieldOf("u")
+                            .forGetter(Image::u),
+                        Codec.FLOAT.fieldOf("v")
+                            .forGetter(Image::v),
+                        Codec.FLOAT.fieldOf("width")
+                            .forGetter(Image::uWidth),
+                        Codec.FLOAT.fieldOf("height")
+                            .forGetter(Image::vHeight),
+                    )
+                        .apply(instance, ::Image)
+                }
+            }
+        }
+
+        data class ImageWithOverlay(
+            var image: Image,
+            var color: Color,
+        ) : Background("image_overlay") {
+            companion object {
+                @JvmField
+                val CODEC: MapCodec<ImageWithOverlay> = RecordCodecBuilder.mapCodec { instance ->
+                    instance.group(
+                        Image.CODEC
+                            .forGetter(ImageWithOverlay::image),
+                        Color.CODEC
+                            .forGetter(ImageWithOverlay::color),
+                    )
+                        .apply(instance, ::ImageWithOverlay)
+                }
             }
         }
     }

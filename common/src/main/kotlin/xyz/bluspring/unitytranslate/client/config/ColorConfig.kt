@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 import xyz.bluspring.unitytranslate.api.v2.util.AdditionalCodecs
+import xyz.bluspring.unitytranslate.api.v2.util.ColorMatrix
 import xyz.bluspring.unitytranslate.client.config.ColorConfig.Gradient.GradientDirection.*
 
 sealed class ColorConfig(val type: String) {
@@ -19,6 +20,15 @@ sealed class ColorConfig(val type: String) {
                 "gradient" -> Gradient.CODEC
                 else -> throw IllegalArgumentException("No color config found by type $type!")
             }
+        }
+
+        fun separateMatrix(color: ColorConfig): ColorMatrix {
+            val topLeft = if (color is Solid) color.color else if (color is Gradient) color.colors[0] else -1
+            val topRight = if (color is Solid) color.color else if (color is Gradient) color.colors[1] else -1
+            val bottomLeft = if (color is Solid) color.color else if (color is Gradient) color.colors[2] else -1
+            val bottomRight = if (color is Solid) color.color else if (color is Gradient) color.colors[3] else -1
+
+            return ColorMatrix(topLeft, topRight, bottomLeft, bottomRight)
         }
     }
 

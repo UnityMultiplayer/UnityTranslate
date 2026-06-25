@@ -63,7 +63,7 @@ class BatchedUIGraphics(private val layer: BatchedGuiRenderer.DrawLayer) : UIGra
     }
 
     override fun blitWithColor(
-        x: Float, y: Float, width: Float, height: Float,
+        x1: Float, y1: Float, x2: Float, y2: Float,
         u: Float, v: Float, uWidth: Float, vHeight: Float,
         texture: TextureReference,
         colorTopLeft: Int, colorTopRight: Int,
@@ -77,16 +77,16 @@ class BatchedUIGraphics(private val layer: BatchedGuiRenderer.DrawLayer) : UIGra
         val u1 = (((u + uWidth) * texture.width) + (texture.u1 * texture.imageWidth)) / texture.imageWidth
         val v1 = (((v + vHeight) * texture.height) + (texture.v1 * texture.imageHeight)) / texture.imageHeight
 
-        buffer.addVertex(pose, x, y, 0f)
+        buffer.addVertex(pose, x1, y1, 0f)
             .setUv(u0, v0)
             .setColor(colorTopLeft)
-        buffer.addVertex(pose, x, y + height, 0f)
+        buffer.addVertex(pose, x1, y2, 0f)
             .setUv(u0, v1)
             .setColor(colorBottomLeft)
-        buffer.addVertex(pose, x + width, y + height, 0f)
+        buffer.addVertex(pose, x2, y2, 0f)
             .setUv(u1, v1)
             .setColor(colorBottomRight)
-        buffer.addVertex(pose, x + width, y, 0f)
+        buffer.addVertex(pose,  x2, y1, 0f)
             .setUv(u1, v0)
             .setColor(colorTopRight)
     }

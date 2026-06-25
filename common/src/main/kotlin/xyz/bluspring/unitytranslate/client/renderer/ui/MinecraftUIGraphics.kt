@@ -58,7 +58,7 @@ class MinecraftUIGraphics(private val graphics: GuiGraphicsExtractor) : UIGraphi
     }
 
     override fun blitWithColor(
-        x: Float, y: Float, width: Float, height: Float,
+        x1: Float, y1: Float, x2: Float, y2: Float,
         u: Float, v: Float, uWidth: Float, vHeight: Float,
         texture: TextureReference,
         colorTopLeft: Int, colorTopRight: Int, colorBottomLeft: Int, colorBottomRight: Int
@@ -66,7 +66,7 @@ class MinecraftUIGraphics(private val graphics: GuiGraphicsExtractor) : UIGraphi
         graphics.guiRenderState.addGuiElement(ColoredBlitRenderState(RenderPipelines.GUI_TEXTURED, TextureSetup.singleTexture(texture.textureView, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST)),
             Matrix3x2f(graphics.pose()),
             graphics.scissor,
-            x, y, x + width, y + height,
+            x1, y1, x2, y2,
 
             colorTopLeft, colorTopRight,
             colorBottomLeft, colorBottomRight,

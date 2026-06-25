@@ -7,7 +7,11 @@ import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.alpha
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.blue
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.green
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.red
+import java.nio.file.InvalidPathException
+import java.nio.file.Path
 import java.util.*
+import kotlin.io.path.Path
+import kotlin.io.path.absolutePathString
 
 /**
  * Some additional codecs that may be useful.
@@ -33,6 +37,17 @@ object AdditionalCodecs {
                 )
             })
     )
+
+    /**
+     * A codec that points at a path.
+     */
+    @JvmField val PATH: Codec<Path> = Codec.STRING.comapFlatMap({
+        try {
+            DataResult.success(Path(it))
+        } catch (e: InvalidPathException) {
+            DataResult.error { "Invalid path ${it}: ${e.message}" }
+        }
+    }, Path::absolutePathString)
 
     /**
      * A quick and easy codec for handling enums.
