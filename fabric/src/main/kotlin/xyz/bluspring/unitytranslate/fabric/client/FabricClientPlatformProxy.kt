@@ -4,6 +4,8 @@ import com.mojang.blaze3d.pipeline.RenderTarget
 import com.mojang.blaze3d.textures.GpuTexture
 import net.minecraft.client.Minecraft
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
+import xyz.bluspring.unitytranslate.client.gui.WrappedUTScreen
+import xyz.bluspring.unitytranslate.client.gui.screen.UTScreen
 
 class FabricClientPlatformProxy : ClientPlatformProxy {
     override val framebuffer: RenderTarget
@@ -16,6 +18,16 @@ class FabricClientPlatformProxy : ClientPlatformProxy {
 
     override fun getTexture(id: Int): GpuTexture {
         TODO("Not yet implemented")
+    }
+
+    override fun setScreen(screen: UTScreen?) {
+        Minecraft.getInstance().execute {
+            if (screen != null) {
+                Minecraft.getInstance().setScreenAndShow(WrappedUTScreen(screen))
+            } else {
+                Minecraft.getInstance().gui.setScreen(null)
+            }
+        }
     }
 
     override val renderThread: Thread

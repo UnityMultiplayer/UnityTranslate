@@ -29,6 +29,21 @@ object ARGBHelper {
     }
 
     @JvmStatic
+    fun opaque(color: Int): Int {
+        return color.withAlpha(0xFF)
+    }
+
+    @JvmStatic
+    fun Int.withAlpha(alpha: Int): Int {
+        return (this and 0x00FFFFFF) or (alpha shl 24)
+    }
+
+    @JvmStatic
+    fun Int.withAlpha(alpha: Float): Int {
+        return this.withAlpha((alpha * 255).toInt())
+    }
+
+    @JvmStatic
     fun color(a: Int, r: Int, g: Int, b: Int): Int {
         // 0xFF_FF_FF_FF
         return (a shl 24) or (r shl 16) or (g shl 8) or b

@@ -1,13 +1,12 @@
-package xyz.bluspring.unitytranslate.client.gui.screen.config
+package xyz.bluspring.unitytranslate.client.gui
 
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
+import xyz.bluspring.unitytranslate.client.gui.screen.UTScreen
 import xyz.bluspring.unitytranslate.client.renderer.ui.MinecraftUIGraphics
 
-class UnityTranslateMCConfigScreen(private val parent: Screen) : Screen(Component.empty()) {
-    val actualScreen = UnityTranslateConfigScreen()
-
+class WrappedUTScreen(val actualScreen: UTScreen, private val parent: Screen? = null) : Screen(Component.empty()) {
     override fun extractBackground(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, a: Float) {
         if (this.minecraft.level == null) {
             this.extractPanorama(graphics, a)
