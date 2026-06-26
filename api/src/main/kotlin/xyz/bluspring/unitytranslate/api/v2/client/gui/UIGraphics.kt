@@ -1,32 +1,30 @@
-package xyz.bluspring.unitytranslate.client.renderer.ui
+package xyz.bluspring.unitytranslate.api.v2.client.gui
 
-import net.minecraft.client.gui.Font
 import net.minecraft.locale.Language
-import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.FormattedText
 import net.minecraft.util.FormattedCharSequence
+import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
-import xyz.bluspring.unitytranslate.client.renderer.ui.texture.TextureReference
 
+/**
+ * An abstraction that allows drawing to a screen, designed to be similar to Minecraft's GuiGraphics, except with a few more additional useful things.
+ */
 interface UIGraphics {
     val width: Int
     val height: Int
     fun enableScissor(x: Int, y: Int, width: Int, height: Int)
     fun disableScissor()
 
-    fun drawCenteredString(font: Font, text: Component, x: Float, y: Float, color: Int, dropShadow: Boolean)
-        = drawString(font, text.visualOrderText, x - (font.width(text) / 2f), y, color, dropShadow)
+    fun centeredText(font: FontReference, text: FormattedCharSequence, x: Float, y: Float, color: Int, dropShadow: Boolean)
+        = text(font, text, x - (font.width(text) / 2f), y, color, dropShadow)
 
-    fun drawCenteredString(font: Font, text: FormattedCharSequence, x: Float, y: Float, color: Int, dropShadow: Boolean)
-        = drawString(font, text, x - (font.width(text) / 2f), y, color, dropShadow)
+    fun centeredText(font: FontReference, text: FormattedText, x: Float, y: Float, color: Int, dropShadow: Boolean)
+        = centeredText(font, Language.getInstance().getVisualOrder(text), x, y, color, dropShadow)
 
-    fun drawString(font: Font, text: Component, x: Float, y: Float, color: Int, dropShadow: Boolean)
-        = drawString(font, text.visualOrderText, x, y, color, dropShadow)
+    fun text(font: FontReference, text: FormattedText, x: Float, y: Float, color: Int, dropShadow: Boolean)
+        = text(font, Language.getInstance().getVisualOrder(text), x, y, color, dropShadow)
 
-    fun drawString(font: Font, text: FormattedText, x: Float, y: Float, color: Int, dropShadow: Boolean)
-        = drawString(font, Language.getInstance().getVisualOrder(text), x, y, color, dropShadow)
-
-    fun drawString(font: Font, text: FormattedCharSequence, x: Float, y: Float, color: Int, dropShadow: Boolean)
+    fun text(font: FontReference, text: FormattedCharSequence, x: Float, y: Float, color: Int, dropShadow: Boolean)
 
     fun fill(x1: Float, y1: Float, x2: Float, y2: Float, colorFrom: Int, colorTo: Int = colorFrom)
         = fill(x1, y1, x2, y2, colorFrom, colorFrom, colorTo, colorTo)

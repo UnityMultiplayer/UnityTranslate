@@ -1,6 +1,6 @@
 package xyz.bluspring.unitytranslate.client.gui.screen.config.entry
 
-import xyz.bluspring.unitytranslate.client.renderer.ui.UIGraphics
+import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.config.values.DropdownValidatingReflectingConfigValue
 
 class DropdownConfigEntry<E>(value: DropdownValidatingReflectingConfigValue<E>) : ConfigEntry<E, DropdownValidatingReflectingConfigValue<E>>(value) {

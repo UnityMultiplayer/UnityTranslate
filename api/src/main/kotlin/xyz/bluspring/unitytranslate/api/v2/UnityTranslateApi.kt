@@ -1,5 +1,6 @@
 package xyz.bluspring.unitytranslate.api.v2
 
+import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigBuilder
 import xyz.bluspring.unitytranslate.api.v2.plugin.PluginMetadata
 import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
@@ -82,6 +83,11 @@ interface UnityTranslateApi {
      * Gets the current spoken language. This is typically used as the default output language if none is set.
      */
     val currentSpokenLanguage: String
+
+    /**
+     * Gets the default font used in this instance of UnityTranslate.
+     */
+    val defaultFont: FontReference
 
     companion object {
         @JvmStatic

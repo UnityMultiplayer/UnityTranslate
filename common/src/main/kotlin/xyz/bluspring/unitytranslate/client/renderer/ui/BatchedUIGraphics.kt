@@ -7,9 +7,13 @@ import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.util.FormattedCharSequence
 import net.minecraft.util.LightCoordsUtil
+import xyz.bluspring.unitytranslate.api.v2.client.gui.TextureReference
+import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
+import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
+import xyz.bluspring.unitytranslate.api.v2.client.gui.font.MinecraftFontReference
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.renderer.BatchedGuiRenderer
-import xyz.bluspring.unitytranslate.client.renderer.ui.texture.TextureReference
+import xyz.bluspring.unitytranslate.client.renderer.ui.texture.AbstractTextureReference
 import java.util.*
 
 class BatchedUIGraphics(private val layer: BatchedGuiRenderer.DrawLayer) : UIGraphics {
@@ -32,9 +36,9 @@ class BatchedUIGraphics(private val layer: BatchedGuiRenderer.DrawLayer) : UIGra
         this.scissorState.pop()
     }
 
-    override fun drawString(font: Font, text: FormattedCharSequence, x: Float, y: Float, color: Int, dropShadow: Boolean) {
+    override fun text(font: FontReference, text: FormattedCharSequence, x: Float, y: Float, color: Int, dropShadow: Boolean) {
         val pose = poseStack.last()
-        val prepared = font.prepareText(text, x, y, color, dropShadow, true, 0)
+        val prepared = (font as MinecraftFontReference).font.prepareText(text, x, y, color, dropShadow, true, 0)
         prepared.visit(object : Font.GlyphVisitor {
             override fun acceptEffect(effect: TextRenderable) {
                 accept(effect)
@@ -69,6 +73,9 @@ class BatchedUIGraphics(private val layer: BatchedGuiRenderer.DrawLayer) : UIGra
         colorTopLeft: Int, colorTopRight: Int,
         colorBottomLeft: Int, colorBottomRight: Int
     ) {
+        if (texture !is AbstractTextureReference)
+            throw IllegalStateException("You are not supposed to extend TextureReference! Currently using ${texture::class.java.name}")
+
         val pose = poseStack.last()
         val buffer = BatchedGuiRenderer.getBuffer(RenderPipelines.GUI_TEXTURED, listOf(BatchedGuiRenderer.Texture("Sampler0", texture.textureView)), scissor = currentScissor, layer = this@BatchedUIGraphics.layer)
 

@@ -2,9 +2,9 @@ package xyz.bluspring.unitytranslate.client.gui
 
 import net.minecraft.util.Mth
 import xyz.bluspring.unitytranslate.UnityTranslate
+import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 import xyz.bluspring.unitytranslate.api.v2.util.CommonEasing
-import xyz.bluspring.unitytranslate.client.renderer.ui.UIGraphics
 import xyz.bluspring.unitytranslate.client.renderer.ui.texture.MinecraftTextureReference
 import kotlin.math.max
 

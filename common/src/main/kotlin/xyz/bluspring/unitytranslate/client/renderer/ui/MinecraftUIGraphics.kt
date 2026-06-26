@@ -2,7 +2,6 @@ package xyz.bluspring.unitytranslate.client.renderer.ui
 
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.FilterMode
-import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.gui.render.TextureSetup
@@ -10,9 +9,13 @@ import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.util.FormattedCharSequence
 import org.joml.Matrix3x2f
+import xyz.bluspring.unitytranslate.api.v2.client.gui.TextureReference
+import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
+import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
+import xyz.bluspring.unitytranslate.api.v2.client.gui.font.MinecraftFontReference
 import xyz.bluspring.unitytranslate.client.renderer.ui.minecraft.ColoredBlitRenderState
 import xyz.bluspring.unitytranslate.client.renderer.ui.minecraft.GradientedFillRenderState
-import xyz.bluspring.unitytranslate.client.renderer.ui.texture.TextureReference
+import xyz.bluspring.unitytranslate.client.renderer.ui.texture.AbstractTextureReference
 import xyz.bluspring.unitytranslate.mixin.accessor.GuiGraphicsExtractorAccessor
 
 class MinecraftUIGraphics(private val graphics: GuiGraphicsExtractor) : UIGraphics {
@@ -35,8 +38,8 @@ class MinecraftUIGraphics(private val graphics: GuiGraphicsExtractor) : UIGraphi
         graphics.disableScissor()
     }
 
-    override fun drawString(font: Font, text: FormattedCharSequence, x: Float, y: Float, color: Int, dropShadow: Boolean) {
-        graphics.text(font, text, x.toInt(), y.toInt(), color, dropShadow)
+    override fun text(font: FontReference, text: FormattedCharSequence, x: Float, y: Float, color: Int, dropShadow: Boolean) {
+        graphics.text((font as MinecraftFontReference).font, text, x.toInt(), y.toInt(), color, dropShadow)
     }
 
     override fun fill(
@@ -63,6 +66,9 @@ class MinecraftUIGraphics(private val graphics: GuiGraphicsExtractor) : UIGraphi
         texture: TextureReference,
         colorTopLeft: Int, colorTopRight: Int, colorBottomLeft: Int, colorBottomRight: Int
     ) {
+        if (texture !is AbstractTextureReference)
+            throw IllegalStateException("You are not supposed to extend TextureReference! Currently using ${texture::class.java.name}")
+
         graphics.guiRenderState.addGuiElement(ColoredBlitRenderState(RenderPipelines.GUI_TEXTURED, TextureSetup.singleTexture(texture.textureView, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST)),
             Matrix3x2f(graphics.pose()),
             graphics.scissor,

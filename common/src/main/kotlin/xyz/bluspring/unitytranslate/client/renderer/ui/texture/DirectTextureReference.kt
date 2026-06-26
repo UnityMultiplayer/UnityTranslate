@@ -6,7 +6,7 @@ import com.mojang.blaze3d.textures.GpuTextureView
 
 data class DirectTextureReference(
     val texture: GpuTexture
-) : TextureReference("direct") {
+) : AbstractTextureReference("direct") {
     override val textureView: GpuTextureView = RenderSystem.getDevice().createTextureView(this.texture)
 
     override val imageWidth: Int

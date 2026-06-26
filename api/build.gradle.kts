@@ -12,6 +12,7 @@ dependencies {
     api(libs.bundles.kotlin)
     api(libs.slf4j.api.get())
     api(libs.datafixerupper.get())
+    "stubsApi"(libs.datafixerupper.get())
     api(libs.unitytranslatelib.get())
 
     compileOnly(stubs.output)

@@ -8,9 +8,9 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.chat.Style
 import org.joml.Vector2f
+import xyz.bluspring.unitytranslate.api.v2.client.gui.TextureReference
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptData
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
-import xyz.bluspring.unitytranslate.client.renderer.ui.texture.TextureReference
 import xyz.bluspring.unitytranslate.util.Box2f
 import xyz.bluspring.unitytranslate.util.ScreenUtil
 import java.util.*

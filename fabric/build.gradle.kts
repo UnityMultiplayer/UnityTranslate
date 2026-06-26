@@ -34,7 +34,7 @@ val elementaConfig by configurations.creating {
 }
 
 dependencies {
-    runtimeOnly(project(":api"))
+    implementation(project(":api"))
     runtimeOnly(project(":common:${stonecutter.current.version}"))
 
     moddedImplementation(libs.fabric.loader)

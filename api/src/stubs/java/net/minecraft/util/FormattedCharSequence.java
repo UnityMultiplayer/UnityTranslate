@@ -1,4 +1,4 @@
-package net.minecraft.network.chat;
+package net.minecraft.util;
 
 public interface FormattedCharSequence {
 }

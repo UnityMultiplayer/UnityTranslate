@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.texture.AbstractTexture
 import net.minecraft.resources.Identifier
 
-data class MinecraftTextureReference(val id: Identifier) : TextureReference("minecraft_texture") {
+data class MinecraftTextureReference(val id: Identifier) : AbstractTextureReference("minecraft_texture") {
     val texture: AbstractTexture
         get() = Minecraft.getInstance().textureManager.getTexture(this.id)
 

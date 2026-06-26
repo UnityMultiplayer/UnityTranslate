@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.texture.TextureAtlas
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.resources.Identifier
 
-data class MinecraftSpriteTextureReference(val atlasId: Identifier, val spriteId: Identifier) : TextureReference("minecraft_sprite") {
+data class MinecraftSpriteTextureReference(val atlasId: Identifier, val spriteId: Identifier) : AbstractTextureReference("minecraft_sprite") {
     val atlas: TextureAtlas
         get() = Minecraft.getInstance().atlasManager.getAtlasOrThrow(this.atlasId)
 
