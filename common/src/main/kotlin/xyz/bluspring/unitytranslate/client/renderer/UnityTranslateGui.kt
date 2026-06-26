@@ -2,12 +2,12 @@ package xyz.bluspring.unitytranslate.client.renderer
 
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
+import xyz.bluspring.unitytranslate.client.gui.LogoTransitionOverlay
 import xyz.bluspring.unitytranslate.client.gui.TranscriptBoxRenderer
 import xyz.bluspring.unitytranslate.client.renderer.ui.UIGraphics
 
 object UnityTranslateGui {
     val transcriptRenderer = TranscriptBoxRenderer()
-    
 
     init {
         transcriptRenderer.updateConfig(listOf(
@@ -44,5 +44,6 @@ object UnityTranslateGui {
 
     fun submitLate(graphics: UIGraphics, partialTick: Float) {
         updateSizes()
+        LogoTransitionOverlay.submit(graphics, partialTick)
     }
 }

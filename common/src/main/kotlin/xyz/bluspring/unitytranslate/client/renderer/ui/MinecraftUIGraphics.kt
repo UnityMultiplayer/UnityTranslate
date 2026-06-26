@@ -59,7 +59,7 @@ class MinecraftUIGraphics(private val graphics: GuiGraphicsExtractor) : UIGraphi
 
     override fun blitWithColor(
         x1: Float, y1: Float, x2: Float, y2: Float,
-        u: Float, v: Float, uWidth: Float, vHeight: Float,
+        u0: Float, v0: Float, u1: Float, v1: Float,
         texture: TextureReference,
         colorTopLeft: Int, colorTopRight: Int, colorBottomLeft: Int, colorBottomRight: Int
     ) {
@@ -71,8 +71,8 @@ class MinecraftUIGraphics(private val graphics: GuiGraphicsExtractor) : UIGraphi
             colorTopLeft, colorTopRight,
             colorBottomLeft, colorBottomRight,
 
-            ((u * texture.width) + (texture.u0 * texture.imageWidth)) / texture.imageWidth, ((v * texture.height) + (texture.v0 * texture.imageHeight)) / texture.imageHeight,
-            (((u + uWidth) * texture.width) + (texture.u1 * texture.imageWidth)) / texture.imageWidth, (((v + vHeight) * texture.height) + (texture.v1 * texture.imageHeight)) / texture.imageHeight
+            ((u0 * texture.width) + (texture.u0 * texture.imageWidth)) / texture.imageWidth, ((v0 * texture.height) + (texture.v0 * texture.imageHeight)) / texture.imageHeight,
+            ((u1 * texture.width) + (texture.u0 * texture.imageWidth)) / texture.imageWidth, ((v1 * texture.height) + (texture.v0 * texture.imageHeight)) / texture.imageHeight
         ))
     }
 

@@ -64,7 +64,7 @@ class BatchedUIGraphics(private val layer: BatchedGuiRenderer.DrawLayer) : UIGra
 
     override fun blitWithColor(
         x1: Float, y1: Float, x2: Float, y2: Float,
-        u: Float, v: Float, uWidth: Float, vHeight: Float,
+        u0: Float, v0: Float, u1: Float, v1: Float,
         texture: TextureReference,
         colorTopLeft: Int, colorTopRight: Int,
         colorBottomLeft: Int, colorBottomRight: Int
@@ -72,22 +72,22 @@ class BatchedUIGraphics(private val layer: BatchedGuiRenderer.DrawLayer) : UIGra
         val pose = poseStack.last()
         val buffer = BatchedGuiRenderer.getBuffer(RenderPipelines.GUI_TEXTURED, listOf(BatchedGuiRenderer.Texture("Sampler0", texture.textureView)), scissor = currentScissor, layer = this@BatchedUIGraphics.layer)
 
-        val u0 = ((u * texture.width) + (texture.u0 * texture.imageWidth)) / texture.imageWidth
-        val v0 = ((v * texture.height) + (texture.v0 * texture.imageHeight)) / texture.imageHeight
-        val u1 = (((u + uWidth) * texture.width) + (texture.u1 * texture.imageWidth)) / texture.imageWidth
-        val v1 = (((v + vHeight) * texture.height) + (texture.v1 * texture.imageHeight)) / texture.imageHeight
+        val uStart = ((u0 * texture.width) + (texture.u0 * texture.imageWidth)) / texture.imageWidth
+        val vStart = ((v0 * texture.height) + (texture.v0 * texture.imageHeight)) / texture.imageHeight
+        val uEnd = ((u1 * texture.width) + (texture.u0 * texture.imageWidth)) / texture.imageWidth
+        val vEnd = ((v1 * texture.height) + (texture.v0 * texture.imageHeight)) / texture.imageHeight
 
         buffer.addVertex(pose, x1, y1, 0f)
-            .setUv(u0, v0)
+            .setUv(uStart, vStart)
             .setColor(colorTopLeft)
         buffer.addVertex(pose, x1, y2, 0f)
-            .setUv(u0, v1)
+            .setUv(uStart, vEnd)
             .setColor(colorBottomLeft)
         buffer.addVertex(pose, x2, y2, 0f)
-            .setUv(u1, v1)
+            .setUv(uEnd, vEnd)
             .setColor(colorBottomRight)
         buffer.addVertex(pose,  x2, y1, 0f)
-            .setUv(u1, v0)
+            .setUv(uEnd, vStart)
             .setColor(colorTopRight)
     }
 

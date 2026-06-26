@@ -68,11 +68,11 @@ interface UIGraphics {
         this.fill(x2 - thickness, y1 + thickness, x2, y2 - thickness, colorInnerLowerTopRight, colorOuterLowerTopRight, colorInnerUpperBottomRight, colorOuterUpperBottomRight) // right
     }
 
-    fun blit(x1: Float, y1: Float, x2: Float, y2: Float, u: Float, v: Float, uWidth: Float, vHeight: Float, texture: TextureReference)
-        = this.blitWithColor(x1, y1, x2, y2, u, v, uWidth, vHeight, texture, -1, -1)
-    fun blitWithColor(x1: Float, y1: Float, x2: Float, y2: Float, u: Float, v: Float, uWidth: Float, vHeight: Float, texture: TextureReference, colorFrom: Int, colorTo: Int)
-        = this.blitWithColor(x1, y1, x2, y2, u, v, uWidth, vHeight, texture, colorFrom, colorFrom, colorTo, colorTo)
-    fun blitWithColor(x1: Float, y1: Float, x2: Float, y2: Float, u: Float, v: Float, uWidth: Float, vHeight: Float, texture: TextureReference, colorTopLeft: Int, colorTopRight: Int, colorBottomLeft: Int, colorBottomRight: Int)
+    fun blit(x1: Float, y1: Float, x2: Float, y2: Float, u0: Float, v0: Float, u1: Float, v1: Float, texture: TextureReference)
+        = this.blitWithColor(x1, y1, x2, y2, u0, v0, u1, v1, texture, -1, -1)
+    fun blitWithColor(x1: Float, y1: Float, x2: Float, y2: Float, u0: Float, v0: Float, u1: Float, v1: Float, texture: TextureReference, colorFrom: Int, colorTo: Int = colorFrom)
+        = this.blitWithColor(x1, y1, x2, y2, u0, v0, u1, v1, texture, colorFrom, colorFrom, colorTo, colorTo)
+    fun blitWithColor(x1: Float, y1: Float, x2: Float, y2: Float, u0: Float, v0: Float, u1: Float, v1: Float, texture: TextureReference, colorTopLeft: Int, colorTopRight: Int, colorBottomLeft: Int, colorBottomRight: Int)
 
     fun pushMatrix()
     fun translate(x: Float, y: Float)
