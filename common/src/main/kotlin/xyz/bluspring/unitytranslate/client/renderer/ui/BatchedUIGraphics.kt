@@ -7,6 +7,8 @@ import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.util.FormattedCharSequence
 import net.minecraft.util.LightCoordsUtil
+import net.minecraft.util.Mth
+import org.joml.Quaternionf
 import xyz.bluspring.unitytranslate.api.v2.client.gui.TextureReference
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
@@ -98,8 +100,56 @@ class BatchedUIGraphics(private val layer: BatchedGuiRenderer.DrawLayer) : UIGra
             .setColor(colorTopRight)
     }
 
+    override fun meshFill(
+        x1: Float, y1: Float, x2: Float, y2: Float,
+        x3: Float, y3: Float, x4: Float, y4: Float,
+        color1: Int, color2: Int,
+        color3: Int, color4: Int
+    ) {
+        val pose = this.poseStack.last().pose()
+        val consumer = BatchedGuiRenderer.getBuffer(RenderPipelines.GUI, scissor = currentScissor, layer = this@BatchedUIGraphics.layer)
+        consumer.addVertex(pose, x1, y1, 0f) // top left
+            .setColor(color1)
+        consumer.addVertex(pose, x3, y3, 0f) // bottom left
+            .setColor(color3)
+        consumer.addVertex(pose, x4, y4, 0f) // bottom right
+            .setColor(color4)
+        consumer.addVertex(pose, x2, y2, 0f) // top right
+            .setColor(color2)
+    }
+
+    override fun meshBlitWithColor(
+        x1: Float, y1: Float, x2: Float, y2: Float,
+        x3: Float, y3: Float, x4: Float, y4: Float,
+
+        u1: Float, v1: Float, u2: Float, v2: Float,
+        u3: Float, v3: Float, u4: Float, v4: Float,
+        texture: TextureReference,
+        color1: Int, color2: Int,
+        color3: Int, color4: Int
+    ) {
+        if (texture !is AbstractTextureReference)
+            throw IllegalStateException("You are not supposed to extend TextureReference! Currently using ${texture::class.java.name}")
+
+        val pose = this.poseStack.last().pose()
+        val consumer = BatchedGuiRenderer.getBuffer(RenderPipelines.GUI_TEXTURED, listOf(BatchedGuiRenderer.Texture("Sampler0", texture.textureView)), scissor = currentScissor, layer = this@BatchedUIGraphics.layer)
+        consumer.addVertex(pose, x1, y1, 0f) // top left
+            .setUv(u1, v1)
+            .setColor(color1)
+        consumer.addVertex(pose, x3, y3, 0f) // bottom left
+            .setUv(u3, v3)
+            .setColor(color3)
+        consumer.addVertex(pose, x4, y4, 0f) // bottom right
+            .setUv(u4, v4)
+            .setColor(color4)
+        consumer.addVertex(pose, x2, y2, 0f) // top right
+            .setUv(u2, v2)
+            .setColor(color2)
+    }
+
     override fun pushMatrix() = this.poseStack.pushPose()
     override fun translate(x: Float, y: Float) = this.poseStack.translate(x, y, 0f)
+    override fun rotate(degrees: Float) = this.poseStack.mulPose(Quaternionf().rotateXYZ(degrees * Mth.DEG_TO_RAD, 0f, 0f))
     override fun scale(x: Float, y: Float) = this.poseStack.scale(x, y, 1f)
     override fun popMatrix() = this.poseStack.popPose()
 }

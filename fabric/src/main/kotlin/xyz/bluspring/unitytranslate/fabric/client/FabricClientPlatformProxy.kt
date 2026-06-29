@@ -1,24 +1,23 @@
 package xyz.bluspring.unitytranslate.fabric.client
 
 import com.mojang.blaze3d.pipeline.RenderTarget
-import com.mojang.blaze3d.textures.GpuTexture
 import net.minecraft.client.Minecraft
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
-import xyz.bluspring.unitytranslate.client.gui.WrappedUTScreen
 import xyz.bluspring.unitytranslate.client.gui.screen.UTScreen
+import xyz.bluspring.unitytranslate.client.gui.screen.WrappedUTScreen
 
 class FabricClientPlatformProxy : ClientPlatformProxy {
     override val framebuffer: RenderTarget
-        get() = Minecraft.getInstance().gameRenderer.mainRenderTarget()
+        get() =
+            Minecraft.getInstance().gameRenderer.mainRenderTarget()
+
+    override val windowHandle: Long
+        get() =
+            Minecraft.getInstance().window.handle()
 
     override val shouldRenderGui: Boolean
-        get() {
-            return !Minecraft.getInstance().gameRenderer.gameRenderState().guiRenderState.isHudHidden
-        }
-
-    override fun getTexture(id: Int): GpuTexture {
-        TODO("Not yet implemented")
-    }
+        get() =
+            !Minecraft.getInstance().gameRenderer.gameRenderState().guiRenderState.isHudHidden
 
     override fun setScreen(screen: UTScreen?) {
         Minecraft.getInstance().execute {

@@ -31,6 +31,8 @@ interface UIGraphics {
 
     fun fill(x1: Float, y1: Float, x2: Float, y2: Float, colorTopLeft: Int, colorTopRight: Int, colorBottomLeft: Int, colorBottomRight: Int)
 
+    fun meshFill(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float, x4: Float, y4: Float, color1: Int, color2: Int = color1, color3: Int = color1, color4: Int = color1)
+
     fun outline(x1: Float, y1: Float, x2: Float, y2: Float, thickness: Float = 1f, colorFrom: Int, colorTo: Int = colorFrom)
         = outline(x1, y1, x2, y2, thickness, colorFrom, colorFrom, colorTo, colorTo)
 
@@ -66,6 +68,14 @@ interface UIGraphics {
         this.fill(x2 - thickness, y1 + thickness, x2, y2 - thickness, colorInnerLowerTopRight, colorOuterLowerTopRight, colorInnerUpperBottomRight, colorOuterUpperBottomRight) // right
     }
 
+    fun meshBlit(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float, x4: Float, y4: Float,
+                          u1: Float, v1: Float, u2: Float, v2: Float, u3: Float, v3: Float, u4: Float, v4: Float, texture: TextureReference)
+        = this.meshBlitWithColor(x1, y1, x2, y2, x3, y3, x4, y4, u1, v1, u2, v2, u3, v3, u4, v4, texture, -1)
+
+    fun meshBlitWithColor(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float, x4: Float, y4: Float,
+                 u1: Float, v1: Float, u2: Float, v2: Float, u3: Float, v3: Float, u4: Float, v4: Float, texture: TextureReference,
+                 color1: Int, color2: Int = color1, color3: Int = color1, color4: Int = color1)
+
     fun blit(x1: Float, y1: Float, x2: Float, y2: Float, u0: Float, v0: Float, u1: Float, v1: Float, texture: TextureReference)
         = this.blitWithColor(x1, y1, x2, y2, u0, v0, u1, v1, texture, -1, -1)
     fun blitWithColor(x1: Float, y1: Float, x2: Float, y2: Float, u0: Float, v0: Float, u1: Float, v1: Float, texture: TextureReference, colorFrom: Int, colorTo: Int = colorFrom)
@@ -74,6 +84,7 @@ interface UIGraphics {
 
     fun pushMatrix()
     fun translate(x: Float, y: Float)
+    fun rotate(degrees: Float)
     fun scale(x: Float, y: Float)
     fun popMatrix()
 }

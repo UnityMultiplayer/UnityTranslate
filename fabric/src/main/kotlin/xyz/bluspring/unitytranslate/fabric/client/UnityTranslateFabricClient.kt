@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.TitleScreen
 import xyz.bluspring.unitytranslate.UnityTranslate
+import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 import xyz.bluspring.unitytranslate.client.gui.LogoTransitionOverlay
 import xyz.bluspring.unitytranslate.client.renderer.UnityTranslateGui
@@ -24,7 +25,8 @@ class UnityTranslateFabricClient : ClientModInitializer {
         UnityTranslateClient.init()
 
         HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, UnityTranslate.id("transcript_boxes")) { graphics, deltaTracker ->
-            UnityTranslateGui.submit(MinecraftUIGraphics(graphics), deltaTracker.getGameTimeDeltaPartialTick(true))
+            val mouse = Minecraft.getInstance().mouseHandler
+            UnityTranslateGui.submit(MinecraftUIGraphics(graphics), deltaTracker.getGameTimeDeltaPartialTick(true), mouse.xpos() / ClientPlatformProxy.instance.guiScale, mouse.ypos() / ClientPlatformProxy.instance.guiScale)
         }
 
         var shouldStartFirstLaunch = false
@@ -34,6 +36,10 @@ class UnityTranslateFabricClient : ClientModInitializer {
             if (!UnityTranslateClient.handledFirstJoin) {
                 shouldStartFirstLaunch = true
             }
+        }
+
+        ClientLifecycleEvents.CLIENT_STOPPING.register { _ ->
+            UnityTranslateClient.onClose()
         }
 
         ClientTickEvents.END_CLIENT_TICK.register { client ->

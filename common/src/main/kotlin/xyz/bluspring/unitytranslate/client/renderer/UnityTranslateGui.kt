@@ -5,9 +5,11 @@ import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
 import xyz.bluspring.unitytranslate.client.gui.LogoTransitionOverlay
 import xyz.bluspring.unitytranslate.client.gui.TranscriptBoxRenderer
+import xyz.bluspring.unitytranslate.client.gui.hud.QuickLanguageRadialSelector
 
 object UnityTranslateGui {
     val transcriptRenderer = TranscriptBoxRenderer()
+    val quickLanguageSelector = QuickLanguageRadialSelector()
 
     init {
         transcriptRenderer.updateConfig(listOf(
@@ -37,9 +39,10 @@ object UnityTranslateGui {
         }
     }
 
-    fun submit(uiGraphics: UIGraphics, partialTick: Float) {
+    fun submit(uiGraphics: UIGraphics, partialTick: Float, mouseX: Double, mouseY: Double) {
         updateSizes()
         this.transcriptRenderer.submit(uiGraphics, partialTick)
+//        this.quickLanguageSelector.submit(uiGraphics, partialTick, mouseX, mouseY)
     }
 
     fun submitLate(graphics: UIGraphics, partialTick: Float) {
