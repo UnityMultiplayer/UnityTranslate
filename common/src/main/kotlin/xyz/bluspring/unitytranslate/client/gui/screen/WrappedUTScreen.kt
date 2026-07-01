@@ -1,5 +1,6 @@
 package xyz.bluspring.unitytranslate.client.gui.screen
 
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.input.CharacterEvent
@@ -18,8 +19,13 @@ class WrappedUTScreen(val actualScreen: UTScreen, private val parent: Screen? = 
         graphics.fill(0, 0, graphics.guiWidth(), graphics.guiHeight(), 0)
     }
 
+    override fun tick() {
+        super.tick()
+        actualScreen.tick()
+    }
+
     override fun extractRenderState(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, a: Float) {
-        actualScreen.submit(MinecraftUIGraphics(graphics), a, mouseX, mouseY)
+        actualScreen.submit(MinecraftUIGraphics(graphics), Minecraft.getInstance().deltaTracker.getGameTimeDeltaPartialTick(true), mouseX, mouseY)
     }
 
     override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {

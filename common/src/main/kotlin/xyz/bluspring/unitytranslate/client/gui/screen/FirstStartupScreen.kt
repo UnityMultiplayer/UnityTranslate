@@ -10,11 +10,21 @@ import xyz.bluspring.unitytranslate.api.v2.util.CommonEasing
 import xyz.bluspring.unitytranslate.client.gui.LogoTransitionOverlay
 
 class FirstStartupScreen : UTScreen() {
-    private val startTime = System.currentTimeMillis()
-    val transitionTime = 1_200 // ms
+    var currentTick = 0
+    val transitionTime = 24 // ticks
+
+    override fun tick() {
+        super.tick()
+
+        if (this.currentTick >= this.transitionTime) {
+            this.currentTick = this.transitionTime
+        } else {
+            this.currentTick++
+        }
+    }
 
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
-        val delta = ((System.currentTimeMillis() - this.startTime) / transitionTime.toFloat()).coerceAtMost(1f)
+        val delta = ((this.currentTick + partialTick) / transitionTime.toFloat()).coerceAtMost(1f)
         val size = 80f
 
         graphics.fill(0f, 0f, graphics.width.toFloat(), graphics.height.toFloat(),

@@ -43,8 +43,10 @@ class UnityTranslateFabricClient : ClientModInitializer {
         }
 
         ClientTickEvents.END_CLIENT_TICK.register { client ->
+            UnityTranslateClient.tick()
+
             if (!UnityTranslateClient.handledFirstJoin && client.screen is TitleScreen && shouldStartFirstLaunch && ticksUntilFirstLaunch-- <= 0) {
-                LogoTransitionOverlay.startTime = System.currentTimeMillis()
+                LogoTransitionOverlay.currentTick = 0
                 UnityTranslateClient.handledFirstJoin = true
             }
         }

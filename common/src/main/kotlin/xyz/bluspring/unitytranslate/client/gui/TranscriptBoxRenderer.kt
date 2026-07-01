@@ -8,6 +8,8 @@ import xyz.bluspring.unitytranslate.client.gui.hud.TranscriptBoxContainer
 class TranscriptBoxRenderer {
     val containers = mutableListOf<TranscriptBoxContainer>()
 
+    fun tick() {}
+
     fun submit(graphics: UIGraphics, partialTick: Float) {
         for (container in this.containers) {
             container.submit(graphics, partialTick)

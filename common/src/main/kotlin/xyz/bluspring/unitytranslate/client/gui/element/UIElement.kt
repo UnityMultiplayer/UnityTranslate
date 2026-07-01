@@ -11,6 +11,8 @@ abstract class UIElement {
     abstract val bounds: ScreenRectangle
     abstract fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int)
 
+    open fun tick() {}
+
     open fun keyPressed(key: Int, scanCode: Int, modifiers: Int): Boolean {
         return false
     }

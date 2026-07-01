@@ -39,6 +39,11 @@ object UnityTranslateGui {
         }
     }
 
+    fun tick() {
+        this.transcriptRenderer.tick()
+        LogoTransitionOverlay.tick()
+    }
+
     fun submit(uiGraphics: UIGraphics, partialTick: Float, mouseX: Double, mouseY: Double) {
         updateSizes()
         this.transcriptRenderer.submit(uiGraphics, partialTick)
