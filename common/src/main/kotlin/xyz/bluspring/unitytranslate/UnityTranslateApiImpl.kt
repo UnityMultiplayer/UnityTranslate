@@ -5,7 +5,6 @@ import xyz.bluspring.sunset.SunsetConfig
 import xyz.bluspring.unitytranslate.api.v2.LanguageHolder
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
-import xyz.bluspring.unitytranslate.api.v2.client.gui.font.MinecraftFontReference
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigBuilder
 import xyz.bluspring.unitytranslate.api.v2.plugin.PluginMetadata
 import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
@@ -120,7 +119,7 @@ object UnityTranslateApiImpl : UnityTranslateApi {
     }
 
     override val defaultFont: FontReference
-        get() = MinecraftFontReference(Minecraft.getInstance().font)
+        get() = FontReference.minecraft(Minecraft.getInstance().font)
 
     override fun registerOutputLanguage(id: String): LanguageHolder {
         if (this.outputLanguages.contains(id))

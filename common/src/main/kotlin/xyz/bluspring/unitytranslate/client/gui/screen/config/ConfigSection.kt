@@ -6,7 +6,7 @@ import xyz.bluspring.sunset.SunsetConfig
 import xyz.bluspring.sunset.values.ConfigCategory
 import xyz.bluspring.sunset.values.ConfigValue
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
-import xyz.bluspring.unitytranslate.api.v2.client.gui.font.MinecraftFontReference
+import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.config.values.HiddenConfigValue
 
 class ConfigSection(val id: String, val config: Collection<SunsetConfig>) {
@@ -40,7 +40,7 @@ class ConfigSection(val id: String, val config: Collection<SunsetConfig>) {
 
     fun submitSidebar(graphics: UIGraphics, font: Font, partialTick: Float, offsetYFinal: Float): Float {
         var offsetY = offsetYFinal
-        graphics.centeredText(MinecraftFontReference(font), Component.translatable("config.unitytranslate.$id")
+        graphics.centeredText(FontReference.minecraft(font), Component.translatable("config.unitytranslate.$id")
             .withStyle { it.withBold(true) }, 87.5f, offsetY, -1, true)
         offsetY += 16
 
@@ -61,7 +61,7 @@ class ConfigSection(val id: String, val config: Collection<SunsetConfig>) {
 
         var offsetY = offsetYFinal
 
-        graphics.text(MinecraftFontReference(font), font.substrByWidth(Component.translatable("config.unitytranslate.$id${value.fullId}"), 175 - offsetX), offsetX.toFloat(), offsetY, -1, true)
+        graphics.text(FontReference.minecraft(font), font.substrByWidth(Component.translatable("config.unitytranslate.$id${value.fullId}"), 175 - offsetX), offsetX.toFloat(), offsetY, -1, true)
         offsetY += font.lineHeight + 4
 
         if (value is ConfigCategory) {

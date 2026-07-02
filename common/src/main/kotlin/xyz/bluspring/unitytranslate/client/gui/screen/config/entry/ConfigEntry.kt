@@ -5,7 +5,7 @@ import net.minecraft.network.chat.Component
 import xyz.bluspring.sunset.values.ConfigValue
 import xyz.bluspring.sunset.values.RangedConfigValue
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
-import xyz.bluspring.unitytranslate.api.v2.client.gui.font.MinecraftFontReference
+import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.client.gui.GuiColors
 import xyz.bluspring.unitytranslate.config.values.DropdownValidatingReflectingConfigValue
 
@@ -14,7 +14,7 @@ abstract class ConfigEntry<E, T : ConfigValue<E>>(val value: T) {
 
     open fun submit(graphics: UIGraphics, partialTick: Float, areaWidth: Int, mouseX: Int, mouseY: Int): Int {
         val font = Minecraft.getInstance().font
-        graphics.text(MinecraftFontReference(font), Component.translatable("unitytranslate.config.${value.fullId}"), 0f, 0f, if (isFocused) GuiColors.TEXT_FOCUSED else GuiColors.TEXT_UNFOCUSED, true)
+        graphics.text(FontReference.minecraft(font), Component.translatable("unitytranslate.config.${value.fullId}"), 0f, 0f, if (isFocused) GuiColors.TEXT_FOCUSED else GuiColors.TEXT_UNFOCUSED, true)
 
         return font.lineHeight
     }

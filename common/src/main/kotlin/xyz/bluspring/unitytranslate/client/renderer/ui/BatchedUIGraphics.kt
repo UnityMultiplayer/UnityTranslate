@@ -12,9 +12,9 @@ import org.joml.Quaternionf
 import xyz.bluspring.unitytranslate.api.v2.client.gui.TextureReference
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
-import xyz.bluspring.unitytranslate.api.v2.client.gui.font.MinecraftFontReference
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.renderer.BatchedGuiRenderer
+import xyz.bluspring.unitytranslate.client.renderer.ui.font.MinecraftFontReference
 import xyz.bluspring.unitytranslate.client.renderer.ui.texture.AbstractTextureReference
 import java.util.*
 

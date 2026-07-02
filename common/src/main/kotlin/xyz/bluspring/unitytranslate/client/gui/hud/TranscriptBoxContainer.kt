@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
-import xyz.bluspring.unitytranslate.api.v2.client.gui.font.MinecraftFontReference
+import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.ColorConfig
@@ -75,7 +75,7 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
         graphics.popMatrix()
 
         // Header
-        graphics.text(MinecraftFontReference(font), headerText.visualOrderText, this.headerX, this.headerY, -1, this.config.header.hasShadow)
+        graphics.text(FontReference.minecraft(font), headerText.visualOrderText, this.headerX, this.headerY, -1, this.config.header.hasShadow)
 
         graphics.popMatrix()
     }

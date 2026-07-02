@@ -40,9 +40,9 @@ class FabricClientPlatformProxy : ClientPlatformProxy {
     override val windowHeight: Int
         get() = Minecraft.getInstance().window.height
     override val viewportWidth: Int
-        get() = Minecraft.getInstance().window.screenWidth
+        get() = Minecraft.getInstance().window.guiScaledWidth
     override val viewportHeight: Int
-        get() = Minecraft.getInstance().window.screenHeight
+        get() = Minecraft.getInstance().window.guiScaledHeight
     override val guiScale: Double
         get() = Minecraft.getInstance().window.guiScale.toDouble()
 }

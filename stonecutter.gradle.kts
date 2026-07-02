@@ -33,7 +33,7 @@ allprojects {
         mavenProviding("https://maven.fabricmc.net", "net.fabricmc")
         mavenProviding("https://libraries.minecraft.net", "com.mojang")
         mavenProviding("https://mvn.devos.one/releases", "xyz.bluspring.sunset")
-//        mavenProviding("https://mvn.devos.one/snapshots", "dev.cadindie") // FIXME: why is this broken. what.
+        mavenProviding("https://mvn.devos.one/snapshots", "dev.cadindie") // FIXME: why is this broken. what.
         mavenProviding("https://maven.maxhenkel.de/releases", "de.maxhenkel")
         mavenProviding("https://api.modrinth.com/maven", "maven.modrinth")
         mavenProviding("https://www.cursemaven.com", "curse.maven")

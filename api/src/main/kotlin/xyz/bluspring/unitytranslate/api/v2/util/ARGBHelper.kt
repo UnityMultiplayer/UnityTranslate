@@ -9,42 +9,42 @@ object ARGBHelper {
     const val MAX_COMPONENT_SIZE = 0xFF
 
     @JvmStatic
-    fun Int.alpha(): Int {
+    inline fun Int.alpha(): Int {
         return (this shr 24) and MAX_COMPONENT_SIZE
     }
 
     @JvmStatic
-    fun Int.red(): Int {
+    inline fun Int.red(): Int {
         return (this shr 16) and MAX_COMPONENT_SIZE
     }
 
     @JvmStatic
-    fun Int.green(): Int {
+    inline fun Int.green(): Int {
         return (this shr 8) and MAX_COMPONENT_SIZE
     }
 
     @JvmStatic
-    fun Int.blue(): Int {
+    inline fun Int.blue(): Int {
         return this and MAX_COMPONENT_SIZE
     }
 
     @JvmStatic
-    fun opaque(color: Int): Int {
-        return color.withAlpha(0xFF)
+    inline fun opaque(color: Int): Int {
+        return color.withAlpha(MAX_COMPONENT_SIZE)
     }
 
     @JvmStatic
-    fun Int.withAlpha(alpha: Int): Int {
+    inline fun Int.withAlpha(alpha: Int): Int {
         return (this and 0x00FFFFFF) or (alpha shl 24)
     }
 
     @JvmStatic
-    fun Int.withAlpha(alpha: Float): Int {
-        return this.withAlpha((alpha * 255).toInt())
+    inline fun Int.withAlpha(alpha: Float): Int {
+        return this.withAlpha((alpha * MAX_COMPONENT_SIZE).toInt())
     }
 
     @JvmStatic
-    fun color(a: Int, r: Int, g: Int, b: Int): Int {
+    inline fun color(a: Int, r: Int, g: Int, b: Int): Int {
         // 0xFF_FF_FF_FF
         return (a shl 24) or (r shl 16) or (g shl 8) or b
     }

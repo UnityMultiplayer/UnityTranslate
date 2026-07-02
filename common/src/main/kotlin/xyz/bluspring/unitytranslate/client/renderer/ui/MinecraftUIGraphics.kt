@@ -13,7 +13,7 @@ import org.joml.Matrix3x2f
 import xyz.bluspring.unitytranslate.api.v2.client.gui.TextureReference
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
-import xyz.bluspring.unitytranslate.api.v2.client.gui.font.MinecraftFontReference
+import xyz.bluspring.unitytranslate.client.renderer.ui.font.MinecraftFontReference
 import xyz.bluspring.unitytranslate.client.renderer.ui.minecraft.ColoredBlitRenderState
 import xyz.bluspring.unitytranslate.client.renderer.ui.minecraft.ColoredMeshBlitRenderState
 import xyz.bluspring.unitytranslate.client.renderer.ui.minecraft.GradientedFillRenderState

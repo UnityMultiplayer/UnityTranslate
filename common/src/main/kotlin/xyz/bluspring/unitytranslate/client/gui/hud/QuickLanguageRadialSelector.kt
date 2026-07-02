@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
-import xyz.bluspring.unitytranslate.api.v2.client.gui.font.MinecraftFontReference
+import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.withAlpha
 import java.awt.Color
@@ -23,7 +23,7 @@ class QuickLanguageRadialSelector {
         val diffY = mouseY - centerY
 
         val font = Minecraft.getInstance().font
-        val fontReference = MinecraftFontReference(font)
+        val fontReference = FontReference.minecraft(font)
 
         val languages = listOf("English", "Español", "Portugués", "Français", "Svenska", "Bahasa Melayu", "Deutsch", "Nederlands")
         val totalLanguages = languages.size
