@@ -52,7 +52,7 @@ class FirstStartupScreen : UTScreen() {
             LogoTransitionOverlay.TOP_GRADIENT.withAlpha(1f), LogoTransitionOverlay.BOTTOM_GRADIENT.withAlpha(1f))
 
         if (this.transitioningSequence != null) {
-            this.transitioningSequence!!.submit(graphics, partialTick, mouseX, mouseY)
+            this.transitioningSequence!!.submit(graphics, partialTick, -100, -100)
         } else {
             this.currentSequence.submit(graphics, partialTick, mouseX, mouseY)
         }

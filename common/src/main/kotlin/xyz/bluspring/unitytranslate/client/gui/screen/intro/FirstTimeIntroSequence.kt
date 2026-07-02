@@ -1,5 +1,6 @@
 package xyz.bluspring.unitytranslate.client.gui.screen.intro
 
+import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
@@ -14,13 +15,19 @@ import xyz.bluspring.unitytranslate.client.gui.screen.FirstStartupScreen
 class FirstTimeIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent) {
     init {
         this.children.add(PlainUIButton(
-            UnityTranslateApi.instance.defaultFont, Component.literal("Let's go!"), { width, _ -> width / 2f }, { _, height -> height / 2f }) {
+            UnityTranslateApi.instance.defaultFont, Component.literal("Let's go!").withStyle(ChatFormatting.UNDERLINE), { width, _ -> width / 2f }, { _, height -> height / 2f + 80f }) {
                 this.parent.next()
             }
         )
     }
 
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int, transitionProgress: Float) {
+        for (element in this.children) {
+            if (element is PlainUIButton) {
+                element.color = element.color.withAlpha(transitionProgress)
+            }
+        }
+
         val size = 80f
 
         graphics.pushMatrix()

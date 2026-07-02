@@ -14,7 +14,7 @@ open class PlainUIButton(
     private val x: (Int, Int) -> Float,
     private val y: (Int, Int) -> Float,
     private val maxWidth: Int = 10000,
-    protected open val color: Int = ARGBHelper.color(255, 240, 240, 240),
+    open var color: Int = ARGBHelper.color(255, 210, 210, 210),
     protected val hoverColor: Int = -1,
     private val onClick: () -> Unit,
 ) : UIElement() {
