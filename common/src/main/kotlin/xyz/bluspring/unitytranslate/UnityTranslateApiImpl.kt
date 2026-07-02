@@ -3,6 +3,7 @@ package xyz.bluspring.unitytranslate
 import xyz.bluspring.sunset.SunsetConfig
 import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.LanguageHolder
+import xyz.bluspring.unitytranslate.api.v2.Languages
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigBuilder
@@ -30,7 +31,7 @@ object UnityTranslateApiImpl : UnityTranslateApi {
     val configs: MutableMap<String, SunsetConfig> = mutableMapOf()
 
     val outputLanguages: MutableMap<String, LanguageHolder> = mutableMapOf()
-    override var currentSpokenLanguage: Language = Language("en")
+    override var currentSpokenLanguage: Language = Languages.ENGLISH
     override val translatorManager: TranslatorManager
         get() = TranslatorManagerImpl // Don't inline this! You're gonna run into a bunch of headaches otherwise.
 

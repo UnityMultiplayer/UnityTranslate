@@ -9,7 +9,12 @@ import java.nio.file.OpenOption
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import java.security.DigestOutputStream
+import java.util.Collections
+import java.util.WeakHashMap
 import kotlin.io.path.*
+import kotlin.text.HexFormat
+import kotlin.text.format
+import kotlin.text.toHexString
 
 /**
  * Utilities to allow for downloading files in parallel without worrying about having to manage it yourself.
@@ -19,6 +24,8 @@ object DownloadHelper {
     private val context = Dispatchers.IO.limitedParallelism(MAX_DOWNLOAD_THREADS) + CoroutineName("UnityTranslate Download Helper")
     private val scope = CoroutineScope(context)
     private val logger: Logger = LoggerFactory.getLogger("UnityTranslate Download Helper")
+
+    private val alreadyDownloading: MutableMap<Path, DownloadInfo> = Collections.synchronizedMap(WeakHashMap())
 
     @JvmStatic
     fun <T : URLProvider> findSuitableUrl(urls: Collection<T>): T? {
@@ -79,7 +86,7 @@ object DownloadHelper {
     }
 
     // This only works for the Kotlin code, so.
-    fun queue(
+    fun queueSha1(
         url: URL, path: Path,
         sha1: String? = null,
         createTemp: Boolean = true,
@@ -97,6 +104,12 @@ object DownloadHelper {
         overwrite: Boolean = false,
         vararg options: OpenOption = arrayOf(StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING),
     ): DownloadInfo {
+        // If something's already downloading to that location, we can just return that
+        synchronized(this.alreadyDownloading) {
+            if (this.alreadyDownloading.containsKey(path))
+                return this.alreadyDownloading[path]!!
+        }
+
         val info = DownloadInfo.Mutable(path, url)
 
         if (!overwrite && path.exists()) {
@@ -105,6 +118,7 @@ object DownloadHelper {
             return info
         } else {
             logger.debug("Queued {} for download.", url)
+            this.alreadyDownloading[path] = info
         }
 
         val tempPath = if (createTemp) path.resolveSibling("${path.name}.tmp") else path
@@ -164,6 +178,8 @@ object DownloadHelper {
             } catch (e: Throwable) {
                 logger.error("Failed to download $url into ${path.absolutePathString()}!", e)
                 throw e
+            } finally {
+                alreadyDownloading.remove(path)
             }
         }.apply {
             invokeOnCompletion {

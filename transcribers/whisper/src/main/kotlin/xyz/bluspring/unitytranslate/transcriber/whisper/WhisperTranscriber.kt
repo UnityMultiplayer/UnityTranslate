@@ -5,6 +5,7 @@ import kotlinx.coroutines.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import xyz.bluspring.unitytranslate.api.v2.Language
+import xyz.bluspring.unitytranslate.api.v2.Languages
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadHelper
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import java.io.IOException
@@ -67,8 +68,21 @@ object WhisperTranscriber : SpeechTranscriber() {
             download.deferred.await()
         }
 
+    // https://developers.openai.com/api/docs/guides/speech-to-text#supported-languages
+    val supportedLanguages = listOf(
+        Languages.AFRIKAANS, Languages.ARABIC, Languages.ARMENIAN, Languages.AZERBAIJANI, Languages.BELARUSIAN, Languages.BOSNIAN,
+        Languages.BULGARIAN, Languages.CATALAN, Languages.CHINESE_SIMPLIFIED, Languages.CHINESE_TRADITIONAL, Languages.CROATIAN,
+        Languages.CZECH, Languages.DANISH, Languages.DUTCH, Languages.ENGLISH, Languages.ESTONIAN, Languages.FINNISH, Languages.FRENCH,
+        Languages.GALICIAN, Languages.GERMAN, Languages.GREEK, Languages.HEBREW, Languages.HINDI, Languages.HUNGARIAN, Languages.ICELANDIC,
+        Languages.INDONESIAN, Languages.ITALIAN, Languages.JAPANESE, Languages.KANNADA, Languages.KAZAKH, Languages.KOREAN, Languages.LATVIAN,
+        Languages.LITHUANIAN, Languages.MACEDONIAN, Languages.MALAY, Languages.MARATHI, Languages.MAORI, Languages.NEPALI, Languages.NORWEGIAN,
+        Languages.PERSIAN, Languages.POLISH, Languages.PORTUGUESE, Languages.ROMANIAN, Languages.RUSSIAN, Languages.SERBIAN, Languages.SLOVAK,
+        Languages.SLOVENIAN, Languages.SPANISH, Languages.SWAHILI, Languages.SWEDISH, Languages.TAGALOG, Languages.TAMIL, Languages.THAI,
+        Languages.TURKISH, Languages.UKRAINIAN, Languages.URDU, Languages.VIETNAMESE, Languages.WELSH
+    )
+
     override suspend fun supportsLanguage(language: Language): Boolean {
-        return true
+        return this.supportedLanguages.contains(language)
     }
 
     override fun transcribeSamples(samples: FloatArray, language: Language): Deferred<String> {

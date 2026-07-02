@@ -241,7 +241,7 @@ suspend fun tryDownloadLibraries(unityTranslateVersion: String?, minecraftVersio
             if (url != null && utVersion != null) {
                 logger.info("Downloading UnityTranslate Standalone v${utVersion}...")
                 val utPath = buildUnityTranslatePath(utVersion)
-                downloadInfos.add(DownloadHelper.queue(url.url, utPath, sha1 = url.sha1.orElse(null)))
+                downloadInfos.add(DownloadHelper.queueSha1(url.url, utPath, sha1 = url.sha1.orElse(null)))
                 libraries.add(utPath)
             }
         }
@@ -289,7 +289,7 @@ suspend fun tryDownloadLibraries(unityTranslateVersion: String?, minecraftVersio
     val clientJarInfo = ArtifactInfo.CODEC.decode(JsonOps.INSTANCE, metadata.getAsJsonObject("downloads").getAsJsonObject("client"))
         .orThrow.first
     val clientJarPath = librariesPath / "com/mojang/minecraft/${mcVersion}/minecraft-$mcVersion.jar"
-    val clientJarDownload = DownloadHelper.queue(clientJarInfo.url.toURL(), clientJarPath, sha1 = clientJarInfo.sha1)
+    val clientJarDownload = DownloadHelper.queueSha1(clientJarInfo.url.toURL(), clientJarPath, sha1 = clientJarInfo.sha1)
     downloadInfos.add(clientJarDownload)
     libraries.add(clientJarPath)
 
@@ -310,7 +310,7 @@ suspend fun tryDownloadLibraries(unityTranslateVersion: String?, minecraftVersio
             .orThrow.first
 
         val libraryPath = librariesPath / downloadData.path.orElseThrow()
-        val libraryDownload = DownloadHelper.queue(downloadData.url.toURL(), libraryPath, sha1 = downloadData.sha1)
+        val libraryDownload = DownloadHelper.queueSha1(downloadData.url.toURL(), libraryPath, sha1 = downloadData.sha1)
         downloadInfos.add(libraryDownload)
 
         libraries.add(libraryPath)
