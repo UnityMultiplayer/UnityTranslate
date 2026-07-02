@@ -1,6 +1,7 @@
 package xyz.bluspring.unitytranslate.client
 
 import com.mojang.blaze3d.pipeline.RenderTarget
+import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.client.gui.screen.UTScreen
 import java.util.*
 
@@ -19,6 +20,8 @@ interface ClientPlatformProxy {
     val windowHeight: Int
     val viewportWidth: Int
     val viewportHeight: Int
+
+    val defaultFont: FontReference
 
     fun setScreen(screen: UTScreen?)
 
