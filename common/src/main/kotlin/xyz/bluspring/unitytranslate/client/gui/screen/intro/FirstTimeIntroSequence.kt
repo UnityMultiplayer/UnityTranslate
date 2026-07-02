@@ -15,7 +15,7 @@ import xyz.bluspring.unitytranslate.client.gui.screen.FirstStartupScreen
 class FirstTimeIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent) {
     init {
         this.children.add(PlainUIButton(
-            UnityTranslateApi.instance.defaultFont, Component.literal("Let's go!").withStyle(ChatFormatting.UNDERLINE), { width, _ -> width / 2f }, { _, height -> height / 2f + 80f }) {
+            UnityTranslateApi.instance.defaultFont, Component.literal("unitytranslate.intro.first_time.next").withStyle(ChatFormatting.UNDERLINE), { width, _ -> width / 2f }, { _, height -> height / 2f + 80f }) {
                 this.parent.next()
             }
         )
@@ -38,7 +38,7 @@ class FirstTimeIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent)
         graphics.popMatrix()
 
         val font = Minecraft.getInstance().font
-        val splitText = font.split(Component.literal("Looks like this is your first time using UnityTranslate, let's help you get set up."), 315)
+        val splitText = font.split(Component.translatable("unitytranslate.intro.first_time"), 315)
 
         graphics.pushMatrix()
         graphics.translate(0f, Mth.lerp(1f - CommonEasing.SMOOTH.getValue(transitionProgress), 0f, 4f))
