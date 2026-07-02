@@ -19,6 +19,11 @@ class WrappedUTScreen(val actualScreen: UTScreen, private val parent: Screen? = 
         graphics.fill(0, 0, graphics.guiWidth(), graphics.guiHeight(), 0)
     }
 
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        this.actualScreen.setup(width, height)
+    }
+
     override fun tick() {
         super.tick()
         actualScreen.tick()

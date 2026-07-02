@@ -1,6 +1,6 @@
 package xyz.bluspring.unitytranslate.api.v2.translator
 
-import xyz.bluspring.unitytranslate.library.util.LangPair
+import xyz.bluspring.unitytranslate.api.v2.util.LangPair
 
 abstract class TranslatorInstance {
     abstract suspend fun supportsLanguage(langPair: LangPair): Boolean

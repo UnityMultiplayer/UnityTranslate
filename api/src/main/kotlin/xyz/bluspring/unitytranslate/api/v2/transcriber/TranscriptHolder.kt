@@ -1,6 +1,7 @@
 package xyz.bluspring.unitytranslate.api.v2.transcriber
 
 import org.jetbrains.annotations.ApiStatus
+import xyz.bluspring.unitytranslate.api.v2.Language
 import java.util.*
 
 /**
@@ -9,11 +10,11 @@ import java.util.*
 @JvmRecord
 data class TranscriptHolder @ApiStatus.Internal constructor(
     /**
-     * The language code that is used by this transcript holder.
+     * The language that is used by this transcript holder.
      * This means that transcripts will be translated to this language when provided,
      * if it's not already in this language.
      */
-    val languageCode: String,
+    val language: Language,
 
     /**
      * The list of transcripts that are in this transcript holder.

@@ -27,7 +27,7 @@ class TranscriptBoxRenderer {
         // Add new boxes
         for (config in boxes) {
             if (existing.none { e -> e.config == config }) {
-                this.containers.add(TranscriptBoxContainer(UnityTranslateApi.instance.getOrCreateTranscriptHolder(config.languageCode), config))
+                this.containers.add(TranscriptBoxContainer(UnityTranslateApi.instance.getOrCreateTranscriptHolder(config.language), config))
             }
         }
 

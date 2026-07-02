@@ -8,5 +8,7 @@ public abstract class Language {
         throw new IllegalStateException();
     }
 
+    public abstract String getOrDefault(String id);
+    public abstract String getOrDefault(String id, String fallback);
     public abstract FormattedCharSequence getVisualOrder(FormattedText text);
 }

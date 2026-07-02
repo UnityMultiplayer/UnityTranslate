@@ -81,8 +81,8 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
     }
 
     fun updateConfig() {
-        if (this.holder.languageCode != this.config.languageCode)
-            this.holder = UnityTranslateApi.instance.getOrCreateTranscriptHolder(this.config.languageCode)
+        if (this.holder.language != this.config.language)
+            this.holder = UnityTranslateApi.instance.getOrCreateTranscriptHolder(this.config.language)
 
         val screenWidth = (ClientPlatformProxy.instance.windowWidth / ClientPlatformProxy.instance.guiScale).toInt()
         val screenHeight = (ClientPlatformProxy.instance.windowHeight / ClientPlatformProxy.instance.guiScale).toInt()
@@ -95,9 +95,9 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
         this.width = dimensions.right - dimensions.left
         this.height = dimensions.bottom - dimensions.top
 
-        this.headerText = this.config.header.text(this.holder.languageCode)
+        this.headerText = this.config.header.text(this.holder.language)
         val headerLength = font.width(this.config.header.display.text(Component.empty()))
-        val languageLength = font.width(this.config.header.langDecoration.decorate(this.config.header.langDisplay.text(this.holder.languageCode)))
+        val languageLength = font.width(this.config.header.langDecoration.decorate(this.config.header.langDisplay.text(this.holder.language)))
 
         this.headerX = this.config.header.alignX.align(this.width, headerLength, languageLength)
         this.headerY = this.config.header.alignY.align(this.height)

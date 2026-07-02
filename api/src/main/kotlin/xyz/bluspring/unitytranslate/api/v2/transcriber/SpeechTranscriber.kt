@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
+import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 
 abstract class SpeechTranscriber : AutoCloseable {
@@ -18,10 +19,10 @@ abstract class SpeechTranscriber : AutoCloseable {
      */
     open val supportsExternal: Boolean = true
 
-    abstract suspend fun supportsLanguage(langCode: String): Boolean
+    abstract suspend fun supportsLanguage(language: Language): Boolean
 
     open fun onSelected() {}
-    abstract fun transcribeSamples(samples: FloatArray, langCode: String): Deferred<String>
+    abstract fun transcribeSamples(samples: FloatArray, language: Language): Deferred<String>
     abstract override fun close()
 
     companion object {

@@ -5,12 +5,30 @@ import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 
 abstract class UIElement {
-    protected val children = mutableListOf<UIElement>()
+    protected val children: List<UIElement>
+        field = mutableListOf<UIElement>()
 
     protected var isSelected = false
 
     fun bounds(): ScreenRectangle = bounds(ClientPlatformProxy.instance.viewportWidth, ClientPlatformProxy.instance.viewportHeight)
     abstract fun bounds(screenWidth: Int, screenHeight: Int): ScreenRectangle
+
+    protected open fun init(width: Int, height: Int) {
+    }
+
+    fun setup(width: Int, height: Int) {
+        this.children.clear()
+        this.init(width, height)
+
+        for (element in children) {
+            element.setup(width, height)
+        }
+    }
+
+    protected fun <T : UIElement> addChild(child: T): T {
+        this.children.add(child)
+        return child
+    }
 
     open fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
         for (element in this.children) {

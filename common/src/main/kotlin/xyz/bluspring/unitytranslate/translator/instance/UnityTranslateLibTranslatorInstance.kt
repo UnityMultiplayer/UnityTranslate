@@ -4,14 +4,22 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
+import xyz.bluspring.unitytranslate.api.v2.util.LangPair
 import xyz.bluspring.unitytranslate.library.UnityTranslateLib
 import xyz.bluspring.unitytranslate.library.UnityTranslateLibInstance
-import xyz.bluspring.unitytranslate.library.util.LangPair
 import java.util.*
 
 object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
     var enableGpu = false
     private var lastEnabledGpu = false
+
+    // Argos' index uses unofficial codes, so we need to remap them.
+    // This is based on https://github.com/LibreTranslate/LibreTranslate/blob/main/libretranslate/language.py#L9
+    val unofficialToOfficialAliases = mapOf(
+        "pt-BR" to "pb",
+        "zh-Hans" to "zh",
+        "zh-Hant" to "zt",
+    )
 
     val library = UnityTranslateLib(UnityTranslateApi.instance.storagePath.resolve("library"))
     val instances: MutableMap<LangPair, UnityTranslateLibInstance> = Collections.synchronizedMap(mutableMapOf<LangPair, UnityTranslateLibInstance>())

@@ -4,6 +4,7 @@ import dev.cadindie.whisper4j.Whisper
 import kotlinx.coroutines.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadHelper
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import java.io.IOException
@@ -38,7 +39,7 @@ object WhisperTranscriber : SpeechTranscriber() {
 
     private fun createContextThreads() = Dispatchers.Default.limitedParallelism(maxWhisperThreads) + CoroutineName("UnityTranslate Whisper Transcriber")
 
-    private val whisperInstances = Collections.synchronizedMap(mutableMapOf<String, Whisper>())
+    private val whisperInstances = Collections.synchronizedMap(mutableMapOf<Language, Whisper>())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override val initialSetup: Deferred<Unit>
@@ -66,11 +67,11 @@ object WhisperTranscriber : SpeechTranscriber() {
             download.deferred.await()
         }
 
-    override suspend fun supportsLanguage(langCode: String): Boolean {
+    override suspend fun supportsLanguage(language: Language): Boolean {
         return true
     }
 
-    override fun transcribeSamples(samples: FloatArray, langCode: String): Deferred<String> {
+    override fun transcribeSamples(samples: FloatArray, language: Language): Deferred<String> {
         return this.scope.async(this.context) {
             // Wait for the Whisper model to be downloaded first.
             if (!model.path.exists()) {
@@ -79,8 +80,8 @@ object WhisperTranscriber : SpeechTranscriber() {
 
             // Initialize Whisper instance for this specific language.
             val whisper = synchronized(whisperInstances) {
-                whisperInstances.computeIfAbsent(langCode) {
-                    createWhisperInstance(langCode)
+                whisperInstances.computeIfAbsent(language) {
+                    createWhisperInstance(language)
                 }
             }
 
@@ -98,12 +99,12 @@ object WhisperTranscriber : SpeechTranscriber() {
         }
     }
 
-    private fun createWhisperInstance(langCode: String): Whisper {
+    private fun createWhisperInstance(language: Language): Whisper {
         if (!this.model.path.exists())
             throw IllegalStateException("Whisper model ${this.model.name} has not been downloaded yet!")
 
         return Whisper.Builder()
-            .setLanguage(langCode)
+            .setLanguage(language.formatted)
             .setModel(this.model.path.toFile())
             .setUseGpu(this.enableGpu)
             .setDebugInfo(true)

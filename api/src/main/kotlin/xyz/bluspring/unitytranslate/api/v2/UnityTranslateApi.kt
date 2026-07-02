@@ -65,7 +65,7 @@ interface UnityTranslateApi {
      * If you want to keep reusing this holder, make sure you always hold a reference to it,
      * as the holder is stored in a [WeakHashMap].
      */
-    fun getOrCreateTranscriptHolder(languageCode: String): TranscriptHolder
+    fun getOrCreateTranscriptHolder(language: Language): TranscriptHolder
 
     fun hasPlugin(group: String, id: String): Boolean = hasPlugin("$group.$id")
     fun hasPlugin(id: String): Boolean
@@ -82,7 +82,7 @@ interface UnityTranslateApi {
     /**
      * Gets the current spoken language. This is typically used as the default output language if none is set.
      */
-    val currentSpokenLanguage: String
+    val currentSpokenLanguage: Language
 
     /**
      * Gets the default font used in this instance of UnityTranslate.

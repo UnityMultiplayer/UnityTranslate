@@ -4,6 +4,7 @@ import kotlinx.coroutines.Deferred
 import net.sourceforge.javaflacencoder.FLACEncoder
 import net.sourceforge.javaflacencoder.FLACStreamOutputStream
 import net.sourceforge.javaflacencoder.StreamConfiguration
+import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import java.io.ByteArrayOutputStream
 import kotlin.random.Random
@@ -55,11 +56,11 @@ object GoogleInternalTranscriber : SpeechTranscriber() {
         return (timeLow or randomHigh).toHexString()
     }
 
-    override suspend fun supportsLanguage(langCode: String): Boolean {
+    override suspend fun supportsLanguage(language: Language): Boolean {
         return true
     }
 
-    override fun transcribeSamples(samples: FloatArray, langCode: String): Deferred<String> {
+    override fun transcribeSamples(samples: FloatArray, language: Language): Deferred<String> {
         // This uses speech recognition v1 for now rather than full duplex, we don't want to lose the
         // connection from silence.
 

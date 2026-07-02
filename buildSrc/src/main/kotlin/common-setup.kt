@@ -1,7 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.google.gson.JsonParser
 import dev.kikugie.stonecutter.build.StonecutterBuildExtension
-import egt.RelocationTransform
 import groovy.xml.XmlSlurper
 import groovy.xml.slurpersupport.NodeChildren
 import me.modmuss50.mpp.ModPublishExtension
@@ -9,18 +8,15 @@ import me.modmuss50.mpp.ReleaseType
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
-import org.gradle.api.artifacts.dsl.DependencyHandler
-import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.BasePluginExtension
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.SourceSetContainer
-import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.*
 import org.gradle.language.jvm.tasks.ProcessResources
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import java.net.URI
 
 fun Project.setupCommon(module: String, isMod: Boolean = true) {
@@ -103,7 +99,9 @@ fun Project.setupCommon(module: String, isMod: Boolean = true) {
             }
         }
 
-        setupCommonUnmodded(module, commonProj)
+        setupCommonUnmodded(module, commonProj, setupJarTasks = true)
+    } else {
+        setupCommonUnmodded(module, project, setupJarTasks = false)
     }
 
     val commonProject = stonecutter.node.sibling("")?.project ?: this
@@ -122,7 +120,7 @@ fun Project.setupCommon(module: String, isMod: Boolean = true) {
     }
 }
 
-fun Project.setupCommonUnmodded(module: String, commonProj: Project? = null, javaVersion: Int = project.minimumJavaVersion) {
+fun Project.setupCommonUnmodded(module: String, commonProj: Project? = null, javaVersion: Int = project.minimumJavaVersion, setupJarTasks: Boolean = false) {
     project.extensions.configure<BasePluginExtension>("base") {
         archivesName.set("${mod.name}-$module")
     }
@@ -138,55 +136,60 @@ fun Project.setupCommonUnmodded(module: String, commonProj: Project? = null, jav
         sourceCompatibility = java
     }
 
-    project.extensions.configure<KotlinProjectExtension>("kotlin") {
+    project.extensions.configure<KotlinJvmProjectExtension>("kotlin") {
         jvmToolchain(javaVersion)
+        compilerOptions {
+            freeCompilerArgs.add("-Xexplicit-backing-fields") // idk it was yelling at me otherwise
+        }
     }
 
-    tasks.named<Jar>("jar") {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        if (commonProj != null)
-            from(zipTree(commonProj.tasks.named<Jar>("jar").get().archiveFile))
-        archiveClassifier = "dev"
-    }
-
-    tasks.named<Jar>("sourcesJar") {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        if (commonProj != null)
-            from(zipTree(commonProj.tasks.named<Jar>("sourcesJar").get().archiveFile))
-    }
-
-    tasks.named<ShadowJar>("shadowJar") {
-        configurations = listOf(shadedDep)
-
-        if (!shouldRemap() || module == "neoforge") {
-            archiveClassifier = null
+    if (setupJarTasks) {
+        tasks.named<Jar>("jar") {
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            if (commonProj != null)
+                from(zipTree(commonProj.tasks.named<Jar>("jar").get().archiveFile))
+            archiveClassifier = "dev"
         }
 
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        if (commonProj != null)
-            from(zipTree(commonProj.tasks.named<Jar>("jar").get().archiveFile))
+        tasks.named<Jar>("sourcesJar") {
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            if (commonProj != null)
+                from(zipTree(commonProj.tasks.named<Jar>("sourcesJar").get().archiveFile))
+        }
 
-        relocate("gg.essential", "xyz.bluspring.unitytranslate.shaded.essential")
-    }
+        tasks.named<ShadowJar>("shadowJar") {
+            configurations = listOf(shadedDep)
 
-    tasks.named<ProcessResources>("processResources") {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        if (commonProj != null)
-            from(commonProj.extensions.getByName<SourceSetContainer>("sourceSets").named("main").get().resources)
-    }
+            if (!shouldRemap() || module == "neoforge") {
+                archiveClassifier = null
+            }
 
-    tasks.register<Copy>("buildAndCollect") {
-        group = "versioned"
-        description = "Must run through 'chiseledBuild'"
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            if (commonProj != null)
+                from(zipTree(commonProj.tasks.named<Jar>("jar").get().archiveFile))
 
-        if (shouldRemap() && module == "fabric")
-            from(tasks.named<Jar>("remapJar").get().archiveFile)
-        else if (module == "forge")
-            from(tasks.named<Jar>("reobfJar").get().archiveFile)
-        else
-            from(tasks.named<Jar>("shadowJar").get().archiveFile)
-        into(rootProject.layout.buildDirectory.file("libs/${mod.version}/$module"))
-        dependsOn("build")
+            relocate("gg.essential", "xyz.bluspring.unitytranslate.shaded.essential")
+        }
+
+        tasks.named<ProcessResources>("processResources") {
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            if (commonProj != null)
+                from(commonProj.extensions.getByName<SourceSetContainer>("sourceSets").named("main").get().resources)
+        }
+
+        tasks.register<Copy>("buildAndCollect") {
+            group = "versioned"
+            description = "Must run through 'chiseledBuild'"
+
+            if (shouldRemap() && module == "fabric")
+                from(tasks.named<Jar>("remapJar").get().archiveFile)
+            else if (module == "forge")
+                from(tasks.named<Jar>("reobfJar").get().archiveFile)
+            else
+                from(tasks.named<Jar>("shadowJar").get().archiveFile)
+            into(rootProject.layout.buildDirectory.file("libs/${mod.version}/$module"))
+            dependsOn("build")
+        }
     }
 }
 

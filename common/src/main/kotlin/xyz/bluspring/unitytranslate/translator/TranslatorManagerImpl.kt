@@ -4,7 +4,7 @@ import kotlinx.coroutines.*
 import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorManager
-import xyz.bluspring.unitytranslate.library.util.LangPair
+import xyz.bluspring.unitytranslate.api.v2.util.LangPair
 import xyz.bluspring.unitytranslate.translator.instance.UnityTranslateLibTranslatorInstance
 import java.util.Queue
 import java.util.concurrent.ConcurrentHashMap

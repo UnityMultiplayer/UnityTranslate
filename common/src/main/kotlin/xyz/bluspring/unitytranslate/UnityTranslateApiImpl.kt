@@ -1,6 +1,7 @@
 package xyz.bluspring.unitytranslate
 
 import xyz.bluspring.sunset.SunsetConfig
+import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.LanguageHolder
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
@@ -21,7 +22,7 @@ import java.util.*
 object UnityTranslateApiImpl : UnityTranslateApi {
     val transcribers: MutableMap<String, SpeechTranscriber> = mutableMapOf()
     val transcriberConfigs: MutableMap<String, SunsetConfig> = mutableMapOf()
-    val transcriptHolders: MutableMap<String, TranscriptHolder> = WeakHashMap()
+    val transcriptHolders: MutableMap<Language, TranscriptHolder> = WeakHashMap()
 
     val translators: MutableMap<String, TranslatorInstance> = mutableMapOf()
     val translatorConfigs: MutableMap<String, SunsetConfig> = mutableMapOf()
@@ -29,7 +30,7 @@ object UnityTranslateApiImpl : UnityTranslateApi {
     val configs: MutableMap<String, SunsetConfig> = mutableMapOf()
 
     val outputLanguages: MutableMap<String, LanguageHolder> = mutableMapOf()
-    override var currentSpokenLanguage: String = "en"
+    override var currentSpokenLanguage: Language = Language("en")
     override val translatorManager: TranslatorManager
         get() = TranslatorManagerImpl // Don't inline this! You're gonna run into a bunch of headaches otherwise.
 
@@ -96,8 +97,8 @@ object UnityTranslateApiImpl : UnityTranslateApi {
         return this.translators.filterValues { it == translator }.keys.first()
     }
 
-    override fun getOrCreateTranscriptHolder(languageCode: String): TranscriptHolder {
-        return this.transcriptHolders.computeIfAbsent(languageCode, ::TranscriptHolder)
+    override fun getOrCreateTranscriptHolder(language: Language): TranscriptHolder {
+        return this.transcriptHolders.computeIfAbsent(language, ::TranscriptHolder)
     }
 
     override fun hasPlugin(id: String): Boolean {

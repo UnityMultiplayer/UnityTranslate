@@ -8,8 +8,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
+import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
-import xyz.bluspring.unitytranslate.library.util.LangPair
+import xyz.bluspring.unitytranslate.api.v2.util.LangPair
 import java.net.URI
 import java.net.URL
 import java.net.http.HttpClient
@@ -51,7 +52,7 @@ object LibreTranslateTranslatorInstance : TranslatorInstance() {
                             if (langObj.has("targets")) {
                                 for (ele in langObj.getAsJsonArray("targets")) {
                                     val toCode = ele.asString
-                                    this.cachedSupportedLanguages.add(LangPair(fromCode, toCode))
+                                    this.cachedSupportedLanguages.add(LangPair(Language.parse(fromCode), Language.parse(toCode)))
                                 }
                             }
                         }
@@ -107,8 +108,8 @@ object LibreTranslateTranslatorInstance : TranslatorInstance() {
 
             try {
                 val reqJson = JsonObject()
-                reqJson.addProperty("source", langPair.fromCode)
-                reqJson.addProperty("target", langPair.toCode)
+                reqJson.addProperty("source", langPair.from.formatted)
+                reqJson.addProperty("target", langPair.to.formatted)
                 reqJson.add("q", textArray)
 
                 if (entry.authKey?.isNotBlank() == true)
@@ -135,12 +136,12 @@ object LibreTranslateTranslatorInstance : TranslatorInstance() {
                     it.asString
                 }
             } catch (e: Throwable) {
-                logger.error("LibreTranslate instance ${entry.url} failed to translate texts (${text.joinToString(", ") { "\"it\"" }}) from ${langPair.fromCode} -> ${langPair.toCode}!", e)
+                logger.error("LibreTranslate instance ${entry.url} failed to translate texts (${text.joinToString(", ") { "\"it\"" }}) from ${langPair.from} -> ${langPair.to}!", e)
             }
         }
 
         // We shouldn't be able to reach this point, but warn anyway.
-        logger.warn("Failed to translate texts (${text.joinToString(", ") { "\"it\"" }}) from ${langPair.fromCode} -> ${langPair.toCode}! Not sure what happened here.")
+        logger.warn("Failed to translate texts (${text.joinToString(", ") { "\"it\"" }}) from ${langPair.from} -> ${langPair.to}! Not sure what happened here.")
         return text
     }
 }

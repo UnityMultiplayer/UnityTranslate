@@ -11,8 +11,8 @@ open class PlainUIButton(
     private val font: FontReference,
     private val text: Component,
 
-    private val x: (Int, Int) -> Float,
-    private val y: (Int, Int) -> Float,
+    private val x: Float,
+    private val y: Float,
     private val maxWidth: Int = 10000,
     open var color: Int = ARGBHelper.color(255, 210, 210, 210),
     protected val hoverColor: Int = -1,
@@ -24,8 +24,8 @@ open class PlainUIButton(
 
         return ScreenRectangle(
             ScreenPosition(
-                (this.x(screenWidth, screenHeight) - (longestWidth / 2f)).toInt(),
-                (this.y(screenWidth, screenHeight) - (this.font.lineHeight * split.size) / 2f).toInt()
+                (this.x - (longestWidth / 2f)).toInt(),
+                (this.y - (this.font.lineHeight * split.size) / 2f).toInt()
             ), longestWidth, split.size * this.font.lineHeight
         )
     }
@@ -43,7 +43,7 @@ open class PlainUIButton(
 
         val yStart = bounds.top()
         for ((index, text) in split.withIndex()) {
-            graphics.centeredText(this.font, text, this.x(graphics.width, graphics.height), yStart + (index * this.font.lineHeight).toFloat(), if (isHovered) this.hoverColor else this.color, true)
+            graphics.centeredText(this.font, text, this.x, yStart + (index * this.font.lineHeight).toFloat(), if (isHovered) this.hoverColor else this.color, true)
         }
 
 //        graphics.outline(bounds.left().toFloat(), bounds.top().toFloat(), bounds.right().toFloat(), bounds.bottom().toFloat(), 1f, -1)

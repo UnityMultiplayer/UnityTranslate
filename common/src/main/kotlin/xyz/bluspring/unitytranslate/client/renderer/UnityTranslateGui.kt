@@ -1,5 +1,6 @@
 package xyz.bluspring.unitytranslate.client.renderer
 
+import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
@@ -13,7 +14,7 @@ object UnityTranslateGui {
 
     init {
         transcriptRenderer.updateConfig(listOf(
-            TranscriptBoxConfig("en", TranscriptBoxConfig.Transforms(
+            TranscriptBoxConfig(UnityTranslateApi.instance.currentSpokenLanguage, TranscriptBoxConfig.Transforms(
                 TranscriptBoxConfig.Transforms.Position.Relative(0.1f, 0.1f),
                 TranscriptBoxConfig.Transforms.Size.Anchored(320f, 413f),
             ))

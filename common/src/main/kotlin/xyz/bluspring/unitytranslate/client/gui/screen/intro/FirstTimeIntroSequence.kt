@@ -13,12 +13,14 @@ import xyz.bluspring.unitytranslate.client.gui.element.PlainUIButton
 import xyz.bluspring.unitytranslate.client.gui.screen.FirstStartupScreen
 
 class FirstTimeIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent) {
-    init {
-        this.children.add(PlainUIButton(
-            UnityTranslateApi.instance.defaultFont, Component.literal("unitytranslate.intro.first_time.next").withStyle(ChatFormatting.UNDERLINE), { width, _ -> width / 2f }, { _, height -> height / 2f + 80f }) {
-                this.parent.next()
-            }
-        )
+    override fun init(width: Int, height: Int) {
+        super.init(width, height)
+
+        this.addChild(PlainUIButton(
+            UnityTranslateApi.instance.defaultFont, Component.literal("unitytranslate.intro.first_time.next").withStyle(ChatFormatting.UNDERLINE), width / 2f, height / 2f + 80f
+        ) {
+            this.parent.next()
+        })
     }
 
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int, transitionProgress: Float) {

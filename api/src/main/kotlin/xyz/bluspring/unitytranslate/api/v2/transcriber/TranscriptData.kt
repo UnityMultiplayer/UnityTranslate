@@ -1,5 +1,6 @@
 package xyz.bluspring.unitytranslate.api.v2.transcriber
 
+import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.TranscriptSender
 
 /**
@@ -20,9 +21,9 @@ interface TranscriptData {
     val sender: TranscriptSender
 
     /**
-     * The original language code of the transcript, before it was translated.
+     * The original language of the transcript, before it was translated.
      */
-    val languageCode: String
+    val language: Language
 
     /**
      * The timestamp, in ms, of when the transcript was last updated.

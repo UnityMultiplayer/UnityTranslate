@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Style
 import net.minecraft.resources.Identifier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
@@ -114,7 +115,7 @@ object UnityTranslate {
                 string("spoken", ClientConfig::spokenLanguage)
 
                 for ((langKey, langHolder) in UnityTranslateApiImpl.outputLanguages) {
-                    string(langKey, langHolder::languageCode)
+                    value(langKey, Language.CODEC, langHolder::language)
                 }
             }
 
