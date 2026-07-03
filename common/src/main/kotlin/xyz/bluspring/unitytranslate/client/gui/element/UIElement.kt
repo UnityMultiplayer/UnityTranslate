@@ -34,6 +34,14 @@ abstract class UIElement {
         for (element in this.children) {
             element.submit(graphics, partialTick, mouseX, mouseY)
         }
+
+        this.submitLate(graphics, partialTick, mouseX, mouseY)
+    }
+
+    protected open fun submitLate(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
+        for (element in this.children) {
+            element.submitLate(graphics, partialTick, mouseX, mouseY)
+        }
     }
 
     open fun tick() {

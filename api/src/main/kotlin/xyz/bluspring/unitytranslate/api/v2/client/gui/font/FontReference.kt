@@ -15,6 +15,7 @@ interface FontReference {
     fun width(text: FormattedCharSequence): Int
     fun width(text: String): Int
     fun split(text: FormattedText, maxWidth: Int): List<FormattedCharSequence>
+    fun substr(text: FormattedText, maxWidth: Int): FormattedText
 
     companion object {
         @JvmStatic

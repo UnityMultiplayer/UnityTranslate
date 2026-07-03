@@ -7,7 +7,7 @@ import net.minecraft.locale.Language as MinecraftLanguage
 data class Language(
     val languageCode: String, // ISO 639-1 codes
     val regionCode: String? = null, // ISO 3166-1 codes
-) {
+) : Comparable<Language> {
     val formatted: String = if (this.regionCode == null)
         this.languageCode
     else
@@ -28,6 +28,10 @@ data class Language(
         get() = MinecraftLanguage.getInstance().getOrDefault("unitytranslate.language.$serialized.localized.short", this.nativeText)
 
     override fun toString(): String = this.formatted
+
+    override fun compareTo(other: Language): Int {
+        return this.formatted.compareTo(other.formatted)
+    }
 
     companion object {
         @JvmField val CODEC: Codec<Language> = Codec.STRING.xmap(Language::parse, Language::formatted)

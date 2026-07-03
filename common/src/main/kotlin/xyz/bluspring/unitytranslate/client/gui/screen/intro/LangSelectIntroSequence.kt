@@ -25,20 +25,23 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
         }
 
 
-        val elementWidth = 140f
-        val elementHeight = 20f
+        val elementWidth = 160f
+        val elementHeight = 15f
         val font = ClientPlatformProxy.instance.defaultFont
 
-        this.addChild(UILabel(width / 2f - 4, height / 2f + (elementHeight / 2f), Component.translatable("config.unitytranslate.unitytranslate.languages.spoken").append(": "), font, alignX = UILabel.HorizontalAlign.RIGHT, alignY = UILabel.VerticalAlign.CENTER))
-        this.addChild(DropdownList(width / 2f, height / 2f, elementWidth, elementHeight, font, languages, visualizer,
+        val xPos = 12f
+        val yPos = height / 2f - (((elementHeight + 20f) * (UnityTranslateApiImpl.outputLanguages.size)) / 2f)
+
+        this.addChild(UILabel(xPos, yPos - 6f, Component.translatable("config.unitytranslate.unitytranslate.languages.spoken").append(": "), font, alignX = UILabel.HorizontalAlign.LEFT, alignY = UILabel.VerticalAlign.CENTER))
+        this.addChild(DropdownList(xPos, yPos, elementWidth, elementHeight, font, languages, visualizer,
             UnityTranslateApiImpl::currentSpokenLanguage))
 
         var index = 1
         for ((id, langHolder) in UnityTranslateApiImpl.outputLanguages) {
-            val offset = (index++) * (elementHeight + 5f)
+            val offset = (index++) * (elementHeight + 20f)
 
-            this.addChild(UILabel(width / 2f - 4, height / 2f + offset + (elementHeight / 2f), Component.translatable("config.unitytranslate.unitytranslate.languages.$id").append(": "), font, alignX = UILabel.HorizontalAlign.RIGHT, alignY = UILabel.VerticalAlign.CENTER))
-            this.addChild(DropdownList(width / 2f, height / 2f + offset, elementWidth, elementHeight, font, languages, visualizer,
+            this.addChild(UILabel(xPos, yPos + offset - 6f, Component.translatable("config.unitytranslate.unitytranslate.languages.$id").append(": "), font, alignX = UILabel.HorizontalAlign.LEFT, alignY = UILabel.VerticalAlign.CENTER))
+            this.addChild(DropdownList(xPos, yPos + offset, elementWidth, elementHeight, font, languages, visualizer,
                 langHolder::languageOrNull, DropdownList.Type.DEFAULTED))
         }
     }

@@ -13,4 +13,5 @@ data class MinecraftFontReference(val font: Font) : FontReference {
     override fun width(text: String): Int = this.font.width(text)
     override fun width(text: FormattedCharSequence): Int = this.font.width(text)
     override fun split(text: FormattedText, maxWidth: Int): List<FormattedCharSequence> = this.font.split(text, maxWidth)
+    override fun substr(text: FormattedText, maxWidth: Int): FormattedText = this.font.substrByWidth(text, maxWidth)
 }
