@@ -116,6 +116,8 @@ object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
                 }
             }
         }
+
+        yield()
     }
 
     override suspend fun batchTranslate(text: List<String>, langPair: LangPair): List<String> {
@@ -155,7 +157,11 @@ object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
 
         lock.withLock {
             val instance = this.instances[langPair]!!
-            return instance.batchTranslate(text)
+            try {
+                return instance.batchTranslate(text)
+            } finally {
+                yield()
+            }
         }
     }
 
@@ -171,5 +177,7 @@ object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
                 this.instances.remove(langPair)
             }
         }
+
+        yield()
     }
 }

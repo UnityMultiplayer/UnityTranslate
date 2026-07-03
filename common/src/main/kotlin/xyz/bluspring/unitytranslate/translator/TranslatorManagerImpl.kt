@@ -10,7 +10,11 @@ import xyz.bluspring.unitytranslate.translator.instance.UnityTranslateLibTransla
 import java.util.Queue
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.locks.LockSupport
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.milliseconds
 
 object TranslatorManagerImpl : TranslatorManager {
     object Config {
@@ -19,8 +23,11 @@ object TranslatorManagerImpl : TranslatorManager {
         var delayBetweenBatches: Int = 500
     }
 
+    private lateinit var pool: ExecutorService
     private lateinit var context: CoroutineContext
     private lateinit var scope: CoroutineScope
+
+    private val tickScope = CoroutineScope(Dispatchers.Main) + CoroutineName("UnityTranslate Translator Manager Tick")
 
     init {
         this.updateConfig()
@@ -51,8 +58,17 @@ object TranslatorManagerImpl : TranslatorManager {
                 this.scope.cancel("Thread count updated (${this.lastMaxThreads} -> ${Config.maxThreads})")
             }
 
-            this.context = Dispatchers.Default.limitedParallelism(Config.maxThreads) + CoroutineName("UnityTranslate Translator Manager")
-            this.scope = CoroutineScope(this.context)
+            val tasks = if (this::pool.isInitialized) {
+                this.pool.shutdownNow()
+            } else emptyList()
+
+            this.pool = Executors.newFixedThreadPool(Config.maxThreads)
+            this.context = pool.asCoroutineDispatcher() + CoroutineName("UnityTranslate Translator Manager")
+            this.scope = CoroutineScope(this.context) + CoroutineName("UnityTranslate Translator Manager")
+
+            for (task in tasks) {
+                this.pool.submit(task)
+            }
 
             this.lastMaxThreads = Config.maxThreads
         }
@@ -66,7 +82,15 @@ object TranslatorManagerImpl : TranslatorManager {
         return deferred
     }
 
-    suspend fun tick() {
+    fun startTicking() {
+        this.tickScope.launch {
+            tick()
+            yield()
+            LockSupport.parkNanos("Ticking for UnityTranslate translator", 50.milliseconds.inWholeNanoseconds)
+        }
+    }
+
+    private suspend fun tick() {
         this.updateConfig()
 
         // just to try to collect enough to even batch translate.
@@ -102,6 +126,7 @@ object TranslatorManagerImpl : TranslatorManager {
                 for ((i, translated) in batchTranslated.withIndex()) {
                     entries[i].deferred.complete(translated)
                 }
+                yield()
             }
 
             anyTranslationsQueued = true

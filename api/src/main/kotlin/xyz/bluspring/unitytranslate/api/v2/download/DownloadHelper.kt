@@ -13,7 +13,6 @@ import java.util.Collections
 import java.util.WeakHashMap
 import kotlin.io.path.*
 import kotlin.text.HexFormat
-import kotlin.text.format
 import kotlin.text.toHexString
 
 /**
@@ -181,6 +180,8 @@ object DownloadHelper {
             } finally {
                 alreadyDownloading.remove(path)
             }
+
+            yield()
         }.apply {
             invokeOnCompletion {
                 info.onFinishDownload.invoker().run()

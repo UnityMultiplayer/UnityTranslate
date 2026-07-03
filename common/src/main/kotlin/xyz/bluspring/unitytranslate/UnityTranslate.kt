@@ -133,6 +133,8 @@ object UnityTranslate {
                 this.wrapped.custom(HiddenReflectingConfigValue("handled_first_join", Codec.BOOL, UnityTranslateClient::handledFirstJoin))
             }
         }
+
+        TranslatorManagerImpl.startTicking()
     }
 
     @JvmStatic
