@@ -64,6 +64,7 @@ class DropdownList<E : Comparable<E>>(
                 completed
         }
     private var currentIndex = 0
+    private var lastStoredIndex = 0
     private var isOpened = false
     private var scrollOffset = 0.0
 
@@ -95,10 +96,13 @@ class DropdownList<E : Comparable<E>>(
 
         if (!this.isLoaded) {
             val value = this.property.getter.call()
-            if (value == null && this.type != Type.REQUIRED)
+            if (value == null && this.type != Type.REQUIRED) {
                 this.currentIndex = 0
-            else
+                this.lastStoredIndex = 0
+            } else {
                 this.currentIndex = this.elements.indexOf(value)
+                this.lastStoredIndex = this.elements.indexOf(value)
+            }
 
             this.isLoaded = true
         }
@@ -208,6 +212,7 @@ class DropdownList<E : Comparable<E>>(
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
         if (this.mainBounds.containsPoint(mouseX.toInt(), mouseY.toInt()) && this.isLoaded && this.elements.isNotEmpty()) {
             this.isOpened = !this.isOpened
+            this.lastStoredIndex = this.currentIndex
         } else if (this.isOpened) {
             val elements = this.elements
             val usableScreenHeight = ClientPlatformProxy.instance.viewportHeight - this.y - this.height - 2
@@ -233,20 +238,35 @@ class DropdownList<E : Comparable<E>>(
 
     override fun keyPressed(key: Int, scanCode: Int, modifiers: Int): Boolean {
         if (this.isOpened) {
-            if (key == GLFW.GLFW_KEY_UP) {
-                this.currentIndex--
+            when (key) {
+                GLFW.GLFW_KEY_UP -> {
+                    this.currentIndex--
 
-                if (this.currentIndex < 0)
-                    this.currentIndex = this.elements.lastIndex
+                    if (this.currentIndex < 0)
+                        this.currentIndex = this.elements.lastIndex
 
-                return true
-            } else if (key == GLFW.GLFW_KEY_DOWN) {
-                this.currentIndex++
+                    return true
+                }
 
-                if (this.currentIndex > this.elements.lastIndex)
-                    this.currentIndex = 0
+                GLFW.GLFW_KEY_DOWN -> {
+                    this.currentIndex++
 
-                return true
+                    if (this.currentIndex > this.elements.lastIndex)
+                        this.currentIndex = 0
+
+                    return true
+                }
+
+                GLFW.GLFW_KEY_ESCAPE -> {
+                    this.isOpened = false
+                    this.currentIndex = this.lastStoredIndex
+                    return true
+                }
+
+                GLFW.GLFW_KEY_ENTER -> {
+                    this.isOpened = false
+                    return true
+                }
             }
         }
 
