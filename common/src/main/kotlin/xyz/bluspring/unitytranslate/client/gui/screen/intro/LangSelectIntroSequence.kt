@@ -24,10 +24,18 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
             )
         }
 
+        val font = ClientPlatformProxy.instance.defaultFont
+
+        run {
+            val text = Component.translatable("unitytranslate.intro.language_select")
+
+            for ((index, segment) in font.split(text, (width * (3 / 4f)).toInt()).withIndex()) {
+                this.addChild(UILabel(width / 2f, 25f + (index * font.lineHeight), segment, font, alignX = UILabel.HorizontalAlign.CENTER))
+            }
+        }
 
         val elementWidth = 160f
         val elementHeight = 15f
-        val font = ClientPlatformProxy.instance.defaultFont
 
         val xPos = 12f
         val yPos = height / 2f - (((elementHeight + 20f) * (UnityTranslateApiImpl.outputLanguages.size)) / 2f)
@@ -47,5 +55,12 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
     }
 
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int, transitionProgress: Float) {
+        for (element in this.children) {
+            if (element is UILabel) {
+                element.opacity = transitionProgress
+            } else if (element is DropdownList<*>) {
+                element.opacity = transitionProgress
+            }
+        }
     }
 }

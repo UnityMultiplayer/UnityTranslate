@@ -15,7 +15,7 @@
 
     "unitytranslate.intro.first_time": "Looks like this is your first time using UnityTranslate, let's help you get set up.",
     "unitytranslate.intro.first_time.next": "Let's go!",
-    "unitytranslate.intro.language_select": "To get started, select your preferred languages here!",
+    "unitytranslate.intro.language_select": "To get started, select your preferred languages here! Then, you can select the transcriber you want to use.",
 
     "unitytranslate.language.native_and_localized": "%s / %s",
     "unitytranslate.language.en.native": "English",

@@ -9,6 +9,7 @@ import org.lwjgl.glfw.GLFW
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
+import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import kotlin.math.floor
 import kotlin.reflect.KMutableProperty
@@ -22,8 +23,10 @@ class DropdownList<E : Comparable<E>>(
     visualizer: (E) -> Component,
 
     val property: KMutableProperty<E?>,
-    val type: Type
+    val type: Type,
 ) : UIElement() {
+    var opacity = 1f
+
     constructor(x: Float, y: Float, width: Float, height: Float, font: FontReference, elements: suspend () -> Collection<E>, visualizer: (E) -> Component, property: KMutableProperty<E>)
         : this(x, y, width, height, font, elements, visualizer, property as KMutableProperty<E?>, Type.REQUIRED)
 
@@ -127,21 +130,21 @@ class DropdownList<E : Comparable<E>>(
             ARGBHelper.color(185, 255, 255, 255)
 
 //        graphics.outline(x, y, x + width, y + height, 1f, -1)
-        graphics.fill(x, y, x + width, y + height, 0, ARGBHelper.colorFromFloat(0.35f, 0f, 0f, 0f))
-        graphics.fill(x, y + height, x + width, y + height + 1, colorWithHover) // underline
+        graphics.fill(x, y, x + width, y + height, 0, ARGBHelper.colorFromFloat(0.35f, 0f, 0f, 0f).multiplyAlpha(this.opacity))
+        graphics.fill(x, y + height, x + width, y + height + 1, colorWithHover.multiplyAlpha(this.opacity)) // underline
 
         val disabledColor = ARGBHelper.color(255, 190, 190, 190)
         val isDisabled = !this.elementGetter.isCompleted || this.elements.isEmpty()
 
         if (!this.elementGetter.isCompleted) {
-            graphics.text(this.font, Component.translatable("unitytranslate.dropdown.loading").append(".".repeat(floor(this.currentTick / 20f).toInt() + 1)), this.x + 4, this.y + (this.height / 2f - 4), disabledColor, true)
+            graphics.text(this.font, Component.translatable("unitytranslate.dropdown.loading").append(".".repeat(floor(this.currentTick / 20f).toInt() + 1)), this.x + 4, this.y + (this.height / 2f - 4), disabledColor.multiplyAlpha(this.opacity), true)
         } else if (this.elements.isEmpty()) {
-            graphics.text(this.font, Component.translatable("unitytranslate.dropdown.empty"), this.x + 4, this.y + (this.height / 2f - 4), disabledColor, true)
+            graphics.text(this.font, Component.translatable("unitytranslate.dropdown.empty"), this.x + 4, this.y + (this.height / 2f - 4), disabledColor.multiplyAlpha(this.opacity), true)
         } else {
-            graphics.text(this.font, ellipsize(this.visualizer(this.selected), this.width.toInt() - 15), this.x + 4, this.y + (this.height / 2f - 4), colorWithHover, true)
+            graphics.text(this.font, ellipsize(this.visualizer(this.selected), this.width.toInt() - 15), this.x + 4, this.y + (this.height / 2f - 4), colorWithHover.multiplyAlpha(this.opacity), true)
         }
 
-        graphics.text(this.font, Component.literal(if (this.isOpened) "▲" else "▼"), this.x + this.width - 10, this.y + (this.height / 2f - 4), if (isDisabled) disabledColor else colorWithHover, true)
+        graphics.text(this.font, Component.literal(if (this.isOpened) "▲" else "▼"), this.x + this.width - 10, this.y + (this.height / 2f - 4), (if (isDisabled) disabledColor else colorWithHover).multiplyAlpha(this.opacity), true)
     }
 
     private fun ellipsize(text: FormattedText, maxWidth: Int): FormattedText {
@@ -167,7 +170,7 @@ class DropdownList<E : Comparable<E>>(
             val shouldShowScroll = maxAreaHeight != elementHeight
 
             graphics.fill(this.x, yStart, this.x + this.width, yStart + maxAreaHeight,
-                ARGBHelper.colorFromFloat(0.9f, 0f, 0f, 0f))
+                ARGBHelper.colorFromFloat(0.9f, 0f, 0f, 0f).multiplyAlpha(this.opacity))
 
             graphics.enableScissor(this.x.toInt(), yStart.toInt() + 1, (this.x + this.width).toInt(), maxAreaHeight.toInt() - 2)
             graphics.pushMatrix()
@@ -198,7 +201,7 @@ class DropdownList<E : Comparable<E>>(
                         graphics.translate(Mth.lerp((this.currentTick + (partialTick * (if (this.isReversing) -1f else 1f))) / this.maxScrollTick.toFloat(), 0f, (maxWidth - textWidth).toFloat()), 0f)
                     }
 
-                    graphics.text(this.font, text, this.x + 4, y + 4f, colorWithHover, true)
+                    graphics.text(this.font, text, this.x + 4, y + 4f, colorWithHover.multiplyAlpha(this.opacity), true)
 
                     if (textWidth > maxWidth) {
                         graphics.disableScissor()
@@ -206,7 +209,7 @@ class DropdownList<E : Comparable<E>>(
 
                     graphics.popMatrix()
                 } else {
-                    graphics.text(this.font, ellipsize(text, maxWidth), this.x + 4, y + 4f, colorWithHover, true)
+                    graphics.text(this.font, ellipsize(text, maxWidth), this.x + 4, y + 4f, colorWithHover.multiplyAlpha(this.opacity), true)
                 }
             }
 
@@ -214,14 +217,14 @@ class DropdownList<E : Comparable<E>>(
             graphics.disableScissor()
 
             graphics.outline(this.x, this.y + this.height + 2, this.x + this.width, this.y + this.height + 2 + maxAreaHeight, 1f,
-                ARGBHelper.colorFromFloat(0.1f, 1f, 1f, 1f))
+                ARGBHelper.colorFromFloat(0.1f, 1f, 1f, 1f).multiplyAlpha(this.opacity))
 
             if (shouldShowScroll) {
                 val elementsPerHeight = maxAreaHeight / this.height
                 val scrollHeight = elementsPerHeight / elements.size
 
                 val scrollYOffset = (this.scrollOffset.toFloat() / elementHeight) * maxAreaHeight
-                graphics.fill(this.x + this.width - 1, yStart - scrollYOffset + 1, this.x + this.width, yStart - scrollYOffset + (maxAreaHeight * scrollHeight) - 1, -1)
+                graphics.fill(this.x + this.width - 1, yStart - scrollYOffset + 1, this.x + this.width, yStart - scrollYOffset + (maxAreaHeight * scrollHeight) - 1, (-1).multiplyAlpha(this.opacity))
             }
         }
     }

@@ -3,9 +3,10 @@ package xyz.bluspring.unitytranslate.translator.instance.index
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
 import xyz.bluspring.unitytranslate.api.v2.util.LangPair
 import java.nio.file.Path
+import java.util.*
 
 abstract class PackageIndex<T : ModelPackage>(val path: Path, val name: String) {
-    val packages = mutableListOf<T>()
+    val packages: MutableList<T> = Collections.synchronizedList(mutableListOf())
 
     abstract suspend fun loadIndex()
     abstract suspend fun loadIndexOrCache(waitForIndexUpdate: Boolean = false)

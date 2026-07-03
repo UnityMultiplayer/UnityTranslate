@@ -44,6 +44,12 @@ object ARGBHelper {
     }
 
     @JvmStatic
+    inline fun Int.multiplyAlpha(multiplier: Float): Int {
+        val alpha = this.alpha() / 255f
+        return this.withAlpha(alpha * multiplier)
+    }
+
+    @JvmStatic
     inline fun color(a: Int, r: Int, g: Int, b: Int): Int {
         // 0xFF_FF_FF_FF
         return (a shl 24) or (r shl 16) or (g shl 8) or b

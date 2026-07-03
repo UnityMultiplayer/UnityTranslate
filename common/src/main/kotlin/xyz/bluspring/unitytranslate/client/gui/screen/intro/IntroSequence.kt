@@ -48,7 +48,9 @@ abstract class IntroSequence(protected val parent: FirstStartupScreen) : UIEleme
     }
 
     final override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
-        val delta = ((this.currentTick + partialTick) / transitionTime.toFloat()).coerceAtMost(1f)
+        val delta = ((if (this.isReversed)
+            this.currentTick - partialTick
+        else this.currentTick + partialTick) / transitionTime.toFloat()).coerceAtMost(1f)
         this.submit(graphics, partialTick, mouseX, mouseY, delta)
 
         super.submit(graphics, partialTick, mouseX, mouseY)
