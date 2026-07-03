@@ -150,6 +150,8 @@
     "unitytranslate.language.vi.localized": "Vietnamese",
     "unitytranslate.language.cy.native": "Cymraeg",
     "unitytranslate.language.cy.localized": "Welsh",
+    "unitytranslate.language.eu.native": "Euskara",
+    "unitytranslate.language.eu.localized": "Basque",
 
     "config.unitytranslate.unitytranslate": "UnityTranslate",
     "config.unitytranslate.unitytranslate.hud": "HUD",

@@ -18,9 +18,11 @@ import kotlin.time.Duration.Companion.days
 class ArgosPackageIndex(path: Path) : PackageIndex<ArgosPackage>(path, "argos") {
     private var lastIndexTime = 0L
 
-    override fun loadIndex() {
+    override suspend fun loadIndex() {
         val url = URI.create(PACKAGE_INDEX_URL).toURL()
-        url.openStream().use { loadIndexFromStream(it, true) }
+        withContext(Dispatchers.IO) {
+            url.openStream()
+        }.use { loadIndexFromStream(it, true) }
 
         lastIndexTime = System.currentTimeMillis()
     }
@@ -42,7 +44,7 @@ class ArgosPackageIndex(path: Path) : PackageIndex<ArgosPackage>(path, "argos") 
         }
     }
 
-    override fun loadIndexOrCache() {
+    override suspend fun loadIndexOrCache() {
         val cachedFile = path.resolve("index.json")
 
         if (lastIndexTime == 0L && cachedFile.exists()) {
@@ -134,7 +136,7 @@ class ArgosPackageIndex(path: Path) : PackageIndex<ArgosPackage>(path, "argos") 
         else throw IllegalStateException("Could not determine tokenizer type for package ${pkg.from} -> ${pkg.to}")
 
         return ModelInfo(
-            pkg.code,
+            pkg.code, pkg.langPair,
             pkgDir.resolve("model"),
             tokenizerType,
             when (tokenizerType) {

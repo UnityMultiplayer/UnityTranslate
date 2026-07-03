@@ -12,7 +12,6 @@ import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
 import xyz.bluspring.unitytranslate.api.v2.util.LangPair
 import java.net.URI
-import java.net.URL
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
@@ -37,7 +36,7 @@ object LibreTranslateTranslatorInstance : TranslatorInstance() {
         suspend fun getSupportedLanguages(): Collection<LangPair> {
             if (System.currentTimeMillis() - this.lastCheck >= CHECK_INTERVAL) {
                 try {
-                    val url = URL("${this.url}/languages")
+                    val url = URI.create("${this.url}/languages").toURL()
                     val json = withContext(Dispatchers.IO) {
                         url.openStream()
                     }.use { JsonParser.parseReader(it.bufferedReader()) }.asJsonArray

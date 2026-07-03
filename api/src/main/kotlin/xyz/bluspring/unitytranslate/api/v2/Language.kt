@@ -1,6 +1,7 @@
 package xyz.bluspring.unitytranslate.api.v2
 
 import com.mojang.serialization.Codec
+import xyz.bluspring.unitytranslate.api.v2.util.reverse
 import net.minecraft.locale.Language as MinecraftLanguage
 
 data class Language(
@@ -30,6 +31,16 @@ data class Language(
 
     companion object {
         @JvmField val CODEC: Codec<Language> = Codec.STRING.xmap(Language::parse, Language::formatted)
+
+        @JvmStatic fun codecWithAliasing(aliases: Map<Language, String>): Codec<Language> {
+            val reverseLookup = aliases.reverse()
+
+            return Codec.STRING.xmap({
+                reverseLookup.getOrElse(it) { parse(it) }
+            }, {
+                aliases.getOrElse(it) { it.formatted }
+            })
+        }
 
         @JvmStatic
         fun parse(code: String): Language {

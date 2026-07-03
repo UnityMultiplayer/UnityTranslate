@@ -17,6 +17,7 @@ object Languages {
     @JvmField val ARABIC = register("ar")
     @JvmField val ARMENIAN = register("hy")
     @JvmField val AZERBAIJANI = register("az")
+    @JvmField val BASQUE = register("eu")
     @JvmField val BELARUSIAN = register("be")
     @JvmField val BULGARIAN = register("bg")
     @JvmField val BENGALI = register("bn")

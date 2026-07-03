@@ -1,18 +1,20 @@
 package xyz.bluspring.unitytranslate.translator.instance.index
 
+import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
+import xyz.bluspring.unitytranslate.api.v2.util.LangPair
 import java.nio.file.Path
 
 abstract class PackageIndex<T : ModelPackage>(val path: Path, val name: String) {
     val packages = mutableListOf<T>()
 
-    abstract fun loadIndex()
-    abstract fun loadIndexOrCache()
+    abstract suspend fun loadIndex()
+    abstract suspend fun loadIndexOrCache()
 
     abstract fun getAvailableModelInfo(pkg: T): ModelInfo?
     abstract suspend fun tryDownloadModelInfo(pkg: T): ModelInfo
 
-    open fun isModelAvailable(fromLang: String, toLang: String): Boolean {
-        val packages = this.getTranslationPackage(fromLang, toLang)
+    open suspend fun isModelAvailable(langPair: LangPair): Boolean {
+        val packages = this.getTranslationPackage(langPair)
         if (packages.isEmpty())
             return false
 
@@ -24,8 +26,8 @@ abstract class PackageIndex<T : ModelPackage>(val path: Path, val name: String) 
         return true
     }
 
-    open fun getAvailableModelInfos(fromLang: String, toLang: String): Map<T, ModelInfo> {
-        val packages = this.getTranslationPackage(fromLang, toLang)
+    open suspend fun getAvailableModelInfos(langPair: LangPair): Map<T, ModelInfo> {
+        val packages = this.getTranslationPackage(langPair)
         if (packages.isEmpty())
             return mapOf()
 
@@ -37,8 +39,8 @@ abstract class PackageIndex<T : ModelPackage>(val path: Path, val name: String) 
         return modelInfos
     }
 
-    open fun getUnavailablePackages(fromLang: String, toLang: String): List<T> {
-        val packages = this.getTranslationPackage(fromLang, toLang)
+    open suspend fun getUnavailablePackages(langPair: LangPair): List<T> {
+        val packages = this.getTranslationPackage(langPair)
         if (packages.isEmpty())
             return emptyList()
 
@@ -51,8 +53,8 @@ abstract class PackageIndex<T : ModelPackage>(val path: Path, val name: String) 
         return unavailable
     }
 
-    open suspend fun tryDownloadModelInfos(fromLang: String, toLang: String): Map<T, ModelInfo> {
-        val packages = this.getTranslationPackage(fromLang, toLang)
+    open suspend fun tryDownloadModelInfos(langPair: LangPair): Map<T, ModelInfo> {
+        val packages = this.getTranslationPackage(langPair)
         if (packages.isEmpty())
             return mapOf()
 
@@ -64,30 +66,18 @@ abstract class PackageIndex<T : ModelPackage>(val path: Path, val name: String) 
         return modelInfos
     }
 
-    open fun getTranslationPackage(fromLang: String, toLang: String): List<T> {
+    open suspend fun getTranslationPackage(expected: LangPair): List<T> {
         if (this.packages.isEmpty())
             this.loadIndexOrCache()
 
-        // Check if there's a direct translation
-        if (this.packages.any { it.fromCode == fromLang && it.toCode == toLang }) {
-            return listOf(this.packages.first { it.fromCode == fromLang && it.toCode == toLang })
-        }
+        val translationPath = TranslatorInstance.getAvailableTranslationPath(expected, this.packages.map { it.langPair })
+        return translationPath.map { langPair -> this.getDirectTranslationPackage(langPair)!! }
+    }
 
-        // If not, see if it's possible to do translations via another language
-        val fromLanguages = this.packages.filter { it.fromCode == fromLang }
-        val toLanguages = this.packages.filter { it.toCode == toLang }
+    open suspend fun getDirectTranslationPackage(expected: LangPair): T? {
+        if (this.packages.isEmpty())
+            this.loadIndexOrCache()
 
-        if (fromLanguages.isEmpty() || toLanguages.isEmpty())
-            return emptyList()
-
-        val possibleLanguages = toLanguages.filter { fromLanguages.any { a -> a.toCode == it.fromCode } }
-
-        if (possibleLanguages.isEmpty())
-            return emptyList()
-
-        val toLanguage = possibleLanguages.first()
-        val fromLanguage = fromLanguages.first { it.toCode == toLanguage.fromCode }
-
-        return listOf(fromLanguage, toLanguage)
+        return this.packages.firstOrNull { it.langPair == expected }
     }
 }

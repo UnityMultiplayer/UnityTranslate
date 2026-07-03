@@ -99,6 +99,7 @@ object TranslatorManagerImpl : TranslatorManager {
             }
 
             this.scope.launch(this.context) {
+                instance.prepareTranslationModels(langPair) // Make sure they're ready first.
                 val batchTranslated = instance.batchTranslate(entries.map { it.original }, langPair)
                 for ((i, translated) in batchTranslated.withIndex()) {
                     entries[i].deferred.complete(translated)
