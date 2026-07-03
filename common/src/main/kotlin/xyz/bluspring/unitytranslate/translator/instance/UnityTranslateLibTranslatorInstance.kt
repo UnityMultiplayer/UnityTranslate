@@ -52,7 +52,7 @@ object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
             return
 
         for (index in this.packageIndexes) {
-            index.loadIndexOrCache()
+            index.loadIndexOrCache(true)
         }
 
         this.isLoaded = true

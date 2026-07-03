@@ -68,14 +68,9 @@ class DropdownList<E : Comparable<E>>(
     private var isOpened = false
     private var scrollOffset = 0.0
 
-    private val indexOffset = if (this.type != Type.REQUIRED) 1 else 0
-
     val selected: E?
         get() {
-            if (this.type != Type.REQUIRED && this.currentIndex == 0)
-                return null
-
-            return this.elements[this.currentIndex - this.indexOffset]
+            return this.elements[this.currentIndex]
         }
 
     private val mainBounds = ScreenRectangle(x.toInt(), y.toInt(), width.toInt(), height.toInt())
@@ -85,14 +80,23 @@ class DropdownList<E : Comparable<E>>(
     }
 
     private var currentTick = 0
+    private val maxScrollTick = 60
+    private var isReversing = false
+
     private var isLoaded = false
 
     override fun tick() {
         super.tick()
-        this.currentTick++
 
-        if (this.currentTick >= 60)
-            this.currentTick = 0
+        if (!this.isReversing) {
+            if (this.currentTick++ >= this.maxScrollTick) {
+                this.isReversing = true
+            }
+        } else {
+            if (this.currentTick-- <= 0) {
+                this.isReversing = false
+            }
+        }
 
         if (!this.isLoaded) {
             val value = this.property.getter.call()
@@ -106,6 +110,11 @@ class DropdownList<E : Comparable<E>>(
 
             this.isLoaded = true
         }
+    }
+
+    private fun updateProperty() {
+        val element = this.elements[this.currentIndex]
+        this.property.setter.call(element)
     }
 
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
@@ -169,14 +178,36 @@ class DropdownList<E : Comparable<E>>(
             for (i in elements.indices) {
                 val y = yStart + (i * this.height)
 
-                val colorWithHover = if (mouseX >= this.x && mouseY >= y && mouseX <= (this.x + this.width) && mouseY <= (y + this.height))
+                val isHovered = mouseX >= this.x && mouseY >= y && mouseX <= (this.x + this.width) && mouseY <= (y + this.height)
+                val colorWithHover = if (isHovered)
                     -1
                 else if (this.selected == elements[i])
                     ARGBHelper.color(255, 255, 255, 0)
                 else
                     ARGBHelper.color(255, 185, 185, 185)
 
-                graphics.text(this.font, ellipsize(this.visualizer(elements[i]), this.width.toInt() - 15), this.x + 4, y + 4f, colorWithHover, true)
+                val text = this.visualizer(elements[i])
+                val maxWidth = this.width.toInt() - 15
+
+                if (isHovered) {
+                    graphics.pushMatrix()
+
+                    val textWidth = font.width(text)
+                    if (textWidth > maxWidth) {
+                        graphics.enableScissor(this.x.toInt() + 4, y.toInt(), maxWidth, this.height.toInt())
+                        graphics.translate(Mth.lerp((this.currentTick + (partialTick * (if (this.isReversing) -1f else 1f))) / this.maxScrollTick.toFloat(), 0f, (maxWidth - textWidth).toFloat()), 0f)
+                    }
+
+                    graphics.text(this.font, text, this.x + 4, y + 4f, colorWithHover, true)
+
+                    if (textWidth > maxWidth) {
+                        graphics.disableScissor()
+                    }
+
+                    graphics.popMatrix()
+                } else {
+                    graphics.text(this.font, ellipsize(text, maxWidth), this.x + 4, y + 4f, colorWithHover, true)
+                }
             }
 
             graphics.popMatrix()
@@ -226,6 +257,7 @@ class DropdownList<E : Comparable<E>>(
 
                 this.currentIndex = index
                 this.isOpened = false
+                this.updateProperty()
 
                 return true
             }
@@ -238,12 +270,27 @@ class DropdownList<E : Comparable<E>>(
 
     override fun keyPressed(key: Int, scanCode: Int, modifiers: Int): Boolean {
         if (this.isOpened) {
+            val elements = this.elements
+            val usableScreenHeight = ClientPlatformProxy.instance.viewportHeight - this.y - this.height - 2
+            val elementHeight = (this.height * elements.size)
+            val maxAreaHeight = elementHeight.coerceAtMost(usableScreenHeight - 4)
+
+            val topVisibleArea = this.y + this.height + 2 - this.scrollOffset
+            val bottomVisibleArea = topVisibleArea + maxAreaHeight
+
             when (key) {
                 GLFW.GLFW_KEY_UP -> {
                     this.currentIndex--
 
                     if (this.currentIndex < 0)
                         this.currentIndex = this.elements.lastIndex
+
+                    // key up moving the scroll box
+                    // FIXME: balloon languages hate this for some reason.
+                    val yPos = this.y + this.height + 2 + (this.currentIndex * this.height)
+                    if (yPos !in topVisibleArea..bottomVisibleArea) {
+                        this.scrollOffset = Mth.clamp((maxAreaHeight - yPos).toDouble(), (-elementHeight + maxAreaHeight).toDouble(), 0.0)
+                    }
 
                     return true
                 }
@@ -253,6 +300,12 @@ class DropdownList<E : Comparable<E>>(
 
                     if (this.currentIndex > this.elements.lastIndex)
                         this.currentIndex = 0
+
+                    // key down moving the scroll box
+                    val yPos = this.y + this.height + 2 + (this.currentIndex * this.height) + this.height
+                    if (yPos !in topVisibleArea..bottomVisibleArea) {
+                        this.scrollOffset = Mth.clamp((maxAreaHeight - yPos + maxAreaHeight).toDouble(), (-elementHeight + maxAreaHeight).toDouble(), 0.0)
+                    }
 
                     return true
                 }
@@ -265,6 +318,7 @@ class DropdownList<E : Comparable<E>>(
 
                 GLFW.GLFW_KEY_ENTER -> {
                     this.isOpened = false
+                    this.updateProperty()
                     return true
                 }
             }

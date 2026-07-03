@@ -43,7 +43,7 @@ class ArgosPackageIndex(path: Path) : PackageIndex<ArgosPackage>(path, "argos") 
         }
     }
 
-    override suspend fun loadIndexOrCache() {
+    override suspend fun loadIndexOrCache(waitForIndexUpdate: Boolean) {
         val cachedFile = path.resolve("index.json")
 
         if (lastIndexTime == 0L && cachedFile.exists()) {
@@ -53,10 +53,14 @@ class ArgosPackageIndex(path: Path) : PackageIndex<ArgosPackage>(path, "argos") 
         if (System.currentTimeMillis() - lastIndexTime >= 1.days.inWholeMilliseconds) {
             try {
                 UnityTranslate.logger.debug("Cache outdated! Updating Argos index.")
-                coroutineScope {
-                    launch {
-                        loadIndex()
-                        yield()
+                if (waitForIndexUpdate) {
+                    loadIndex()
+                } else {
+                    coroutineScope {
+                        launch {
+                            loadIndex()
+                            yield()
+                        }
                     }
                 }
             } catch (e: Exception) {

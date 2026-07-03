@@ -8,7 +8,7 @@ abstract class PackageIndex<T : ModelPackage>(val path: Path, val name: String) 
     val packages = mutableListOf<T>()
 
     abstract suspend fun loadIndex()
-    abstract suspend fun loadIndexOrCache()
+    abstract suspend fun loadIndexOrCache(waitForIndexUpdate: Boolean = false)
 
     abstract fun getAvailableModelInfo(pkg: T): ModelInfo?
     abstract suspend fun tryDownloadModelInfo(pkg: T): ModelInfo
