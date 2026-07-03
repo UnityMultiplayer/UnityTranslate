@@ -20,7 +20,7 @@ abstract class UIElement {
         this.children.clear()
         this.init(width, height)
 
-        for (element in children) {
+        for (element in this.children) {
             element.setup(width, height)
         }
     }

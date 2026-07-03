@@ -19,6 +19,11 @@ class FirstStartupScreen : UTScreen() {
         get() = this.sequence[this.current]
     private var transitioningSequence: IntroSequence? = null
 
+    override fun init(width: Int, height: Int) {
+        super.init(width, height)
+        this.currentSequence.setup(width, height)
+    }
+
     fun next() {
         this.currentSequence.reverse()
         this.transitioningSequence = this.currentSequence
@@ -32,6 +37,7 @@ class FirstStartupScreen : UTScreen() {
             this.next()
         } else {
             this.currentSequence.reset()
+            this.currentSequence.setup(ClientPlatformProxy.instance.viewportWidth, ClientPlatformProxy.instance.viewportHeight)
         }
     }
 

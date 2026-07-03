@@ -6,6 +6,11 @@ import xyz.bluspring.unitytranslate.api.v2.util.LangPair
 import java.util.*
 
 abstract class TranslatorInstance {
+    /**
+     * The languages supported by this translator. This should provide the languages that have at least one translation that provides it as an input (source) and as an output (target).
+     */
+    abstract suspend fun getSupportedLanguages(): Set<Language>
+
     abstract suspend fun supportsLanguage(langPair: LangPair): Boolean
     abstract suspend fun batchTranslate(text: List<String>, langPair: LangPair): List<String>
     open suspend fun prepareTranslationModels(langPair: LangPair) {}
@@ -77,6 +82,23 @@ abstract class TranslatorInstance {
             }
 
             return path
+        }
+
+        @JvmStatic
+        fun getAllSupportedLanguages(entries: Collection<LangPair>): Set<Language> {
+            val languages = mutableSetOf<Language>()
+
+            for (langPair in entries) {
+                if (!languages.contains(langPair.from) && entries.any { it.from == langPair.from } && entries.any { it.to == langPair.from }) {
+                    languages.add(langPair.from)
+                }
+
+                if (!languages.contains(langPair.to) && entries.any { it.from == langPair.to } && entries.any { it.to == langPair.to }) {
+                    languages.add(langPair.to)
+                }
+            }
+
+            return languages
         }
     }
 }

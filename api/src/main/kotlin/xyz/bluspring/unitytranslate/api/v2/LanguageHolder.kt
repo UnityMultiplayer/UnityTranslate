@@ -4,7 +4,7 @@ import org.jetbrains.annotations.ApiStatus
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
 
 data class LanguageHolder @ApiStatus.Internal constructor (
-    private var actualLanguage: Language? = null,
+    var languageOrNull: Language? = null,
 ) {
     /**
      * Warning: Do NOT hold a reference to this! This holder may get updated at any time if the language code changes!
@@ -13,15 +13,15 @@ data class LanguageHolder @ApiStatus.Internal constructor (
         get() = UnityTranslateApi.instance.getOrCreateTranscriptHolder(this.language)
 
     var language: Language
-        get() = this.actualLanguage ?: UnityTranslateApi.instance.currentSpokenLanguage
+        get() = this.languageOrNull ?: UnityTranslateApi.instance.currentSpokenLanguage
         set(value) {
-            this.actualLanguage = value
+            this.languageOrNull = value
         }
 
     val isDefault: Boolean
-        get() = this.actualLanguage == null
+        get() = this.languageOrNull == null
 
     fun reset() {
-        this.actualLanguage = null
+        this.languageOrNull = null
     }
 }

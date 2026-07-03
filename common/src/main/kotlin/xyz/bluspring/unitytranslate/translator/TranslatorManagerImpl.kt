@@ -27,7 +27,7 @@ object TranslatorManagerImpl : TranslatorManager {
     private lateinit var context: CoroutineContext
     private lateinit var scope: CoroutineScope
 
-    private val tickScope = CoroutineScope(Dispatchers.Main) + CoroutineName("UnityTranslate Translator Manager Tick")
+    private val tickScope = CoroutineScope(Dispatchers.Default) + CoroutineName("UnityTranslate Translator Manager Tick")
 
     init {
         this.updateConfig()

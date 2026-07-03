@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
 import xyz.bluspring.unitytranslate.api.v2.util.LangPair
@@ -43,6 +44,26 @@ object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
 
     override suspend fun supportsLanguage(langPair: LangPair): Boolean {
         return this.getTranslationPath(langPair).isNotEmpty()
+    }
+
+    private var isLoaded = false
+    private suspend fun ensureIndexLoaded() {
+        if (this.isLoaded)
+            return
+
+        for (index in this.packageIndexes) {
+            index.loadIndexOrCache()
+        }
+
+        this.isLoaded = true
+    }
+
+    override suspend fun getSupportedLanguages(): Set<Language> {
+        this.ensureIndexLoaded()
+        val entries = this.packageIndexes.flatMap {
+            it.packages.map { pkg -> pkg.langPair }
+        }
+        return getAllSupportedLanguages(entries)
     }
 
     private fun getTranslationPath(langPair: LangPair): List<LangPair> {

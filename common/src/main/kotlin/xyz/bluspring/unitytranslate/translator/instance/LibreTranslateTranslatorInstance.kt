@@ -87,6 +87,11 @@ object LibreTranslateTranslatorInstance : TranslatorInstance() {
         }
     }
 
+    override suspend fun getSupportedLanguages(): Set<Language> {
+        val entries = this.entries.flatMap { it.getSupportedLanguages() }
+        return getAllSupportedLanguages(entries)
+    }
+
     override suspend fun isAvailable(): Boolean = this.entries.any { it.getSupportedLanguages().isNotEmpty() }
 
     override suspend fun supportsLanguage(langPair: LangPair): Boolean {

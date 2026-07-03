@@ -2,8 +2,7 @@ package xyz.bluspring.unitytranslate.translator.instance.index
 
 import com.google.gson.JsonParser
 import com.mojang.serialization.JsonOps
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadHelper
 import xyz.bluspring.unitytranslate.library.util.TokenizerType
@@ -54,15 +53,20 @@ class ArgosPackageIndex(path: Path) : PackageIndex<ArgosPackage>(path, "argos") 
         if (System.currentTimeMillis() - lastIndexTime >= 1.days.inWholeMilliseconds) {
             try {
                 UnityTranslate.logger.debug("Cache outdated! Updating Argos index.")
-                loadIndex()
-            } catch (e: Exception) {
-                if (cachedFile.exists())
-                    cachedFile.inputStream(options = arrayOf(StandardOpenOption.READ)).use { loadIndexFromStream(it) }
-                else {
-                    UnityTranslate.logger.debug("Failed to update Argos index, and no cached index could be found!", e)
+                coroutineScope {
+                    launch {
+                        loadIndex()
+                        yield()
+                    }
                 }
+            } catch (e: Exception) {
+                if (!cachedFile.exists())
+                    UnityTranslate.logger.debug("Failed to update Argos index, and no cached index could be found!", e)
             }
-        } else if (cachedFile.exists()) {
+        }
+
+        // Try to load the cached data in the meantime.
+        if (cachedFile.exists()) {
             cachedFile.inputStream(options = arrayOf(StandardOpenOption.READ)).use { loadIndexFromStream(it) }
         }
     }
