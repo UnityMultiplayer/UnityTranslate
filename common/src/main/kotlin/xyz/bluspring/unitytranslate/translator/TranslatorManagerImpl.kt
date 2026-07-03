@@ -5,6 +5,7 @@ import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorManager
 import xyz.bluspring.unitytranslate.api.v2.util.LangPair
+import xyz.bluspring.unitytranslate.translator.instance.InactiveTranslatorInstance
 import xyz.bluspring.unitytranslate.translator.instance.UnityTranslateLibTranslatorInstance
 import java.util.Queue
 import java.util.concurrent.ConcurrentHashMap
@@ -79,10 +80,7 @@ object TranslatorManagerImpl : TranslatorManager {
 
             val instance = this.instances.firstOrNull {
                 it.isAvailable() && it.supportsLanguage(langPair)
-            }
-
-            if (instance == null)
-                continue
+            } ?: InactiveTranslatorInstance
 
             val entries = ArrayList<Entry>(Config.batchSize)
             while (queue.isNotEmpty()) {
