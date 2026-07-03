@@ -61,7 +61,9 @@ object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
     override suspend fun getSupportedLanguages(): Set<Language> {
         this.ensureIndexLoaded()
         val entries = this.packageIndexes.flatMap {
-            it.packages.map { pkg -> pkg.langPair }
+            synchronized(it.packages) {
+                it.packages.map { pkg -> pkg.langPair }
+            }
         }
         return getAllSupportedLanguages(entries)
     }

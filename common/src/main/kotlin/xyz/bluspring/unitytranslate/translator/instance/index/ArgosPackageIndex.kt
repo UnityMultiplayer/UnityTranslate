@@ -29,8 +29,10 @@ class ArgosPackageIndex(path: Path) : PackageIndex<ArgosPackage>(path, "argos") 
     private fun loadIndexFromStream(stream: InputStream, cache: Boolean = false) {
         val indexData = ArgosPackage.CODEC.listOf().decode(JsonOps.INSTANCE, JsonParser.parseReader(stream.reader())).orThrow.first
 
-        this.packages.clear()
-        this.packages.addAll(indexData)
+        synchronized(this.packages) {
+            this.packages.clear()
+            this.packages.addAll(indexData)
+        }
 
         if (cache) {
             val cachedFile = path.resolve("index.json")
