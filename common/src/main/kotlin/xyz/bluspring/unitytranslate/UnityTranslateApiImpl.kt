@@ -10,13 +10,18 @@ import xyz.bluspring.unitytranslate.api.v2.config.ConfigBuilder
 import xyz.bluspring.unitytranslate.api.v2.plugin.PluginMetadata
 import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
+import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriberSource
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
+import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.TranscriptSender
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorManager
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.config.builders.SunsetWrappedConfigBuilder
+import xyz.bluspring.unitytranslate.plugin.PluginManager
+import xyz.bluspring.unitytranslate.transcriber.TranscriberSourceImpl
 import xyz.bluspring.unitytranslate.translator.TranslatorManagerImpl
 import xyz.bluspring.unitytranslate.translator.instance.InactiveTranslatorInstance
+import xyz.bluspring.unitytranslate.util.DefaultedDelegate
 import java.nio.file.Path
 import java.util.*
 
@@ -24,6 +29,7 @@ object UnityTranslateApiImpl : UnityTranslateApi {
     val transcribers: MutableMap<String, SpeechTranscriber> = mutableMapOf()
     val transcriberConfigs: MutableMap<String, SunsetConfig> = mutableMapOf()
     val transcriptHolders: MutableMap<Language, TranscriptHolder> = WeakHashMap()
+    val transcriberSources: MutableMap<TranscriptSender, TranscriberSourceImpl> = WeakHashMap()
 
     val translators: MutableMap<String, TranslatorInstance> = mutableMapOf()
     val translatorConfigs: MutableMap<String, SunsetConfig> = mutableMapOf()
@@ -90,6 +96,15 @@ object UnityTranslateApiImpl : UnityTranslateApi {
         return this.transcribers[id] ?: InactiveTranscriber
     }
 
+    override fun getOrCreateTranscriberSource(sender: TranscriptSender): TranscriberSource {
+        if (this.transcriberSources.contains(sender))
+            return this.transcriberSources[sender]!!
+
+        val source = TranscriberSourceImpl(sender, DefaultedDelegate(::activeTranscriber), DefaultedDelegate(::currentSpokenLanguage))
+        this.transcriberSources[sender] = source
+        return source
+    }
+
     fun getTranslator(id: String): TranslatorInstance {
         return this.translators[id] ?: InactiveTranslatorInstance
     }
@@ -103,11 +118,11 @@ object UnityTranslateApiImpl : UnityTranslateApi {
     }
 
     override fun hasPlugin(id: String): Boolean {
-        TODO("Not yet implemented")
+        return PluginManager.getPluginMetadataById(id) != null
     }
 
     override fun getPluginMetadata(id: String): PluginMetadata? {
-        TODO("Not yet implemented")
+        return PluginManager.getPluginMetadataById(id)
     }
 
     override fun registerConfig(id: String, builder: ConfigBuilder.() -> Unit) {

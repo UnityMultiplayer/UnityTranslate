@@ -17,7 +17,7 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
             UnityTranslateApiImpl.translators.values.flatMap { it.getSupportedLanguages() }.distinct()
         }
 
-        val visualizer: (Language) -> Component= { language ->
+        val visualizer: (Language) -> Component = { language ->
             Component.translatable("unitytranslate.language.native_and_localized",
                 Component.translatableWithFallback("unitytranslate.language.${language.serialized}.native", language.formatted),
                 Component.translatableWithFallback("unitytranslate.language.${language.serialized}.localized", language.formatted)

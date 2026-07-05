@@ -7,4 +7,5 @@ object ClientConfig {
     var spokenLanguage: String = "en"
     var transcriptBoxes: MutableList<TranscriptBoxConfig> = mutableListOf()
     var transcriber: SpeechTranscriber = InactiveTranscriber
+    var transcriptionInterval: Int = 1_250
 }

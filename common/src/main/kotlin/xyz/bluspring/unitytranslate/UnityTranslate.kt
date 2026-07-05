@@ -19,6 +19,7 @@ import xyz.bluspring.unitytranslate.config.values.HiddenReflectingConfigValue
 import xyz.bluspring.unitytranslate.integration.UnityTranslateIntegration
 import xyz.bluspring.unitytranslate.plugin.PluginManager
 import xyz.bluspring.unitytranslate.shared.Constants
+import xyz.bluspring.unitytranslate.transcriber.TranscriberManager
 import xyz.bluspring.unitytranslate.translator.TranslatorManagerImpl
 import xyz.bluspring.unitytranslate.translator.instance.InactiveTranslatorInstance
 import xyz.bluspring.unitytranslate.translator.instance.LibreTranslateTranslatorInstance
@@ -27,6 +28,9 @@ import xyz.bluspring.unitytranslate.translator.instance.UnityTranslateLibTransla
 object UnityTranslate {
     const val MOD_ID = Constants.MOD_ID
     val logger: Logger = LoggerFactory.getLogger("UnityTranslate")
+    val transcriberManager by lazy {
+        TranscriberManager() // Server transcriber manager, shouldn't be active unless it's enabled.
+    }
 
     fun init() {
         UnityTranslateApi.instance.registerTranscriber("inactive", InactiveTranscriber) {}
@@ -109,7 +113,10 @@ object UnityTranslate {
                 listValue("transcript_boxes", TranscriptBoxConfig.CODEC, ClientConfig::transcriptBoxes)
             }
 
-            value("transcriber", SpeechTranscriber.CODEC, ClientConfig::transcriber)
+            category("transcriber") {
+                value("type", SpeechTranscriber.CODEC, ClientConfig::transcriber)
+                integer("interval", 250, 15_000, 1, ClientConfig::transcriptionInterval)
+            }
 
             category("languages") {
                 string("spoken", ClientConfig::spokenLanguage)

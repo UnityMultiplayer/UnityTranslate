@@ -88,6 +88,8 @@ class DropdownList<E : Comparable<E>>(
 
     private var isLoaded = false
 
+    var isDisabled = false
+
     override fun tick() {
         super.tick()
 
@@ -134,7 +136,7 @@ class DropdownList<E : Comparable<E>>(
         graphics.fill(x, y + height, x + width, y + height + 1, colorWithHover.multiplyAlpha(this.opacity)) // underline
 
         val disabledColor = ARGBHelper.color(255, 190, 190, 190)
-        val isDisabled = !this.elementGetter.isCompleted || this.elements.isEmpty()
+        val isDisabled = this.isDisabled || !this.elementGetter.isCompleted || this.elements.isEmpty()
 
         if (!this.elementGetter.isCompleted) {
             graphics.text(this.font, Component.translatable("unitytranslate.dropdown.loading").append(".".repeat(floor(this.currentTick / 20f).toInt() + 1)), this.x + 4, this.y + (this.height / 2f - 4), disabledColor.multiplyAlpha(this.opacity), true)
@@ -244,7 +246,7 @@ class DropdownList<E : Comparable<E>>(
     }
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        if (this.mainBounds.containsPoint(mouseX.toInt(), mouseY.toInt()) && this.isLoaded && this.elements.isNotEmpty()) {
+        if (this.mainBounds.containsPoint(mouseX.toInt(), mouseY.toInt()) && !this.isDisabled && this.isLoaded && this.elements.isNotEmpty()) {
             this.isOpened = !this.isOpened
             this.lastStoredIndex = this.currentIndex
         } else if (this.isOpened) {

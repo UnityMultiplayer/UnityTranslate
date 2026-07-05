@@ -5,7 +5,9 @@ import xyz.bluspring.unitytranslate.api.v2.config.ConfigBuilder
 import xyz.bluspring.unitytranslate.api.v2.plugin.PluginMetadata
 import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
+import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriberSource
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
+import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.TranscriptSender
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorManager
 import java.nio.file.Path
@@ -41,6 +43,12 @@ interface UnityTranslateApi {
      * Registers a speech transcriber into UnityTranslate. The [id] must be unique, and it is recommended to at least prefix the ID with your plugin's ID.
      */
     fun <T : SpeechTranscriber> registerTranscriber(id: String, value: T, configBuilder: ConfigBuilder.() -> Unit)
+
+    /**
+     * Registers a transcriber source into UnityTranslate. The [sender] should refer to whoever is sending the transcript.
+     * This transcriber may be discarded at any time by simply dereferencing it.
+     */
+    fun getOrCreateTranscriberSource(sender: TranscriptSender): TranscriberSource
 
     /**
      * Gets the ID of the provided [SpeechTranscriber].
