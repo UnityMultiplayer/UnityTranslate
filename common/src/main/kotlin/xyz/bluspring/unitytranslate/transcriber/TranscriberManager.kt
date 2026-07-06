@@ -20,6 +20,7 @@ class TranscriberManager {
                 try {
                     processTranscriptions()
                 } catch (e: Throwable) {
+                    e.printStackTrace()
                     throw e
                 } finally {
                     isTranscribing = false

@@ -11,7 +11,6 @@ import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import java.io.IOException
 import java.nio.file.Files
 import java.util.*
-import java.util.concurrent.Executors
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.exists
 
@@ -39,7 +38,8 @@ object WhisperTranscriber : SpeechTranscriber() {
     private var scope = CoroutineScope(context)
     private val logger: Logger = LoggerFactory.getLogger(WhisperTranscriber::class.java)
 
-    private fun createContextThreads() = Executors.newFixedThreadPool(maxWhisperThreads).asCoroutineDispatcher() + CoroutineName("UnityTranslate Whisper Transcriber")
+//    private fun createContextThreads() = Executors.newFixedThreadPool(maxWhisperThreads).asCoroutineDispatcher() + CoroutineName("UnityTranslate Whisper Transcriber")
+    private fun createContextThreads() = WhisperTranscriberPlugin.initThread
 
     private val whisperInstances = Collections.synchronizedMap(mutableMapOf<Language, Whisper>())
 
