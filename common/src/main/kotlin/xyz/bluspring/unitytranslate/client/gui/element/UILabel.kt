@@ -7,6 +7,7 @@ import net.minecraft.util.FormattedCharSequence
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
+import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 
 class UILabel(
     val x: Float, val y: Float,
@@ -14,7 +15,7 @@ class UILabel(
     val font: FontReference,
 
     val dropShadow: Boolean = true,
-    val color: Int = -1,
+    val color: Int = ThemeConfig.textColor,
     val alignX: HorizontalAlign = HorizontalAlign.LEFT,
     val alignY: VerticalAlign = VerticalAlign.CENTER,
 ) : UIElement() {

@@ -5,7 +5,7 @@ import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
-import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
+import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 
 open class PlainUIButton(
     private val font: FontReference,
@@ -14,8 +14,8 @@ open class PlainUIButton(
     private val x: Float,
     private val y: Float,
     private val maxWidth: Int = 10000,
-    open var color: Int = ARGBHelper.color(255, 210, 210, 210),
-    protected val hoverColor: Int = -1,
+    open var color: Int = ThemeConfig.plainButton,
+    protected val hoverColor: Int = ThemeConfig.plainButtonHover,
     private val onClick: () -> Unit,
 ) : UIElement() {
     override fun bounds(screenWidth: Int, screenHeight: Int): ScreenRectangle {

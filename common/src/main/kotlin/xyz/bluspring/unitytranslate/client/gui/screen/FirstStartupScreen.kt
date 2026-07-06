@@ -1,12 +1,13 @@
 package xyz.bluspring.unitytranslate.client.gui.screen
 
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
-import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.withAlpha
+import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
-import xyz.bluspring.unitytranslate.client.gui.LogoTransitionOverlay
+import xyz.bluspring.unitytranslate.client.config.ColorConfig
 import xyz.bluspring.unitytranslate.client.gui.screen.intro.FirstTimeIntroSequence
 import xyz.bluspring.unitytranslate.client.gui.screen.intro.IntroSequence
 import xyz.bluspring.unitytranslate.client.gui.screen.intro.LangSelectIntroSequence
+import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 
 class FirstStartupScreen : UTScreen() {
     val sequence = listOf(
@@ -54,8 +55,12 @@ class FirstStartupScreen : UTScreen() {
     }
 
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
+        val alpha = 1f
+        val matrix = ColorConfig.separateMatrix(ThemeConfig.mainBackground)
         graphics.fill(0f, 0f, graphics.width.toFloat(), graphics.height.toFloat(),
-            LogoTransitionOverlay.TOP_GRADIENT.withAlpha(1f), LogoTransitionOverlay.BOTTOM_GRADIENT.withAlpha(1f))
+            matrix.topLeft.multiplyAlpha(alpha), matrix.topRight.multiplyAlpha(alpha),
+            matrix.bottomLeft.multiplyAlpha(alpha), matrix.bottomRight.multiplyAlpha(alpha),
+        )
 
         if (this.transitioningSequence != null) {
             this.transitioningSequence!!.submit(graphics, partialTick, -100, -100)

@@ -4,10 +4,12 @@ import net.minecraft.util.Mth
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
-import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.withAlpha
+import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.api.v2.util.CommonEasing
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
+import xyz.bluspring.unitytranslate.client.config.ColorConfig
 import xyz.bluspring.unitytranslate.client.gui.screen.FirstStartupScreen
+import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 import xyz.bluspring.unitytranslate.client.renderer.ui.texture.MinecraftTextureReference
 import kotlin.math.max
 
@@ -16,9 +18,6 @@ object LogoTransitionOverlay {
     val logoTexture = MinecraftTextureReference(UnityTranslate.id("textures/gui/icon_transparent.png"))
 
     var currentTick = -1
-
-    const val TOP_GRADIENT = 0x380648
-    const val BOTTOM_GRADIENT = 0x130b19
 
     fun tick() {
         if (this.currentTick < 0)
@@ -39,8 +38,11 @@ object LogoTransitionOverlay {
         val delta = ((this.currentTick + partialTick) / TRANSITION_TIME.toFloat()).coerceAtMost(1f)
         val size = Mth.clamp(Mth.lerp(CommonEasing.EASE_IN_CUBIC.getValue(delta), maxSize, minSize), minSize, maxSize)
 
+        val matrix = ColorConfig.separateMatrix(ThemeConfig.mainBackground)
         graphics.fill(0f, 0f, graphics.width.toFloat(), graphics.height.toFloat(),
-            TOP_GRADIENT.withAlpha(delta), BOTTOM_GRADIENT.withAlpha(delta))
+            matrix.topLeft.multiplyAlpha(delta), matrix.topRight.multiplyAlpha(delta),
+            matrix.bottomLeft.multiplyAlpha(delta), matrix.bottomRight.multiplyAlpha(delta),
+        )
 
         graphics.pushMatrix()
         graphics.translate(graphics.width / 2f - (size / 2f), graphics.height / 2f - (size / 2f))

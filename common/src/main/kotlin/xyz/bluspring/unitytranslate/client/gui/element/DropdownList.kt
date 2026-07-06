@@ -8,9 +8,10 @@ import net.minecraft.util.Mth
 import org.lwjgl.glfw.GLFW
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
-import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
+import xyz.bluspring.unitytranslate.client.config.ColorConfig
+import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 import kotlin.math.floor
 import kotlin.reflect.KMutableProperty
 
@@ -127,15 +128,19 @@ class DropdownList<E : Comparable<E>>(
 
         val isHovered = this.bounds().containsPoint(mouseX, mouseY)
         val colorWithHover = if (isHovered || this.isOpened)
-            -1
+            ThemeConfig.textColor
         else
-            ARGBHelper.color(185, 255, 255, 255)
+            ThemeConfig.textColor.multiplyAlpha(0.7255f)
 
 //        graphics.outline(x, y, x + width, y + height, 1f, -1)
-        graphics.fill(x, y, x + width, y + height, 0, ARGBHelper.colorFromFloat(0.35f, 0f, 0f, 0f).multiplyAlpha(this.opacity))
+        val dropdownBgMatrix = ColorConfig.separateMatrix(ThemeConfig.dropdownBackground)
+        graphics.fill(x, y, x + width, y + height,
+            dropdownBgMatrix.topLeft.multiplyAlpha(this.opacity), dropdownBgMatrix.topRight.multiplyAlpha(this.opacity),
+            dropdownBgMatrix.bottomLeft.multiplyAlpha(this.opacity), dropdownBgMatrix.bottomRight.multiplyAlpha(this.opacity),
+        )
         graphics.fill(x, y + height, x + width, y + height + 1, colorWithHover.multiplyAlpha(this.opacity)) // underline
 
-        val disabledColor = ARGBHelper.color(255, 190, 190, 190)
+        val disabledColor = ThemeConfig.dropdownTextDisabled
         val isDisabled = this.isDisabled || !this.elementGetter.isCompleted || this.elements.isEmpty()
 
         if (!this.elementGetter.isCompleted) {
@@ -171,8 +176,11 @@ class DropdownList<E : Comparable<E>>(
 
             val shouldShowScroll = maxAreaHeight != elementHeight
 
+            val dropdownOpenBgMatrix = ColorConfig.separateMatrix(ThemeConfig.dropdownOpenBackground)
             graphics.fill(this.x, yStart, this.x + this.width, yStart + maxAreaHeight,
-                ARGBHelper.colorFromFloat(0.9f, 0f, 0f, 0f).multiplyAlpha(this.opacity))
+                dropdownOpenBgMatrix.topLeft.multiplyAlpha(this.opacity), dropdownOpenBgMatrix.topRight.multiplyAlpha(this.opacity),
+                dropdownOpenBgMatrix.bottomLeft.multiplyAlpha(this.opacity), dropdownOpenBgMatrix.bottomRight.multiplyAlpha(this.opacity),
+            )
 
             graphics.enableScissor(this.x.toInt(), yStart.toInt() + 1, (this.x + this.width).toInt(), maxAreaHeight.toInt() - 2)
             graphics.pushMatrix()
@@ -185,11 +193,11 @@ class DropdownList<E : Comparable<E>>(
 
                 val isHovered = mouseX >= this.x && mouseY >= y && mouseX <= (this.x + this.width) && mouseY <= (y + this.height)
                 val colorWithHover = if (isHovered)
-                    -1
+                    ThemeConfig.dropdownTextItemHover
                 else if (this.selected == elements[i])
-                    ARGBHelper.color(255, 255, 255, 0)
+                    ThemeConfig.dropdownTextItemSelected
                 else
-                    ARGBHelper.color(255, 185, 185, 185)
+                    ThemeConfig.dropdownTextItem
 
                 val text = this.visualizer(elements[i])
                 val maxWidth = this.width.toInt() - 15
@@ -218,15 +226,22 @@ class DropdownList<E : Comparable<E>>(
             graphics.popMatrix()
             graphics.disableScissor()
 
+            val outlineMatrix = ColorConfig.separateMatrix(ThemeConfig.dropdownOpenOutline)
             graphics.outline(this.x, this.y + this.height + 2, this.x + this.width, this.y + this.height + 2 + maxAreaHeight, 1f,
-                ARGBHelper.colorFromFloat(0.1f, 1f, 1f, 1f).multiplyAlpha(this.opacity))
+                outlineMatrix.topLeft.multiplyAlpha(this.opacity), outlineMatrix.topRight.multiplyAlpha(this.opacity),
+                outlineMatrix.bottomLeft.multiplyAlpha(this.opacity), outlineMatrix.bottomRight.multiplyAlpha(this.opacity),
+            )
 
             if (shouldShowScroll) {
                 val elementsPerHeight = maxAreaHeight / this.height
                 val scrollHeight = elementsPerHeight / elements.size
 
                 val scrollYOffset = (this.scrollOffset.toFloat() / elementHeight) * maxAreaHeight
-                graphics.fill(this.x + this.width - 1, yStart - scrollYOffset + 1, this.x + this.width, yStart - scrollYOffset + (maxAreaHeight * scrollHeight) - 1, (-1).multiplyAlpha(this.opacity))
+                val scrollbarMatrix = ColorConfig.separateMatrix(ThemeConfig.scrollbar)
+                graphics.fill(this.x + this.width - 1, yStart - scrollYOffset + 1, this.x + this.width, yStart - scrollYOffset + (maxAreaHeight * scrollHeight) - 1,
+                    scrollbarMatrix.topLeft.multiplyAlpha(this.opacity), scrollbarMatrix.topRight.multiplyAlpha(this.opacity),
+                    scrollbarMatrix.bottomLeft.multiplyAlpha(this.opacity), scrollbarMatrix.bottomRight.multiplyAlpha(this.opacity),
+                )
             }
         }
     }
