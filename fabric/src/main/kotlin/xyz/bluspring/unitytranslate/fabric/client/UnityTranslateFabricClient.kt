@@ -1,5 +1,6 @@
 package xyz.bluspring.unitytranslate.fabric.client
 
+import kotlinx.coroutines.runBlocking
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
@@ -9,6 +10,8 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.TitleScreen
 import xyz.bluspring.unitytranslate.UnityTranslate
+import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
+import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 import xyz.bluspring.unitytranslate.client.gui.LogoTransitionOverlay
@@ -49,6 +52,10 @@ class UnityTranslateFabricClient : ClientModInitializer {
                 LogoTransitionOverlay.currentTick = 0
                 UnityTranslateClient.handledFirstJoin = true
             }
+        }
+
+        runBlocking {
+            UnityTranslateApiImpl.setActiveTranscriber(UnityTranslateApi.instance.getTranscriber("unitytranslate_whisper"))
         }
     }
 }

@@ -42,6 +42,8 @@ class TranscriberSourceImpl(
             }
 
             return this.transcriber.transcribeSamples(samples, this.language).await()
+        } catch (e: Throwable) {
+            throw e
         } finally {
             this.isProcessing = false
         }

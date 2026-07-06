@@ -50,5 +50,6 @@ class FloatRingBuffer(val capacity: Int) {
 
     fun reset() {
         this.totalWritten = 0L
+        this.marked = 0
     }
 }
