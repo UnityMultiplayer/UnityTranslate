@@ -2,6 +2,8 @@ package xyz.bluspring.unitytranslate.api.v2.transcriber
 
 import org.jetbrains.annotations.ApiStatus
 import xyz.bluspring.unitytranslate.api.v2.Language
+import xyz.bluspring.unitytranslate.api.v2.event.TranscriptEvent
+import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptData.Companion.id
 import java.util.*
 
 /**
@@ -22,4 +24,13 @@ data class TranscriptHolder @ApiStatus.Internal constructor(
      * or a user-configurable amount has been reached.
      */
     val transcripts: MutableCollection<TranscriptData> = Collections.synchronizedList(mutableListOf()),
-)
+) {
+    fun update(data: TranscriptData) {
+        synchronized(this.transcripts) {
+            this.transcripts.removeIf { it.id == data.id }
+            this.transcripts.add(data)
+        }
+
+        TranscriptEvent.UPDATED.invoker().onTranscriptUpdated(this, data)
+    }
+}

@@ -1,10 +1,14 @@
 package xyz.bluspring.unitytranslate.translator
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.future.asCompletableFuture
 import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
+import xyz.bluspring.unitytranslate.api.v2.event.TranscriptEvent
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorManager
 import xyz.bluspring.unitytranslate.api.v2.util.LangPair
+import xyz.bluspring.unitytranslate.transcriber.DirectTranscriptData
+import xyz.bluspring.unitytranslate.transcriber.TranslatedTranscriptData
 import xyz.bluspring.unitytranslate.translator.instance.InactiveTranslatorInstance
 import xyz.bluspring.unitytranslate.translator.instance.UnityTranslateLibTranslatorInstance
 import java.util.Queue
@@ -31,6 +35,27 @@ object TranslatorManagerImpl : TranslatorManager {
 
     init {
         this.updateConfig()
+
+        TranscriptEvent.UPDATED.register { holder, data ->
+            // make sure we're only handling direct transcript data
+            if (data !is DirectTranscriptData)
+                return@register
+
+            UnityTranslateApiImpl.transcriptHolders.forEach { (toLang, otherHolder) ->
+                this.queue(data.message, holder.language, toLang)
+                    .asCompletableFuture()
+                    .thenAccept { translated ->
+                        otherHolder.update(TranslatedTranscriptData(
+                            data.timeCreated,
+                            data.sender,
+                            data.language,
+                            data.message,
+                            translated,
+                            data.timeUpdated,
+                        ))
+                    }
+            }
+        }
     }
 
     override var instances = mutableListOf<TranslatorInstance>(

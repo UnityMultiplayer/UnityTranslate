@@ -28,18 +28,16 @@ interface TranscriptData {
     /**
      * The timestamp, in ms, of when the transcript was last updated.
      * This value will be used for sorting the transcript in a transcript holder list.
-     * This value should never be updated outside a transcriber unless there is a very good reason.
      *
      * When translated, this value will still match the original untranslated data's value, even if the translation
      * arrived later.
      */
-    var timeUpdated: Long
+    val timeUpdated: Long
 
     /**
-     * The message contained in this data. This message may update
-     * This value should never be updated outside a transcriber unless there is a very good reason.
+     * The message contained in this data.
      */
-    var message: String
+    val message: String
 
     companion object {
         /**
