@@ -139,7 +139,10 @@ object DownloadHelper {
                 val digest = hash?.createDigest()
 
                 tempPath.outputStream(*options).use { fileStream ->
-                    val actualStream = DigestOutputStream(fileStream, digest)
+                    val actualStream = if (digest != null)
+                        DigestOutputStream(fileStream, digest)
+                    else
+                        fileStream
                     val connection = url.openConnection() as HttpURLConnection
                     connection.requestMethod = "HEAD"
                     info.totalBytes = connection.contentLengthLong
