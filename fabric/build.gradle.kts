@@ -36,6 +36,7 @@ val elementaConfig by configurations.creating {
 dependencies {
     implementation(project(":api"))
     runtimeOnly(project(":common:${stonecutter.current.version}"))
+    runtimeOnly(project(":transcribers:whisper"))
 
     moddedImplementation(libs.fabric.loader)
     moddedApi(libs.fabric.kotlin)
@@ -45,6 +46,7 @@ dependencies {
     moddedApi(fletchingTable.modrinth("modmenu", stonecutter.current.version, "fabric"))
 
     moddedApi("maven.modrinth:talk-balloons:${libs.versions.talk.balloons.get()}+${stonecutter.current.version}-fabric")
+    moddedRuntimeOnly(fletchingTable.modrinth("simple-voice-chat", stonecutter.current.version, "fabric"))
 }
 
 tasks.processResources {

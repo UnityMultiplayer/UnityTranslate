@@ -12,7 +12,7 @@ class TranscriberSourceImpl(
     transcriber: ReadWriteProperty<Any?, SpeechTranscriber>,
     language: ReadWriteProperty<Any?, Language>
 ) : TranscriberSource {
-    private val speechSamples = FloatRingBuffer(8 * 1024 * 1024) // 8 MiB
+    private val speechSamples = FloatRingBuffer(1 * 1024 * 1024) // 1 MiB
     private var isProcessing = false
 
     var sessionTimestamp = -1L

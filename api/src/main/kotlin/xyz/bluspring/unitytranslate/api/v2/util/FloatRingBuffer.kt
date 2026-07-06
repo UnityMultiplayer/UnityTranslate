@@ -19,7 +19,7 @@ class FloatRingBuffer(val capacity: Int) {
     }
 
     val size: Int
-        get() = this.totalWritten.coerceAtLeast(this.capacity.toLong()).toInt()
+        get() = this.totalWritten.coerceAtMost(this.capacity.toLong()).toInt()
 
     fun mark() {
         this.marked = this.totalWritten

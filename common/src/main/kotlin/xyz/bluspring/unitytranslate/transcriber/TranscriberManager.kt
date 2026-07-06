@@ -1,6 +1,7 @@
 package xyz.bluspring.unitytranslate.transcriber
 
 import kotlinx.coroutines.*
+import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.client.config.ClientConfig
@@ -30,11 +31,17 @@ class TranscriberManager {
         val sources = UnityTranslateApiImpl.transcriberSources.values.toList()
 
         for (source in sources) {
-            val processed = source.processSamples()
-            val holder = UnityTranslateApi.instance.getOrCreateTranscriptHolder(source.language)
-            val transcriptData = DirectTranscriptData(source.sessionTimestamp, source.sender, source.language, processed, System.currentTimeMillis())
+            if (!source.isReadyToProcess)
+                continue
 
-            holder.update(transcriptData)
+            val processed = source.processSamples()
+            if (processed.isNotBlank()) {
+                val holder = UnityTranslateApi.instance.getOrCreateTranscriptHolder(source.language)
+                val transcriptData = DirectTranscriptData(source.sessionTimestamp, source.sender, source.language, processed, System.currentTimeMillis())
+
+                holder.update(transcriptData)
+                UnityTranslate.logger.info(processed)
+            }
         }
     }
 }

@@ -11,6 +11,8 @@ import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.PlayerSender
 import xyz.bluspring.unitytranslate.api.v2.util.AudioConverters
 import xyz.bluspring.unitytranslate.client.UnityTranslateMCClient
+import xyz.bluspring.unitytranslate.transcriber.TranscriberSourceImpl
+import kotlin.time.Duration.Companion.seconds
 
 @ForgeVoicechatPlugin
 class SimpleVoiceChatIntegration : VoicechatPlugin {
@@ -24,13 +26,22 @@ class SimpleVoiceChatIntegration : VoicechatPlugin {
 
             val uuid = event.entityId
             val entity = Minecraft.getInstance().level?.getEntity(uuid) ?: return@registerEvent
+            val source = UnityTranslateApi.instance.getOrCreateTranscriberSource(PlayerSender(entity.uuid, entity.displayName))
+
+            if (System.currentTimeMillis() - (source as TranscriberSourceImpl).sessionTimestamp >= 2.seconds.inWholeMilliseconds)
+                source.reset()
 
             val samples = AudioConverters.shortPcm16ToFloat(event.rawAudio)
-            UnityTranslateApi.instance.getOrCreateTranscriberSource(PlayerSender(entity.uuid, entity.displayName))
+            source
                 .submitSpeechSamples(samples)
         }
 
         registration.registerEvent(ClientSoundEvent::class.java) { event ->
+            val source = UnityTranslateMCClient.transcriberSource
+
+            if (System.currentTimeMillis() - (source as TranscriberSourceImpl).sessionTimestamp >= 2.seconds.inWholeMilliseconds)
+                source.reset()
+
             val samples = AudioConverters.shortPcm16ToFloat(event.rawAudio)
             UnityTranslateMCClient.transcriberSource.submitSpeechSamples(samples)
         }
