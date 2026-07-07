@@ -78,6 +78,9 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
         // Header
         graphics.text(FontReference.minecraft(font), headerText.visualOrderText, this.headerX, this.headerY, -1, this.config.header.hasShadow)
 
+        graphics.enableScissor(0, font.lineHeight + 2, this.width.toInt(), this.height.toInt() - 7)
+        graphics.pushMatrix()
+        graphics.translate(0f, this.height - 8f)
         val transcripts = synchronized(this.holder.transcripts) { this.holder.transcripts.toList() }
         var offset = 0f
         for (transcript in transcripts.reversed()) {
@@ -91,6 +94,8 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
 
             offset += 2
         }
+        graphics.popMatrix()
+        graphics.disableScissor()
 
         graphics.popMatrix()
     }

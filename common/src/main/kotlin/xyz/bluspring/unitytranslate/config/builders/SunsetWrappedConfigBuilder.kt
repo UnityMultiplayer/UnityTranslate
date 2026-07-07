@@ -6,6 +6,7 @@ import xyz.bluspring.sunset.SunsetConfig
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigBuilder
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigButtonBuilder
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigValueBuilder
+import xyz.bluspring.unitytranslate.api.v2.config.NameProvidingEntry
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadableEntry
 import xyz.bluspring.unitytranslate.config.values.*
 import kotlin.reflect.KMutableProperty
@@ -160,7 +161,7 @@ class SunsetWrappedConfigBuilder(val wrapped: SunsetConfig.CategoryBuilder) : Co
         ))
     }
 
-    override fun <T> dropdown(
+    override fun <T : NameProvidingEntry> dropdown(
         id: String,
         values: Collection<T>,
         codec: Codec<T>,
@@ -180,14 +181,14 @@ class SunsetWrappedConfigBuilder(val wrapped: SunsetConfig.CategoryBuilder) : Co
         )
     }
 
-    override fun <T : DownloadableEntry> downloadableDropdown(
+    override fun <T> downloadableDropdown(
         id: String,
         values: Collection<T>,
         codec: Codec<T>,
         property: KMutableProperty<T>,
         owner: Any?,
         builder: ConfigValueBuilder<T>.() -> Unit
-    ) {
+    ) where T : DownloadableEntry, T : NameProvidingEntry {
         this.wrapped.custom(
             DownloadableDropdownValidatingReflectingConfigValue(
                 id,

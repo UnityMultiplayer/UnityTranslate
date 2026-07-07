@@ -8,6 +8,7 @@ import net.minecraft.util.Mth
 import org.lwjgl.glfw.GLFW
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
+import xyz.bluspring.unitytranslate.api.v2.event.Event
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.ColorConfig
@@ -27,12 +28,23 @@ class DropdownList<E : Comparable<E>>(
     val type: Type,
 
     validator: (E) -> Boolean = { true },
-    private val tooltip: (E?) -> Component = { Component.empty() }
+    private val tooltip: (E?) -> Component = { Component.empty() },
 ) : UIElement() {
+    fun interface DropdownCallback<E> {
+        fun onDropdownEvent(item: E)
+    }
+
+    val onUpdated: Event<DropdownCallback<E?>> = Event<DropdownCallback<E?>>(DropdownCallback::class.java as Class<DropdownCallback<E?>>) { callbacks ->
+        DropdownCallback<E?> {
+            for (callback in callbacks) {
+                callback.onDropdownEvent(it)
+            }
+        }
+    }
     var opacity = 1f
 
-    constructor(x: Float, y: Float, width: Float, height: Float, font: FontReference, elements: suspend () -> Collection<E>, visualizer: (E) -> Component, property: KMutableProperty<E>)
-        : this(x, y, width, height, font, elements, visualizer, property as KMutableProperty<E?>, Type.REQUIRED)
+    constructor(x: Float, y: Float, width: Float, height: Float, font: FontReference, elements: suspend () -> Collection<E>, visualizer: (E) -> Component, property: KMutableProperty<E>, validator: (E) -> Boolean = { true }, tooltip: (E?) -> Component = { Component.empty() },)
+        : this(x, y, width, height, font, elements, visualizer, property as KMutableProperty<E?>, Type.REQUIRED, validator, tooltip)
 
     enum class Type {
         REQUIRED, DEFAULTED, OPTIONAL
@@ -131,6 +143,7 @@ class DropdownList<E : Comparable<E>>(
     private fun updateProperty() {
         val element = this.elements[this.currentIndex]
         this.property.setter.call(element)
+        this.onUpdated.invoker().onDropdownEvent(element)
     }
 
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {

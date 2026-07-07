@@ -2,12 +2,13 @@ package xyz.bluspring.unitytranslate.transcriber.whisper
 
 import com.mojang.serialization.Codec
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
+import xyz.bluspring.unitytranslate.api.v2.config.NameProvidingEntry
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadableEntry
 import xyz.bluspring.unitytranslate.api.v2.util.AdditionalCodecs
 import java.net.URI
 import java.nio.file.Path
 
-enum class WhisperModel(val fileName: String, val minimumBytes: Long, val minimumMemoryBytes: Long) : DownloadableEntry {
+enum class WhisperModel(val fileName: String, val minimumBytes: Long, val minimumMemoryBytes: Long) : DownloadableEntry, NameProvidingEntry {
     TINY("ggml-tiny.bin", 45613056, 286261248), // 43.5 MiB, 273 MiB
     BASE("ggml-base.bin", 155189248, 406847488), // 148 MiB, 388 MiB
     SMALL("ggml-small.bin", 511705088, 893386752), // 488 MiB, 852 MiB
@@ -18,6 +19,8 @@ enum class WhisperModel(val fileName: String, val minimumBytes: Long, val minimu
 
     override val path: Path = UnityTranslateApi.instance.storagePath.resolve("models/transcriber/whisper/${this.fileName}")
     override val uri: URI = URI.create("https://huggingface.co/ggerganov/whisper.cpp/resolve/main/$fileName")
+
+    override val serializedName: String = this.name.lowercase()
 
     // OpenAI models: https://github.com/openai/whisper/blob/main/whisper/__init__.py#L17-L30
     // GGML models: https://huggingface.co/ggerganov/whisper.cpp/tree/main

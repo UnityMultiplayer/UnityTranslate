@@ -32,8 +32,7 @@ class SimpleVoiceChatIntegration : VoicechatPlugin {
                 source.reset()
 
             val samples = AudioConverters.shortPcm16ToFloat(event.rawAudio)
-            source
-                .submitSpeechSamples(this.downsampleTo16k(samples))
+            source.submitSpeechSamples(this.downsampleTo16k(samples))
         }
 
         registration.registerEvent(ClientSoundEvent::class.java) { event ->
