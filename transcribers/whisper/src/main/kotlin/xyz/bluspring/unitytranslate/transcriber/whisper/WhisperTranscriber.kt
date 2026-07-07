@@ -1,6 +1,8 @@
 package xyz.bluspring.unitytranslate.transcriber.whisper
 
-import dev.cadindie.whisper4j.Whisper
+import io.github.ggerganov.whispercpp.WhisperCpp
+import io.github.ggerganov.whispercpp.params.WhisperFullParams
+import io.github.ggerganov.whispercpp.params.WhisperSamplingStrategy
 import kotlinx.coroutines.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -11,11 +13,13 @@ import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import java.io.IOException
 import java.nio.file.Files
 import java.util.*
+import java.util.concurrent.Executors
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.exists
 
 object WhisperTranscriber : SpeechTranscriber() {
-    var model: WhisperModel = WhisperModel.TINY
+    var model: WhisperModel = WhisperModel.MEDIUM
         set(value) {
             field = value
             this.close() // Invalidate all existing instances
@@ -38,10 +42,9 @@ object WhisperTranscriber : SpeechTranscriber() {
     private var scope = CoroutineScope(context)
     private val logger: Logger = LoggerFactory.getLogger(WhisperTranscriber::class.java)
 
-//    private fun createContextThreads() = Executors.newFixedThreadPool(maxWhisperThreads).asCoroutineDispatcher() + CoroutineName("UnityTranslate Whisper Transcriber")
-    private fun createContextThreads() = WhisperTranscriberPlugin.initThread
+    private fun createContextThreads() = Executors.newFixedThreadPool(maxWhisperThreads).asCoroutineDispatcher() + CoroutineName("UnityTranslate Whisper Transcriber")
 
-    private val whisperInstances = Collections.synchronizedMap(mutableMapOf<Language, Whisper>())
+    private val whisperInstances = Collections.synchronizedMap(mutableMapOf<Language, WhisperInstance>())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override val initialSetup: Deferred<Unit>
@@ -53,20 +56,22 @@ object WhisperTranscriber : SpeechTranscriber() {
                 throw IOException("Not enough storage to download ${model.fileName}! (expected: ${model.minimumBytes}, actual: ${storage.usableSpace})")
             }
 
-            val download = DownloadHelper.queue(model)
-            download.onStartDownload.register {
-                logger.info("Downloading ${model.fileName}...")
-            }
-
-            download.onFinishDownload.register {
-                if (download.deferred.isCancelled || download.deferred.getCompletionExceptionOrNull() != null) {
-                    logger.error("Failed to download ${model.fileName}!")
-                } else {
-                    logger.info("Successfully downloaded ${model.fileName}!")
+            if (!model.path.exists()) {
+                val download = DownloadHelper.queue(model)
+                download.onStartDownload.register {
+                    logger.info("Downloading ${model.fileName}...")
                 }
-            }
 
-            download.deferred.await()
+                download.onFinishDownload.register {
+                    if (download.deferred.isCancelled || download.deferred.getCompletionExceptionOrNull() != null) {
+                        logger.error("Failed to download ${model.fileName}!")
+                    } else {
+                        logger.info("Successfully downloaded ${model.fileName}!")
+                    }
+                }
+
+                download.deferred.await()
+            }
         }
 
     // https://developers.openai.com/api/docs/guides/speech-to-text#supported-languages
@@ -94,37 +99,45 @@ object WhisperTranscriber : SpeechTranscriber() {
             }
 
             // Initialize Whisper instance for this specific language.
-            val whisper = synchronized(whisperInstances) {
+            val instance = synchronized(whisperInstances) {
                 whisperInstances.computeIfAbsent(language) {
                     createWhisperInstance(language)
                 }
             }
 
-            whisper.transcribeRaw(samples)
+            instance.whisper.fullTranscribe(instance.params, samples)
         }
     }
 
     override fun close() {
         synchronized(this.whisperInstances) {
-            for ((_, whisper) in this.whisperInstances) {
-                whisper.close()
+            for ((_, instance) in this.whisperInstances) {
+                instance.whisper.close()
             }
 
             this.whisperInstances.clear()
         }
     }
 
-    private fun createWhisperInstance(language: Language): Whisper {
+    private fun createWhisperInstance(language: Language): WhisperInstance {
         if (!this.model.path.exists())
             throw IllegalStateException("Whisper model ${this.model.name} has not been downloaded yet!")
 
-        return Whisper.Builder()
-            .setLanguage(language.formatted)
-            .setModel(this.model.path.toFile())
-            .setUseGpu(this.enableGpu)
-            .setDebugInfo(true)
-            .build().apply {
-                this.initialize()
-            }
+        val whisper = WhisperCpp()
+        whisper.initContext(this.model.path.absolutePathString())
+
+        val params = whisper.getFullDefaultParams(WhisperSamplingStrategy.WHISPER_SAMPLING_BEAM_SEARCH)
+        params.language = language.formatted
+        params.suppressBlanks(true)
+        params.suppressNonSpeechTokens(true)
+        params.transcribeMode()
+
+        return WhisperInstance(whisper, params)
     }
+
+    @JvmRecord
+    private data class WhisperInstance(
+        val whisper: WhisperCpp,
+        val params: WhisperFullParams,
+    )
 }

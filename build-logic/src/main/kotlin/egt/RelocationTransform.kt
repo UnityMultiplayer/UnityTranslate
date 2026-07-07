@@ -1,5 +1,6 @@
 package egt
 
+import egt.RelocationTransform.Companion.registerRelocationAttribute
 import org.gradle.api.Project
 import org.gradle.api.artifacts.transform.InputArtifact
 import org.gradle.api.artifacts.transform.TransformAction

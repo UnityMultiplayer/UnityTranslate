@@ -63,6 +63,9 @@ javaflacencoder = "0.3.7"
 # https://central.sonatype.com/artifact/io.github.ggerganov/whispercpp/versions
 whispercpp = "1.4.0"
 
+# https://github.com/java-native-access/jna/tags
+jna = "5.19.1"
+
 [bundles]
 kotlin = [
     "kotlinx-coroutines-core", "kotlinx-coroutines-core-jvm", "kotlinx-coroutines-jdk8", "kotlinx-serialization-json"
@@ -105,12 +108,13 @@ voicechat-api = { module = "de.maxhenkel.voicechat:voicechat-api", version.ref =
 sunset = { module = "xyz.bluspring.sunset:sunset-config", version.ref = "sunset" }
 
 javaflacencoder = { module = "net.sourceforge.javaflacencoder:java-flac-encoder", version.ref = "javaflacencoder" }
+jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 
 [plugins]
 moddevgradle = { id = "net.neoforged.moddev" }
 moddevgradle-legacy = { id = "net.neoforged.moddev.legacyforge" }
-kotlin = { id = "org.jetbrains.kotlin.jvm" }
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 fletching-table = { id = "dev.kikugie.fletching-table", version.ref = "fletching-table" }
-shadow = { id = "com.gradleup.shadow" }
-mod-publish = { id = "me.modmuss50.mod-publish-plugin" }
-fabric-loom = { id = "net.fabricmc.fabric-loom" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+mod-publish = { id = "me.modmuss50.mod-publish-plugin", version.ref = "mod-publish" }
+fabric-loom = { id = "net.fabricmc.fabric-loom", version.ref = "fabric-loom" }

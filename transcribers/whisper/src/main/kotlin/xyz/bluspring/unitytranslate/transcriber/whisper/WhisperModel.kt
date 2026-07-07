@@ -16,7 +16,7 @@ enum class WhisperModel(val fileName: String, val minimumBytes: Long, val minimu
     LARGE_TURBO("ggml-large-v3-turbo.bin", 1739461754, 4187593113), // 1.62 GiB, 3.9 GiB
     ;
 
-    override val path: Path = UnityTranslateApi.instance.storagePath.resolve("whisper/models/${this.fileName}")
+    override val path: Path = UnityTranslateApi.instance.storagePath.resolve("models/whisper/${this.fileName}")
     override val uri: URI = URI.create("https://huggingface.co/ggerganov/whisper.cpp/resolve/main/$fileName")
 
     // OpenAI models: https://github.com/openai/whisper/blob/main/whisper/__init__.py#L17-L30

@@ -10,8 +10,7 @@ import org.gradle.api.tasks.util.PatternSet
 import java.io.File
 import java.io.OutputStream
 import java.security.MessageDigest
-import java.util.Calendar
-import java.util.GregorianCalendar
+import java.util.*
 import java.util.jar.JarOutputStream
 import java.util.zip.ZipEntry
 

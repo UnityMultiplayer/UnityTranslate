@@ -33,7 +33,7 @@ class SimpleVoiceChatIntegration : VoicechatPlugin {
 
             val samples = AudioConverters.shortPcm16ToFloat(event.rawAudio)
             source
-                .submitSpeechSamples(samples)
+                .submitSpeechSamples(this.downsampleTo16k(samples))
         }
 
         registration.registerEvent(ClientSoundEvent::class.java) { event ->
@@ -43,7 +43,20 @@ class SimpleVoiceChatIntegration : VoicechatPlugin {
                 source.reset()
 
             val samples = AudioConverters.shortPcm16ToFloat(event.rawAudio)
-            UnityTranslateMCClient.transcriberSource.submitSpeechSamples(samples)
+            UnityTranslateMCClient.transcriberSource.submitSpeechSamples(this.downsampleTo16k(samples))
         }
+    }
+
+    private fun downsampleTo16k(input: FloatArray): FloatArray {
+        val outputLength = input.size / 3
+        val output = FloatArray(outputLength)
+
+        for (i in 0 until outputLength) {
+            val base = i * 3
+            val sum = input[base] + input[base + 1] + input[base + 2]
+            output[i] = sum / 3f
+        }
+
+        return output
     }
 }

@@ -53,4 +53,6 @@ include(":standalone", ":standalone:launcher")
 include(":transcribers", ":transcribers:google", ":transcribers:whisper")
 include(":relay")
 
+includeBuild("build-logic")
+
 rootProject.name = "UnityTranslate"

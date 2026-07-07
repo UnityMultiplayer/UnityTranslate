@@ -3,11 +3,14 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 
 plugins {
     id("dev.kikugie.stonecutter")
+    alias(libs.plugins.fabric.loom) apply false
+    alias(libs.plugins.moddevgradle) version libs.versions.moddevgradle.get() apply false
     alias(libs.plugins.kotlin) apply false
     alias(libs.plugins.mod.publish) apply false
     alias(libs.plugins.shadow) apply false
     alias(libs.plugins.fletching.table) apply false
     id("idea")
+    id("multiplatform")
 }
 
 stonecutter active "26.2"
@@ -33,7 +36,6 @@ allprojects {
         mavenProviding("https://maven.fabricmc.net", "net.fabricmc")
         mavenProviding("https://libraries.minecraft.net", "com.mojang")
         mavenProviding("https://mvn.devos.one/releases", "xyz.bluspring.sunset")
-        mavenProviding("https://mvn.devos.one/snapshots", "dev.cadindie") // FIXME: why is this broken. what.
         mavenProviding("https://maven.maxhenkel.de/releases", "de.maxhenkel")
         mavenProviding("https://api.modrinth.com/maven", "maven.modrinth")
         mavenProviding("https://www.cursemaven.com", "curse.maven")
