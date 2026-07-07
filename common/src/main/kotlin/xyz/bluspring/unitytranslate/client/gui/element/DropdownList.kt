@@ -25,6 +25,9 @@ class DropdownList<E : Comparable<E>>(
 
     val property: KMutableProperty<E?>,
     val type: Type,
+
+    validator: (E) -> Boolean = { true },
+    private val tooltip: (E?) -> Component = { Component.empty() }
 ) : UIElement() {
     var opacity = 1f
 
@@ -47,6 +50,13 @@ class DropdownList<E : Comparable<E>>(
                 else -> throw IllegalStateException()
             }}")
         else visualizer(it)
+    }
+
+    private val validator: (E?) -> Boolean = {
+        if (it == null)
+            this.type != Type.REQUIRED
+        else
+            validator(it)
     }
 
     private val elementGetter: Deferred<List<E>> = scope.async {
@@ -186,13 +196,16 @@ class DropdownList<E : Comparable<E>>(
             graphics.pushMatrix()
             graphics.translate(0f, this.scrollOffset.toFloat())
 
-            val mouseY = mouseY - this.scrollOffset.toFloat()
+            val adjustedMouseY = mouseY - this.scrollOffset.toFloat()
 
             for (i in elements.indices) {
                 val y = yStart + (i * this.height)
 
-                val isHovered = mouseX >= this.x && mouseY >= y && mouseX <= (this.x + this.width) && mouseY <= (y + this.height)
-                val colorWithHover = if (isHovered)
+                val isHovered = mouseX >= this.x && adjustedMouseY >= y && mouseX <= (this.x + this.width) && adjustedMouseY <= (y + this.height)
+                val isDisabled = !this.validator(elements[i])
+                val colorWithHover = if (isDisabled)
+                    ThemeConfig.dropdownTextItemDisabled
+                else if (isHovered)
                     ThemeConfig.dropdownTextItemHover
                 else if (this.selected == elements[i])
                     ThemeConfig.dropdownTextItemSelected
@@ -218,6 +231,13 @@ class DropdownList<E : Comparable<E>>(
                     }
 
                     graphics.popMatrix()
+
+                    val tooltip = this.tooltip(elements[i])
+
+                    if (tooltip.string.isNotEmpty()) {
+                        graphics.text(this.font, tooltip, mouseX.toFloat(), mouseY.toFloat(),
+                            ThemeConfig.tooltipText, false)
+                    }
                 } else {
                     graphics.text(this.font, ellipsize(text, maxWidth), this.x + 4, y + 4f, colorWithHover.multiplyAlpha(this.opacity), true)
                 }
@@ -275,9 +295,13 @@ class DropdownList<E : Comparable<E>>(
                 val yOffset = mouseY - (this.y + height + 2)
                 val index = Mth.clamp(((yOffset / elementHeight * elements.size)).toInt(), 0, elements.lastIndex)
 
-                this.currentIndex = index
-                this.isOpened = false
-                this.updateProperty()
+                val isDisabled = !this.validator(elements[index])
+
+                if (!isDisabled) {
+                    this.currentIndex = index
+                    this.isOpened = false
+                    this.updateProperty()
+                }
 
                 return true
             }
@@ -300,10 +324,20 @@ class DropdownList<E : Comparable<E>>(
 
             when (key) {
                 GLFW.GLFW_KEY_UP -> {
-                    this.currentIndex--
+                    var isDisabled: Boolean
+                    val startingIndex = this.currentIndex
+                    do {
+                        this.currentIndex--
 
-                    if (this.currentIndex < 0)
-                        this.currentIndex = this.elements.lastIndex
+                        if (this.currentIndex < 0)
+                            this.currentIndex = this.elements.lastIndex
+
+                        isDisabled = !this.validator(elements[this.currentIndex])
+
+                        // safety check
+                        if (startingIndex == this.currentIndex)
+                            break
+                    } while (isDisabled)
 
                     // key up moving the scroll box
                     // FIXME: balloon languages hate this for some reason.

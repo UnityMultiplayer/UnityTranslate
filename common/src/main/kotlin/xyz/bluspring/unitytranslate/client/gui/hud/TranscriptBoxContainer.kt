@@ -6,6 +6,7 @@ import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
+import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.alpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.ColorConfig
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
@@ -76,6 +77,20 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
 
         // Header
         graphics.text(FontReference.minecraft(font), headerText.visualOrderText, this.headerX, this.headerY, -1, this.config.header.hasShadow)
+
+        val transcripts = synchronized(this.holder.transcripts) { this.holder.transcripts.toList() }
+        var offset = 0f
+        for (transcript in transcripts.reversed()) {
+            val text = this.config.transcriptDisplay.text(transcript)
+
+            for (sequence in font.split(text, this.width.toInt() - 4).reversed()) {
+                val hasShadow = this.config.shadowColor.alpha() <= 10
+                graphics.text(FontReference.minecraft(font), sequence, 0f, -offset, this.config.textColor, hasShadow) // TODO: shadow
+                offset += 10
+            }
+
+            offset += 2
+        }
 
         graphics.popMatrix()
     }

@@ -44,7 +44,6 @@ class TranscriberManager {
                 val transcriptData = DirectTranscriptData(source.sessionTimestamp, source.sender, source.language, processed, System.currentTimeMillis())
 
                 holder.update(transcriptData)
-                UnityTranslate.logger.info(processed)
             }
         }
     }
