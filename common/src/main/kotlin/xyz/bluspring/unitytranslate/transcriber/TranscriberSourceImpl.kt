@@ -12,10 +12,13 @@ class TranscriberSourceImpl(
     transcriber: ReadWriteProperty<Any?, SpeechTranscriber>,
     language: ReadWriteProperty<Any?, Language>
 ) : TranscriberSource {
-    private val speechSamples = FloatRingBuffer(1 * 1024 * 1024) // 1 MiB
+    private val speechSamples = FloatRingBuffer(8 * 1024 * 1024) // 8 MiB
     private var isProcessing = false
 
     var sessionTimestamp = -1L
+        private set
+
+    var lastUpdateTimestamp = -1L
         private set
 
     var transcriber by transcriber
@@ -25,6 +28,8 @@ class TranscriberSourceImpl(
         synchronized(this.speechSamples) {
             this.speechSamples += samples
         }
+
+        this.lastUpdateTimestamp = System.currentTimeMillis()
     }
 
     val isReadyToProcess: Boolean

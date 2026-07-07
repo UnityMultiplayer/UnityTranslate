@@ -28,7 +28,7 @@ class SimpleVoiceChatIntegration : VoicechatPlugin {
             val entity = Minecraft.getInstance().level?.getEntity(uuid) ?: return@registerEvent
             val source = UnityTranslateApi.instance.getOrCreateTranscriberSource(PlayerSender(entity.uuid, entity.displayName))
 
-            if (System.currentTimeMillis() - (source as TranscriberSourceImpl).sessionTimestamp >= 2.seconds.inWholeMilliseconds)
+            if (System.currentTimeMillis() - (source as TranscriberSourceImpl).lastUpdateTimestamp >= 2.seconds.inWholeMilliseconds)
                 source.reset()
 
             val samples = AudioConverters.shortPcm16ToFloat(event.rawAudio)
@@ -39,7 +39,7 @@ class SimpleVoiceChatIntegration : VoicechatPlugin {
         registration.registerEvent(ClientSoundEvent::class.java) { event ->
             val source = UnityTranslateMCClient.transcriberSource
 
-            if (System.currentTimeMillis() - (source as TranscriberSourceImpl).sessionTimestamp >= 2.seconds.inWholeMilliseconds)
+            if (System.currentTimeMillis() - (source as TranscriberSourceImpl).lastUpdateTimestamp >= 2.seconds.inWholeMilliseconds)
                 source.reset()
 
             val samples = AudioConverters.shortPcm16ToFloat(event.rawAudio)

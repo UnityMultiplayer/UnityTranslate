@@ -19,7 +19,7 @@ import kotlin.io.path.createParentDirectories
 import kotlin.io.path.exists
 
 object WhisperTranscriber : SpeechTranscriber() {
-    var model: WhisperModel = WhisperModel.MEDIUM
+    var model: WhisperModel = WhisperModel.TINY
         set(value) {
             field = value
             this.close() // Invalidate all existing instances
