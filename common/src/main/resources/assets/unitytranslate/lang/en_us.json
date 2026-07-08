@@ -9,10 +9,12 @@
     "unitytranslate.transcript.message": "<%1$s %2$s> %3$s",
     "unitytranslate.transcript.message.language": "(%s)",
 
-    "unitytranslate.dropdown.loading": "Loading",
-    "unitytranslate.dropdown.empty": "(empty)",
-    "unitytranslate.dropdown.none": "(none)",
-    "unitytranslate.dropdown.default": "(default)",
+    "unitytranslate.config.loading": "Loading",
+    "unitytranslate.config.empty": "(empty)",
+    "unitytranslate.config.none": "(none)",
+    "unitytranslate.config.default": "(default)",
+
+    "unitytranslate.measurement.seconds": "%s seconds",
 
     "unitytranslate.intro.first_time": "Looks like this is your first time using UnityTranslate, let's help you get set up.",
     "unitytranslate.intro.first_time.next": "Let's go!",

@@ -24,6 +24,7 @@ import xyz.bluspring.unitytranslate.translator.TranslatorManagerImpl
 import xyz.bluspring.unitytranslate.translator.instance.InactiveTranslatorInstance
 import xyz.bluspring.unitytranslate.translator.instance.LibreTranslateTranslatorInstance
 import xyz.bluspring.unitytranslate.translator.instance.UnityTranslateLibTranslatorInstance
+import java.text.DecimalFormat
 
 object UnityTranslate {
     const val MOD_ID = Constants.MOD_ID
@@ -103,9 +104,24 @@ object UnityTranslate {
                     float("font_scale", min = 0f, max = 16f, step = 0.5f, property = TranscriptBoxConfig.Defaults::fontScale) {
                         formatting {
                             if (it == 0f)
-                                Component.literal("(default)")
+                                Component.translatable("unitytranslate.config.none")
                             else
                                 Component.literal("${"%.1f".format(it * 100f)}%")
+                        }
+                    }
+
+                    integer("time_to_live", min = 0, max = 180_000, step = 250, property = TranscriptBoxConfig.Defaults::msToLive) {
+                        formatting {
+                            if (it == 0)
+                                Component.translatable("unitytranslate.measurement.seconds", "∞")
+                            else
+                                Component.translatable("unitytranslate.measurement.seconds", DecimalFormat("0.###").format((it / 1000.0)))
+                        }
+                    }
+
+                    integer("time_to_fade_out", min = 0, max = 5_000, step = 250, property = TranscriptBoxConfig.Defaults::msToFadeOut) {
+                        formatting {
+                            Component.translatable("unitytranslate.measurement.seconds", DecimalFormat("0.###").format((it / 1000.0)))
                         }
                     }
                 }

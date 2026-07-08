@@ -29,6 +29,8 @@ class TranscriptBoxConfig(
     private var _header: Optional<Header> = Optional.empty(),
     private var _transcriptDisplay: Optional<TranscriptDisplay> = Optional.empty(),
     private var _padding: Optional<Padding> = Optional.empty(),
+    private var _msToLive: Optional<Int> = Optional.empty(),
+    private var _msToFadeOut: Optional<Int> = Optional.empty(),
 ) : TranscriptBoxConfigHolder {
     object Defaults : TranscriptBoxConfigHolder {
         override var outline: Outline = Outline()
@@ -42,6 +44,8 @@ class TranscriptBoxConfig(
         override var transcriptDisplay: TranscriptDisplay = TranscriptDisplay.default()
 
         override var padding: Padding = Padding.default()
+        override var msToLive: Int = 2_000 // 20 seconds
+        override var msToFadeOut: Int = 500 // 0.5 seconds
     }
 
     override var outline: Outline
@@ -96,6 +100,18 @@ class TranscriptBoxConfig(
         get() = _padding.orElse(Defaults.padding)!!
         set(value) {
             _padding = Optional.of(value)
+        }
+
+    override var msToLive: Int
+        get() = _msToLive.orElse(Defaults.msToLive)!!
+        set(value) {
+            _msToLive = Optional.of(value)
+        }
+
+    override var msToFadeOut: Int
+        get() = _msToFadeOut.orElse(Defaults.msToFadeOut)!!
+        set(value) {
+            _msToFadeOut = Optional.of(value)
         }
 
     companion object {

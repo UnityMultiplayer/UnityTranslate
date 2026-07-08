@@ -14,4 +14,6 @@ interface TranscriptBoxConfigHolder {
     var transcriptDisplay: TranscriptDisplay
 
     var padding: Padding
+    var msToLive: Int
+    var msToFadeOut: Int
 }

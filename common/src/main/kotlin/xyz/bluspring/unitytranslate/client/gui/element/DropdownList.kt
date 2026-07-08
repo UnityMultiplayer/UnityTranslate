@@ -56,7 +56,7 @@ class DropdownList<E : Comparable<E>>(
 
     private val visualizer: (E?) -> Component = {
         if (it == null)
-            Component.translatable("unitytranslate.dropdown.${when (this.type) {
+            Component.translatable("unitytranslate.config.${when (this.type) {
                 Type.OPTIONAL -> "none"
                 Type.DEFAULTED -> "default"
                 else -> throw IllegalStateException()
@@ -167,9 +167,9 @@ class DropdownList<E : Comparable<E>>(
         val isDisabled = this.isDisabled || !this.elementGetter.isCompleted || this.elements.isEmpty()
 
         if (!this.elementGetter.isCompleted) {
-            graphics.text(this.font, Component.translatable("unitytranslate.dropdown.loading").append(".".repeat(floor(this.currentTick / 20f).toInt() + 1)), this.x + 4, this.y + (this.height / 2f - 4), disabledColor.multiplyAlpha(this.opacity), true)
+            graphics.text(this.font, Component.translatable("unitytranslate.config.loading").append(".".repeat(floor(this.currentTick / 20f).toInt() + 1)), this.x + 4, this.y + (this.height / 2f - 4), disabledColor.multiplyAlpha(this.opacity), true)
         } else if (this.elements.isEmpty()) {
-            graphics.text(this.font, Component.translatable("unitytranslate.dropdown.empty"), this.x + 4, this.y + (this.height / 2f - 4), disabledColor.multiplyAlpha(this.opacity), true)
+            graphics.text(this.font, Component.translatable("unitytranslate.config.empty"), this.x + 4, this.y + (this.height / 2f - 4), disabledColor.multiplyAlpha(this.opacity), true)
         } else {
             graphics.text(this.font, ellipsize(this.visualizer(this.selected), this.width.toInt() - 15), this.x + 4, this.y + (this.height / 2f - 4), colorWithHover.multiplyAlpha(this.opacity), true)
         }
