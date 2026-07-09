@@ -9,7 +9,7 @@ import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriberSource
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
-import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.TranscriptSender
+import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.TranscriptUser
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorManager
 import java.nio.file.Path
@@ -50,7 +50,7 @@ interface UnityTranslateApi {
      * Registers a transcriber source into UnityTranslate. The [sender] should refer to whoever is sending the transcript.
      * This transcriber may be discarded at any time by simply dereferencing it.
      */
-    fun getOrCreateTranscriberSource(sender: TranscriptSender): TranscriberSource
+    fun getOrCreateTranscriberSource(sender: TranscriptUser): TranscriberSource
 
     /**
      * Gets the ID of the provided [SpeechTranscriber].

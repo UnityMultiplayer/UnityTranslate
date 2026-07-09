@@ -4,12 +4,12 @@ import com.google.common.collect.Queues
 import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriberSource
-import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.TranscriptSender
+import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.TranscriptUser
 import xyz.bluspring.unitytranslate.api.v2.util.FloatRingBuffer
 import kotlin.properties.ReadWriteProperty
 
 class TranscriberSourceImpl(
-    override val sender: TranscriptSender,
+    override val sender: TranscriptUser,
     transcriber: ReadWriteProperty<Any?, SpeechTranscriber>,
     language: ReadWriteProperty<Any?, Language>
 ) : TranscriberSource {

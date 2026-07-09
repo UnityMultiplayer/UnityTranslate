@@ -14,6 +14,7 @@ dependencies {
     api(libs.datafixerupper.get())
     "stubsApi"(libs.datafixerupper.get())
     api(libs.unitytranslatelib.get())
+    api(libs.joml)
 
     compileOnly(stubs.output)
 }

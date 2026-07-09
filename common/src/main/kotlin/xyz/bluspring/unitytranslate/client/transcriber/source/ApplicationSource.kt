@@ -2,9 +2,9 @@ package xyz.bluspring.unitytranslate.client.transcriber.source
 
 import net.minecraft.network.chat.Component
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
-import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.TranscriptSender
+import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.TranscriptUser
 
-class ApplicationSource(val applicationName: String) : TranscriptSender {
+class ApplicationSource(val applicationName: String) : TranscriptUser {
     override val displayName: Component
         get() = Component.literal(this.applicationName)
 

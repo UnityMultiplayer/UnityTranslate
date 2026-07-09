@@ -1,7 +1,7 @@
 package xyz.bluspring.unitytranslate.api.v2.transcriber
 
 import xyz.bluspring.unitytranslate.api.v2.Language
-import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.TranscriptSender
+import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.TranscriptUser
 
 /**
  * The data for each transcript. Usually stored in [TranscriptHolder.transcripts].
@@ -18,7 +18,7 @@ interface TranscriptData {
     /**
      * The sender who sent this transcript.
      */
-    val sender: TranscriptSender
+    val sender: TranscriptUser
 
     /**
      * The original language of the transcript, before it was translated.

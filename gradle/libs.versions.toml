@@ -66,6 +66,8 @@ whispercpp = "1.4.0"
 # https://github.com/java-native-access/jna/tags
 jna = "5.19.1"
 
+joml = "1.10.8"
+
 [bundles]
 kotlin = [
     "kotlinx-coroutines-core", "kotlinx-coroutines-core-jvm", "kotlinx-coroutines-jdk8", "kotlinx-serialization-json"
@@ -101,7 +103,6 @@ datafixerupper = { module = "com.mojang:datafixerupper", version.ref = "datafixe
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 
 unitytranslatelib = { module = "xyz.bluspring.unitytranslate:unitytranslate-library", version.ref = "unitytranslatelib" }
-whisper4j = { module = "dev.cadindie:whisper4j", version.ref = "whisper4j" }
 whispercpp = { module = "io.github.ggerganov:whispercpp", version.ref = "whispercpp" }
 
 voicechat-api = { module = "de.maxhenkel.voicechat:voicechat-api", version.ref = "voicechat-api" }
@@ -109,6 +110,8 @@ sunset = { module = "xyz.bluspring.sunset:sunset-config", version.ref = "sunset"
 
 javaflacencoder = { module = "net.sourceforge.javaflacencoder:java-flac-encoder", version.ref = "javaflacencoder" }
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
+
+joml = { module = "org.joml:joml", version.ref = "joml" }
 
 [plugins]
 moddevgradle = { id = "net.neoforged.moddev" }

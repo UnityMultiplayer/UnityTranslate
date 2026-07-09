@@ -1,6 +1,7 @@
 package xyz.bluspring.unitytranslate.integration.voicechat
 
 import de.maxhenkel.voicechat.api.ForgeVoicechatPlugin
+import de.maxhenkel.voicechat.api.VoicechatApi
 import de.maxhenkel.voicechat.api.VoicechatPlugin
 import de.maxhenkel.voicechat.api.events.ClientReceiveSoundEvent
 import de.maxhenkel.voicechat.api.events.ClientSoundEvent
@@ -8,7 +9,8 @@ import de.maxhenkel.voicechat.api.events.EventRegistration
 import net.minecraft.client.Minecraft
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
-import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.PlayerSender
+import xyz.bluspring.unitytranslate.api.v2.event.TranscriptEvent
+import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.PlayerUser
 import xyz.bluspring.unitytranslate.api.v2.util.AudioConverters
 import xyz.bluspring.unitytranslate.client.UnityTranslateMCClient
 import xyz.bluspring.unitytranslate.transcriber.TranscriberSourceImpl
@@ -18,6 +20,17 @@ import kotlin.time.Duration.Companion.seconds
 class SimpleVoiceChatIntegration : VoicechatPlugin {
     override fun getPluginId(): String = UnityTranslate.MOD_ID
 
+    override fun initialize(api: VoicechatApi) {
+        super.initialize(api)
+
+        TranscriptEvent.ALLOWED.register { _, data, receiver ->
+            val senderPos = data.sender.pos ?: return@register true
+            val receiverPos = receiver.pos ?: return@register true
+
+            senderPos.distanceSquared(receiverPos) <= api.voiceChatDistance * api.voiceChatDistance
+        }
+    }
+
     override fun registerEvents(registration: EventRegistration) {
         registration.registerEvent(ClientReceiveSoundEvent.EntitySound::class.java) { event ->
             // We don't want to transcribe players we're not supposed to have.
@@ -26,7 +39,7 @@ class SimpleVoiceChatIntegration : VoicechatPlugin {
 
             val uuid = event.entityId
             val entity = Minecraft.getInstance().level?.getEntity(uuid) ?: return@registerEvent
-            val source = UnityTranslateApi.instance.getOrCreateTranscriberSource(PlayerSender(entity.uuid, entity.displayName))
+            val source = UnityTranslateApi.instance.getOrCreateTranscriberSource(PlayerUser(entity.uuid, entity.position().toVector3f(), entity.displayName))
 
             if (System.currentTimeMillis() - (source as TranscriberSourceImpl).lastUpdateTimestamp >= 2.seconds.inWholeMilliseconds)
                 source.reset()
@@ -46,6 +59,7 @@ class SimpleVoiceChatIntegration : VoicechatPlugin {
         }
     }
 
+    // because SVC takes in 48k sample rate audio by default.
     private fun downsampleTo16k(input: FloatArray): FloatArray {
         val outputLength = input.size / 3
         val output = FloatArray(outputLength)

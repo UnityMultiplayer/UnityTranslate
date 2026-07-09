@@ -4,14 +4,15 @@ import net.minecraft.network.chat.Component
 import java.util.*
 
 /**
- * A Minecraft player as a [TranscriptSender].
+ * A Minecraft player as a [TranscriptUser].
  */
 @JvmRecord
-data class PlayerSender(
+data class PlayerUser(
     /**
      * The UUID of the Minecraft player.
      */
     val uuid: UUID,
+    override val pos: Vector3f,
 
     /**
      * The Minecraft player's display name. This may not match their username,
@@ -19,4 +20,19 @@ data class PlayerSender(
      * using the [uuid].
      */
     override val displayName: Component,
-) : TranscriptSender
+) : TranscriptUser {
+
+    override fun hashCode(): Int {
+        return uuid.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other is UUID) return this.uuid == other
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as PlayerUser
+
+        return uuid == other.uuid
+    }
+}

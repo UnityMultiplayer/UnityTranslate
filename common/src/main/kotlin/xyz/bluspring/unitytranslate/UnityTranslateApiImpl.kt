@@ -14,7 +14,7 @@ import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriberSource
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
-import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.TranscriptSender
+import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.TranscriptUser
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorManager
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
@@ -31,7 +31,7 @@ object UnityTranslateApiImpl : UnityTranslateApi {
     val transcribers: MutableMap<String, SpeechTranscriber> = mutableMapOf()
     val transcriberConfigs: MutableMap<String, SunsetConfig> = mutableMapOf()
     val transcriptHolders: MutableMap<Language, TranscriptHolder> = WeakHashMap()
-    val transcriberSources: MutableMap<TranscriptSender, TranscriberSourceImpl> = WeakHashMap()
+    val transcriberSources: MutableMap<TranscriptUser, TranscriberSourceImpl> = WeakHashMap()
 
     val languageDisplays: MutableMap<String, MapCodec<out LanguageDisplay>> = mutableMapOf()
     val languageDisplayLookup: MutableMap<MapCodec<out LanguageDisplay>, String> = mutableMapOf()
@@ -102,7 +102,7 @@ object UnityTranslateApiImpl : UnityTranslateApi {
         return this.transcribers[id] ?: InactiveTranscriber
     }
 
-    override fun getOrCreateTranscriberSource(sender: TranscriptSender): TranscriberSource {
+    override fun getOrCreateTranscriberSource(sender: TranscriptUser): TranscriberSource {
         if (this.transcriberSources.contains(sender))
             return this.transcriberSources[sender]!!
 
