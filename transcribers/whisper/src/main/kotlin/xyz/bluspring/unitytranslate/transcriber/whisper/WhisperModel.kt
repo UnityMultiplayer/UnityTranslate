@@ -22,6 +22,13 @@ enum class WhisperModel(val fileName: String, val minimumBytes: Long, val minimu
 
     override val serializedName: String = this.name.lowercase()
 
+    override fun compareTo(other: NameProvidingEntry): Int {
+        if (other is WhisperModel)
+            return this.ordinal.compareTo(other.ordinal)
+
+        return this.serializedName.compareTo(other.serializedName)
+    }
+
     // OpenAI models: https://github.com/openai/whisper/blob/main/whisper/__init__.py#L17-L30
     // GGML models: https://huggingface.co/ggerganov/whisper.cpp/tree/main
     // Memory usage reference: https://github.com/ggml-org/whisper.cpp#memory-usage

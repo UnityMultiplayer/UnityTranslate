@@ -41,7 +41,13 @@ class ArgosPackageIndex(path: Path) : PackageIndex<ArgosPackage>(path, "argos") 
                 cachedFile.createFile()
             }
 
-            cachedFile.writeText(ArgosPackage.CODEC.listOf().encodeStart(JsonOps.INSTANCE, this.packages).orThrow.toString(), Charsets.UTF_8, options = arrayOf(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE))
+            synchronized(this.packages) {
+                cachedFile.writeText(
+                    ArgosPackage.CODEC.listOf().encodeStart(JsonOps.INSTANCE, this.packages).orThrow.toString(),
+                    Charsets.UTF_8,
+                    options = arrayOf(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)
+                )
+            }
         }
     }
 

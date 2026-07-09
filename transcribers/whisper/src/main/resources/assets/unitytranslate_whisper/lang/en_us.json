@@ -1,0 +1,15 @@
+{
+    "unitytranslate.transcriber.unitytranslate_whisper.name": "OpenAI Whisper (Local)",
+    "unitytranslate.transcriber.unitytranslate_whisper.description": "A speech transcriber that runs 100% locally on your system, but may consume slightly more resources than other transcribers. No speech processing will occur on third-party datacenters.",
+    "config.unitytranslate.transcriber.unitytranslate_whisper.model": "Transcription Model",
+
+    "config.unitytranslate.transcriber.unitytranslate_whisper.model.tiny": "Tiny",
+    "config.unitytranslate.transcriber.unitytranslate_whisper.model.tiny.description": "Uses the least amount of resources on your system, but is also the most inaccurate.",
+    "config.unitytranslate.transcriber.unitytranslate_whisper.model.base": "Base",
+    "config.unitytranslate.transcriber.unitytranslate_whisper.model.small": "Small",
+    "config.unitytranslate.transcriber.unitytranslate_whisper.model.medium": "Medium",
+    "config.unitytranslate.transcriber.unitytranslate_whisper.model.large": "Large",
+    "config.unitytranslate.transcriber.unitytranslate_whisper.model.large.description": "Uses a significant amount of storage and memory on your system, but is the most accurate model available.",
+    "config.unitytranslate.transcriber.unitytranslate_whisper.model.large_turbo": "Turbo",
+    "config.unitytranslate.transcriber.unitytranslate_whisper.model.large_turbo.description": "Uses a significant amount of storage and memory on your system, but is a perfect balance between speed and accuracy."
+}

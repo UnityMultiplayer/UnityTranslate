@@ -1,6 +1,7 @@
 package xyz.bluspring.unitytranslate.api.v2.transcriber.sender
 
 import net.minecraft.network.chat.Component
+import org.joml.Vector3f
 import java.util.*
 
 /**

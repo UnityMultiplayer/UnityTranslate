@@ -9,6 +9,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
+import xyz.bluspring.unitytranslate.api.v2.display.LanguageDisplay
 import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
@@ -47,14 +48,14 @@ object UnityTranslate {
         }
 
         UnityTranslateApi.instance.registerLanguageDisplay("none", BuiltinLanguageDisplays.None.CODEC)
-        UnityTranslateApi.instance.registerLanguageDisplay("lang_code/short/lowercase", BuiltinLanguageDisplays.None.CODEC)
-        UnityTranslateApi.instance.registerLanguageDisplay("lang_code/short/uppercase", BuiltinLanguageDisplays.None.CODEC)
-        UnityTranslateApi.instance.registerLanguageDisplay("lang_code/long/lowercase", BuiltinLanguageDisplays.None.CODEC)
-        UnityTranslateApi.instance.registerLanguageDisplay("lang_code/long/uppercase", BuiltinLanguageDisplays.None.CODEC)
-        UnityTranslateApi.instance.registerLanguageDisplay("lang_name/short/lowercase", BuiltinLanguageDisplays.None.CODEC)
-        UnityTranslateApi.instance.registerLanguageDisplay("lang_name/short/uppercase", BuiltinLanguageDisplays.None.CODEC)
-        UnityTranslateApi.instance.registerLanguageDisplay("lang_name/long/lowercase", BuiltinLanguageDisplays.None.CODEC)
-        UnityTranslateApi.instance.registerLanguageDisplay("lang_name/long/uppercase", BuiltinLanguageDisplays.None.CODEC)
+        UnityTranslateApi.instance.registerLanguageDisplay("lang_code/short/lowercase", BuiltinLanguageDisplays.LangCodeShort.CODEC)
+        UnityTranslateApi.instance.registerLanguageDisplay("lang_code/short/uppercase", BuiltinLanguageDisplays.LangCodeShortUppercase.CODEC)
+        UnityTranslateApi.instance.registerLanguageDisplay("lang_code/long/lowercase", BuiltinLanguageDisplays.LangCodeLong.CODEC)
+        UnityTranslateApi.instance.registerLanguageDisplay("lang_code/long/uppercase", BuiltinLanguageDisplays.LangCodeLongUppercase.CODEC)
+        UnityTranslateApi.instance.registerLanguageDisplay("lang_name/short/native", BuiltinLanguageDisplays.LangNameNativeShort.CODEC)
+        UnityTranslateApi.instance.registerLanguageDisplay("lang_name/short/localized", BuiltinLanguageDisplays.LangNameLocalizedShort.CODEC)
+        UnityTranslateApi.instance.registerLanguageDisplay("lang_name/long/native", BuiltinLanguageDisplays.LangNameNative.CODEC)
+        UnityTranslateApi.instance.registerLanguageDisplay("lang_name/long/localized", BuiltinLanguageDisplays.LangNameLocalized.CODEC)
 
         UnityTranslateIntegration.setup()
         PluginManager.loadPlugins()
@@ -72,7 +73,7 @@ object UnityTranslate {
                     category("header") {
                         value("display", TranscriptBoxConfig.HeaderDisplay.CODEC, TranscriptBoxConfig.Defaults.header::display)
                         value("style", Style.Serializer.CODEC, TranscriptBoxConfig.Defaults.header::style)
-                        value("lang_display", TranscriptBoxConfig.LanguageDisplay.CODEC, TranscriptBoxConfig.Defaults.header::langDisplay)
+                        value("lang_display", LanguageDisplay.CODEC, TranscriptBoxConfig.Defaults.header::langDisplay)
                         value("lang_style", Style.Serializer.CODEC, TranscriptBoxConfig.Defaults.header::langStyle)
                         value("lang_decoration", TranscriptBoxConfig.LanguageDecoration.CODEC, TranscriptBoxConfig.Defaults.header::langDecoration)
                         value("align_x", TranscriptBoxConfig.Header.HorizontalAlignment.CODEC, TranscriptBoxConfig.Defaults.header::alignX)

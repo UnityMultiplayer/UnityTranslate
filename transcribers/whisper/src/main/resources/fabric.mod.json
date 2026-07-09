@@ -1,0 +1,18 @@
+{
+    "schemaVersion": 1,
+    "id": "unitytranslate_whisper",
+    "version": "1.0.0",
+    "name": "UnityTranslate: Whisper Transcriber Plugin",
+    "description": "The Whisper transcriber plugin for UnityTranslate.",
+    "authors": [
+        "BluSpring"
+    ],
+    "license": "Artistic-2.0",
+    "icon": "icon.png",
+    "environment": "*",
+    "custom": {
+        "modmenu": {
+            "parent": "unitytranslate"
+        }
+    }
+}

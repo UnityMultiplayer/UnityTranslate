@@ -7,7 +7,6 @@ import org.lwjgl.openal.EXTFloat32
 import org.lwjgl.system.MemoryUtil
 import xyz.bluspring.unitytranslate.api.v2.client.AudioHelper
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriberSource
-import kotlin.concurrent.thread
 
 class OpenALInputDeviceSource(deviceName: String? = null, source: TranscriberSource) : InputSource(source) {
     val deviceHandle: Long
@@ -21,11 +20,6 @@ class OpenALInputDeviceSource(deviceName: String? = null, source: TranscriberSou
             ?: ALC11.alcGetString(0L, ALC11.ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER)
     }
 
-    val thread: Thread
-    private var isRunning = true
-
-    var isMuted = false
-
     init {
         OpenAlUtil.checkALError("UnityTranslate: Get device name")
         this.deviceHandle = ALC11.alcCaptureOpenDevice(deviceName, AudioHelper.SAMPLE_RATE, EXTFloat32.AL_FORMAT_MONO_FLOAT32, AudioHelper.BUFFER_SIZE)
@@ -35,14 +29,6 @@ class OpenALInputDeviceSource(deviceName: String? = null, source: TranscriberSou
         }
 
         ALC11.alcCaptureStart(this.deviceHandle)
-        this.thread = thread(start = true, isDaemon = true) {
-            while (this.isRunning) {
-                if (this.isMuted) continue
-
-                val samples = this.sample()
-                this.source.submitSpeechSamples(samples)
-            }
-        }
     }
 
     override val available: Int
@@ -63,7 +49,7 @@ class OpenALInputDeviceSource(deviceName: String? = null, source: TranscriberSou
     }
 
     override fun close() {
-        this.isRunning = false
+        super.close()
         ALC11.alcCaptureStop(this.deviceHandle)
     }
 }

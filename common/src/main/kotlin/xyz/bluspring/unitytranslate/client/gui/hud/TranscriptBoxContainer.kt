@@ -165,7 +165,7 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
 
         this.headerText = this.config.header.text(this.holder.language)
         val headerLength = font.width(this.config.header.display.text(Component.empty()))
-        val languageLength = font.width(this.config.header.langDecoration.decorate(this.config.header.langDisplay.text(this.holder.language)))
+        val languageLength = font.width(this.config.header.langDecoration.decorate(this.config.header.langDisplay.text(this.holder.language, this.config.header.langStyle)))
 
         this.headerX = this.config.header.alignX.align(this.width, headerLength, languageLength)
         this.headerY = this.config.header.alignY.align(this.height)

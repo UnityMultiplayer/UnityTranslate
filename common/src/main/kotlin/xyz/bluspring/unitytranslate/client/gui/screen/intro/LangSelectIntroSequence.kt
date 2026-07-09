@@ -16,7 +16,7 @@ import xyz.bluspring.unitytranslate.client.gui.screen.FirstStartupScreen
 import xyz.bluspring.unitytranslate.config.values.DropdownValidatingReflectingConfigValue
 
 class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent) {
-    private var currentTranscriberId: String = UnityTranslateApi.instance.getTranscriberId(UnityTranslateApi.instance.activeTranscriber)
+    var currentTranscriberId: String = UnityTranslateApi.instance.getTranscriberId(UnityTranslateApi.instance.activeTranscriber)
 
     override fun init(width: Int, height: Int) {
         super.init(width, height)
@@ -44,42 +44,53 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
 
         val elementWidth = 160f
         val elementHeight = 15f
+        val elementOffset = 12f
 
-        val xPos = 12f
+        val xPos = (width / 2f - elementWidth - elementOffset)
         val yPos = height / 2f - (((elementHeight + 20f) * (UnityTranslateApiImpl.outputLanguages.size)) / 2f)
-
-        // Right side
-        this.addChild(UILabel(width - elementWidth, yPos - 6f, Component.translatable("config.unitytranslate.unitytranslate.transcriber").append(": "), font, alignX = UILabel.HorizontalAlign.LEFT, alignY = UILabel.VerticalAlign.CENTER))
-        val transcriber = this.addChild(DropdownList(width - elementWidth, yPos, elementWidth, elementHeight, font,
-            { UnityTranslateApiImpl.transcribers.keys }, { id ->
-                Component.translatable("unitytranslate.transcriber.$id.name")
-            }, this::currentTranscriberId))
-
-        transcriber.onUpdated.register { id ->
-            this.currentTranscriberId = id!!
-            this.setup(width, height) // Set up again so we have new elements
-        }
 
         val currentTranscriber = UnityTranslateApi.instance.getTranscriber(this.currentTranscriberId)
 
         // Right side
         run {
-            val xPos = width - elementWidth
-            var yPos = yPos + elementHeight
+            val xPos = (width / 2f) + elementOffset
+            var yPos = height / 2f - (elementHeight + 8.5f)
+
+            this.addChild(UILabel(xPos, yPos, Component.translatable("config.unitytranslate.unitytranslate.transcriber").append(": "), font, alignX = UILabel.HorizontalAlign.LEFT, alignY = UILabel.VerticalAlign.CENTER))
+            val transcriber = this.addChild(DropdownList(xPos, yPos + 6f, elementWidth, elementHeight, font,
+                { UnityTranslateApiImpl.transcribers.keys }, { id ->
+                    Component.translatable("unitytranslate.transcriber.$id.name")
+                }, this::currentTranscriberId, tooltip = { id ->
+                    if (id != null)
+                        Component.translatableWithFallback("unitytranslate.transcriber.$id.description", "")
+                    else Component.empty()
+                }))
+
+            transcriber.onUpdated.register { id ->
+                this.currentTranscriberId = id!!
+                this.setup(width, height) // Set up again so we have new elements
+            }
+
+            yPos += elementHeight + 20f
 
             val config = UnityTranslateApiImpl.transcriberConfigs[this.currentTranscriberId]
             if (config != null) {
                 for (configValue in config.rootCategory.value) {
                     if (configValue is DropdownValidatingReflectingConfigValue<*>) {
-                        this.addChild(UILabel(xPos, yPos, Component.translatable("config.unitytranslate.transcriber.${this.currentTranscriberId}.${configValue.fullId}"), font))
-                        yPos += font.lineHeight
+                        this.addChild(UILabel(xPos, yPos, Component.translatable("config.unitytranslate.transcriber.${this.currentTranscriberId}${configValue.fullId}"), font))
 
-                        this.addChild(DropdownList(xPos, yPos, elementWidth, elementHeight, font,
+                        this.addChild(DropdownList(xPos, yPos + 6f, elementWidth, elementHeight, font,
                             { configValue.values }, {
-                                value -> Component.translatable("config.unitytranslate.transcriber.${this.currentTranscriberId}.${configValue.fullId}.${value.serializedName}")
-                            }, (configValue as ReflectingConfigValue<NameProvidingEntry>).property
+                                value -> Component.translatable("config.unitytranslate.transcriber.${this.currentTranscriberId}${configValue.fullId}.${value.serializedName}")
+                            }, (configValue as ReflectingConfigValue<NameProvidingEntry>).property,
+                            tooltip = { entry ->
+                                if (entry != null)
+                                    Component.translatableWithFallback("config.unitytranslate.transcriber.${this.currentTranscriberId}${configValue.fullId}.${entry.serializedName}.description", "")
+                                else Component.empty()
+                            }
                         ))
-                        yPos += elementHeight
+
+                        yPos += elementHeight + 10f
                     }
                 }
             }

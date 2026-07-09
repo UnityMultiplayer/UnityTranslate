@@ -47,6 +47,7 @@ class JavaxInputDeviceSource(deviceName: String? = null, source: TranscriberSour
     }
 
     override fun close() {
+        super.close()
         this.line.stop()
         this.line.flush()
         this.line.close()

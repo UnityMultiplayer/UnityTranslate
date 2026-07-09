@@ -1,4 +1,0 @@
-{
-    "unitytranslate.transcriber.whisper.name": "OpenAI Whisper (Local)",
-    "unitytranslate.transcriber.whisper.description": "A speech transcriber that runs 100% locally on your system, but may consume slightly more resources than other transcribers. No speech processing will occur on third-party datacenters."
-}

@@ -15,6 +15,8 @@
 
     "unitytranslate.measurement.seconds": "%s seconds",
 
+    "unitytranslate.transcriber.inactive.name": "(inactive)",
+
     "unitytranslate.intro.first_time": "Looks like this is your first time using UnityTranslate, let's help you get set up.",
     "unitytranslate.intro.first_time.next": "Let's go!",
     "unitytranslate.intro.language_select": "To get started, select your preferred languages here! Then, you can select the transcriber you want to use.",
@@ -200,7 +202,7 @@
     "config.unitytranslate.unitytranslate.translator.delay_between_batches": "Delay Between Batches",
     "config.unitytranslate.unitytranslate.translator.instances": "Translation Instances",
 
-    "config.unitytranslate.language.error.unsupported_transcriber": "The \"\" transcriber does not support this language!",
+    "config.unitytranslate.language.error.unsupported_transcriber": "The \"%s\" transcriber does not support this language!",
 
     "config.unitytranslate.plugins": "Plugins"
 }

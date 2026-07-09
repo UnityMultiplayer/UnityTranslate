@@ -9,6 +9,7 @@ import org.lwjgl.glfw.GLFW
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.event.Event
+import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.ColorConfig
@@ -189,6 +190,8 @@ class DropdownList<E : Comparable<E>>(
     override fun submitLate(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
         super.submitLate(graphics, partialTick, mouseX, mouseY)
 
+        var currentTooltip: Component? = null
+
         if (this.isOpened) {
             val elements = this.elements
             val usableScreenHeight = ClientPlatformProxy.instance.viewportHeight - this.y - this.height - 2
@@ -248,8 +251,7 @@ class DropdownList<E : Comparable<E>>(
                     val tooltip = this.tooltip(elements[i])
 
                     if (tooltip.string.isNotEmpty()) {
-                        graphics.text(this.font, tooltip, mouseX.toFloat(), mouseY.toFloat(),
-                            ThemeConfig.tooltipText, false)
+                        currentTooltip = tooltip
                     }
                 } else {
                     graphics.text(this.font, ellipsize(text, maxWidth), this.x + 4, y + 4f, colorWithHover.multiplyAlpha(this.opacity), true)
@@ -275,6 +277,24 @@ class DropdownList<E : Comparable<E>>(
                     scrollbarMatrix.topLeft.multiplyAlpha(this.opacity), scrollbarMatrix.topRight.multiplyAlpha(this.opacity),
                     scrollbarMatrix.bottomLeft.multiplyAlpha(this.opacity), scrollbarMatrix.bottomRight.multiplyAlpha(this.opacity),
                 )
+            }
+        }
+
+        if (currentTooltip != null) {
+            val split = this.font.split(currentTooltip, 220)
+            val maxWidth = split.maxOf { this.font.width(it) }
+
+            val tooltipWidth = maxWidth + 8
+            var xPos = mouseX.toFloat() + 4f
+            if (ClientPlatformProxy.instance.viewportWidth <= xPos + tooltipWidth)
+                xPos -= (xPos + tooltipWidth) - ClientPlatformProxy.instance.viewportWidth + 4
+
+            graphics.fill(xPos, mouseY.toFloat() - 3, xPos + tooltipWidth, mouseY.toFloat() + (split.size * this.font.lineHeight) + 3,
+                ARGBHelper.color(220, 0, 0, 0))
+
+            for ((index, text) in split.withIndex()) {
+                graphics.text(this.font, text, xPos + 4, mouseY.toFloat() + (index * this.font.lineHeight),
+                    ThemeConfig.tooltipText, false)
             }
         }
     }
