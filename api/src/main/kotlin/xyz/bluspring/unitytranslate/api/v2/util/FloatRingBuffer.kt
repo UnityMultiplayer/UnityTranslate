@@ -3,7 +3,8 @@ package xyz.bluspring.unitytranslate.api.v2.util
 // hopefully this is good :blobcatfearful:
 class FloatRingBuffer(val capacity: Int) {
     private val buffer = FloatArray(this.capacity)
-    private var totalWritten = 0L
+    var totalWritten = 0L
+        private set
     private var marked = 0L
 
     operator fun plusAssign(value: Float) {
