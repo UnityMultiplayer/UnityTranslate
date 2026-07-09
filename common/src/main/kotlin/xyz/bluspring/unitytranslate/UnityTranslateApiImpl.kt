@@ -1,5 +1,6 @@
 package xyz.bluspring.unitytranslate
 
+import com.mojang.serialization.MapCodec
 import xyz.bluspring.sunset.SunsetConfig
 import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.LanguageHolder
@@ -7,6 +8,7 @@ import xyz.bluspring.unitytranslate.api.v2.Languages
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigBuilder
+import xyz.bluspring.unitytranslate.api.v2.display.LanguageDisplay
 import xyz.bluspring.unitytranslate.api.v2.plugin.PluginMetadata
 import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
@@ -31,12 +33,16 @@ object UnityTranslateApiImpl : UnityTranslateApi {
     val transcriptHolders: MutableMap<Language, TranscriptHolder> = WeakHashMap()
     val transcriberSources: MutableMap<TranscriptSender, TranscriberSourceImpl> = WeakHashMap()
 
+    val languageDisplays: MutableMap<String, MapCodec<out LanguageDisplay>> = mutableMapOf()
+    val languageDisplayLookup: MutableMap<MapCodec<out LanguageDisplay>, String> = mutableMapOf()
+
     val translators: MutableMap<String, TranslatorInstance> = mutableMapOf()
     val translatorConfigs: MutableMap<String, SunsetConfig> = mutableMapOf()
 
     val configs: MutableMap<String, SunsetConfig> = mutableMapOf()
 
     val outputLanguages: MutableMap<String, LanguageHolder> = mutableMapOf()
+
     override var currentSpokenLanguage: Language = Languages.ENGLISH
     override val translatorManager: TranslatorManager
         get() = TranslatorManagerImpl // Don't inline this! You're gonna run into a bunch of headaches otherwise.
@@ -145,5 +151,24 @@ object UnityTranslateApiImpl : UnityTranslateApi {
         val holder = LanguageHolder()
         this.outputLanguages[id] = holder
         return holder
+    }
+
+    override fun <T : LanguageDisplay> registerLanguageDisplay(id: String, codec: MapCodec<T>) {
+        if (this.languageDisplays.contains(id))
+            throw IllegalArgumentException("A language display already exists by ID $id!")
+
+        if (this.languageDisplayLookup.contains(codec))
+            throw IllegalArgumentException("Tried to register duplicate language display! (new: $id, existing: ${this.languageDisplayLookup[codec]})")
+
+        this.languageDisplays[id] = codec
+        this.languageDisplayLookup[codec] = id
+    }
+
+    override fun getLanguageDisplay(id: String): MapCodec<out LanguageDisplay>? {
+        return this.languageDisplays[id]
+    }
+
+    override fun getLanguageDisplayId(codec: MapCodec<out LanguageDisplay>): String {
+        return this.languageDisplayLookup[codec]!!
     }
 }

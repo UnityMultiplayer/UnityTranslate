@@ -20,6 +20,7 @@ import xyz.bluspring.unitytranslate.integration.UnityTranslateIntegration
 import xyz.bluspring.unitytranslate.plugin.PluginManager
 import xyz.bluspring.unitytranslate.shared.Constants
 import xyz.bluspring.unitytranslate.transcriber.TranscriberManager
+import xyz.bluspring.unitytranslate.transcriber.display.BuiltinLanguageDisplays
 import xyz.bluspring.unitytranslate.translator.TranslatorManagerImpl
 import xyz.bluspring.unitytranslate.translator.instance.InactiveTranslatorInstance
 import xyz.bluspring.unitytranslate.translator.instance.LibreTranslateTranslatorInstance
@@ -44,6 +45,16 @@ object UnityTranslate {
         UnityTranslateApi.instance.registerTranslator("libretranslate", LibreTranslateTranslatorInstance) {
             listValue("entries", LibreTranslateTranslatorInstance.Entry.CODEC, LibreTranslateTranslatorInstance::entries)
         }
+
+        UnityTranslateApi.instance.registerLanguageDisplay("none", BuiltinLanguageDisplays.None.CODEC)
+        UnityTranslateApi.instance.registerLanguageDisplay("lang_code/short/lowercase", BuiltinLanguageDisplays.None.CODEC)
+        UnityTranslateApi.instance.registerLanguageDisplay("lang_code/short/uppercase", BuiltinLanguageDisplays.None.CODEC)
+        UnityTranslateApi.instance.registerLanguageDisplay("lang_code/long/lowercase", BuiltinLanguageDisplays.None.CODEC)
+        UnityTranslateApi.instance.registerLanguageDisplay("lang_code/long/uppercase", BuiltinLanguageDisplays.None.CODEC)
+        UnityTranslateApi.instance.registerLanguageDisplay("lang_name/short/lowercase", BuiltinLanguageDisplays.None.CODEC)
+        UnityTranslateApi.instance.registerLanguageDisplay("lang_name/short/uppercase", BuiltinLanguageDisplays.None.CODEC)
+        UnityTranslateApi.instance.registerLanguageDisplay("lang_name/long/lowercase", BuiltinLanguageDisplays.None.CODEC)
+        UnityTranslateApi.instance.registerLanguageDisplay("lang_name/long/uppercase", BuiltinLanguageDisplays.None.CODEC)
 
         UnityTranslateIntegration.setup()
         PluginManager.loadPlugins()

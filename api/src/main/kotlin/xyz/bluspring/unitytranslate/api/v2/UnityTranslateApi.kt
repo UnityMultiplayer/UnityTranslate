@@ -1,7 +1,9 @@
 package xyz.bluspring.unitytranslate.api.v2
 
+import com.mojang.serialization.MapCodec
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigBuilder
+import xyz.bluspring.unitytranslate.api.v2.display.LanguageDisplay
 import xyz.bluspring.unitytranslate.api.v2.plugin.PluginMetadata
 import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
@@ -86,6 +88,15 @@ interface UnityTranslateApi {
 
     fun registerOutputLanguage(group: String, id: String): LanguageHolder = registerOutputLanguage("$group.$id")
     fun registerOutputLanguage(id: String): LanguageHolder
+
+    fun <T : LanguageDisplay> registerLanguageDisplay(group: String, id: String, codec: MapCodec<T>) = registerLanguageDisplay("$group/$id", codec)
+    fun <T : LanguageDisplay> registerLanguageDisplay(id: String, codec: MapCodec<T>)
+
+    fun getLanguageDisplay(id: String): MapCodec<out LanguageDisplay>?
+    fun getLanguageDisplayId(codec: MapCodec<out LanguageDisplay>): String
+    fun getLanguageDisplayId(display: LanguageDisplay): String {
+        return this.getLanguageDisplayId(display.codec)
+    }
 
     /**
      * Gets the current spoken language. This is typically used as the default output language if none is set.

@@ -10,8 +10,10 @@ import net.minecraft.network.chat.Style
 import org.joml.Vector2f
 import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.client.gui.TextureReference
+import xyz.bluspring.unitytranslate.api.v2.display.LanguageDisplay
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptData
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
+import xyz.bluspring.unitytranslate.transcriber.display.BuiltinLanguageDisplays
 import xyz.bluspring.unitytranslate.util.Box2f
 import xyz.bluspring.unitytranslate.util.ScreenUtil
 import java.util.*
@@ -450,7 +452,7 @@ class TranscriptBoxConfig(
     data class Header(
         var display: HeaderDisplay = HeaderDisplay.Transcript,
         var style: Style = DEFAULT_STYLE,
-        var langDisplay: LanguageDisplay = LanguageDisplay.LangCodeShortUppercase,
+        var langDisplay: LanguageDisplay = BuiltinLanguageDisplays.LangCodeShortUppercase,
         var langStyle: Style = DEFAULT_LANG_STYLE,
         var langDecoration: LanguageDecoration = LanguageDecoration.None,
         var alignX: HorizontalAlignment = HorizontalAlignment.Center(false),
@@ -458,7 +460,7 @@ class TranscriptBoxConfig(
         var hasShadow: Boolean = false,
     ) {
         fun text(language: Language): Component
-            = this.display.text(this.langDecoration.decorate(this.langDisplay.text(language).copy().withStyle(this.langStyle))).copy().withStyle(this.style)
+            = this.display.text(this.langDecoration.decorate(this.langDisplay.text(language, this.langStyle))).copy().withStyle(this.style)
 
         companion object {
             @JvmField val DEFAULT_STYLE = Style.EMPTY.withColor(ChatFormatting.WHITE).withBold(true)
@@ -472,7 +474,7 @@ class TranscriptBoxConfig(
                         .forGetter(Header::display),
                     Style.Serializer.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
                         .forGetter(Header::style),
-                    LanguageDisplay.CODEC.optionalFieldOf("lang_display", LanguageDisplay.LangCodeShortUppercase)
+                    LanguageDisplay.CODEC.optionalFieldOf("lang_display", BuiltinLanguageDisplays.LangCodeShortUppercase)
                         .forGetter(Header::langDisplay),
                     Style.Serializer.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
                         .forGetter(Header::langStyle),
@@ -595,89 +597,6 @@ class TranscriptBoxConfig(
         }
     }
 
-    sealed class LanguageDisplay(val type: String) {
-        companion object {
-            @JvmField val CODEC: Codec<LanguageDisplay> = Codec.STRING.dispatch("type", LanguageDisplay::type) { type ->
-                when (type) {
-                    "none" -> None.CODEC
-                    "lang_code/short" -> LangCodeShort.CODEC
-                    "lang_code/short_uppercase" -> LangCodeShortUppercase.CODEC
-                    "lang_code/long" -> LangCodeLong.CODEC
-                    "lang_code/long_uppercase" -> LangCodeLongUppercase.CODEC
-                    "lang_name/native" -> LangNameNative.CODEC
-                    "lang_name/native_short" -> LangNameNativeShort.CODEC
-                    "lang_name/localized" -> LangNameLocalized.CODEC
-                    "lang_name/localized_short" -> LangNameLocalizedShort.CODEC
-                    else -> throw IllegalArgumentException("No language display found by type $type!")
-                }
-            }
-        }
-
-        abstract fun text(language: Language): Component
-
-        object None : LanguageDisplay("none") {
-            @JvmField val CODEC: MapCodec<None> = MapCodec.unit(None)
-
-            override fun text(language: Language): Component = Component.empty()
-        }
-
-        object LangCodeShort : LanguageDisplay("lang_code/short") {
-            @JvmField val CODEC: MapCodec<LangCodeShort> = MapCodec.unit(LangCodeShort)
-
-            // Transcript en
-            override fun text(language: Language): Component = Component.literal(language.languageCode)
-        }
-
-        object LangCodeShortUppercase : LanguageDisplay("lang_code/short_uppercase") {
-            @JvmField val CODEC: MapCodec<LangCodeShortUppercase> = MapCodec.unit(LangCodeShortUppercase)
-
-            // Transcript EN
-            override fun text(language: Language): Component = Component.literal(language.languageCode.uppercase())
-        }
-
-        object LangCodeLong : LanguageDisplay("lang_code/long") {
-            @JvmField val CODEC: MapCodec<LangCodeLong> = MapCodec.unit(LangCodeLong)
-
-            // Transcript en-US
-            override fun text(language: Language): Component = Component.literal(language.formatted)
-        }
-
-        object LangCodeLongUppercase : LanguageDisplay("lang_code/long_uppercase") {
-            @JvmField val CODEC: MapCodec<LangCodeLongUppercase> = MapCodec.unit(LangCodeLongUppercase)
-
-            // Transcript EN-US
-            override fun text(language: Language): Component = Component.literal(language.formatted.uppercase())
-        }
-
-        object LangNameLocalized : LanguageDisplay("lang_name/localized") {
-            @JvmField val CODEC: MapCodec<LangNameLocalized> = MapCodec.unit(LangNameLocalized)
-
-            // Transcript English, US
-            override fun text(language: Language): Component = Component.literal(language.localizedText)
-        }
-
-        object LangNameNative : LanguageDisplay("lang_name/native") {
-            @JvmField val CODEC: MapCodec<LangNameNative> = MapCodec.unit(LangNameNative)
-
-            // Transcript Español, Castellano
-            override fun text(language: Language): Component = Component.literal(language.nativeText)
-        }
-
-        object LangNameLocalizedShort : LanguageDisplay("lang_name/localized_short") {
-            @JvmField val CODEC: MapCodec<LangNameLocalizedShort> = MapCodec.unit(LangNameLocalizedShort)
-
-            // Transcript English
-            override fun text(language: Language): Component = Component.literal(language.localizedShortText)
-        }
-
-        object LangNameNativeShort : LanguageDisplay("lang_name/native_short") {
-            @JvmField val CODEC: MapCodec<LangNameNativeShort> = MapCodec.unit(LangNameNativeShort)
-
-            // Transcript Español, Castellano
-            override fun text(language: Language): Component = Component.literal(language.nativeShortText)
-        }
-    }
-
     sealed class HeaderDisplay(val type: String) {
         companion object {
             const val HEADER_LANG = "unitytranslate.transcript.header"
@@ -776,133 +695,34 @@ class TranscriptBoxConfig(
         }
     }
 
-    sealed class TranscriptDisplay(val type: String) {
+    data class TranscriptDisplay(
+        var langDisplay: LanguageDisplay = BuiltinLanguageDisplays.LangCodeShortUppercase,
+        var langStyle: Style = DEFAULT_STYLE,
+        var langDecoration: LanguageDecoration = LanguageDecoration.Parentheses,
+    ) {
         companion object {
             const val MESSAGE_LANG = "unitytranslate.transcript.message"
-            const val LANGUAGE_LANG = "unitytranslate.transcript.message.language"
 
             @JvmField val DEFAULT_STYLE = Style.EMPTY.withColor(ChatFormatting.GREEN)
-            @JvmField val CODEC: Codec<TranscriptDisplay> = Codec.STRING.dispatch("type", TranscriptDisplay::type) { type ->
-                when (type) {
-                    "lang_code/long/lowercase" -> LangCodeLong.CODEC
-                    "lang_code/long/uppercase" -> LangCodeLongUppercase.CODEC
-                    "lang_name/long/native" -> LangNameNativeLong.CODEC
-                    "lang_name/long/localized" -> LangNameLocalizedLong.CODEC
-                    "lang_code/short/lowercase" -> LangCodeShort.CODEC
-                    "lang_code/short/uppercase" -> LangCodeShortUppercase.CODEC
-                    "lang_name/short/native" -> LangNameNativeShort.CODEC
-                    "lang_name/short/localized" -> LangNameLocalizedShort.CODEC
-                    else -> throw IllegalArgumentException("No transcript display found by type $type!")
-                }
+            @JvmField val CODEC: Codec<TranscriptDisplay> = RecordCodecBuilder.create { instance ->
+                instance.group(
+                    LanguageDisplay.CODEC.optionalFieldOf("lang_display", BuiltinLanguageDisplays.LangCodeShortUppercase)
+                        .forGetter(TranscriptDisplay::langDisplay),
+                    Style.Serializer.CODEC.optionalFieldOf("lang_style", DEFAULT_STYLE)
+                        .forGetter(TranscriptDisplay::langStyle),
+                    LanguageDecoration.CODEC.optionalFieldOf("lang_decoration", LanguageDecoration.Parentheses)
+                        .forGetter(TranscriptDisplay::langDecoration)
+                )
+                    .apply(instance, ::TranscriptDisplay)
             }
 
-            @JvmStatic fun default(): TranscriptDisplay = LangCodeShortUppercase()
+            @JvmStatic fun default(): TranscriptDisplay = TranscriptDisplay()
         }
 
-        abstract fun text(data: TranscriptData): Component
-
-        data class LangCodeLong(val style: Style = DEFAULT_STYLE) : TranscriptDisplay("lang_code/long/lowercase") {
-            // <BluSpring (en-US)> Hi
-            override fun text(data: TranscriptData): Component = Component.translatable(MESSAGE_LANG, data.sender.displayName,
-                Component.translatable(LANGUAGE_LANG, data.language.formatted).withStyle(this.style),
-                data.message
-            )
-
-            companion object {
-                @JvmField val CODEC: MapCodec<LangCodeLong> = Style.Serializer.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
-                    .xmap(::LangCodeLong, LangCodeLong::style)
-            }
-        }
-
-        data class LangCodeLongUppercase(val style: Style = DEFAULT_STYLE) : TranscriptDisplay("lang_code/long/uppercase") {
-            // <BluSpring (EN-US)> Hi
-            override fun text(data: TranscriptData): Component = Component.translatable(MESSAGE_LANG, data.sender.displayName,
-                Component.translatable(LANGUAGE_LANG, data.language.formatted.uppercase()).withStyle(this.style),
-                data.message
-            )
-
-            companion object {
-                @JvmField val CODEC: MapCodec<LangCodeLongUppercase> = Style.Serializer.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
-                    .xmap(::LangCodeLongUppercase, LangCodeLongUppercase::style)
-            }
-        }
-
-        data class LangNameNativeLong(val style: Style = DEFAULT_STYLE) : TranscriptDisplay("lang_name/long/native") {
-            // <BluSpring (Español, Castellano)> Hi
-            override fun text(data: TranscriptData): Component = Component.translatable(MESSAGE_LANG, data.sender.displayName,
-                Component.translatable(LANGUAGE_LANG, data.language.nativeText).withStyle(this.style),
-                data.message
-            )
-
-            companion object {
-                @JvmField val CODEC: MapCodec<LangNameNativeLong> = Style.Serializer.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
-                    .xmap(::LangNameNativeLong, LangNameNativeLong::style)
-            }
-        }
-
-        data class LangNameLocalizedLong(val style: Style = DEFAULT_STYLE) : TranscriptDisplay("lang_name/long/localized") {
-            // <BluSpring (Spanish, Castilian)> Hi
-            override fun text(data: TranscriptData): Component = Component.translatable(MESSAGE_LANG, data.sender.displayName,
-                Component.translatable(LANGUAGE_LANG, data.language.localizedText).withStyle(this.style),
-                data.message
-            )
-
-            companion object {
-                @JvmField val CODEC: MapCodec<LangNameLocalizedLong> = Style.Serializer.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
-                    .xmap(::LangNameLocalizedLong, LangNameLocalizedLong::style)
-            }
-        }
-
-        data class LangCodeShort(val style: Style = DEFAULT_STYLE) : TranscriptDisplay("lang_code/short/lowercase") {
-            // <BluSpring (en)> Hi
-            override fun text(data: TranscriptData): Component = Component.translatable(MESSAGE_LANG, data.sender.displayName,
-                Component.translatable(LANGUAGE_LANG, data.language.languageCode).withStyle(this.style),
-                data.message
-            )
-
-            companion object {
-                @JvmField val CODEC: MapCodec<LangCodeShort> = Style.Serializer.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
-                    .xmap(::LangCodeShort, LangCodeShort::style)
-            }
-        }
-
-        data class LangCodeShortUppercase(val style: Style = DEFAULT_STYLE) : TranscriptDisplay("lang_code/short/uppercase") {
-            // <BluSpring (EN)> Hi
-            override fun text(data: TranscriptData): Component = Component.translatable(MESSAGE_LANG, data.sender.displayName,
-                Component.translatable(LANGUAGE_LANG, data.language.languageCode.uppercase()).withStyle(this.style),
-                data.message
-            )
-
-            companion object {
-                @JvmField val CODEC: MapCodec<LangCodeShortUppercase> = Style.Serializer.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
-                    .xmap(::LangCodeShortUppercase, LangCodeShortUppercase::style)
-            }
-        }
-
-        data class LangNameNativeShort(val style: Style = DEFAULT_STYLE) : TranscriptDisplay("lang_name/short/native") {
-            // <BluSpring (Español)> Hi
-            override fun text(data: TranscriptData): Component = Component.translatable(MESSAGE_LANG, data.sender.displayName,
-                Component.translatable(LANGUAGE_LANG, data.language.nativeShortText).withStyle(this.style),
-                data.message
-            )
-
-            companion object {
-                @JvmField val CODEC: MapCodec<LangNameNativeShort> = Style.Serializer.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
-                    .xmap(::LangNameNativeShort, LangNameNativeShort::style)
-            }
-        }
-
-        data class LangNameLocalizedShort(val style: Style = DEFAULT_STYLE) : TranscriptDisplay("lang_name/short/localized") {
-            // <BluSpring (Spanish)> Hi
-            override fun text(data: TranscriptData): Component = Component.translatable(MESSAGE_LANG, data.sender.displayName,
-                Component.translatable(LANGUAGE_LANG, data.language.localizedShortText).withStyle(this.style),
-                data.message
-            )
-
-            companion object {
-                @JvmField val CODEC: MapCodec<LangNameLocalizedShort> = Style.Serializer.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
-                    .xmap(::LangNameLocalizedShort, LangNameLocalizedShort::style)
-            }
-        }
+        fun text(data: TranscriptData): Component = Component.translatable(MESSAGE_LANG,
+            data.sender.displayName,
+            this.langDecoration.decorate(this.langDisplay.text(data.language, this.langStyle)),
+            data.message
+        )
     }
 }

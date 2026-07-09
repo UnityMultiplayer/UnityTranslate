@@ -7,7 +7,6 @@
     "unitytranslate.transcript.decoration.parentheses": "(%s)",
     "unitytranslate.transcript.decoration.brackets": "[%s]",
     "unitytranslate.transcript.message": "<%1$s %2$s> %3$s",
-    "unitytranslate.transcript.message.language": "(%s)",
 
     "unitytranslate.config.loading": "Loading",
     "unitytranslate.config.empty": "(empty)",
