@@ -9,7 +9,6 @@ import org.lwjgl.glfw.GLFW
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.event.Event
-import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.ColorConfig
@@ -289,8 +288,11 @@ class DropdownList<E : Comparable<E>>(
             if (ClientPlatformProxy.instance.viewportWidth <= xPos + tooltipWidth)
                 xPos -= (xPos + tooltipWidth) - ClientPlatformProxy.instance.viewportWidth + 4
 
+            val bgMatrix = ColorConfig.separateMatrix(ThemeConfig.tooltipBackground)
             graphics.fill(xPos, mouseY.toFloat() - 3, xPos + tooltipWidth, mouseY.toFloat() + (split.size * this.font.lineHeight) + 3,
-                ARGBHelper.color(220, 0, 0, 0))
+                bgMatrix.topLeft, bgMatrix.topRight,
+                bgMatrix.bottomRight, bgMatrix.bottomRight
+            )
 
             for ((index, text) in split.withIndex()) {
                 graphics.text(this.font, text, xPos + 4, mouseY.toFloat() + (index * this.font.lineHeight),

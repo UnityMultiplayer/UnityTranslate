@@ -26,6 +26,9 @@ object ThemeConfig {
     var dropdownTextItem: Int = Color(185, 185, 185, 255).rgb
     var dropdownTextDisabled: Int = Color(190, 190, 190, 255).rgb
 
+    var tooltipBackground: ColorConfig = ColorConfig.Solid(
+        Color(220, 0, 0, 0).rgb
+    )
     var tooltipText: Int = Color(255, 255, 255, 255).rgb
 
     var scrollbar: ColorConfig = ColorConfig.Solid(
