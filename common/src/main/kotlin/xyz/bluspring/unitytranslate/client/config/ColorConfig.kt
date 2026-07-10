@@ -9,8 +9,11 @@ import xyz.bluspring.unitytranslate.api.v2.util.ColorMatrix
 import xyz.bluspring.unitytranslate.client.config.ColorConfig.Gradient.GradientDirection.*
 
 sealed class ColorConfig(val type: String) {
+    // must be a 4-sized int array
+    abstract val colors: IntArray
+
     companion object {
-        @JvmField val TYPES = listOf("none", "solid", "gradient")
+        @JvmField val TYPES = listOf("none", "solid", "gradient", "matrix")
 
         @JvmField
         val CODEC: Codec<ColorConfig> = Codec.STRING.dispatch("type", ColorConfig::type) { type ->
@@ -18,34 +21,71 @@ sealed class ColorConfig(val type: String) {
                 "none" -> None.CODEC
                 "solid" -> Solid.CODEC
                 "gradient" -> Gradient.CODEC
+                "matrix" -> Matrix.CODEC
                 else -> throw IllegalArgumentException("No color config found by type $type!")
             }
         }
 
         fun separateMatrix(color: ColorConfig): ColorMatrix {
-            val topLeft = if (color is Solid) color.color else if (color is Gradient) color.colors[0] else -1
-            val topRight = if (color is Solid) color.color else if (color is Gradient) color.colors[1] else -1
-            val bottomLeft = if (color is Solid) color.color else if (color is Gradient) color.colors[2] else -1
-            val bottomRight = if (color is Solid) color.color else if (color is Gradient) color.colors[3] else -1
+            val topLeft = color.colors[0]
+            val topRight = color.colors[1]
+            val bottomLeft = color.colors[2]
+            val bottomRight = color.colors[3]
 
             return ColorMatrix(topLeft, topRight, bottomLeft, bottomRight)
         }
     }
 
     object None : ColorConfig("none") {
+        override val colors: IntArray = intArrayOf(0, 0, 0, 0)
+
         @JvmField val CODEC: MapCodec<None> = MapCodec.unit(None)
     }
 
     data class Solid(val color: Int) : ColorConfig("solid") {
+        override val colors: IntArray = intArrayOf(color, color, color, color)
+
         companion object {
             @JvmField
             val CODEC: MapCodec<Solid> = AdditionalCodecs.COLOR_ARGB.fieldOf("color").xmap(::Solid, Solid::color)
         }
     }
 
+    data class Matrix(
+        val topLeft: Int, val topRight: Int,
+        val bottomLeft: Int, val bottomRight: Int,
+    ) : ColorConfig("matrix") {
+        override val colors: IntArray = intArrayOf(
+            topLeft, topRight,
+            bottomLeft, bottomRight
+        )
+
+        companion object {
+            @JvmField val NAMED_CODEC: Codec<Matrix> = RecordCodecBuilder.create { instance ->
+                instance.group(
+                    AdditionalCodecs.COLOR_ARGB.fieldOf("top_left")
+                        .forGetter(Matrix::topLeft),
+                    AdditionalCodecs.COLOR_ARGB.fieldOf("top_right")
+                        .forGetter(Matrix::topRight),
+                    AdditionalCodecs.COLOR_ARGB.fieldOf("bottom_left")
+                        .forGetter(Matrix::bottomLeft),
+                    AdditionalCodecs.COLOR_ARGB.fieldOf("bottom_right")
+                        .forGetter(Matrix::bottomRight),
+                )
+                    .apply(instance, ::Matrix)
+            }
+            @JvmField val ARRAY_CODEC: Codec<Matrix> = AdditionalCodecs.COLOR_ARGB.listOf(4, 4)
+                .xmap({ Matrix(it[0], it[1], it[2], it[3]) }, { it.colors.toList() })
+
+            @JvmField val CODEC: MapCodec<Matrix> = Codec.withAlternative(
+                NAMED_CODEC, ARRAY_CODEC
+            ).fieldOf("colors")
+        }
+    }
+
     data class Gradient(val direction: GradientDirection, val fromColor: Int, val toColor: Int) : ColorConfig("gradient") {
         // top left  |  top right  |  bottom left  |  bottom right
-        val colors = when (this.direction) {
+        override val colors = when (this.direction) {
             TOP_LEFT -> intArrayOf(
                 toColor, ARGBHelper.srgbLerp(toColor, fromColor, 0.5f),
                 ARGBHelper.srgbLerp(toColor, fromColor, 0.5f), fromColor
