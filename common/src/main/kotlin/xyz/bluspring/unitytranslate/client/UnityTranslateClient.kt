@@ -1,8 +1,12 @@
 package xyz.bluspring.unitytranslate.client
 
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import xyz.bluspring.unitytranslate.PlatformProxy
 import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
+import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
+import xyz.bluspring.unitytranslate.client.config.ClientConfig
 import xyz.bluspring.unitytranslate.client.gui.MouseHelper
 import xyz.bluspring.unitytranslate.client.renderer.UnityTranslateGui
 import xyz.bluspring.unitytranslate.transcriber.TranscriberManager
@@ -16,6 +20,14 @@ object UnityTranslateClient {
     fun init() {
         if (!PlatformProxy.instance.isStandalone()) {
             UnityTranslateMCClient.init()
+        }
+
+        if (ClientConfig.transcriber !is InactiveTranscriber) {
+            runBlocking {
+                launch(start = CoroutineStart.UNDISPATCHED) {
+                    UnityTranslateApiImpl.setActiveTranscriber(ClientConfig.transcriber)
+                }
+            }
         }
     }
 
