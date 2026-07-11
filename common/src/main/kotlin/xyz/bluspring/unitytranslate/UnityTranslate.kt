@@ -169,6 +169,10 @@ object UnityTranslate {
             }
         }
 
+        for ((_, config) in UnityTranslateApiImpl.configs) {
+            config.load()
+        }
+
         TranslatorManagerImpl.startTicking()
     }
 
