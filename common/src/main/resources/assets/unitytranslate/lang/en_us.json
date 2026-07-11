@@ -21,6 +21,9 @@
     "unitytranslate.intro.first_time.next": "Let's go!",
     "unitytranslate.intro.language_select": "To get started, select your preferred languages here! Then, you can select the transcriber you want to use.",
 
+    "unitytranslate.model.estimated.storage": "Estimated Storage Usage: %s",
+    "unitytranslate.model.estimated.memory": "Estimated Memory Usage: %s",
+
     "unitytranslate.language.native_and_localized": "%s / %s",
     "unitytranslate.language.en.native": "English",
     "unitytranslate.language.en.localized": "English",

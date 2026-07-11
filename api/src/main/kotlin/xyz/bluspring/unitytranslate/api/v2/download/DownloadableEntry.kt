@@ -22,4 +22,8 @@ interface DownloadableEntry {
      */
     val expectedHash: DownloadHash?
         get() = null
+
+    fun canBeSelected(): Boolean {
+        return true
+    }
 }

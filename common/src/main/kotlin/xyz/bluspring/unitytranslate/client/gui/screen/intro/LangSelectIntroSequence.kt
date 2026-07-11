@@ -9,6 +9,8 @@ import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.config.NameProvidingEntry
+import xyz.bluspring.unitytranslate.api.v2.config.TooltipProvidingEntry
+import xyz.bluspring.unitytranslate.api.v2.download.DownloadableEntry
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.gui.element.DropdownList
 import xyz.bluspring.unitytranslate.client.gui.element.UILabel
@@ -83,10 +85,31 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
                             { configValue.values }, {
                                 value -> Component.translatable("config.unitytranslate.transcriber.${this.currentTranscriberId}${configValue.fullId}.${value.serializedName}")
                             }, (configValue as ReflectingConfigValue<NameProvidingEntry>).property,
+                            validator = { entry ->
+                                if (entry is DownloadableEntry) {
+                                    entry.canBeSelected()
+                                } else true
+                            },
                             tooltip = { entry ->
-                                if (entry != null)
+                                (if (entry != null)
                                     Component.translatableWithFallback("config.unitytranslate.transcriber.${this.currentTranscriberId}${configValue.fullId}.${entry.serializedName}.description", "")
-                                else Component.empty()
+                                else Component.empty()).apply {
+                                    if (entry is TooltipProvidingEntry) {
+                                        for (tooltip in entry.tooltip) {
+                                            if (tooltip.translationKey.isBlank()) {
+                                                if (!this.string.isBlank())
+                                                    this.append("\n")
+
+                                                continue
+                                            }
+
+                                            if (!this.string.isBlank())
+                                                this.append("\n")
+
+                                            this.append(Component.translatable(tooltip.translationKey, *tooltip.args.toTypedArray()).withColor(tooltip.color))
+                                        }
+                                    }
+                                }
                             }
                         ))
 
