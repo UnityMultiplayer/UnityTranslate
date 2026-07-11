@@ -285,17 +285,21 @@ class DropdownList<E : Comparable<E>>(
 
             val tooltipWidth = maxWidth + 8
             var xPos = mouseX.toFloat() + 4f
+            var yPos = mouseY.toFloat() - 3
             if (ClientPlatformProxy.instance.viewportWidth <= xPos + tooltipWidth)
                 xPos -= (xPos + tooltipWidth) - ClientPlatformProxy.instance.viewportWidth + 4
 
+            if (ClientPlatformProxy.instance.viewportHeight <= yPos + (split.size * this.font.lineHeight) + 5)
+                yPos -= (yPos + (split.size * this.font.lineHeight) + 5) - ClientPlatformProxy.instance.viewportHeight + 4
+
             val bgMatrix = ColorConfig.separateMatrix(ThemeConfig.tooltipBackground)
-            graphics.fill(xPos, mouseY.toFloat() - 3, xPos + tooltipWidth, mouseY.toFloat() + (split.size * this.font.lineHeight) + 3,
+            graphics.fill(xPos, yPos, xPos + tooltipWidth, yPos + (split.size * this.font.lineHeight) + 5,
                 bgMatrix.topLeft, bgMatrix.topRight,
                 bgMatrix.bottomRight, bgMatrix.bottomRight
             )
 
             for ((index, text) in split.withIndex()) {
-                graphics.text(this.font, text, xPos + 4, mouseY.toFloat() + (index * this.font.lineHeight),
+                graphics.text(this.font, text, xPos + 4, yPos + 3 + (index * this.font.lineHeight),
                     ThemeConfig.tooltipText, false)
             }
         }
