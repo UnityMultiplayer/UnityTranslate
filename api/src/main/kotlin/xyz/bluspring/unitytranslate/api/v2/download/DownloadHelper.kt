@@ -25,6 +25,7 @@ object DownloadHelper {
     private val logger: Logger = LoggerFactory.getLogger("UnityTranslate Download Helper")
 
     private val alreadyDownloading: MutableMap<Path, DownloadInfo> = Collections.synchronizedMap(WeakHashMap())
+    val activeDownloads: Map<Path, DownloadInfo> = Collections.unmodifiableMap(this.alreadyDownloading)
 
     @JvmStatic
     fun <T : URLProvider> findSuitableUrl(urls: Collection<T>): T? {

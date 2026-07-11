@@ -4,6 +4,7 @@ import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.ColorConfig
+import xyz.bluspring.unitytranslate.client.gui.screen.intro.DownloadIntroSequence
 import xyz.bluspring.unitytranslate.client.gui.screen.intro.FirstTimeIntroSequence
 import xyz.bluspring.unitytranslate.client.gui.screen.intro.IntroSequence
 import xyz.bluspring.unitytranslate.client.gui.screen.intro.LangSelectIntroSequence
@@ -13,6 +14,7 @@ class FirstStartupScreen : UTScreen() {
     val sequence = listOf(
         FirstTimeIntroSequence(this),
         LangSelectIntroSequence(this),
+        DownloadIntroSequence(this),
     )
 
     var current = 0
@@ -25,11 +27,28 @@ class FirstStartupScreen : UTScreen() {
         this.currentSequence.setup(width, height)
     }
 
+    fun back() {
+        this.currentSequence.reverse()
+        this.transitioningSequence = this.currentSequence
+
+        if (--this.current < 0) {
+            ClientPlatformProxy.instance.setScreen(null)
+            return
+        }
+
+        if (!this.currentSequence.isActive) {
+            this.back()
+        } else {
+            this.currentSequence.reset()
+            this.currentSequence.setup(ClientPlatformProxy.instance.viewportWidth, ClientPlatformProxy.instance.viewportHeight)
+        }
+    }
+
     fun next() {
         this.currentSequence.reverse()
         this.transitioningSequence = this.currentSequence
 
-        if (this.current++ >= this.sequence.size) {
+        if (++this.current >= this.sequence.size) {
             ClientPlatformProxy.instance.setScreen(null)
             return
         }

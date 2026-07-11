@@ -39,13 +39,7 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
 
         val font = ClientPlatformProxy.instance.defaultFont
 
-        run {
-            val text = Component.translatable("unitytranslate.intro.language_select")
-
-            for ((index, segment) in font.split(text, (width * (3 / 4f)).toInt()).withIndex()) {
-                this.addChild(UILabel(width / 2f, 25f + (index * font.lineHeight), segment, font, alignX = UILabel.HorizontalAlign.CENTER))
-            }
-        }
+        this.addChild(UILabel(width / 2f, 25f, Component.translatable("unitytranslate.intro.language_select"), font, alignX = UILabel.HorizontalAlign.CENTER, maxWidth = (width * (3 / 4f)).toInt()))
 
         val elementWidth = 160f
         val elementHeight = 15f
@@ -139,7 +133,7 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
         }
 
         val nextText = Component.translatable("unitytranslate.intro.language_select.next")
-        this.nextButton = this.addChild(PlainUIButton(font, nextText, width - 4f - font.width(nextText), height - 8f) {
+        this.nextButton = this.addChild(PlainUIButton(font, nextText, width - 4f - font.width(nextText), height - 16f) {
             this.parent.next()
         })
     }
