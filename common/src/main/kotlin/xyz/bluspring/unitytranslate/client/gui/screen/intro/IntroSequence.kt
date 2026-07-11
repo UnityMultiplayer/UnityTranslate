@@ -3,6 +3,7 @@ package xyz.bluspring.unitytranslate.client.gui.screen.intro
 import net.minecraft.client.gui.navigation.ScreenPosition
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
+import xyz.bluspring.unitytranslate.client.gui.element.FadeableUIElement
 import xyz.bluspring.unitytranslate.client.gui.element.UIElement
 import xyz.bluspring.unitytranslate.client.gui.screen.FirstStartupScreen
 
@@ -51,6 +52,13 @@ abstract class IntroSequence(protected val parent: FirstStartupScreen) : UIEleme
         val delta = ((if (this.isReversed)
             this.currentTick - partialTick
         else this.currentTick + partialTick) / transitionTime.toFloat()).coerceAtMost(1f)
+
+        for (element in this.children) {
+            if (element is FadeableUIElement) {
+                element.opacity = delta
+            }
+        }
+
         this.submit(graphics, partialTick, mouseX, mouseY, delta)
 
         super.submit(graphics, partialTick, mouseX, mouseY)

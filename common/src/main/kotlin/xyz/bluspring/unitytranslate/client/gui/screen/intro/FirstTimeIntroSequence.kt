@@ -26,12 +26,6 @@ class FirstTimeIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent)
     }
 
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int, transitionProgress: Float) {
-        for (element in this.children) {
-            if (element is PlainUIButton) {
-                element.color = element.color.withAlpha(transitionProgress)
-            }
-        }
-
         val size = 80f
 
         graphics.pushMatrix()

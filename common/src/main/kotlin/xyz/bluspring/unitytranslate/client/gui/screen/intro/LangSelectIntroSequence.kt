@@ -11,7 +11,6 @@ import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.gui.element.DropdownList
-import xyz.bluspring.unitytranslate.client.gui.element.FadeableUIElement
 import xyz.bluspring.unitytranslate.client.gui.element.PlainUIButton
 import xyz.bluspring.unitytranslate.client.gui.element.UILabel
 import xyz.bluspring.unitytranslate.client.gui.screen.FirstStartupScreen
@@ -167,12 +166,6 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
     }
 
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int, transitionProgress: Float) {
-        for (element in this.children) {
-            if (element is FadeableUIElement) {
-                element.opacity = transitionProgress
-            }
-        }
-
         val currentTranscriber = UnityTranslateApi.instance.getTranscriber(this.currentTranscriberId)
         if (currentTranscriber == InactiveTranscriber) {
             val font = ClientPlatformProxy.instance.defaultFont
