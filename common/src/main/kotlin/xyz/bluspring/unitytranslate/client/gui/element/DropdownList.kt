@@ -99,7 +99,7 @@ class DropdownList<E : Comparable<E>>(
             return this.elements[this.currentIndex]
         }
 
-    private val mainBounds = ScreenRectangle(x.toInt(), y.toInt(), width.toInt(), height.toInt())
+    private val mainBounds = ScreenRectangle(x.toInt(), y.toInt(), width.toInt(), height.toInt() + 1)
 
     override fun bounds(screenWidth: Int, screenHeight: Int): ScreenRectangle {
         return this.mainBounds

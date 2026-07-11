@@ -17,7 +17,7 @@ class ToggleConfigEntry(
 
     override fun init(width: Int, height: Int) {
         super.init(width, height)
-        this.button = this.addChild(ToggleButton(this.xPos, this.yPos + 6, 12f, this.value.property, ThemeConfig.toggleOutline,
+        this.button = this.addChild(ToggleButton(this.xPos, this.yPos + 7, 12f, this.value.property, ThemeConfig.toggleOutline,
             ThemeConfig.toggleOutlineFocused, ThemeConfig.toggleDisabledFill, ThemeConfig.toggleEnabledFill))
     }
 
