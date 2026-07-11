@@ -51,4 +51,19 @@ object ThemeConfig {
     var toggleEnabledFill: ColorConfig = ColorConfig.Solid(
         Color(255, 255, 255).rgb
     )
+
+    var sliderTrack: ColorConfig = ColorConfig.Solid(
+        Color(170, 170, 170).rgb
+    )
+    var sliderTrackFocused: ColorConfig = ColorConfig.Solid(
+        Color(255, 255, 255).rgb
+    )
+    var sliderNotch: ColorConfig = ColorConfig.Solid(
+        Color(170, 170, 170).rgb
+    )
+    var sliderNotchFocused: ColorConfig = ColorConfig.Solid(
+        Color(255, 255, 255).rgb
+    )
+    var sliderValue: Int = Color(170, 170, 170).rgb
+    var sliderValueFocused: Int = Color(255, 255, 255).rgb
 }

@@ -18,8 +18,8 @@ class UILabel(
     var color: Int = ThemeConfig.textColor,
     val alignX: HorizontalAlign = HorizontalAlign.LEFT,
     val alignY: VerticalAlign = VerticalAlign.CENTER,
-) : UIElement() {
-    var opacity = 1f
+) : UIElement(), FadeableUIElement {
+    override var opacity = 1f
 
     constructor(x: Float, y: Float, text: FormattedText, font: FontReference, dropShadow: Boolean = true, color: Int = -1, alignX: HorizontalAlign = HorizontalAlign.LEFT, alignY: VerticalAlign = VerticalAlign.CENTER)
         : this(x, y, Language.getInstance().getVisualOrder(text), font, dropShadow, color, alignX, alignY)

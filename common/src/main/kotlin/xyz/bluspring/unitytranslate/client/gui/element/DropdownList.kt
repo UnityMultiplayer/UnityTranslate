@@ -29,7 +29,7 @@ class DropdownList<E : Comparable<E>>(
 
     validator: (E) -> Boolean = { true },
     private val tooltip: (E?) -> Component = { Component.empty() },
-) : UIElement() {
+) : UIElement(), FadeableUIElement {
     fun interface DropdownCallback<E> {
         fun onDropdownEvent(item: E)
     }
@@ -41,7 +41,7 @@ class DropdownList<E : Comparable<E>>(
             }
         }
     }
-    var opacity = 1f
+    override var opacity = 1f
 
     constructor(x: Float, y: Float, width: Float, height: Float, font: FontReference, elements: suspend () -> Collection<E>, visualizer: (E) -> Component, property: KMutableProperty<E>, validator: (E) -> Boolean = { true }, tooltip: (E?) -> Component = { Component.empty() },)
         : this(x, y, width, height, font, elements, visualizer, property as KMutableProperty<E?>, Type.REQUIRED, validator, tooltip)

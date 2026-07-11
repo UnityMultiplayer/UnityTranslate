@@ -6,6 +6,9 @@ import net.minecraft.util.Mth
 import org.lwjgl.glfw.GLFW
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
+import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
+import xyz.bluspring.unitytranslate.client.config.ColorConfig
+import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 import kotlin.math.round
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.typeOf
@@ -18,10 +21,14 @@ class SliderElement<T : Number>(
     min: T, max: T, step: T,
     val font: FontReference,
     val visualizer: (T) -> Component,
-) : UIElement() {
+) : UIElement(), FocusableUIElement, FadeableUIElement {
+    override var opacity = 1f
+
     private val min = min.toFloat()
     private val max = max.toFloat()
     private val step = step.toFloat()
+
+    override var isFocused: Boolean = false
 
     var value: Float
         get() = this.property.getter.call().toFloat()
@@ -54,10 +61,23 @@ class SliderElement<T : Number>(
         }
 
         val normalized = this.normalizedValue
-        graphics.fill(this.x, this.y + (this.height / 2f), this.x + this.width, this.y + (this.height / 2f) + 1, -1)
-        graphics.fill(this.x - 1 + (this.width * normalized), this.y + 1, this.x + (this.width * normalized) + 1, this.y + this.height, -1)
 
-        graphics.text(this.font, this.visualizer(this.property.getter.call()), this.x + this.width + 3, this.y + (this.height / 2f) - 3, -1, false)
+        val trackMatrix = ColorConfig.separateMatrix(if (this.isFocused) ThemeConfig.sliderTrackFocused else ThemeConfig.sliderTrack)
+        graphics.fill(this.x, this.y + (this.height / 2f), this.x + this.width, this.y + (this.height / 2f) + 1,
+            trackMatrix.topLeft.multiplyAlpha(this.opacity), trackMatrix.topRight.multiplyAlpha(this.opacity),
+            trackMatrix.bottomLeft.multiplyAlpha(this.opacity), trackMatrix.bottomRight.multiplyAlpha(this.opacity)
+        )
+
+        val notchMatrix = ColorConfig.separateMatrix(if (this.isFocused) ThemeConfig.sliderNotchFocused else ThemeConfig.sliderNotch)
+        graphics.fill(this.x - 1 + (this.width * normalized), this.y + 1, this.x + (this.width * normalized) + 1, this.y + this.height,
+            notchMatrix.topLeft.multiplyAlpha(this.opacity), notchMatrix.topRight.multiplyAlpha(this.opacity),
+            notchMatrix.bottomLeft.multiplyAlpha(this.opacity), notchMatrix.bottomRight.multiplyAlpha(this.opacity)
+        )
+
+        graphics.text(this.font, this.visualizer(this.property.getter.call()), this.x + this.width + 4, this.y + (this.height / 2f) - 3,
+            (if (this.isFocused) ThemeConfig.sliderValueFocused else ThemeConfig.sliderValue).multiplyAlpha(this.opacity), false)
+
+        this.isFocused = this.bounds().containsPoint(mouseX, mouseY)
     }
 
     private fun calculateCurrentValue(mouseX: Int): Float {

@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component
 import org.lwjgl.glfw.GLFW
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
+import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 
 open class PlainUIButton(
@@ -18,7 +19,9 @@ open class PlainUIButton(
     open var color: Int = ThemeConfig.plainButton,
     protected val hoverColor: Int = ThemeConfig.plainButtonHover,
     private val onClick: () -> Unit,
-) : UIElement() {
+) : UIElement(), FadeableUIElement {
+    override var opacity: Float = 1f
+
     override fun bounds(screenWidth: Int, screenHeight: Int): ScreenRectangle {
         val split = this.font.split(this.text, this.maxWidth)
         val longestWidth = split.maxOf { this.font.width(it) }
@@ -44,7 +47,7 @@ open class PlainUIButton(
 
         val yStart = bounds.top()
         for ((index, text) in split.withIndex()) {
-            graphics.centeredText(this.font, text, this.x, yStart + (index * this.font.lineHeight).toFloat(), if (isHovered) this.hoverColor else this.color, true)
+            graphics.centeredText(this.font, text, this.x, yStart + (index * this.font.lineHeight).toFloat(), (if (isHovered) this.hoverColor else this.color).multiplyAlpha(this.opacity), true)
         }
 
 //        graphics.outline(bounds.left().toFloat(), bounds.top().toFloat(), bounds.right().toFloat(), bounds.bottom().toFloat(), 1f, -1)

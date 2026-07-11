@@ -10,6 +10,7 @@ import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.gui.element.DropdownList
+import xyz.bluspring.unitytranslate.client.gui.element.FadeableUIElement
 import xyz.bluspring.unitytranslate.client.gui.element.UILabel
 import xyz.bluspring.unitytranslate.client.gui.screen.FirstStartupScreen
 import xyz.bluspring.unitytranslate.client.gui.screen.config.entry.ConfigEntry
@@ -128,9 +129,7 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
 
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int, transitionProgress: Float) {
         for (element in this.children) {
-            if (element is UILabel) {
-                element.opacity = transitionProgress
-            } else if (element is DropdownList<*>) {
+            if (element is FadeableUIElement) {
                 element.opacity = transitionProgress
             }
         }

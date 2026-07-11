@@ -3,6 +3,7 @@ package xyz.bluspring.unitytranslate.client.gui.element
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import org.lwjgl.glfw.GLFW
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
+import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.client.config.ColorConfig
 import kotlin.reflect.KMutableProperty
 
@@ -15,7 +16,8 @@ class ToggleButton(
     val outlineFocusedColor: ColorConfig,
     val disabledFillColor: ColorConfig,
     val enabledFillColor: ColorConfig,
-) : UIElement(), FocusableUIElement {
+) : UIElement(), FocusableUIElement, FadeableUIElement {
+    override var opacity: Float = 1f
     override var isFocused = false
 
     override fun bounds(
@@ -32,8 +34,8 @@ class ToggleButton(
             this.outlineFocusedColor
         else this.outlineColor)
         graphics.outline(this.x, this.y, this.x + this.size, this.y + size, 1f,
-            outlineMatrix.topLeft, outlineMatrix.topRight,
-            outlineMatrix.bottomLeft, outlineMatrix.bottomRight
+            outlineMatrix.topLeft.multiplyAlpha(this.opacity), outlineMatrix.topRight.multiplyAlpha(this.opacity),
+            outlineMatrix.bottomLeft.multiplyAlpha(this.opacity), outlineMatrix.bottomRight.multiplyAlpha(this.opacity)
         )
 
         val fillMatrix = ColorConfig.separateMatrix(
@@ -44,8 +46,8 @@ class ToggleButton(
         )
 
         graphics.fill(this.x + 2, this.y + 2, this.x + this.size - 2, this.y + this.size - 2,
-            fillMatrix.topLeft, fillMatrix.topRight,
-            fillMatrix.bottomLeft, fillMatrix.bottomRight
+            fillMatrix.topLeft.multiplyAlpha(this.opacity), fillMatrix.topRight.multiplyAlpha(this.opacity),
+            fillMatrix.bottomLeft.multiplyAlpha(this.opacity), fillMatrix.bottomRight.multiplyAlpha(this.opacity)
         )
 
         this.isFocused = this.bounds().containsPoint(mouseX, mouseY)
