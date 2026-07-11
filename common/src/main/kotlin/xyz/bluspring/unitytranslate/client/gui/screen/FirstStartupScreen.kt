@@ -6,10 +6,7 @@ import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 import xyz.bluspring.unitytranslate.client.config.ColorConfig
-import xyz.bluspring.unitytranslate.client.gui.screen.intro.DownloadIntroSequence
-import xyz.bluspring.unitytranslate.client.gui.screen.intro.FirstTimeIntroSequence
-import xyz.bluspring.unitytranslate.client.gui.screen.intro.IntroSequence
-import xyz.bluspring.unitytranslate.client.gui.screen.intro.LangSelectIntroSequence
+import xyz.bluspring.unitytranslate.client.gui.screen.intro.*
 import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 
 class FirstStartupScreen : UTScreen() {
@@ -21,8 +18,10 @@ class FirstStartupScreen : UTScreen() {
 
     var current = 0
     private val currentSequence: IntroSequence
-        get() = this.sequence[this.current]
+        get() = this.sequence.getOrNull(this.current) ?: BlankIntroSequence(this)
     private var transitioningSequence: IntroSequence? = null
+    private var exitTick = -1
+    private val transitionTime = 24
 
     override fun init(width: Int, height: Int) {
         super.init(width, height)
@@ -51,7 +50,7 @@ class FirstStartupScreen : UTScreen() {
         this.transitioningSequence = this.currentSequence
 
         if (++this.current >= this.sequence.size) {
-            ClientPlatformProxy.instance.setScreen(null)
+            this.exitTick = 0
             UnityTranslateClient.handledFirstJoin = true
             for (config in UnityTranslateApiImpl.allConfigs) {
                 config.save()
@@ -76,12 +75,18 @@ class FirstStartupScreen : UTScreen() {
             if (this.transitioningSequence!!.isDone)
                 this.transitioningSequence = null
         } else {
+            if (this.exitTick >= 0 && this.exitTick++ >= this.transitionTime) {
+                ClientPlatformProxy.instance.setScreen(null)
+            }
+
             this.currentSequence.tick()
         }
     }
 
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
-        val alpha = 1f
+        val alpha = if (this.exitTick >= 0)
+            1f - ((this.exitTick + partialTick) / this.transitionTime.toFloat()).coerceAtMost(1f)
+        else 1f
         val matrix = ColorConfig.separateMatrix(ThemeConfig.mainBackground)
         graphics.fill(0f, 0f, graphics.width.toFloat(), graphics.height.toFloat(),
             matrix.topLeft.multiplyAlpha(alpha), matrix.topRight.multiplyAlpha(alpha),

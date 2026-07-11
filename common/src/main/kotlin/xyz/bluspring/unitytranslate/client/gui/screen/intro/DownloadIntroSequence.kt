@@ -37,7 +37,7 @@ class DownloadIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent) 
         val size = 64f
 
         graphics.pushMatrix()
-        graphics.translate(graphics.width / 2f - (size / 2f), this.downloadText.bounds().top() / 2f - Mth.lerp(CommonEasing.SMOOTH.getValue(transitionProgress), 0f, 32f))
+        graphics.translate(graphics.width / 2f - (size / 2f), this.downloadText.bounds().top() / 2f - Mth.lerp(CommonEasing.SMOOTH.getValue(transitionProgress), 0f, 8f))
         graphics.blitWithColor(0f, 0f, size, size, 0f, 0f, 1f, 1f, LogoTransitionOverlay.logoTexture, (-1).withAlpha(CommonEasing.SMOOTH.getValue(transitionProgress)))
         graphics.popMatrix()
     }
