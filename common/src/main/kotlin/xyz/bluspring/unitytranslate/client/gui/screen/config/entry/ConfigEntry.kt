@@ -6,6 +6,7 @@ import xyz.bluspring.sunset.values.ConfigValue
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
+import xyz.bluspring.unitytranslate.client.gui.element.FadeableUIElement
 import xyz.bluspring.unitytranslate.client.gui.element.FocusableUIElement
 import xyz.bluspring.unitytranslate.client.gui.element.UIElement
 import xyz.bluspring.unitytranslate.client.gui.element.UILabel
@@ -22,9 +23,18 @@ abstract class ConfigEntry<E, T : ConfigValue<E>>(
     val value: T,
     val rootKey: String = "",
     val font: FontReference = ClientPlatformProxy.instance.defaultFont,
-) : UIElement(), FocusableUIElement {
+) : UIElement(), FocusableUIElement, FadeableUIElement {
     private lateinit var label: UILabel
     protected var shouldShowTooltip = true
+
+    override var opacity: Float = 1f
+        set(value) {
+            field = value
+            for (element in this.children) {
+                if (element is FadeableUIElement)
+                    element.opacity = value
+            }
+        }
 
     override fun init(width: Int, height: Int) {
         super.init(width, height)

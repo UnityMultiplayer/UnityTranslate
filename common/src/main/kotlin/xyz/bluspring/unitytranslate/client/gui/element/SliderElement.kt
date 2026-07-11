@@ -60,22 +60,23 @@ class SliderElement<T : Number>(
             this.value = this.calculateCurrentValue(mouseX)
         }
 
+        val isFocused = this.isFocused || this.isSelected
         val normalized = this.normalizedValue
 
-        val trackMatrix = ColorConfig.separateMatrix(if (this.isFocused) ThemeConfig.sliderTrackFocused else ThemeConfig.sliderTrack)
+        val trackMatrix = ColorConfig.separateMatrix(if (isFocused) ThemeConfig.sliderTrackFocused else ThemeConfig.sliderTrack)
         graphics.fill(this.x, this.y + (this.height / 2f), this.x + this.width, this.y + (this.height / 2f) + 1,
             trackMatrix.topLeft.multiplyAlpha(this.opacity), trackMatrix.topRight.multiplyAlpha(this.opacity),
             trackMatrix.bottomLeft.multiplyAlpha(this.opacity), trackMatrix.bottomRight.multiplyAlpha(this.opacity)
         )
 
-        val notchMatrix = ColorConfig.separateMatrix(if (this.isFocused) ThemeConfig.sliderNotchFocused else ThemeConfig.sliderNotch)
+        val notchMatrix = ColorConfig.separateMatrix(if (isFocused) ThemeConfig.sliderNotchFocused else ThemeConfig.sliderNotch)
         graphics.fill(this.x - 1 + (this.width * normalized), this.y + 1, this.x + (this.width * normalized) + 1, this.y + this.height,
             notchMatrix.topLeft.multiplyAlpha(this.opacity), notchMatrix.topRight.multiplyAlpha(this.opacity),
             notchMatrix.bottomLeft.multiplyAlpha(this.opacity), notchMatrix.bottomRight.multiplyAlpha(this.opacity)
         )
 
         graphics.text(this.font, this.visualizer(this.property.getter.call()), this.x + this.width + 4, this.y + (this.height / 2f) - 3,
-            (if (this.isFocused) ThemeConfig.sliderValueFocused else ThemeConfig.sliderValue).multiplyAlpha(this.opacity), false)
+            (if (isFocused) ThemeConfig.sliderValueFocused else ThemeConfig.sliderValue).multiplyAlpha(this.opacity), false)
 
         this.isFocused = this.bounds().containsPoint(mouseX, mouseY)
     }

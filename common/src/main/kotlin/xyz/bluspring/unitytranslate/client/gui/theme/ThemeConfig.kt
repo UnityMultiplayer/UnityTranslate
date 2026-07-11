@@ -53,10 +53,10 @@ object ThemeConfig {
     )
 
     var sliderTrack: ColorConfig = ColorConfig.Solid(
-        Color(170, 170, 170).rgb
+        Color(114, 114, 114).rgb
     )
     var sliderTrackFocused: ColorConfig = ColorConfig.Solid(
-        Color(255, 255, 255).rgb
+        Color(200, 200, 200).rgb
     )
     var sliderNotch: ColorConfig = ColorConfig.Solid(
         Color(170, 170, 170).rgb
