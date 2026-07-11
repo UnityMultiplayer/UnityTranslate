@@ -47,14 +47,14 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
         val elementOffset = 12f
 
         val xPos = (width / 2f - elementWidth - elementOffset)
-        val yPos = height / 2f - (((elementHeight + 20f) * (UnityTranslateApiImpl.outputLanguages.size)) / 2f)
+        val yPos = 25f + this.children.sumOf { it.bounds().height } + 24f
 
         val currentTranscriber = UnityTranslateApi.instance.getTranscriber(this.currentTranscriberId)
 
         // Right side
         run {
             val xPos = (width / 2f) + elementOffset
-            var yPos = height / 2f - (elementHeight + 8.5f)
+            var yPos = yPos
 
             this.addChild(UILabel(xPos, yPos, Component.translatable("config.unitytranslate.unitytranslate.transcriber").append(": "), font, alignX = UILabel.HorizontalAlign.LEFT, alignY = UILabel.VerticalAlign.CENTER))
             val transcriber = this.addChild(DropdownList(xPos, yPos + 6f, elementWidth, elementHeight, font,
@@ -88,6 +88,8 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
 
         // Left side
         run {
+            var yPos = yPos
+            yPos += 6f
             this.addChild(UILabel(xPos, yPos - 6f, Component.translatable("config.unitytranslate.unitytranslate.languages.spoken").append(": "), font, alignX = UILabel.HorizontalAlign.LEFT, alignY = UILabel.VerticalAlign.CENTER))
             this.addChild(DropdownList(xPos, yPos, elementWidth, elementHeight, font, languages, visualizer,
                 UnityTranslateApiImpl::currentSpokenLanguage,

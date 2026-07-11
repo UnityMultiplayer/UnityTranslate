@@ -28,7 +28,7 @@ abstract class ConfigEntry<E, T : ConfigValue<E>>(
 
     override fun init(width: Int, height: Int) {
         super.init(width, height)
-        this.label = this.addChild(UILabel(this.xPos, this.yPos, Component.translatable("$rootKey${this.value.fullId}"), font))
+        this.label = this.addChild(UILabel(this.xPos, this.yPos, Component.translatable("$rootKey${this.value.fullId}").append(": "), font))
     }
 
     override fun bounds(screenWidth: Int, screenHeight: Int): ScreenRectangle {
