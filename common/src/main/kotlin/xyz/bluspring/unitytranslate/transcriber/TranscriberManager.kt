@@ -40,6 +40,10 @@ class TranscriberManager {
             val processedTexts = source.processSamples()
             if (processedTexts.isNotEmpty()) {
                 for (processed in processedTexts) {
+                    // Skip over blank text, we don't want to show fake stuff.
+                    if (processed.isBlank())
+                        continue
+
                     val holder = UnityTranslateApi.instance.getOrCreateTranscriptHolder(source.language)
                     val transcriptData = DirectTranscriptData(source.sessionTimestamp, source.sender, source.language, processed, System.currentTimeMillis())
 
