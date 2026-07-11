@@ -13,9 +13,17 @@ abstract class UIElement {
     protected var isSelected = false
 
     private val enableDebug: Boolean // don't optimize this into a const, this is so we can use hotswap to toggle debug display.
-        get() = false
+        get() = true
+    private var isInitialized = false
 
-    fun bounds(): ScreenRectangle = bounds(ClientPlatformProxy.instance.viewportWidth, ClientPlatformProxy.instance.viewportHeight)
+    fun bounds(): ScreenRectangle {
+        if (!this.isInitialized) {
+            this.setup(ClientPlatformProxy.instance.viewportWidth, ClientPlatformProxy.instance.viewportHeight)
+        }
+
+        return bounds(ClientPlatformProxy.instance.viewportWidth, ClientPlatformProxy.instance.viewportHeight)
+    }
+
     abstract fun bounds(screenWidth: Int, screenHeight: Int): ScreenRectangle
 
     protected open fun init(width: Int, height: Int) {
@@ -28,6 +36,8 @@ abstract class UIElement {
         for (element in this.children) {
             element.setup(width, height)
         }
+
+        this.isInitialized = true
     }
 
     protected fun <T : UIElement> addChild(child: T): T {
