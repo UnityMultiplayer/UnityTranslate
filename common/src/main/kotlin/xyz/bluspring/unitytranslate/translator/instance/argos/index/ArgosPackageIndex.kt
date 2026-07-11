@@ -2,6 +2,7 @@ package xyz.bluspring.unitytranslate.translator.instance.argos.index
 
 import com.google.gson.JsonParser
 import com.mojang.serialization.JsonOps
+import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.*
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadHelper
@@ -42,11 +43,13 @@ class ArgosPackageIndex(path: Path) : PackageIndex<ArgosPackage>(path, "argos") 
             }
 
             synchronized(this.packages) {
-                cachedFile.writeText(
-                    ArgosPackage.CODEC.listOf().encodeStart(JsonOps.INSTANCE, this.packages).orThrow.toString(),
-                    Charsets.UTF_8,
-                    options = arrayOf(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)
-                )
+                synchronized(cachedFile) {
+                    cachedFile.writeText(
+                        ArgosPackage.CODEC.listOf().encodeStart(JsonOps.INSTANCE, this.packages).orThrow.toString(),
+                        Charsets.UTF_8,
+                        options = arrayOf(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)
+                    )
+                }
             }
         }
     }
@@ -80,9 +83,12 @@ class ArgosPackageIndex(path: Path) : PackageIndex<ArgosPackage>(path, "argos") 
         // Try to load the cached data in the meantime.
         if (cachedFile.exists()) {
             try {
-                cachedFile.inputStream(options = arrayOf(StandardOpenOption.READ)).use { loadIndexFromStream(it) }
+                synchronized(cachedFile) {
+                    cachedFile.inputStream(options = arrayOf(StandardOpenOption.READ)).use { loadIndexFromStream(it) }
+                }
             } catch (e: Throwable) {
-
+                UnityTranslate.logger.error("Failed to load cached Argos index! Deleting.", e)
+                cachedFile.deleteIfExists()
             }
         }
     }
