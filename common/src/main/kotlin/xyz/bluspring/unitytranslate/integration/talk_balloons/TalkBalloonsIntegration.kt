@@ -21,6 +21,7 @@ object TalkBalloonsIntegration {
                     return@register
 
                 if (data.sender is PlayerUser) {
+                    val messages = TalkBalloonsApi.INSTANCE.getBalloonMessages(Minecraft.getInstance().player!!)
                     val player = Minecraft.getInstance().level?.getPlayerByUUID((data.sender as PlayerUser).uuid)
                         ?: return@register
 
@@ -31,17 +32,26 @@ object TalkBalloonsIntegration {
                     }
 
                     val message = Component.literal(data.message)
-                    TalkBalloonsApi.INSTANCE.createBalloonMessage(player, message, TalkBalloonsApi.INSTANCE.defaultDuration * 20)
+                    synchronized(messages) {
+                        TalkBalloonsApi.INSTANCE.createBalloonMessage(player, message, TalkBalloonsApi.INSTANCE.defaultDuration * 20)
+                    }
                     existingMessages[data.id] = message
                 } else if (data.sender is MinecraftLocalTranscriptUser) {
+                    val messages = TalkBalloonsApi.INSTANCE.getBalloonMessages(Minecraft.getInstance().player!!)
+
                     if (existingMessages.contains(data.id)) {
                         val message = existingMessages[data.id]!!
-                        TalkBalloonsApi.INSTANCE.getBalloonMessages(Minecraft.getInstance().player!!).remove(message)
+                        synchronized(messages) {
+                            messages.remove(message)
+                        }
+
                         existingMessages.remove(data.id)
                     }
 
                     val message = Component.literal(data.message)
-                    TalkBalloonsApi.INSTANCE.createBalloonMessage(Minecraft.getInstance().player!!, message, TalkBalloonsApi.INSTANCE.defaultDuration * 20)
+                    synchronized(messages) {
+                        TalkBalloonsApi.INSTANCE.createBalloonMessage(Minecraft.getInstance().player!!, message, TalkBalloonsApi.INSTANCE.defaultDuration * 20)
+                    }
                     existingMessages[data.id] = message
                 }
             }
