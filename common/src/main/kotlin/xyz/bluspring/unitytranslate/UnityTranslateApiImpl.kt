@@ -43,6 +43,9 @@ object UnityTranslateApiImpl : UnityTranslateApi {
 
     val outputLanguages: MutableMap<String, LanguageHolder> = mutableMapOf()
 
+    val allConfigs: Collection<SunsetConfig>
+        get() = this.translatorConfigs.values + this.translatorConfigs.values + this.configs.values
+
     override var currentSpokenLanguage: Language = Languages.ENGLISH
     override val translatorManager: TranslatorManager
         get() = TranslatorManagerImpl // Don't inline this! You're gonna run into a bunch of headaches otherwise.

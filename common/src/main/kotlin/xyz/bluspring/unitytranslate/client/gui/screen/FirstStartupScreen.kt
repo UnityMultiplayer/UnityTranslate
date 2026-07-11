@@ -1,8 +1,10 @@
 package xyz.bluspring.unitytranslate.client.gui.screen
 
+import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
+import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 import xyz.bluspring.unitytranslate.client.config.ColorConfig
 import xyz.bluspring.unitytranslate.client.gui.screen.intro.DownloadIntroSequence
 import xyz.bluspring.unitytranslate.client.gui.screen.intro.FirstTimeIntroSequence
@@ -50,6 +52,11 @@ class FirstStartupScreen : UTScreen() {
 
         if (++this.current >= this.sequence.size) {
             ClientPlatformProxy.instance.setScreen(null)
+            UnityTranslateClient.handledFirstJoin = true
+            for (config in UnityTranslateApiImpl.allConfigs) {
+                config.save()
+            }
+
             return
         }
 
