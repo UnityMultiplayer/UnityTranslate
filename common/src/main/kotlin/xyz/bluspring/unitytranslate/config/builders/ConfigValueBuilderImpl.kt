@@ -5,7 +5,7 @@ import xyz.bluspring.unitytranslate.api.v2.config.ConfigValueBuilder
 
 open class ConfigValueBuilderImpl<T>(val id: String) : ConfigValueBuilder<T> {
     internal var validator: (T) -> Boolean = { true }
-    internal var formatter: (T) -> Component = { Component.literal(it.toString()) }
+    internal var formatter: ((T) -> Component)? = null
 
     override fun validator(validator: (T) -> Boolean) {
         this.validator = validator

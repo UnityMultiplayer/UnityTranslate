@@ -3,19 +3,16 @@ package xyz.bluspring.unitytranslate.client.gui.screen.intro
 import kotlinx.coroutines.runBlocking
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
-import xyz.bluspring.sunset.values.ReflectingConfigValue
+import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
 import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
-import xyz.bluspring.unitytranslate.api.v2.config.NameProvidingEntry
-import xyz.bluspring.unitytranslate.api.v2.config.TooltipProvidingEntry
-import xyz.bluspring.unitytranslate.api.v2.download.DownloadableEntry
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.gui.element.DropdownList
 import xyz.bluspring.unitytranslate.client.gui.element.UILabel
 import xyz.bluspring.unitytranslate.client.gui.screen.FirstStartupScreen
-import xyz.bluspring.unitytranslate.config.values.DropdownValidatingReflectingConfigValue
+import xyz.bluspring.unitytranslate.client.gui.screen.config.entry.ConfigEntry
 
 class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent) {
     var currentTranscriberId: String = UnityTranslateApi.instance.getTranscriberId(UnityTranslateApi.instance.activeTranscriber)
@@ -78,42 +75,11 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
             val config = UnityTranslateApiImpl.transcriberConfigs[this.currentTranscriberId]
             if (config != null) {
                 for (configValue in config.rootCategory.value) {
-                    if (configValue is DropdownValidatingReflectingConfigValue<*>) {
-                        this.addChild(UILabel(xPos, yPos, Component.translatable("config.unitytranslate.transcriber.${this.currentTranscriberId}${configValue.fullId}"), font))
-
-                        this.addChild(DropdownList(xPos, yPos + 6f, elementWidth, elementHeight, font,
-                            { configValue.values }, {
-                                value -> Component.translatable("config.unitytranslate.transcriber.${this.currentTranscriberId}${configValue.fullId}.${value.serializedName}")
-                            }, (configValue as ReflectingConfigValue<NameProvidingEntry>).property,
-                            validator = { entry ->
-                                if (entry is DownloadableEntry) {
-                                    entry.canBeSelected()
-                                } else true
-                            },
-                            tooltip = { entry ->
-                                (if (entry != null)
-                                    Component.translatableWithFallback("config.unitytranslate.transcriber.${this.currentTranscriberId}${configValue.fullId}.${entry.serializedName}.description", "")
-                                else Component.empty()).apply {
-                                    if (entry is TooltipProvidingEntry) {
-                                        for (tooltip in entry.tooltip) {
-                                            if (tooltip.translationKey.isBlank()) {
-                                                if (!this.string.isBlank())
-                                                    this.append("\n")
-
-                                                continue
-                                            }
-
-                                            if (!this.string.isBlank())
-                                                this.append("\n")
-
-                                            this.append(Component.translatable(tooltip.translationKey, *tooltip.args.toTypedArray()).withColor(tooltip.color))
-                                        }
-                                    }
-                                }
-                            }
-                        ))
-
-                        yPos += elementHeight + 10f
+                    try {
+                        val entry = this.addChild(ConfigEntry.fromValue(configValue, xPos, yPos, elementWidth, elementHeight, rootKey = "config.unitytranslate.transcriber.${this.currentTranscriberId}", font))
+                        yPos += entry.bounds().height + 12
+                    } catch (e: Throwable) {
+                        UnityTranslate.logger.error("Failed to add config value ${configValue.fullId}!", e)
                     }
                 }
             }

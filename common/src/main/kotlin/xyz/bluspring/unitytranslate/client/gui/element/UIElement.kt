@@ -1,7 +1,9 @@
 package xyz.bluspring.unitytranslate.client.gui.element
 
 import net.minecraft.client.gui.navigation.ScreenRectangle
+import net.minecraft.network.chat.Component
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
+import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 
 abstract class UIElement {
@@ -9,6 +11,9 @@ abstract class UIElement {
         field = mutableListOf<UIElement>()
 
     protected var isSelected = false
+
+    private val enableDebug: Boolean // don't optimize this into a const, this is so we can use hotswap to toggle debug display.
+        get() = false
 
     fun bounds(): ScreenRectangle = bounds(ClientPlatformProxy.instance.viewportWidth, ClientPlatformProxy.instance.viewportHeight)
     abstract fun bounds(screenWidth: Int, screenHeight: Int): ScreenRectangle
@@ -31,6 +36,26 @@ abstract class UIElement {
     }
 
     open fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
+        // Debug thing for showing the element bounds.
+        if (this.enableDebug) {
+            val bounds = this.bounds()
+            val isHovered = bounds.containsPoint(mouseX, mouseY)
+            val color = if (isHovered)
+                ARGBHelper.color(255, 255, 255, 255)
+            else
+                ARGBHelper.color(60, 255, 255, 255)
+
+            graphics.outline(bounds.left().toFloat(), bounds.top().toFloat(), bounds.right().toFloat(), bounds.bottom().toFloat(), 1f, color)
+
+            if (isHovered) {
+                graphics.pushMatrix()
+                graphics.translate(bounds.left().toFloat(), bounds.bottom().toFloat() + 2f)
+                graphics.scale(0.5f, 0.5f)
+                graphics.text(ClientPlatformProxy.instance.defaultFont, Component.literal("${this::class.simpleName} (x: ${bounds.left()}, y: ${bounds.top()}, width: ${bounds.right() - bounds.left()}, height: ${bounds.bottom() - bounds.top()})"), 0f, 0f, -1, true)
+                graphics.popMatrix()
+            }
+        }
+
         for (element in this.children) {
             element.submit(graphics, partialTick, mouseX, mouseY)
         }

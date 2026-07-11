@@ -40,4 +40,15 @@ object ThemeConfig {
 
     var configEntryText: Int = Color(170, 170, 170, 255).rgb
     var configEntryTextFocus: Int = Color(255, 255, 255, 255).rgb
+
+    var toggleOutline: ColorConfig = ColorConfig.Solid(
+        Color(170, 170, 170).rgb
+    )
+    var toggleOutlineFocused: ColorConfig = ColorConfig.Solid(
+        Color(255, 255, 255).rgb
+    )
+    var toggleDisabledFill: ColorConfig = ColorConfig.None
+    var toggleEnabledFill: ColorConfig = ColorConfig.Solid(
+        Color(255, 255, 255).rgb
+    )
 }

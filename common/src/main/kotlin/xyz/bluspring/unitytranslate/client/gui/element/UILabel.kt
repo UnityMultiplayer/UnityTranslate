@@ -15,7 +15,7 @@ class UILabel(
     val font: FontReference,
 
     val dropShadow: Boolean = true,
-    val color: Int = ThemeConfig.textColor,
+    var color: Int = ThemeConfig.textColor,
     val alignX: HorizontalAlign = HorizontalAlign.LEFT,
     val alignY: VerticalAlign = VerticalAlign.CENTER,
 ) : UIElement() {
@@ -36,7 +36,9 @@ class UILabel(
         screenWidth: Int,
         screenHeight: Int
     ): ScreenRectangle {
-        return ScreenRectangle(this.x.toInt(), this.y.toInt(), this.font.width(this.text), this.font.lineHeight)
+        val fontWidth = this.font.width(this.text)
+        val fontHeight = this.font.lineHeight - 2
+        return ScreenRectangle((this.x - this.alignX.adjustment(fontWidth)).toInt(), (this.y - this.alignY.adjustment(fontHeight)).toInt(), this.font.width(this.text), this.font.lineHeight)
     }
 
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {

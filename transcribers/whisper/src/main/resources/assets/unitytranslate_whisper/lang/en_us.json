@@ -2,6 +2,8 @@
     "unitytranslate.transcriber.unitytranslate_whisper.name": "OpenAI Whisper (Local)",
     "unitytranslate.transcriber.unitytranslate_whisper.description": "A speech transcriber that runs 100% locally on your system, but may consume slightly more resources than other transcribers. No speech processing will occur on third-party datacenters.",
     "config.unitytranslate.transcriber.unitytranslate_whisper.model": "Transcription Model",
+    "config.unitytranslate.transcriber.unitytranslate_whisper.max_threads": "Max Threads",
+    "config.unitytranslate.transcriber.unitytranslate_whisper.enable_gpu": "Enable GPU Acceleration?",
 
     "config.unitytranslate.transcriber.unitytranslate_whisper.model.tiny": "Tiny",
     "config.unitytranslate.transcriber.unitytranslate_whisper.model.tiny.description": "Uses the least amount of resources on your system, but is also the most inaccurate.",
