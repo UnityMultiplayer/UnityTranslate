@@ -24,6 +24,7 @@ abstract class ConfigEntry<E, T : ConfigValue<E>>(
     val font: FontReference = ClientPlatformProxy.instance.defaultFont,
 ) : UIElement(), FocusableUIElement {
     private lateinit var label: UILabel
+    protected var shouldShowTooltip = true
 
     override fun init(width: Int, height: Int) {
         super.init(width, height)
@@ -44,6 +45,18 @@ abstract class ConfigEntry<E, T : ConfigValue<E>>(
         }
 
         super.submit(graphics, partialTick, mouseX, mouseY)
+    }
+
+    override fun submitLate(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
+        if (this.bounds().containsPoint(mouseX, mouseY) && this.shouldShowTooltip) {
+            val text = Component.translatableWithFallback("${this.rootKey}${this.value.fullId}.description", "")
+
+            if (!text.string.isBlank()) {
+                this.tooltip(graphics, text)
+            }
+        }
+
+        super.submitLate(graphics, partialTick, mouseX, mouseY)
     }
 
     override var isFocused: Boolean = false

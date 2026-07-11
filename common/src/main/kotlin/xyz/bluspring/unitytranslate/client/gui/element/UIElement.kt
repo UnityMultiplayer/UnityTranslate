@@ -6,6 +6,8 @@ import org.jetbrains.annotations.ApiStatus
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
+import xyz.bluspring.unitytranslate.client.config.ColorConfig
+import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 
 abstract class UIElement {
     protected val children: List<UIElement>
@@ -143,5 +145,34 @@ abstract class UIElement {
         }
 
         return false
+    }
+
+    protected fun tooltip(graphics: UIGraphics, tooltip: Component) {
+        val mouseX = (ClientPlatformProxy.instance.mouseX / ClientPlatformProxy.instance.guiScale).toFloat()
+        val mouseY = (ClientPlatformProxy.instance.mouseY / ClientPlatformProxy.instance.guiScale).toFloat()
+        val font = ClientPlatformProxy.instance.defaultFont
+
+        val split = font.split(tooltip, 220)
+        val maxWidth = split.maxOf { font.width(it) }
+
+        val tooltipWidth = maxWidth + 8
+        var xPos = mouseX + 4f
+        var yPos = mouseY - 3
+        if (ClientPlatformProxy.instance.viewportWidth <= xPos + tooltipWidth)
+            xPos -= (xPos + tooltipWidth) - ClientPlatformProxy.instance.viewportWidth + 4
+
+        if (ClientPlatformProxy.instance.viewportHeight <= yPos + (split.size * font.lineHeight) + 5)
+            yPos -= (yPos + (split.size * font.lineHeight) + 5) - ClientPlatformProxy.instance.viewportHeight + 4
+
+        val bgMatrix = ColorConfig.separateMatrix(ThemeConfig.tooltipBackground)
+        graphics.fill(xPos, yPos, xPos + tooltipWidth, yPos + (split.size * font.lineHeight) + 5,
+            bgMatrix.topLeft, bgMatrix.topRight,
+            bgMatrix.bottomRight, bgMatrix.bottomRight
+        )
+
+        for ((index, text) in split.withIndex()) {
+            graphics.text(font, text, xPos + 4, yPos + 3 + (index * font.lineHeight),
+                ThemeConfig.tooltipText, false)
+        }
     }
 }

@@ -280,28 +280,7 @@ class DropdownList<E : Comparable<E>>(
         }
 
         if (currentTooltip != null) {
-            val split = this.font.split(currentTooltip, 220)
-            val maxWidth = split.maxOf { this.font.width(it) }
-
-            val tooltipWidth = maxWidth + 8
-            var xPos = mouseX.toFloat() + 4f
-            var yPos = mouseY.toFloat() - 3
-            if (ClientPlatformProxy.instance.viewportWidth <= xPos + tooltipWidth)
-                xPos -= (xPos + tooltipWidth) - ClientPlatformProxy.instance.viewportWidth + 4
-
-            if (ClientPlatformProxy.instance.viewportHeight <= yPos + (split.size * this.font.lineHeight) + 5)
-                yPos -= (yPos + (split.size * this.font.lineHeight) + 5) - ClientPlatformProxy.instance.viewportHeight + 4
-
-            val bgMatrix = ColorConfig.separateMatrix(ThemeConfig.tooltipBackground)
-            graphics.fill(xPos, yPos, xPos + tooltipWidth, yPos + (split.size * this.font.lineHeight) + 5,
-                bgMatrix.topLeft, bgMatrix.topRight,
-                bgMatrix.bottomRight, bgMatrix.bottomRight
-            )
-
-            for ((index, text) in split.withIndex()) {
-                graphics.text(this.font, text, xPos + 4, yPos + 3 + (index * this.font.lineHeight),
-                    ThemeConfig.tooltipText, false)
-            }
+            this.tooltip(graphics, currentTooltip)
         }
     }
 
