@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.translator.instance.index
+package xyz.bluspring.unitytranslate.translator.instance.argos.index
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder

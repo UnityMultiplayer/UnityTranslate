@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.translator.instance.index
+package xyz.bluspring.unitytranslate.translator.instance.argos.index
 
 import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.util.LangPair

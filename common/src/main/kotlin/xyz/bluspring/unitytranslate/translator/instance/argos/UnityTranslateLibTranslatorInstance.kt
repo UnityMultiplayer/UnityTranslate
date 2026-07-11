@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.translator.instance
+package xyz.bluspring.unitytranslate.translator.instance.argos
 
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
@@ -11,10 +11,10 @@ import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
 import xyz.bluspring.unitytranslate.api.v2.util.LangPair
 import xyz.bluspring.unitytranslate.library.UnityTranslateLib
 import xyz.bluspring.unitytranslate.library.UnityTranslateLibInstance
-import xyz.bluspring.unitytranslate.translator.instance.index.ArgosPackageIndex
-import xyz.bluspring.unitytranslate.translator.instance.index.ModelInfo
-import xyz.bluspring.unitytranslate.translator.instance.index.ModelPackage
-import xyz.bluspring.unitytranslate.translator.instance.index.PackageIndex
+import xyz.bluspring.unitytranslate.translator.instance.argos.index.ArgosPackageIndex
+import xyz.bluspring.unitytranslate.translator.instance.argos.index.ModelInfo
+import xyz.bluspring.unitytranslate.translator.instance.argos.index.ModelPackage
+import xyz.bluspring.unitytranslate.translator.instance.argos.index.PackageIndex
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors

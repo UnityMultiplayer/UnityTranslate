@@ -8,7 +8,7 @@ import xyz.bluspring.unitytranslate.client.renderer.UnityTranslateGui
 import xyz.bluspring.unitytranslate.transcriber.TranscriberManager
 
 object UnityTranslateClient {
-    var handledFirstJoin = true
+    var handledFirstJoin = false
     val transcriberManager by lazy {
         TranscriberManager() // Client transcriber manager
     }

@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.translator.instance
+package xyz.bluspring.unitytranslate.translator.instance.argos
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject

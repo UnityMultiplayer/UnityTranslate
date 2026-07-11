@@ -24,8 +24,8 @@ import xyz.bluspring.unitytranslate.transcriber.TranscriberManager
 import xyz.bluspring.unitytranslate.transcriber.display.BuiltinLanguageDisplays
 import xyz.bluspring.unitytranslate.translator.TranslatorManagerImpl
 import xyz.bluspring.unitytranslate.translator.instance.InactiveTranslatorInstance
-import xyz.bluspring.unitytranslate.translator.instance.LibreTranslateTranslatorInstance
-import xyz.bluspring.unitytranslate.translator.instance.UnityTranslateLibTranslatorInstance
+import xyz.bluspring.unitytranslate.translator.instance.argos.LibreTranslateTranslatorInstance
+import xyz.bluspring.unitytranslate.translator.instance.argos.UnityTranslateLibTranslatorInstance
 import java.text.DecimalFormat
 
 object UnityTranslate {

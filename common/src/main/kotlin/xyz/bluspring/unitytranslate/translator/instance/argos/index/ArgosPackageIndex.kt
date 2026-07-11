@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.translator.instance.index
+package xyz.bluspring.unitytranslate.translator.instance.argos.index
 
 import com.google.gson.JsonParser
 import com.mojang.serialization.JsonOps
@@ -79,7 +79,11 @@ class ArgosPackageIndex(path: Path) : PackageIndex<ArgosPackage>(path, "argos") 
 
         // Try to load the cached data in the meantime.
         if (cachedFile.exists()) {
-            cachedFile.inputStream(options = arrayOf(StandardOpenOption.READ)).use { loadIndexFromStream(it) }
+            try {
+                cachedFile.inputStream(options = arrayOf(StandardOpenOption.READ)).use { loadIndexFromStream(it) }
+            } catch (e: Throwable) {
+
+            }
         }
     }
 

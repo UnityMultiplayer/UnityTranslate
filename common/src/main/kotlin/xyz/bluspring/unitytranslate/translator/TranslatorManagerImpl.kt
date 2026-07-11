@@ -10,7 +10,7 @@ import xyz.bluspring.unitytranslate.api.v2.util.LangPair
 import xyz.bluspring.unitytranslate.transcriber.DirectTranscriptData
 import xyz.bluspring.unitytranslate.transcriber.TranslatedTranscriptData
 import xyz.bluspring.unitytranslate.translator.instance.InactiveTranslatorInstance
-import xyz.bluspring.unitytranslate.translator.instance.UnityTranslateLibTranslatorInstance
+import xyz.bluspring.unitytranslate.translator.instance.argos.UnityTranslateLibTranslatorInstance
 import java.util.Queue
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
