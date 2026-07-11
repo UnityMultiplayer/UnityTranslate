@@ -1,6 +1,10 @@
 package xyz.bluspring.unitytranslate.client.gui.screen
 
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
+import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
@@ -54,6 +58,15 @@ class FirstStartupScreen : UTScreen() {
             UnityTranslateClient.handledFirstJoin = true
             for (config in UnityTranslateApiImpl.allConfigs) {
                 config.save()
+            }
+
+            val transcriber = UnityTranslateApi.instance.getTranscriber((this.sequence.first { it is LangSelectIntroSequence } as LangSelectIntroSequence)
+                .currentTranscriberId)
+
+            runBlocking {
+                launch(start = CoroutineStart.UNDISPATCHED) {
+                    UnityTranslateApiImpl.setActiveTranscriber(transcriber)
+                }
             }
 
             return

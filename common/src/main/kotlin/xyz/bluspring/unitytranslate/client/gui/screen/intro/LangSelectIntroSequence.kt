@@ -10,6 +10,7 @@ import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
+import xyz.bluspring.unitytranslate.client.config.ClientConfig
 import xyz.bluspring.unitytranslate.client.gui.element.DropdownList
 import xyz.bluspring.unitytranslate.client.gui.element.PlainUIButton
 import xyz.bluspring.unitytranslate.client.gui.element.UILabel
@@ -20,7 +21,7 @@ import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 import xyz.bluspring.unitytranslate.config.builders.ConfigValueBuilderImpl
 
 class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent) {
-    var currentTranscriberId: String = UnityTranslateApi.instance.getTranscriberId(UnityTranslateApi.instance.activeTranscriber)
+    var currentTranscriberId: String = UnityTranslateApi.instance.getTranscriberId(ClientConfig.transcriber)
     lateinit var nextButton: PlainUIButton
 
     override fun init(width: Int, height: Int) {
@@ -134,6 +135,7 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
 
         val nextText = Component.translatable("unitytranslate.intro.language_select.next")
         this.nextButton = this.addChild(PlainUIButton(font, nextText, width - 4f - font.width(nextText), height - 16f) {
+            ClientConfig.transcriber = UnityTranslateApi.instance.getTranscriber(this.currentTranscriberId)
             this.parent.next()
         })
     }
