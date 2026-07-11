@@ -20,6 +20,8 @@
     "unitytranslate.intro.first_time": "Looks like this is your first time using UnityTranslate, let's help you get set up.",
     "unitytranslate.intro.first_time.next": "Let's go!",
     "unitytranslate.intro.language_select": "To get started, select your preferred languages here! Then, you can select the transcriber you want to use.",
+    "unitytranslate.intro.language_select.next": ">> Next",
+    "unitytranslate.intro.language_select.warning.inactive_transcriber": "Warning: Your transcriber is currently set to Inactive, if you proceed you will not have your speech converted into text, and as such will not be translated!",
 
     "unitytranslate.model.estimated.storage": "Estimated Storage Usage: %s",
     "unitytranslate.model.estimated.memory": "Estimated Memory Usage: %s",

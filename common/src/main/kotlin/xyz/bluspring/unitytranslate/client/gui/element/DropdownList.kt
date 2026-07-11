@@ -64,7 +64,7 @@ class DropdownList<E : Comparable<E>>(
         else visualizer(it)
     }
 
-    private val validator: (E?) -> Boolean = {
+    val validator: (E?) -> Boolean = {
         if (it == null)
             this.type != Type.REQUIRED
         else

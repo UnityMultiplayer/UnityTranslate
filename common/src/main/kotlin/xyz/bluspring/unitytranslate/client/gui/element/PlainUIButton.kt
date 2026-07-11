@@ -18,9 +18,11 @@ open class PlainUIButton(
     private val maxWidth: Int = 10000,
     open var color: Int = ThemeConfig.plainButton,
     protected val hoverColor: Int = ThemeConfig.plainButtonHover,
+    protected val disabledColor: Int = ThemeConfig.plainButtonDisabled,
     private val onClick: () -> Unit,
 ) : UIElement(), FadeableUIElement {
     override var opacity: Float = 1f
+    var isDisabled = false
 
     override fun bounds(screenWidth: Int, screenHeight: Int): ScreenRectangle {
         val split = this.font.split(this.text, this.maxWidth)
@@ -47,7 +49,11 @@ open class PlainUIButton(
 
         val yStart = bounds.top()
         for ((index, text) in split.withIndex()) {
-            graphics.centeredText(this.font, text, this.x, yStart + (index * this.font.lineHeight).toFloat(), (if (isHovered) this.hoverColor else this.color).multiplyAlpha(this.opacity), true)
+            graphics.centeredText(this.font, text, this.x, yStart + (index * this.font.lineHeight).toFloat(),
+                (if (this.isDisabled) this.disabledColor else if (isHovered) this.hoverColor else this.color)
+                    .multiplyAlpha(this.opacity),
+                true
+            )
         }
 
 //        graphics.outline(bounds.left().toFloat(), bounds.top().toFloat(), bounds.right().toFloat(), bounds.bottom().toFloat(), 1f, -1)
@@ -55,7 +61,7 @@ open class PlainUIButton(
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
         if (this.bounds().containsPoint(mouseX.toInt(), mouseY.toInt())) {
-            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && !this.isDisabled) {
                 this.onClick()
                 return true
             }

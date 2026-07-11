@@ -8,15 +8,21 @@ import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
 import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
+import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.gui.element.DropdownList
 import xyz.bluspring.unitytranslate.client.gui.element.FadeableUIElement
+import xyz.bluspring.unitytranslate.client.gui.element.PlainUIButton
 import xyz.bluspring.unitytranslate.client.gui.element.UILabel
 import xyz.bluspring.unitytranslate.client.gui.screen.FirstStartupScreen
 import xyz.bluspring.unitytranslate.client.gui.screen.config.entry.ConfigEntry
+import xyz.bluspring.unitytranslate.client.gui.screen.config.entry.DropdownConfigEntry
+import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
+import xyz.bluspring.unitytranslate.config.builders.ConfigValueBuilderImpl
 
 class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent) {
     var currentTranscriberId: String = UnityTranslateApi.instance.getTranscriberId(UnityTranslateApi.instance.activeTranscriber)
+    lateinit var nextButton: PlainUIButton
 
     override fun init(width: Int, height: Int) {
         super.init(width, height)
@@ -132,12 +138,48 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
                 })
             }
         }
+
+        val nextText = Component.translatable("unitytranslate.intro.language_select.next")
+        this.nextButton = this.addChild(PlainUIButton(font, nextText, width - 4f - font.width(nextText), height - 8f) {
+            this.parent.next()
+        })
+    }
+
+    override fun tick() {
+        super.tick()
+
+        var canProceed = true
+        for (element in this.children) {
+            if (element is DropdownList<*>) {
+                if (!element.validator(element.selected)) {
+                    canProceed = false
+                    break
+                }
+            } else if (element is DropdownConfigEntry<*>) {
+                if (!(element.value.validator as ConfigValueBuilderImpl<Any>).validator(element.value.property.getter.call())) {
+                    canProceed = false
+                    break
+                }
+            }
+        }
+
+        this.nextButton.isDisabled = !canProceed
     }
 
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int, transitionProgress: Float) {
         for (element in this.children) {
             if (element is FadeableUIElement) {
                 element.opacity = transitionProgress
+            }
+        }
+
+        val currentTranscriber = UnityTranslateApi.instance.getTranscriber(this.currentTranscriberId)
+        if (currentTranscriber == InactiveTranscriber) {
+            val font = ClientPlatformProxy.instance.defaultFont
+            val splitText = font.split(Component.translatable("unitytranslate.intro.language_select.warning.inactive_transcriber"), 200)
+            for ((index, text) in splitText.withIndex()) {
+                graphics.text(font, text, 4f,
+                    ClientPlatformProxy.instance.viewportHeight - (splitText.size * font.lineHeight) - 2f + (index * font.lineHeight), ThemeConfig.warningText, true)
             }
         }
     }

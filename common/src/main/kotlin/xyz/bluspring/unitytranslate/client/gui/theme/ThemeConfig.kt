@@ -37,6 +37,7 @@ object ThemeConfig {
 
     var plainButton: Int = Color(210, 210, 210, 255).rgb
     var plainButtonHover: Int = Color(255, 255, 255, 255).rgb
+    var plainButtonDisabled: Int = Color(100, 100, 100).rgb
 
     var configEntryText: Int = Color(170, 170, 170, 255).rgb
     var configEntryTextFocus: Int = Color(255, 255, 255, 255).rgb
@@ -66,4 +67,6 @@ object ThemeConfig {
     )
     var sliderValue: Int = Color(170, 170, 170).rgb
     var sliderValueFocused: Int = Color(255, 255, 255).rgb
+
+    var warningText: Int = Color(255, 156, 27).rgb
 }
