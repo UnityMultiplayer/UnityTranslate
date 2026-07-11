@@ -32,7 +32,7 @@ abstract class ConfigEntry<E, T : ConfigValue<E>>(
 
     override fun bounds(screenWidth: Int, screenHeight: Int): ScreenRectangle {
         val original = ScreenRectangle(this.xPos.toInt(), this.yPos.toInt(), this.width.toInt(), this.height.toInt())
-        return ScreenUtil.union(original, *this.children.map { it.bounds(screenWidth, screenHeight) }.toTypedArray())
+        return ScreenUtil.union(original, *this.children.map { it.getBounds(screenWidth, screenHeight) }.toTypedArray())
     }
 
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {

@@ -33,7 +33,7 @@ open class PlainUIButton(
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
         super.submit(graphics, partialTick, mouseX, mouseY)
 
-        val bounds = this.bounds(graphics.width, graphics.height)
+        val bounds = this.getBounds(graphics.width, graphics.height)
         val isHovered = bounds.containsPoint(mouseX, mouseY)
         val split = this.font.split(this.text.copy().withStyle {
             if (isHovered)

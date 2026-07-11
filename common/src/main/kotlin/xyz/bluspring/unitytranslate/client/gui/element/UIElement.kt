@@ -2,6 +2,7 @@ package xyz.bluspring.unitytranslate.client.gui.element
 
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
+import org.jetbrains.annotations.ApiStatus
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
@@ -17,14 +18,19 @@ abstract class UIElement {
     private var isInitialized = false
 
     fun bounds(): ScreenRectangle {
+        return this.getBounds(ClientPlatformProxy.instance.viewportWidth, ClientPlatformProxy.instance.viewportHeight)
+    }
+
+    fun getBounds(screenWidth: Int, screenHeight: Int): ScreenRectangle {
         if (!this.isInitialized) {
             this.setup(ClientPlatformProxy.instance.viewportWidth, ClientPlatformProxy.instance.viewportHeight)
         }
 
-        return bounds(ClientPlatformProxy.instance.viewportWidth, ClientPlatformProxy.instance.viewportHeight)
+        return this.bounds(screenWidth, screenHeight)
     }
 
-    abstract fun bounds(screenWidth: Int, screenHeight: Int): ScreenRectangle
+    @ApiStatus.OverrideOnly
+    protected abstract fun bounds(screenWidth: Int, screenHeight: Int): ScreenRectangle
 
     protected open fun init(width: Int, height: Int) {
     }
