@@ -3,7 +3,6 @@ package xyz.bluspring.unitytranslate.client.gui.screen.config.entry
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
 import xyz.bluspring.sunset.values.ConfigValue
-import xyz.bluspring.sunset.values.RangedConfigValue
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
@@ -12,6 +11,7 @@ import xyz.bluspring.unitytranslate.client.gui.element.UIElement
 import xyz.bluspring.unitytranslate.client.gui.element.UILabel
 import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 import xyz.bluspring.unitytranslate.config.values.DropdownValidatingReflectingConfigValue
+import xyz.bluspring.unitytranslate.config.values.ValidatingRangedConfigValue
 import xyz.bluspring.unitytranslate.config.values.ValidatingReflectingConfigValue
 import xyz.bluspring.unitytranslate.util.ScreenUtil
 import kotlin.reflect.typeOf
@@ -63,7 +63,7 @@ abstract class ConfigEntry<E, T : ConfigValue<E>>(
             width: Float, height: Float,
             rootKey: String = "", font: FontReference = ClientPlatformProxy.instance.defaultFont,
         ): ConfigEntry<*, *> = when (value) {
-            is RangedConfigValue -> SliderConfigEntry(xPos, yPos, width, height, value, rootKey, font)
+            is ValidatingRangedConfigValue -> SliderConfigEntry(xPos, yPos, width, height, value, rootKey, font)
             is DropdownValidatingReflectingConfigValue -> DropdownConfigEntry(xPos, yPos, width, height, value, rootKey, font)
             is ValidatingReflectingConfigValue -> when (value.type) {
                 typeOf<Boolean>() -> ToggleConfigEntry(xPos, yPos, width, height, value as ValidatingReflectingConfigValue<Boolean>, rootKey, font)

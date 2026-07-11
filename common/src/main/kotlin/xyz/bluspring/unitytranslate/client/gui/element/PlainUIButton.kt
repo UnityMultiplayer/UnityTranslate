@@ -3,6 +3,7 @@ package xyz.bluspring.unitytranslate.client.gui.element
 import net.minecraft.client.gui.navigation.ScreenPosition
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
+import org.lwjgl.glfw.GLFW
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
@@ -51,7 +52,7 @@ open class PlainUIButton(
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
         if (this.bounds().containsPoint(mouseX.toInt(), mouseY.toInt())) {
-            if (button == 0) {
+            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
                 this.onClick()
                 return true
             }

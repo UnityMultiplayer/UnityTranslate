@@ -320,10 +320,10 @@ class DropdownList<E : Comparable<E>>(
     }
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        if (this.mainBounds.containsPoint(mouseX.toInt(), mouseY.toInt()) && !this.isDisabled && this.isLoaded && this.elements.isNotEmpty()) {
+        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && this.mainBounds.containsPoint(mouseX.toInt(), mouseY.toInt()) && !this.isDisabled && this.isLoaded && this.elements.isNotEmpty()) {
             this.isOpened = !this.isOpened
             this.lastStoredIndex = this.currentIndex
-        } else if (this.isOpened) {
+        } else if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && this.isOpened) {
             val elements = this.elements
             val usableScreenHeight = ClientPlatformProxy.instance.viewportHeight - this.y - this.height - 2
             val elementHeight = (this.height * elements.size)

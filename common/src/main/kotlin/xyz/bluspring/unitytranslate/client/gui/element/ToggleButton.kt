@@ -1,6 +1,7 @@
 package xyz.bluspring.unitytranslate.client.gui.element
 
 import net.minecraft.client.gui.navigation.ScreenRectangle
+import org.lwjgl.glfw.GLFW
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.client.config.ColorConfig
 import kotlin.reflect.KMutableProperty
@@ -51,7 +52,7 @@ class ToggleButton(
     }
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        if (this.bounds().containsPoint(mouseX.toInt(), mouseY.toInt())) {
+        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && this.bounds().containsPoint(mouseX.toInt(), mouseY.toInt())) {
             this.property.setter.call(!this.property.getter.call())
             return true
         }

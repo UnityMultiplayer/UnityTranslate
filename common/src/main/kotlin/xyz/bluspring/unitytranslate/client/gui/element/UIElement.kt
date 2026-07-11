@@ -14,7 +14,7 @@ abstract class UIElement {
     protected var isSelected = false
 
     private val enableDebug: Boolean // don't optimize this into a const, this is so we can use hotswap to toggle debug display.
-        get() = true
+        get() = false
     private var isInitialized = false
 
     fun bounds(): ScreenRectangle {
