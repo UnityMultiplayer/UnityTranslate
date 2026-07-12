@@ -10,6 +10,9 @@ object ThemeConfig {
     )
     var textColor: Int = Color(0xFFFFFF).rgb
 
+    var enabledText: Int = Color(99, 255, 99).rgb
+    var disabledText: Int = Color(255, 99, 99).rgb
+
     var dropdownBackground: ColorConfig = ColorConfig.Gradient(ColorConfig.Gradient.GradientDirection.BOTTOM,
         Color(0, 0, 0, 0).rgb,
         Color(0, 0, 0, 89).rgb
@@ -40,7 +43,7 @@ object ThemeConfig {
     var plainButtonDisabled: Int = Color(100, 100, 100).rgb
 
     var configEntryText: Int = Color(170, 170, 170, 255).rgb
-    var configEntryTextFocus: Int = Color(255, 255, 255, 255).rgb
+    var configEntryTextFocused: Int = Color(255, 255, 255, 255).rgb
 
     var toggleOutline: ColorConfig = ColorConfig.Solid(
         Color(170, 170, 170).rgb
@@ -69,4 +72,23 @@ object ThemeConfig {
     var sliderValueFocused: Int = Color(255, 255, 255).rgb
 
     var warningText: Int = Color(255, 156, 27).rgb
+
+    var contextBoxBackground: ColorConfig = ColorConfig.Solid(
+        Color(0, 0, 0, 230).rgb
+    )
+    var contextBoxOutline: ColorConfig = ColorConfig.Solid(
+        Color(40, 40, 40, 170).rgb
+    )
+    var contextBoxElementOutline: ColorConfig = ColorConfig.Solid(
+        Color(40, 40, 40, 170).rgb
+    )
+    var contextBoxElementOutlineFocused: ColorConfig = ColorConfig.Solid(
+        Color(80, 80, 80, 170).rgb
+    )
+    var contextBoxElementBackground: ColorConfig = ColorConfig.None
+    var contextBoxElementBackgroundFocused: ColorConfig = ColorConfig.Solid(
+        Color(255, 255, 255, 80).rgb
+    )
+    var contextBoxElementText: Int = Color(210, 210, 210).rgb
+    var contextBoxElementTextFocused: Int = Color(255, 255, 255).rgb
 }

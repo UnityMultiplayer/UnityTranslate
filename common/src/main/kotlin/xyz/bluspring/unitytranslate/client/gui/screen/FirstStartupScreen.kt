@@ -17,6 +17,7 @@ class FirstStartupScreen : UTScreen() {
     val sequence = listOf(
         FirstTimeIntroSequence(this),
         LangSelectIntroSequence(this),
+        TranscriptBoxIntroSequence(this),
         DownloadIntroSequence(this),
     )
 

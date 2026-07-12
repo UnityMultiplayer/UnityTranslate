@@ -5,6 +5,7 @@ import net.minecraft.network.chat.FormattedText
 import net.minecraft.util.FormattedCharSequence
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
+import xyz.bluspring.unitytranslate.api.v2.util.ColorMatrix
 
 /**
  * An abstraction that allows drawing to a screen, designed to be similar to Minecraft's GuiGraphics, except with a few more additional useful things.
@@ -29,12 +30,20 @@ interface UIGraphics {
     fun fill(x1: Float, y1: Float, x2: Float, y2: Float, colorFrom: Int, colorTo: Int = colorFrom)
         = fill(x1, y1, x2, y2, colorFrom, colorFrom, colorTo, colorTo)
 
+    fun fill(x1: Float, y1: Float, x2: Float, y2: Float, matrix: ColorMatrix)
+        = fill(x1, y1, x2, y2, matrix.topLeft, matrix.topRight, matrix.bottomLeft, matrix.bottomRight)
+
     fun fill(x1: Float, y1: Float, x2: Float, y2: Float, colorTopLeft: Int, colorTopRight: Int, colorBottomLeft: Int, colorBottomRight: Int)
 
     fun meshFill(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float, x4: Float, y4: Float, color1: Int, color2: Int = color1, color3: Int = color1, color4: Int = color1)
+    fun meshFill(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float, x4: Float, y4: Float, matrix: ColorMatrix)
+        = meshFill(x1, y1, x2, y2, x3, y3, x4, y4, matrix.topLeft, matrix.topRight, matrix.bottomLeft, matrix.bottomRight)
 
     fun outline(x1: Float, y1: Float, x2: Float, y2: Float, thickness: Float = 1f, colorFrom: Int, colorTo: Int = colorFrom)
         = outline(x1, y1, x2, y2, thickness, colorFrom, colorFrom, colorTo, colorTo)
+
+    fun outline(x1: Float, y1: Float, x2: Float, y2: Float, thickness: Float = 1f, matrix: ColorMatrix)
+        = outline(x1, y1, x2, y2, thickness, matrix.topLeft, matrix.topRight, matrix.bottomLeft, matrix.bottomRight)
 
     fun outline(x1: Float, y1: Float, x2: Float, y2: Float, thickness: Float = 1f, colorTopLeft: Int, colorTopRight: Int, colorBottomLeft: Int, colorBottomRight: Int) {
         val width = x2 - x1
@@ -73,6 +82,10 @@ interface UIGraphics {
         = this.meshBlitWithColor(x1, y1, x2, y2, x3, y3, x4, y4, u1, v1, u2, v2, u3, v3, u4, v4, texture, -1)
 
     fun meshBlitWithColor(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float, x4: Float, y4: Float,
+                          u1: Float, v1: Float, u2: Float, v2: Float, u3: Float, v3: Float, u4: Float, v4: Float, texture: TextureReference, matrix: ColorMatrix)
+        = this.meshBlitWithColor(x1, y1, x2, y2, x3, y3, x4, y4, u1, v1, u2, v2, u3, v3, u4, v4, texture, matrix.topLeft, matrix.topRight, matrix.bottomLeft, matrix.bottomRight)
+
+    fun meshBlitWithColor(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float, x4: Float, y4: Float,
                  u1: Float, v1: Float, u2: Float, v2: Float, u3: Float, v3: Float, u4: Float, v4: Float, texture: TextureReference,
                  color1: Int, color2: Int = color1, color3: Int = color1, color4: Int = color1)
 
@@ -80,6 +93,10 @@ interface UIGraphics {
         = this.blitWithColor(x1, y1, x2, y2, u0, v0, u1, v1, texture, -1, -1)
     fun blitWithColor(x1: Float, y1: Float, x2: Float, y2: Float, u0: Float, v0: Float, u1: Float, v1: Float, texture: TextureReference, colorFrom: Int, colorTo: Int = colorFrom)
         = this.blitWithColor(x1, y1, x2, y2, u0, v0, u1, v1, texture, colorFrom, colorFrom, colorTo, colorTo)
+
+    fun blitWithColor(x1: Float, y1: Float, x2: Float, y2: Float, u0: Float, v0: Float, u1: Float, v1: Float, texture: TextureReference, matrix: ColorMatrix)
+        = this.blitWithColor(x1, y1, x2, y2, u0, v0, u1, v1, texture, matrix.topLeft, matrix.topRight, matrix.bottomLeft, matrix.bottomRight)
+
     fun blitWithColor(x1: Float, y1: Float, x2: Float, y2: Float, u0: Float, v0: Float, u1: Float, v1: Float, texture: TextureReference, colorTopLeft: Int, colorTopRight: Int, colorBottomLeft: Int, colorBottomRight: Int)
 
     fun pushMatrix()

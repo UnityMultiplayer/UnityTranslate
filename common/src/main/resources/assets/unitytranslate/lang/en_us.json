@@ -13,6 +13,9 @@
     "unitytranslate.config.none": "(none)",
     "unitytranslate.config.default": "(default)",
 
+    "unitytranslate.value.false": "Off",
+    "unitytranslate.value.true": "On",
+
     "unitytranslate.measurement.seconds": "%s seconds",
 
     "unitytranslate.transcriber.inactive.name": "(inactive)",
@@ -22,12 +25,16 @@
     "unitytranslate.intro.language_select": "To get started, select your preferred languages here! Then, you can select the transcriber you want to use.",
     "unitytranslate.intro.language_select.next": ">> Next",
     "unitytranslate.intro.language_select.warning.inactive_transcriber": "Warning: Your transcriber is currently set to Inactive, if you proceed you will not have your speech converted into text, and as such will not be translated!",
+    "unitytranslate.intro.transcript_box": "Welcome to the transcript box configuration screen! To get started, simply right click (or push the Menu button on your keyboard!) to add a new transcript box at your cursor's position. You can then right click (or push the Menu button) on the transcript boxes themselves to edit their properties.\n\nThis text will disappear once you place your first transcript box, but don't worry, it'll come back if you remove it.",
     "unitytranslate.intro.download_required": "UnityTranslate needs to download some data for its functions, which may take a while depending on your internet speed and the size of the data.\n\nMake sure you have an active and stable internet connection so UnityTranslate can download the files.\n\nYou will be able to see what files it is currently downloading in the pause and main menus, in the bottom right of your screen.",
     "unitytranslate.intro.download_required.proceed": "Proceed",
     "unitytranslate.intro.download_required.back": "Back",
     "unitytranslate.intro.downloading.error.no_internet": "No internet connection detected, make sure you have your internet connected so UnityTranslate can download the data required for its functionality!",
     "unitytranslate.download.file": "Downloading %s",
     "unitytranslate.download.total": "%s out of %s (%s)",
+
+    "unitytranslate.transcript_box.done": "Done",
+    "unitytranslate.transcript_box.create": "Create Transcript Box",
 
     "unitytranslate.model.estimated.storage": "Estimated Storage Usage: %s",
     "unitytranslate.model.estimated.memory": "Estimated Memory Usage: %s",

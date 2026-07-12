@@ -1,6 +1,7 @@
 package xyz.bluspring.unitytranslate.client.gui.hud
 
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
@@ -13,9 +14,10 @@ import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.ColorConfig
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
+import xyz.bluspring.unitytranslate.client.gui.element.UIElement
 import kotlin.math.floor
 
-class TranscriptBoxContainer(var holder: TranscriptHolder, val config: TranscriptBoxConfig) {
+class TranscriptBoxContainer(var holder: TranscriptHolder, val config: TranscriptBoxConfig) : UIElement() {
     var x = 0f
     var y = 0f
     var width = 0f
@@ -26,7 +28,14 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
     private var headerX: Float = 0f
     private var headerY: Float = 0f
 
-    fun tick() {
+    override fun bounds(
+        screenWidth: Int,
+        screenHeight: Int
+    ): ScreenRectangle {
+        return ScreenRectangle(this.x.toInt(), this.y.toInt(), this.width.toInt(), this.height.toInt())
+    }
+
+    override fun tick() {
         val transcripts = this.holder.transcripts.toList()
         var wasModified = false
         val transcriptsToRemove by lazy { mutableSetOf<TranscriptData>() }
@@ -61,7 +70,7 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
             return floor((System.currentTimeMillis() - this.timeUpdated) / 50.0).toInt()
         }
 
-    fun submit(graphics: UIGraphics, partialTick: Float) {
+    override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
         graphics.pushMatrix()
         graphics.translate(this.x, this.y)
 
@@ -146,6 +155,8 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
         graphics.disableScissor()
 
         graphics.popMatrix()
+
+        super.submit(graphics, partialTick, mouseX, mouseY)
     }
 
     fun updateConfig() {
@@ -158,10 +169,10 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
         val pos = config.transforms.position.calculatePos(screenWidth, screenHeight)
         val dimensions = config.transforms.size.calculateDimensions(pos, screenWidth, screenHeight)
 
-        this.x = dimensions.left
-        this.y = dimensions.top
-        this.width = dimensions.right - dimensions.left
-        this.height = dimensions.bottom - dimensions.top
+        this.x = dimensions.left().toFloat()
+        this.y = dimensions.top().toFloat()
+        this.width = dimensions.width.toFloat()
+        this.height = dimensions.height.toFloat()
 
         this.headerText = this.config.header.text(this.holder.language)
         val headerLength = font.width(this.config.header.display.text(Component.empty()))

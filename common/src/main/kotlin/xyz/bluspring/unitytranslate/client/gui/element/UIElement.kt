@@ -53,6 +53,11 @@ abstract class UIElement {
         return child
     }
 
+    protected fun <T : UIElement> removeChild(child: T): T {
+        this.children.remove(child)
+        return child
+    }
+
     open fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
         // Debug thing for showing the element bounds.
         if (this.enableDebug) {

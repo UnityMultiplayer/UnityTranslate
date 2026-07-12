@@ -9,12 +9,15 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
+import xyz.bluspring.unitytranslate.api.v2.config.ConfigBuilder
 import xyz.bluspring.unitytranslate.api.v2.display.LanguageDisplay
 import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
 import xyz.bluspring.unitytranslate.client.config.ClientConfig
+import xyz.bluspring.unitytranslate.client.config.ColorConfig
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
+import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 import xyz.bluspring.unitytranslate.config.builders.SunsetWrappedConfigBuilder
 import xyz.bluspring.unitytranslate.config.values.HiddenReflectingConfigValue
 import xyz.bluspring.unitytranslate.integration.UnityTranslateIntegration
@@ -27,6 +30,7 @@ import xyz.bluspring.unitytranslate.translator.instance.InactiveTranslatorInstan
 import xyz.bluspring.unitytranslate.translator.instance.argos.LibreTranslateTranslatorInstance
 import xyz.bluspring.unitytranslate.translator.instance.argos.UnityTranslateLibTranslatorInstance
 import java.text.DecimalFormat
+import kotlin.reflect.KMutableProperty
 
 object UnityTranslate {
     const val MOD_ID = Constants.MOD_ID
@@ -166,6 +170,91 @@ object UnityTranslate {
 
             if (this is SunsetWrappedConfigBuilder) {
                 this.wrapped.custom(HiddenReflectingConfigValue("handled_first_join", Codec.BOOL, UnityTranslateClient::handledFirstJoin))
+            }
+        }
+
+        UnityTranslateApi.instance.registerConfig("unitytranslate_theme") {
+            fun ConfigBuilder.color(id: String, property: KMutableProperty<ColorConfig>) {
+                value(id, ColorConfig.CODEC, property)
+            }
+
+            category("background") {
+                color("main", ThemeConfig::mainBackground)
+            }
+
+            category("text") {
+                intColor("main", ThemeConfig::textColor)
+                intColor("warning", ThemeConfig::warningText)
+                intColor("off", ThemeConfig::disabledText)
+                intColor("on", ThemeConfig::enabledText)
+            }
+
+            category("dropdown") {
+                color("background", ThemeConfig::dropdownBackground)
+                color("open_background", ThemeConfig::dropdownOpenBackground)
+                color("open_outline", ThemeConfig::dropdownOpenOutline)
+
+                category("text") {
+                    intColor("item", ThemeConfig::dropdownTextItem)
+                    intColor("item_hover", ThemeConfig::dropdownTextItemHover)
+                    intColor("item_selected", ThemeConfig::dropdownTextItemSelected)
+                    intColor("item_disabled", ThemeConfig::dropdownTextItemDisabled)
+                    intColor("disabled", ThemeConfig::dropdownTextDisabled)
+                }
+            }
+
+            category("tooltip") {
+                color("background", ThemeConfig::tooltipBackground)
+                intColor("text", ThemeConfig::tooltipText)
+            }
+
+            category("scrollbar") {
+                color("thumb", ThemeConfig::scrollbar)
+            }
+
+            category("button") {
+                category("plain") {
+                    intColor("text", ThemeConfig::plainButton)
+                    intColor("hover", ThemeConfig::plainButtonHover)
+                    intColor("disabled", ThemeConfig::plainButtonDisabled)
+                }
+
+                category("toggle") {
+                    color("outline", ThemeConfig::toggleOutline)
+                    color("outline_focused", ThemeConfig::toggleOutlineFocused)
+                    color("disabled_fill", ThemeConfig::toggleDisabledFill)
+                    color("enabled_fill", ThemeConfig::toggleEnabledFill)
+                }
+            }
+
+            category("config_entry") {
+                intColor("text", ThemeConfig::configEntryText)
+                intColor("text_focused", ThemeConfig::configEntryTextFocused)
+            }
+
+            category("slider") {
+                color("track", ThemeConfig::sliderTrack)
+                color("track_focused", ThemeConfig::sliderTrackFocused)
+
+                color("notch", ThemeConfig::sliderNotch)
+                color("notch_focused", ThemeConfig::sliderNotchFocused)
+
+                intColor("value", ThemeConfig::sliderValue)
+                intColor("value_focused", ThemeConfig::sliderValueFocused)
+            }
+
+            category("context_box") {
+                color("background", ThemeConfig::contextBoxBackground)
+                color("outline", ThemeConfig::contextBoxOutline)
+
+                category("element") {
+                    color("outline", ThemeConfig::contextBoxElementOutline)
+                    color("outline_focused", ThemeConfig::contextBoxElementOutlineFocused)
+                    color("background", ThemeConfig::contextBoxElementBackground)
+                    color("background_focused", ThemeConfig::contextBoxElementBackgroundFocused)
+                    intColor("text", ThemeConfig::contextBoxElementText)
+                    intColor("text_focused", ThemeConfig::contextBoxElementTextFocused)
+                }
             }
         }
 

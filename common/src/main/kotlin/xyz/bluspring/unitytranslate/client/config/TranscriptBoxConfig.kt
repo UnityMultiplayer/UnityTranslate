@@ -4,9 +4,11 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.ChatFormatting
+import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.chat.Style
+import net.minecraft.util.Mth
 import org.joml.Vector2f
 import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.client.gui.TextureReference
@@ -14,9 +16,9 @@ import xyz.bluspring.unitytranslate.api.v2.display.LanguageDisplay
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptData
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 import xyz.bluspring.unitytranslate.transcriber.display.BuiltinLanguageDisplays
-import xyz.bluspring.unitytranslate.util.Box2f
-import xyz.bluspring.unitytranslate.util.ScreenUtil
 import java.util.*
+import kotlin.math.min
+import kotlin.math.round
 
 class TranscriptBoxConfig(
     var language: Language,
@@ -268,14 +270,11 @@ class TranscriptBoxConfig(
                 }
             }
 
-            abstract fun calculateDimensions(screenPos: Vector2f, screenWidth: Int, screenHeight: Int): Box2f
+            abstract fun calculateDimensions(screenPos: Vector2f, screenWidth: Int, screenHeight: Int): ScreenRectangle
 
             data class Absolute(var width: Float, var height: Float) : Size("absolute") {
-                override fun calculateDimensions(screenPos: Vector2f, screenWidth: Int, screenHeight: Int): Box2f {
-                    return Box2f.expandFromAnchor(
-                        ScreenUtil.findAnchorPoint(screenPos, this.width, this.height, screenWidth, screenHeight),
-                        this.width, this.height
-                    )
+                override fun calculateDimensions(screenPos: Vector2f, screenWidth: Int, screenHeight: Int): ScreenRectangle {
+                    return ScreenRectangle(screenPos.x.toInt(), screenPos.y.toInt(), this.width.toInt(), this.height.toInt())
                 }
 
                 companion object {
@@ -292,61 +291,32 @@ class TranscriptBoxConfig(
             }
 
             data class Anchored(
-                var maxWidth: Float, // px
-                var maxHeight: Float,
+                var targetWidth: Float, // px
+                var targetHeight: Float,
             ) : Size("anchored") {
-                override fun calculateDimensions(
-                    screenPos: Vector2f,
-                    screenWidth: Int,
-                    screenHeight: Int
-                ): Box2f {
-                    val aspectRatio = this.maxWidth / this.maxHeight
-                    val anchor = ScreenUtil.findAnchorPoint(screenPos, this.maxWidth, this.maxHeight, screenWidth, screenHeight)
+                override fun calculateDimensions(screenPos: Vector2f, screenWidth: Int, screenHeight: Int): ScreenRectangle {
+                    val maxWidth = screenWidth / 3f
+                    val maxHeight = screenHeight / 3f
+                    val anchorX = Mth.clamp(screenPos.x / screenWidth, 0f, 1f)
+                    val anchorY = Mth.clamp(screenPos.y / screenHeight, 0f, 1f)
 
-                    var targetWidth = this.maxWidth
-                    var targetHeight = this.maxHeight
+                    val clampedWidth = min(this.targetWidth, maxWidth)
+                    val clampedHeight = min(this.targetHeight, maxHeight)
 
-                    val expectedDimensions = Box2f.expandFromAnchor(anchor, targetWidth, targetHeight)
-
-                    if (screenPos.y + expectedDimensions.bottom > screenHeight)
-                        targetHeight -= (screenHeight - screenPos.y - expectedDimensions.bottom)
-
-                    if (screenPos.y - expectedDimensions.top < 0)
-                        targetHeight += (screenPos.y - expectedDimensions.top)
-
-                    if (screenPos.x + expectedDimensions.right > screenWidth)
-                        targetWidth -= (screenWidth - screenPos.x - expectedDimensions.right)
-
-                    if (screenPos.x - expectedDimensions.left < 0)
-                        targetWidth += (screenPos.x - expectedDimensions.left)
-
-                    if (targetWidth == this.maxWidth && targetHeight == this.maxHeight)
-                        return expectedDimensions
-
-                    val widthDiff = targetWidth / this.maxWidth
-                    val heightDiff = targetHeight / this.maxHeight
-
-                    // width / height = aspect ratio
-                    // width = aspect ratio * height
-                    // width / aspect ratio = height
-
-                    if (heightDiff > widthDiff) {
-                        // prioritize scaling the height
-                        targetWidth = aspectRatio * targetHeight
-                    } else {
-                        targetHeight = targetWidth / aspectRatio
-                    }
-
-                    return Box2f.expandFromAnchor(anchor, targetWidth, targetHeight)
+                    return ScreenRectangle(
+                        round((screenWidth - clampedWidth) * anchorX).toInt(),
+                        round((screenHeight - clampedHeight) * anchorY).toInt(),
+                        clampedWidth.toInt(), clampedHeight.toInt()
+                    )
                 }
 
                 companion object {
                     @JvmField val CODEC: MapCodec<Anchored> = RecordCodecBuilder.mapCodec { instance ->
                         instance.group(
-                            Codec.FLOAT.fieldOf("max_width")
-                                .forGetter(Anchored::maxWidth),
-                            Codec.FLOAT.fieldOf("max_height")
-                                .forGetter(Anchored::maxHeight)
+                            Codec.FLOAT.fieldOf("target_width")
+                                .forGetter(Anchored::targetWidth),
+                            Codec.FLOAT.fieldOf("target_height")
+                                .forGetter(Anchored::targetHeight)
                         )
                             .apply(instance, ::Anchored)
                     }
@@ -457,7 +427,7 @@ class TranscriptBoxConfig(
         var langDecoration: LanguageDecoration = LanguageDecoration.None,
         var alignX: HorizontalAlignment = HorizontalAlignment.Center(false),
         var alignY: VerticalAlignment = VerticalAlignment.Top,
-        var hasShadow: Boolean = false,
+        var hasShadow: Boolean = true,
     ) {
         fun text(language: Language): Component
             = this.display.text(this.langDecoration.decorate(this.langDisplay.text(language, this.langStyle))).copy().withStyle(this.style)
@@ -484,7 +454,7 @@ class TranscriptBoxConfig(
                         .forGetter(Header::alignX),
                     VerticalAlignment.CODEC.optionalFieldOf("align_y", VerticalAlignment.Top)
                         .forGetter(Header::alignY),
-                    Codec.BOOL.optionalFieldOf("has_shadow", false)
+                    Codec.BOOL.optionalFieldOf("has_shadow", true)
                         .forGetter(Header::hasShadow),
                 )
                     .apply(instance, ::Header)

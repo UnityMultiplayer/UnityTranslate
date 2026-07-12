@@ -1,0 +1,110 @@
+package xyz.bluspring.unitytranslate.client.gui.screen.config
+
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Style
+import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
+import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.withAlpha
+import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
+import xyz.bluspring.unitytranslate.client.config.ClientConfig
+import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
+import xyz.bluspring.unitytranslate.client.gui.TranscriptBoxRenderer
+import xyz.bluspring.unitytranslate.client.gui.element.HorizontalAlign
+import xyz.bluspring.unitytranslate.client.gui.element.PlainUIButton
+import xyz.bluspring.unitytranslate.client.gui.element.UILabel
+import xyz.bluspring.unitytranslate.client.gui.element.VerticalAlign
+import xyz.bluspring.unitytranslate.client.gui.element.context.ActionContextBoxElement
+import xyz.bluspring.unitytranslate.client.gui.element.context.ContextBox
+import xyz.bluspring.unitytranslate.client.gui.screen.UTScreen
+
+class ConfigureTranscriptBoxesScreen(val onExit: () -> Unit = { ClientPlatformProxy.instance.setScreen(null) }) : UTScreen() {
+    lateinit var renderer: TranscriptBoxRenderer
+    lateinit var introText: UILabel
+        private set
+
+    private var contextBox: ContextBox? = null
+    private var needsReinit = false
+
+    override fun init(width: Int, height: Int) {
+        super.init(width, height)
+        val font = ClientPlatformProxy.instance.defaultFont
+        this.introText = this.addChild(UILabel(width / 2f, height / 2f, Component.translatable("unitytranslate.intro.transcript_box"), font, maxWidth = width - 20, alignX = HorizontalAlign.CENTER, alignY = VerticalAlign.CENTER))
+        this.addChild(PlainUIButton(width / 2f, height - 12f, Component.translatable("unitytranslate.transcript_box.done").withStyle(Style.EMPTY.withUnderlined(true)), font, onClick = this.onExit))
+
+        this.renderer = this.addChild(TranscriptBoxRenderer())
+        this.needsReinit = true
+    }
+
+    override fun tick() {
+        super.tick()
+
+        if (ClientConfig.transcriptBoxes.isNotEmpty()) {
+            this.introText.color = this.introText.color.withAlpha(0f)
+        } else {
+            this.introText.color = this.introText.color.withAlpha(1f)
+        }
+
+        if (this.needsReinit) {
+            this.renderer.updateConfig(ClientConfig.transcriptBoxes)
+            this.needsReinit = false
+        }
+    }
+
+    override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
+        if (super.mouseClicked(mouseX, mouseY, button))
+            return true
+
+        if (button == 1) {
+            this.createContextBox(mouseX.toFloat(), mouseY.toFloat())
+            return true
+        } else if (button == 0 && this.contextBox != null) {
+            this.closeContextBox()
+            return true
+        }
+
+        return false
+    }
+
+    private fun createContextBox(x: Float, y: Float) {
+        if (this.contextBox != null) {
+            this.removeChild(this.contextBox!!)
+            this.contextBox = null
+        }
+
+        val defaultWidth = 200f
+        val defaultHeight = 250f
+
+        val context = ContextBox(x, y, elements = listOf(
+            ActionContextBoxElement(Component.translatable("unitytranslate.transcript_box.create")) {
+                val width = ClientPlatformProxy.instance.viewportWidth
+                val height = ClientPlatformProxy.instance.viewportHeight
+
+                val x = if (x + defaultWidth > width)
+                    x - (width - defaultWidth)
+                else x
+                val y = if (y + defaultHeight > height)
+                    y - (height - defaultHeight)
+                else y
+
+                ClientConfig.transcriptBoxes.add(TranscriptBoxConfig(UnityTranslateApi.instance.currentSpokenLanguage,
+                    TranscriptBoxConfig.Transforms(
+                        TranscriptBoxConfig.Transforms.Position.Relative(x / width, y / height),
+                        TranscriptBoxConfig.Transforms.Size.Anchored(defaultWidth, defaultHeight)
+                    )
+                ))
+                this.renderer.updateConfig(ClientConfig.transcriptBoxes)
+                this.closeContextBox()
+            }
+        ))
+        this.contextBox = this.addChild(context)
+        context.setup(ClientPlatformProxy.instance.viewportWidth, ClientPlatformProxy.instance.viewportHeight)
+    }
+
+    private fun closeContextBox() {
+        val contextBox = this.contextBox
+
+        if (contextBox != null) {
+            this.removeChild(contextBox)
+            this.contextBox = null
+        }
+    }
+}

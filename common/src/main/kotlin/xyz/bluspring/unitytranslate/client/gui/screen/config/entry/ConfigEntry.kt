@@ -49,7 +49,7 @@ abstract class ConfigEntry<E, T : ConfigValue<E>>(
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
         if (this.bounds().containsPoint(mouseX, mouseY)) {
             this.isFocused = true
-            this.label.color = ThemeConfig.configEntryTextFocus
+            this.label.color = ThemeConfig.configEntryTextFocused
         } else {
             this.label.color = ThemeConfig.configEntryText
         }
