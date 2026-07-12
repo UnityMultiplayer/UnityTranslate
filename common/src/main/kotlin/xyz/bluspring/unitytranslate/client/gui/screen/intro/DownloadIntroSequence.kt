@@ -7,6 +7,7 @@ import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.withAlpha
 import xyz.bluspring.unitytranslate.api.v2.util.CommonEasing
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.gui.LogoTransitionOverlay
+import xyz.bluspring.unitytranslate.client.gui.element.HorizontalAlign
 import xyz.bluspring.unitytranslate.client.gui.element.PlainUIButton
 import xyz.bluspring.unitytranslate.client.gui.element.UILabel
 import xyz.bluspring.unitytranslate.client.gui.screen.FirstStartupScreen
@@ -18,17 +19,17 @@ class DownloadIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent) 
         super.init(width, height)
 
         val font = ClientPlatformProxy.instance.defaultFont
-        this.downloadText = this.addChild(UILabel(width / 2f, height / 2f, Component.translatable("unitytranslate.intro.download_required"), font, alignX = UILabel.HorizontalAlign.CENTER, maxWidth = width - 40))
+        this.downloadText = this.addChild(UILabel(width / 2f, height / 2f, Component.translatable("unitytranslate.intro.download_required"), font, alignX = HorizontalAlign.CENTER, maxWidth = width - 40))
 
         val yPos = height - ((height - this.children.maxOf { it.getBounds(width, height).bottom() } + (font.lineHeight * 2)) / 2f)
         val proceedText = Component.translatable("unitytranslate.intro.download_required.proceed")
         val backText = Component.translatable("unitytranslate.intro.download_required.back")
 
-        this.addChild(PlainUIButton(font, proceedText, width / 2f, yPos) {
+        this.addChild(PlainUIButton(width / 2f, yPos, proceedText, font) {
             this.parent.next()
         })
 
-        this.addChild(PlainUIButton(font, backText, width / 2f, yPos + font.lineHeight + 2) {
+        this.addChild(PlainUIButton(width / 2f, yPos + font.lineHeight + 2, backText, font) {
             this.parent.back()
         })
     }

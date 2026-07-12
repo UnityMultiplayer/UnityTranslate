@@ -19,7 +19,9 @@ class FirstTimeIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent)
         super.init(width, height)
 
         this.addChild(PlainUIButton(
-            UnityTranslateApi.instance.defaultFont, Component.translatable("unitytranslate.intro.first_time.next").withStyle(ChatFormatting.UNDERLINE), width / 2f, height / 2f + 80f
+            width / 2f, height / 2f + 80f,
+            Component.translatable("unitytranslate.intro.first_time.next").withStyle(ChatFormatting.UNDERLINE),
+            UnityTranslateApi.instance.defaultFont,
         ) {
             this.parent.next()
         })

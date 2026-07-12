@@ -11,9 +11,7 @@ import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.ClientConfig
-import xyz.bluspring.unitytranslate.client.gui.element.DropdownList
-import xyz.bluspring.unitytranslate.client.gui.element.PlainUIButton
-import xyz.bluspring.unitytranslate.client.gui.element.UILabel
+import xyz.bluspring.unitytranslate.client.gui.element.*
 import xyz.bluspring.unitytranslate.client.gui.screen.FirstStartupScreen
 import xyz.bluspring.unitytranslate.client.gui.screen.config.entry.ConfigEntry
 import xyz.bluspring.unitytranslate.client.gui.screen.config.entry.DropdownConfigEntry
@@ -40,7 +38,7 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
 
         val font = ClientPlatformProxy.instance.defaultFont
 
-        this.addChild(UILabel(width / 2f, 25f, Component.translatable("unitytranslate.intro.language_select"), font, alignX = UILabel.HorizontalAlign.CENTER, maxWidth = (width * (3 / 4f)).toInt()))
+        this.addChild(UILabel(width / 2f, 25f, Component.translatable("unitytranslate.intro.language_select"), font, alignX = HorizontalAlign.CENTER, maxWidth = (width * (3 / 4f)).toInt()))
 
         val elementWidth = 160f
         val elementHeight = 15f
@@ -56,10 +54,10 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
             val xPos = (width / 2f) + elementOffset
             var yPos = yPos
 
-            this.addChild(UILabel(xPos + (elementWidth / 2f), yPos, Component.translatable("config.unitytranslate.unitytranslate.transcriber").withStyle { it.withUnderlined(true) }, font, alignX = UILabel.HorizontalAlign.CENTER, alignY = UILabel.VerticalAlign.CENTER))
+            this.addChild(UILabel(xPos + (elementWidth / 2f), yPos, Component.translatable("config.unitytranslate.unitytranslate.transcriber").withStyle { it.withUnderlined(true) }, font, alignX = HorizontalAlign.CENTER, alignY = VerticalAlign.CENTER))
             yPos += 14f
 
-            this.addChild(UILabel(xPos, yPos, Component.translatable("config.unitytranslate.unitytranslate.transcriber").append(": "), font, alignX = UILabel.HorizontalAlign.LEFT, alignY = UILabel.VerticalAlign.CENTER))
+            this.addChild(UILabel(xPos, yPos, Component.translatable("config.unitytranslate.unitytranslate.transcriber").append(": "), font, alignX = HorizontalAlign.LEFT, alignY = VerticalAlign.CENTER))
             val transcriber = this.addChild(DropdownList(xPos, yPos + 6f, elementWidth, elementHeight, font,
                 { UnityTranslateApiImpl.transcribers.keys }, { id ->
                     Component.translatable("unitytranslate.transcriber.$id.name")
@@ -92,10 +90,10 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
         // Left side
         run {
             var yPos = yPos
-            this.addChild(UILabel(xPos + (elementWidth / 2f), yPos, Component.translatable("config.unitytranslate.unitytranslate.languages").withStyle { it.withUnderlined(true) }, font, alignX = UILabel.HorizontalAlign.CENTER, alignY = UILabel.VerticalAlign.CENTER))
+            this.addChild(UILabel(xPos + (elementWidth / 2f), yPos, Component.translatable("config.unitytranslate.unitytranslate.languages").withStyle { it.withUnderlined(true) }, font, alignX = HorizontalAlign.CENTER, alignY = VerticalAlign.CENTER))
 
             yPos += 20
-            this.addChild(UILabel(xPos, yPos - 6f, Component.translatable("config.unitytranslate.unitytranslate.languages.spoken").append(": "), font, alignX = UILabel.HorizontalAlign.LEFT, alignY = UILabel.VerticalAlign.CENTER))
+            this.addChild(UILabel(xPos, yPos - 6f, Component.translatable("config.unitytranslate.unitytranslate.languages.spoken").append(": "), font, alignX = HorizontalAlign.LEFT, alignY = VerticalAlign.CENTER))
             this.addChild(DropdownList(xPos, yPos, elementWidth, elementHeight, font, languages, visualizer,
                 UnityTranslateApiImpl::currentSpokenLanguage,
                 { language ->
@@ -115,7 +113,7 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
             for ((id, langHolder) in UnityTranslateApiImpl.outputLanguages) {
                 val offset = (index++) * (elementHeight + 20f)
 
-                this.addChild(UILabel(xPos, yPos + offset - 6f, Component.translatable("config.unitytranslate.unitytranslate.languages.$id").append(": "), font, alignX = UILabel.HorizontalAlign.LEFT, alignY = UILabel.VerticalAlign.CENTER))
+                this.addChild(UILabel(xPos, yPos + offset - 6f, Component.translatable("config.unitytranslate.unitytranslate.languages.$id").append(": "), font, alignX = HorizontalAlign.LEFT, alignY = VerticalAlign.CENTER))
                 this.addChild(DropdownList(xPos, yPos + offset, elementWidth, elementHeight, font, languages, visualizer,
                     langHolder::languageOrNull, DropdownList.Type.DEFAULTED,
                     { language ->
@@ -134,7 +132,7 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
         }
 
         val nextText = Component.translatable("unitytranslate.intro.language_select.next")
-        this.nextButton = this.addChild(PlainUIButton(font, nextText, width - 4f - font.width(nextText), height - 16f) {
+        this.nextButton = this.addChild(PlainUIButton(width - 4f - font.width(nextText), height - 16f, nextText, font) {
             ClientConfig.transcriber = UnityTranslateApi.instance.getTranscriber(this.currentTranscriberId)
             this.parent.next()
         })

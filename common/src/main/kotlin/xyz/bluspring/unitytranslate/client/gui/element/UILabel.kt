@@ -7,26 +7,18 @@ import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 
-class UILabel(
+open class UILabel(
     val x: Float, val y: Float,
-    val text: FormattedText,
+    open val text: FormattedText,
     val font: FontReference,
 
     val dropShadow: Boolean = true,
-    var color: Int = ThemeConfig.textColor,
+    open var color: Int = ThemeConfig.textColor,
     val alignX: HorizontalAlign = HorizontalAlign.LEFT,
     val alignY: VerticalAlign = VerticalAlign.CENTER,
     val maxWidth: Int = 10000,
 ) : UIElement(), FadeableUIElement {
     override var opacity = 1f
-
-    enum class HorizontalAlign(val adjustment: (Int) -> Float) {
-        LEFT({ 0f }), CENTER({ it / 2f }), RIGHT({ it.toFloat() })
-    }
-
-    enum class VerticalAlign(val adjustment: (Int) -> Float) {
-        LEFT({ 0f }), CENTER({ it / 2f }), RIGHT({ it.toFloat() })
-    }
 
     override fun bounds(
         screenWidth: Int,
