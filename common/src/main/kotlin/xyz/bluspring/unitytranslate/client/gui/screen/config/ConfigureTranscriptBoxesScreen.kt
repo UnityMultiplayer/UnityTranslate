@@ -3,6 +3,7 @@ package xyz.bluspring.unitytranslate.client.gui.screen.config
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
+import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.withAlpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.ClientConfig
@@ -45,7 +46,28 @@ class ConfigureTranscriptBoxesScreen(val onExit: () -> Unit = { ClientPlatformPr
 
         if (this.needsReinit) {
             this.renderer.updateConfig(ClientConfig.transcriptBoxes)
+            for (container in this.renderer.containers) {
+                container.isEditorManaged = true
+            }
             this.needsReinit = false
+        }
+    }
+
+    override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
+        super.submit(graphics, partialTick, mouseX, mouseY)
+
+        for (container in this.renderer.containers.reversed()) {
+            val bounds = container.bounds()
+            if (bounds.containsPoint(mouseX, mouseY)) {
+                if (!container.isFocused) {
+                    container.startEditing(mouseX, mouseY)
+                }
+
+                container.isFocused = true
+                break
+            } else if (container.isFocused) {
+                container.isFocused = false
+            }
         }
     }
 

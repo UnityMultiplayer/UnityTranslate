@@ -91,4 +91,11 @@ object ThemeConfig {
     )
     var contextBoxElementText: Int = Color(210, 210, 210).rgb
     var contextBoxElementTextFocused: Int = Color(255, 255, 255).rgb
+
+    var transcriptBoxOutlineFocused: ColorConfig = ColorConfig.Solid(
+        Color(225, 225, 225).rgb
+    )
+    var transcriptBoxOutlineMoving: ColorConfig = ColorConfig.Solid(
+        Color(255, 255, 255).rgb
+    )
 }

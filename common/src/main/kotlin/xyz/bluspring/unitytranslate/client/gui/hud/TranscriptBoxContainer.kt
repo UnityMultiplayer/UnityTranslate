@@ -1,6 +1,7 @@
 package xyz.bluspring.unitytranslate.client.gui.hud
 
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.navigation.ScreenDirection
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
@@ -14,10 +15,18 @@ import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.ColorConfig
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
+import xyz.bluspring.unitytranslate.client.gui.element.FocusableUIElement
 import xyz.bluspring.unitytranslate.client.gui.element.UIElement
+import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
+import java.util.*
 import kotlin.math.floor
 
-class TranscriptBoxContainer(var holder: TranscriptHolder, val config: TranscriptBoxConfig) : UIElement() {
+class TranscriptBoxContainer(var holder: TranscriptHolder, val config: TranscriptBoxConfig) : UIElement(), FocusableUIElement {
+    override var isFocused: Boolean = false
+    var isInEditMode = false
+    var isEditorManaged = false
+    val movingDirections: EnumSet<ScreenDirection> = EnumSet.noneOf(ScreenDirection::class.java)
+
     var x = 0f
     var y = 0f
     var width = 0f
@@ -28,11 +37,19 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
     private var headerX: Float = 0f
     private var headerY: Float = 0f
 
+    private var startMouseX = 0
+    private var startMouseY = 0
+
     override fun bounds(
         screenWidth: Int,
         screenHeight: Int
     ): ScreenRectangle {
-        return ScreenRectangle(this.x.toInt(), this.y.toInt(), this.width.toInt(), this.height.toInt())
+        return ScreenRectangle(
+            (this.x - this.config.padding.left - this.config.outline.thickness).toInt(),
+            (this.y - this.config.padding.top - this.config.outline.thickness).toInt(),
+            (this.width + this.config.padding.left + this.config.padding.right + (this.config.outline.thickness * 2)).toInt(),
+            (this.height + this.config.padding.top + this.config.padding.bottom + (this.config.outline.thickness * 2)).toInt()
+        )
     }
 
     override fun tick() {
@@ -157,6 +174,90 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
         graphics.popMatrix()
 
         super.submit(graphics, partialTick, mouseX, mouseY)
+
+        if (this.isInEditMode) {
+            val bounds = this.bounds()
+            if (!this.isEditorManaged) {
+                val newFocus = bounds.containsPoint(mouseX, mouseY)
+                if (!this.isFocused && newFocus) {
+                    this.startEditing(mouseX, mouseY)
+                }
+
+                this.isFocused = newFocus
+            }
+
+            if (this.isFocused) {
+                val matrix = ColorConfig.separateMatrix(
+                    if (this.movingDirections.isNotEmpty())
+                        ThemeConfig.transcriptBoxOutlineMoving
+                    else
+                        ThemeConfig.transcriptBoxOutlineFocused
+                )
+
+                if (this.movingDirections.isNotEmpty()) {
+                    graphics.outline(bounds.left().toFloat(), bounds.top().toFloat(), bounds.right().toFloat(), bounds.bottom().toFloat(), 1f,
+                        this.colorOrNone(matrix.topLeft, ScreenDirection.UP, ScreenDirection.LEFT), this.colorOrNone(matrix.topRight, ScreenDirection.UP, ScreenDirection.RIGHT),
+                        this.colorOrNone(matrix.bottomLeft, ScreenDirection.DOWN, ScreenDirection.LEFT), this.colorOrNone(matrix.bottomRight, ScreenDirection.DOWN, ScreenDirection.RIGHT)
+                    )
+                } else {
+                    graphics.outline(bounds.left().toFloat(), bounds.top().toFloat(), bounds.right().toFloat(), bounds.bottom().toFloat(), 1f, matrix)
+                }
+            }
+        }
+    }
+
+    private fun colorOrNone(color: Int, vararg directions: ScreenDirection): Int {
+        for (direction in directions) {
+            if (this.movingDirections.contains(direction))
+                return color
+        }
+
+        return 0
+    }
+
+    fun startEditing(mouseX: Int, mouseY: Int) {
+        this.isInEditMode = true
+        this.startMouseX = mouseX
+        this.startMouseY = mouseY
+    }
+
+    private fun inRange(pos: Double, target: Int): Boolean {
+        val range = 3.0
+        return pos >= target - range && pos <= target + range
+    }
+
+    override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
+        if (this.isInEditMode && button == 0 && this.isFocused) {
+            val bounds = this.bounds()
+            if (inRange(mouseX, bounds.left()))
+                this.movingDirections.add(ScreenDirection.LEFT)
+
+            if (inRange(mouseY, bounds.top()))
+                this.movingDirections.add(ScreenDirection.UP)
+
+            if (inRange(mouseY, bounds.bottom()))
+                this.movingDirections.add(ScreenDirection.DOWN)
+
+            if (inRange(mouseX, bounds.right()))
+                this.movingDirections.add(ScreenDirection.RIGHT)
+
+            if (this.movingDirections.isEmpty()) {
+                this.movingDirections.addAll(ScreenDirection.entries)
+            }
+
+            return true
+        }
+
+        return super.mouseClicked(mouseX, mouseY, button)
+    }
+
+    override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
+        if (this.isInEditMode && button == 0 && this.movingDirections.isNotEmpty()) {
+            this.movingDirections.clear()
+            return true
+        }
+
+        return super.mouseReleased(mouseX, mouseY, button)
     }
 
     fun updateConfig() {

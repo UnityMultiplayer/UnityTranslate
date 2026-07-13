@@ -42,6 +42,8 @@ abstract class ContextBoxElement : UIElement(), FocusableUIElement {
         graphics.enableScissor(bounds.left(), bounds.top(), bounds.width, bounds.height)
         this.submitElement(graphics, partialTick, mouseX, mouseY)
         graphics.disableScissor()
+
+        this.isFocused = bounds.containsPoint(mouseX, mouseY)
     }
 
     protected abstract fun submitElement(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int)
