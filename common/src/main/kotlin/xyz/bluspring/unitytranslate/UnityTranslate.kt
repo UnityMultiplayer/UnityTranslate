@@ -256,6 +256,13 @@ object UnityTranslate {
                     intColor("text_focused", ThemeConfig::contextBoxElementTextFocused)
                 }
             }
+
+            category("transcript_box") {
+                category("highlight") {
+                    color("focused", ThemeConfig::transcriptBoxOutlineFocused)
+                    color("moving", ThemeConfig::transcriptBoxOutlineMoving)
+                }
+            }
         }
 
         for ((_, config) in UnityTranslateApiImpl.configs) {
