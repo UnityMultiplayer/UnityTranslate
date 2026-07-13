@@ -267,6 +267,17 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
                             this.height -= (this.y + this.height) - screenHeight
                     }
 
+                    if (modified[ScreenDirection.LEFT]!! < 0 && !this.movingDirections.contains(ScreenDirection.RIGHT)) {
+                        this.width += modified[ScreenDirection.LEFT]!!
+                    }
+
+                    if (modified[ScreenDirection.UP]!! < 0 && !this.movingDirections.contains(ScreenDirection.DOWN)) {
+                        this.height += modified[ScreenDirection.UP]!!
+                    }
+
+                    this.x = this.x.coerceAtLeast(0f)
+                    this.y = this.y.coerceAtLeast(0f)
+
                     updateHeader()
 
                     this.startMouseX = mouseX
