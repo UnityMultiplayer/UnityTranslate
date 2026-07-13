@@ -10,6 +10,11 @@ object ScreenUtil {
     }
 
     @JvmStatic
+    fun ScreenRectangle.inflate(amount: Int): ScreenRectangle {
+        return ScreenRectangle(this.left() - amount, this.top() - amount, this.width + amount + amount, this.height + amount + amount)
+    }
+
+    @JvmStatic
     fun union(vararg rectangles: ScreenRectangle): ScreenRectangle {
         val first = rectangles.first()
         var left = first.left()

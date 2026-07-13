@@ -15,9 +15,11 @@ import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.ColorConfig
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
+import xyz.bluspring.unitytranslate.client.gui.MouseHelper
 import xyz.bluspring.unitytranslate.client.gui.element.FocusableUIElement
 import xyz.bluspring.unitytranslate.client.gui.element.UIElement
 import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
+import xyz.bluspring.unitytranslate.util.ScreenUtil.inflate
 import java.util.*
 import kotlin.math.floor
 
@@ -26,6 +28,8 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
     var isInEditMode = false
     var isEditorManaged = false
     val movingDirections: EnumSet<ScreenDirection> = EnumSet.noneOf(ScreenDirection::class.java)
+
+    private var hasModifiedCursor = false
 
     var x = 0f
     var y = 0f
@@ -178,7 +182,7 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
         if (this.isInEditMode) {
             val bounds = this.bounds()
             if (!this.isEditorManaged) {
-                val newFocus = bounds.containsPoint(mouseX, mouseY)
+                val newFocus = bounds.inflate(2).containsPoint(mouseX, mouseY)
                 if (!this.isFocused && newFocus) {
                     this.startEditing(mouseX, mouseY)
                 }
@@ -194,22 +198,45 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
                         ThemeConfig.transcriptBoxOutlineFocused
                 )
 
-                if (this.movingDirections.isNotEmpty()) {
-                    graphics.outline(bounds.left().toFloat(), bounds.top().toFloat(), bounds.right().toFloat(), bounds.bottom().toFloat(), 1f,
-                        this.colorOrNone(matrix.topLeft, ScreenDirection.UP, ScreenDirection.LEFT), this.colorOrNone(matrix.topRight, ScreenDirection.UP, ScreenDirection.RIGHT),
-                        this.colorOrNone(matrix.bottomLeft, ScreenDirection.DOWN, ScreenDirection.LEFT), this.colorOrNone(matrix.bottomRight, ScreenDirection.DOWN, ScreenDirection.RIGHT)
-                    )
+                val directions = this.movingDirections.ifEmpty {
+                    val directions = EnumSet.noneOf(ScreenDirection::class.java)
+                    this.setupMovingDirections(mouseX, mouseY, directions)
+                    directions
+                }
+
+                graphics.outline(bounds.left().toFloat(), bounds.top().toFloat(), bounds.right().toFloat(), bounds.bottom().toFloat(), 1f,
+                    this.colorOrNone(matrix.topLeft, directions, ScreenDirection.UP, ScreenDirection.LEFT), this.colorOrNone(matrix.topRight, directions, ScreenDirection.UP, ScreenDirection.RIGHT),
+                    this.colorOrNone(matrix.bottomLeft, directions, ScreenDirection.DOWN, ScreenDirection.LEFT), this.colorOrNone(matrix.bottomRight, directions, ScreenDirection.DOWN, ScreenDirection.RIGHT)
+                )
+
+                if (!directions.containsAll(ScreenDirection.entries)) {
+                    if ((directions.contains(ScreenDirection.UP) && directions.contains(ScreenDirection.LEFT)) ||
+                        (directions.contains(ScreenDirection.DOWN) && directions.contains(ScreenDirection.RIGHT))) {
+                        MouseHelper.cursorToTopLeftToBottomRightResize()
+                    } else if ((directions.contains(ScreenDirection.UP) && directions.contains(ScreenDirection.RIGHT)) ||
+                        (directions.contains(ScreenDirection.DOWN) && directions.contains(ScreenDirection.LEFT))) {
+                        MouseHelper.cursorToTopRightToBottomLeftResize()
+                    } else if (directions.contains(ScreenDirection.UP) || directions.contains(ScreenDirection.DOWN)) {
+                        MouseHelper.cursorToVerticalResize()
+                    } else if (directions.contains(ScreenDirection.LEFT) || directions.contains(ScreenDirection.RIGHT)) {
+                        MouseHelper.cursorToHorizontalResize()
+                    }
                 } else {
-                    graphics.outline(bounds.left().toFloat(), bounds.top().toFloat(), bounds.right().toFloat(), bounds.bottom().toFloat(), 1f, matrix)
+                    MouseHelper.cursorToOmniResize()
                 }
             }
         }
     }
 
-    private fun colorOrNone(color: Int, vararg directions: ScreenDirection): Int {
-        for (direction in directions) {
-            if (this.movingDirections.contains(direction))
-                return color
+    private fun colorOrNone(color: Int, movingDirections: EnumSet<ScreenDirection>, vararg directions: ScreenDirection): Int {
+        if (movingDirections.containsAll(directions.toList()))
+            return color
+
+        if (movingDirections.size == 1) {
+            for (direction in directions) {
+                if (movingDirections.contains(direction))
+                    return color
+            }
         }
 
         return 0
@@ -221,30 +248,33 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
         this.startMouseY = mouseY
     }
 
-    private fun inRange(pos: Double, target: Int): Boolean {
-        val range = 3.0
+    private fun inRange(pos: Int, target: Int): Boolean {
+        val range = 3
         return pos >= target - range && pos <= target + range
+    }
+
+    private fun setupMovingDirections(mouseX: Int, mouseY: Int, directions: EnumSet<ScreenDirection>) {
+        val bounds = this.bounds()
+        if (inRange(mouseX, bounds.left()))
+            directions.add(ScreenDirection.LEFT)
+
+        if (inRange(mouseY, bounds.top()))
+            directions.add(ScreenDirection.UP)
+
+        if (inRange(mouseY, bounds.bottom()))
+            directions.add(ScreenDirection.DOWN)
+
+        if (inRange(mouseX, bounds.right()))
+            directions.add(ScreenDirection.RIGHT)
+
+        if (directions.isEmpty()) {
+            directions.addAll(ScreenDirection.entries)
+        }
     }
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
         if (this.isInEditMode && button == 0 && this.isFocused) {
-            val bounds = this.bounds()
-            if (inRange(mouseX, bounds.left()))
-                this.movingDirections.add(ScreenDirection.LEFT)
-
-            if (inRange(mouseY, bounds.top()))
-                this.movingDirections.add(ScreenDirection.UP)
-
-            if (inRange(mouseY, bounds.bottom()))
-                this.movingDirections.add(ScreenDirection.DOWN)
-
-            if (inRange(mouseX, bounds.right()))
-                this.movingDirections.add(ScreenDirection.RIGHT)
-
-            if (this.movingDirections.isEmpty()) {
-                this.movingDirections.addAll(ScreenDirection.entries)
-            }
-
+            this.setupMovingDirections(mouseX.toInt(), mouseY.toInt(), this.movingDirections)
             return true
         }
 

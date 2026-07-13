@@ -34,6 +34,8 @@ object UnityTranslateClient {
     fun tick() {
         UnityTranslateGui.tick()
         this.transcriberManager.tick()
+
+        MouseHelper.tick()
     }
 
     fun onClose() {

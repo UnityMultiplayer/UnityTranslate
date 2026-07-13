@@ -13,24 +13,35 @@ object MouseHelper {
     private val omniResizeCursor = GLFW.glfwCreateStandardCursor(GLFW.GLFW_RESIZE_ALL_CURSOR)
 
     private var currentCursor = this.arrowCursor
+    private var queuedCursor: Long? = null
 
     private fun setCursor(cursor: Long) {
-        if (this.currentCursor == cursor)
-            return
-
         if (cursor == 0L)
             return
 
-        GLFW.glfwSetCursor(ClientPlatformProxy.instance.windowHandle, cursor)
-        this.currentCursor = cursor
+        this.queuedCursor = cursor
     }
 
     fun cursorToDefault() = this.setCursor(this.arrowCursor)
     fun cursorToPointer() = this.setCursor(this.pointerCursor)
     fun cursorToHorizontalResize() = this.setCursor(this.horizontalResizeCursor)
+    fun cursorToVerticalResize() = this.setCursor(this.verticalResizeCursor)
     fun cursorToTopLeftToBottomRightResize() = this.setCursor(this.topLeftToBottomRightResizeCursor)
     fun cursorToTopRightToBottomLeftResize() = this.setCursor(this.topRightToBottomLeftResizeCursor)
     fun cursorToOmniResize() = this.setCursor(this.omniResizeCursor)
+
+    fun tick() {
+        var queued = this.queuedCursor
+        if (queued == null && this.currentCursor != this.arrowCursor) {
+            queued = this.arrowCursor
+        }
+
+        if (queued != null) {
+            GLFW.glfwSetCursor(ClientPlatformProxy.instance.windowHandle, queued)
+            this.currentCursor = queued
+            this.queuedCursor = null
+        }
+    }
 
     fun close() {
         GLFW.glfwDestroyCursor(this.arrowCursor)

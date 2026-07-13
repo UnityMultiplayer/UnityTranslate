@@ -16,6 +16,7 @@ import xyz.bluspring.unitytranslate.client.gui.element.VerticalAlign
 import xyz.bluspring.unitytranslate.client.gui.element.context.ActionContextBoxElement
 import xyz.bluspring.unitytranslate.client.gui.element.context.ContextBox
 import xyz.bluspring.unitytranslate.client.gui.screen.UTScreen
+import xyz.bluspring.unitytranslate.util.ScreenUtil.inflate
 
 class ConfigureTranscriptBoxesScreen(val onExit: () -> Unit = { ClientPlatformProxy.instance.setScreen(null) }) : UTScreen() {
     lateinit var renderer: TranscriptBoxRenderer
@@ -57,7 +58,7 @@ class ConfigureTranscriptBoxesScreen(val onExit: () -> Unit = { ClientPlatformPr
         super.submit(graphics, partialTick, mouseX, mouseY)
 
         for (container in this.renderer.containers.reversed()) {
-            val bounds = container.bounds()
+            val bounds = container.bounds().inflate(2)
             if (bounds.containsPoint(mouseX, mouseY)) {
                 if (!container.isFocused) {
                     container.startEditing(mouseX, mouseY)
