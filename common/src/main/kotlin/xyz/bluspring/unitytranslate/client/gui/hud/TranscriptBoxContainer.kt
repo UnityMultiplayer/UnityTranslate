@@ -6,6 +6,7 @@ import net.minecraft.client.gui.navigation.ScreenDirection
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
+import org.joml.Vector2f
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
@@ -19,7 +20,10 @@ import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
 import xyz.bluspring.unitytranslate.client.gui.MouseHelper
 import xyz.bluspring.unitytranslate.client.gui.element.FocusableUIElement
 import xyz.bluspring.unitytranslate.client.gui.element.UIElement
+import xyz.bluspring.unitytranslate.client.gui.element.context.ContextBox
+import xyz.bluspring.unitytranslate.client.gui.element.context.ExpandableContextBoxElement
 import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
+import xyz.bluspring.unitytranslate.util.ScreenUtil
 import xyz.bluspring.unitytranslate.util.ScreenUtil.inflate
 import java.util.*
 import kotlin.math.floor
@@ -344,10 +348,47 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
     override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
         if (this.isInEditMode && button == 0 && this.movingDirections.isNotEmpty()) {
             this.movingDirections.clear()
+
+            val screenWidth = ClientPlatformProxy.instance.viewportWidth
+            val screenHeight = ClientPlatformProxy.instance.viewportHeight
+            when (this.config.transforms.position) {
+                is TranscriptBoxConfig.Transforms.Position.Absolute -> {
+                    this.config.transforms.position = TranscriptBoxConfig.Transforms.Position.Absolute(this.x.toInt(), this.y.toInt())
+                }
+
+                is TranscriptBoxConfig.Transforms.Position.Relative -> {
+                    val anchor = ScreenUtil.findAnchorPoint(Vector2f(this.x, this.y), this.width, this.height, screenWidth, screenHeight)
+                    this.config.transforms.position = TranscriptBoxConfig.Transforms.Position.Relative(anchor.x, anchor.y)
+                }
+            }
+
+            when (this.config.transforms.size) {
+                is TranscriptBoxConfig.Transforms.Size.Absolute -> {
+                    this.config.transforms.size = TranscriptBoxConfig.Transforms.Size.Absolute(this.width, this.height)
+                }
+
+                is TranscriptBoxConfig.Transforms.Size.Anchored -> {
+                    this.config.transforms.size = TranscriptBoxConfig.Transforms.Size.Anchored(this.width, this.height)
+                }
+            }
+
+            this.updateConfig()
+
             return true
         }
 
         return super.mouseReleased(mouseX, mouseY, button)
+    }
+
+    fun createContextBox(x: Float, y: Float): ContextBox {
+        return ContextBox(x, y, elements = listOf(
+            ExpandableContextBoxElement("config.unitytranslate.unitytranslate.hud.default_box_settings.header", listOf(
+//                CyclingContextBoxElement(listOf(
+//
+//                )),
+
+            ))
+        ))
     }
 
     fun updateConfig() {

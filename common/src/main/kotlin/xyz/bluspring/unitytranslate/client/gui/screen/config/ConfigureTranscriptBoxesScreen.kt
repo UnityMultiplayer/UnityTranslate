@@ -73,30 +73,38 @@ class ConfigureTranscriptBoxesScreen(val onExit: () -> Unit = { ClientPlatformPr
     }
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        if (super.mouseClicked(mouseX, mouseY, button))
+        if (this.contextBox != null) {
+            if (this.contextBox!!.mouseClicked(mouseX, mouseY, button))
+                return true
+
+            this.closeContextBox()
+        }
+
+        if (super.mouseClicked(mouseX, mouseY, button)) {
             return true
+        }
 
         if (button == 1) {
+            for (container in this.renderer.containers.reversed()) {
+                val bounds = container.bounds().inflate(2)
+                if (bounds.containsPoint(mouseX.toInt(), mouseY.toInt())) {
+                    this.createContextBox(mouseX.toFloat(), mouseY.toFloat(), container.createContextBox(mouseX.toFloat(), mouseY.toFloat()))
+                    return true
+                }
+            }
+
             this.createContextBox(mouseX.toFloat(), mouseY.toFloat())
-            return true
-        } else if (button == 0 && this.contextBox != null) {
-            this.closeContextBox()
             return true
         }
 
         return false
     }
 
-    private fun createContextBox(x: Float, y: Float) {
-        if (this.contextBox != null) {
-            this.removeChild(this.contextBox!!)
-            this.contextBox = null
-        }
-
+    private fun getGenericContextBox(x: Float, y: Float): ContextBox {
         val defaultWidth = 200f
         val defaultHeight = 250f
 
-        val context = ContextBox(x, y, elements = listOf(
+        return ContextBox(x, y, elements = listOf(
             ActionContextBoxElement(Component.translatable("unitytranslate.transcript_box.create")) {
                 val width = ClientPlatformProxy.instance.viewportWidth
                 val height = ClientPlatformProxy.instance.viewportHeight
@@ -118,6 +126,14 @@ class ConfigureTranscriptBoxesScreen(val onExit: () -> Unit = { ClientPlatformPr
                 this.closeContextBox()
             }
         ))
+    }
+
+    private fun createContextBox(x: Float, y: Float, context: ContextBox = this.getGenericContextBox(x, y)) {
+        if (this.contextBox != null) {
+            this.removeChild(this.contextBox!!)
+            this.contextBox = null
+        }
+
         this.contextBox = this.addChild(context)
         context.setup(ClientPlatformProxy.instance.viewportWidth, ClientPlatformProxy.instance.viewportHeight)
     }
