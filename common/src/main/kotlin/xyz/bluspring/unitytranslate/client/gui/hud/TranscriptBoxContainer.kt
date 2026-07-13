@@ -1,6 +1,7 @@
 package xyz.bluspring.unitytranslate.client.gui.hud
 
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.navigation.ScreenAxis
 import net.minecraft.client.gui.navigation.ScreenDirection
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
@@ -28,8 +29,6 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
     var isInEditMode = false
     var isEditorManaged = false
     val movingDirections: EnumSet<ScreenDirection> = EnumSet.noneOf(ScreenDirection::class.java)
-
-    private var hasModifiedCursor = false
 
     var x = 0f
     var y = 0f
@@ -190,7 +189,7 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
                 this.isFocused = newFocus
             }
 
-            if (this.isFocused) {
+            if (this.isFocused || this.movingDirections.isNotEmpty()) {
                 val matrix = ColorConfig.separateMatrix(
                     if (this.movingDirections.isNotEmpty())
                         ThemeConfig.transcriptBoxOutlineMoving
@@ -209,6 +208,7 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
                     this.colorOrNone(matrix.bottomLeft, directions, ScreenDirection.DOWN, ScreenDirection.LEFT), this.colorOrNone(matrix.bottomRight, directions, ScreenDirection.DOWN, ScreenDirection.RIGHT)
                 )
 
+                // cursor handling
                 if (!directions.containsAll(ScreenDirection.entries)) {
                     if ((directions.contains(ScreenDirection.UP) && directions.contains(ScreenDirection.LEFT)) ||
                         (directions.contains(ScreenDirection.DOWN) && directions.contains(ScreenDirection.RIGHT))) {
@@ -223,6 +223,54 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
                     }
                 } else {
                     MouseHelper.cursorToOmniResize()
+                }
+
+                // start moving
+                if (this.movingDirections.isNotEmpty()) {
+                    val deltaX = mouseX - this.startMouseX
+                    val deltaY = mouseY - this.startMouseY
+                    val modified = mutableMapOf<ScreenDirection, Int>()
+
+                    modified[ScreenDirection.LEFT] = this.x.toInt()
+                    modified[ScreenDirection.UP] = this.y.toInt()
+                    modified[ScreenDirection.RIGHT] = (this.x + this.width).toInt()
+                    modified[ScreenDirection.DOWN] = (this.y + this.height).toInt()
+
+                    for (direction in this.movingDirections) {
+                        val existing = modified[direction]!!
+                        if (direction.axis == ScreenAxis.HORIZONTAL) {
+                            modified[direction] = existing + deltaX
+                        } else {
+                            modified[direction] = existing + deltaY
+                        }
+                    }
+
+                    val screenWidth = ClientPlatformProxy.instance.viewportWidth
+                    val screenHeight = ClientPlatformProxy.instance.viewportHeight
+
+                    this.width = (modified[ScreenDirection.RIGHT]!! - modified[ScreenDirection.LEFT]!!).toFloat().coerceAtLeast(2f)
+                    this.height = (modified[ScreenDirection.DOWN]!! - modified[ScreenDirection.UP]!!).toFloat().coerceAtLeast(2f)
+                    this.x = Mth.clamp(modified[ScreenDirection.LEFT]!!, 0, screenWidth).toFloat()
+                    this.y = Mth.clamp(modified[ScreenDirection.UP]!!, 0, screenHeight).toFloat()
+
+                    if (this.x + this.width > screenWidth) {
+                        if (this.movingDirections.contains(ScreenDirection.LEFT))
+                            this.x -= (this.x + this.width) - screenWidth
+                        else
+                            this.width -= (this.x + this.width) - screenWidth
+                    }
+
+                    if (this.y + this.height > screenHeight) {
+                        if (this.movingDirections.contains(ScreenDirection.UP))
+                            this.y -= (this.y + this.height) - screenHeight
+                        else
+                            this.height -= (this.y + this.height) - screenHeight
+                    }
+
+                    updateHeader()
+
+                    this.startMouseX = mouseX
+                    this.startMouseY = mouseY
                 }
             }
         }
@@ -274,6 +322,7 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
         if (this.isInEditMode && button == 0 && this.isFocused) {
+            this.startEditing(mouseX.toInt(), mouseY.toInt())
             this.setupMovingDirections(mouseX.toInt(), mouseY.toInt(), this.movingDirections)
             return true
         }
@@ -305,10 +354,14 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
         this.width = dimensions.width.toFloat()
         this.height = dimensions.height.toFloat()
 
+        this.updateHeader()
+    }
+
+    private fun updateHeader() {
         this.headerText = this.config.header.text(this.holder.language)
+
         val headerLength = font.width(this.config.header.display.text(Component.empty()))
         val languageLength = font.width(this.config.header.langDecoration.decorate(this.config.header.langDisplay.text(this.holder.language, this.config.header.langStyle)))
-
         this.headerX = this.config.header.alignX.align(this.width, headerLength, languageLength)
         this.headerY = this.config.header.alignY.align(this.height)
     }
