@@ -21,6 +21,10 @@ class ExpandableContextBoxElement(val text: Component, val elements: Collection<
         graphics.centeredText(font, text, this.x + (this.width / 2f), this.y + (this.bounds().height / 2f) - (font.lineHeight / 2f),
             if (this.isFocused) ThemeConfig.contextBoxElementTextFocused else ThemeConfig.contextBoxElementText, true)
 
+        val arrowText = Component.literal("➤")
+        graphics.text(font, arrowText, this.x + this.width - font.width(arrowText) - 1, this.y + (this.bounds().height / 2f) - (font.lineHeight / 2f),
+            if (this.isFocused) ThemeConfig.contextBoxElementTextFocused else ThemeConfig.contextBoxElementText, true)
+
         if (this.isFocused && this.contextBox == null) {
             this.contextBox = ContextBox(this.x + this.width, this.y, this.elementWidth.toInt(), this.elements, false)
             this.addChild(this.contextBox!!)
