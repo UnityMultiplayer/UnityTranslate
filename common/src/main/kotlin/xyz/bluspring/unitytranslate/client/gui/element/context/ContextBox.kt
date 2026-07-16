@@ -6,7 +6,7 @@ import xyz.bluspring.unitytranslate.client.gui.element.FocusableUIElement
 import xyz.bluspring.unitytranslate.client.gui.element.UIElement
 import xyz.bluspring.unitytranslate.util.ScreenUtil
 
-class ContextBox(val x: Float, val y: Float, val maxWidth: Int = 250, val elements: Collection<ContextBoxElement>) : UIElement(), FocusableUIElement {
+class ContextBox(val x: Float, val y: Float, val maxWidth: Int = 150, val elements: Collection<ContextBoxElement>) : UIElement(), FocusableUIElement {
     override var isFocused: Boolean = false
 
     override fun init(width: Int, height: Int) {
