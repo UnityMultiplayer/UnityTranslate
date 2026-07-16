@@ -149,6 +149,14 @@ object TranslatorManagerImpl : TranslatorManager {
                 instance.prepareTranslationModels(langPair) // Make sure they're ready first.
                 val batchTranslated = instance.batchTranslate(entries.map { it.original }, langPair)
                 for ((i, translated) in batchTranslated.withIndex()) {
+                    val original = translated
+                    var translated = original
+
+                    for ((processor, settings) in UnityTranslateApiImpl.postProcessors) {
+                        if ((settings.translatorInputLanguages == null || settings.translatorInputLanguages!!.contains(langPair.from)) && (settings.translatorOutputLanguages == null || settings.translatorOutputLanguages!!.contains(langPair.to)))
+                            translated = processor.processFinalTranscript(translated, original, langPair.from, langPair.to)
+                    }
+
                     entries[i].deferred.complete(translated)
                 }
                 yield()

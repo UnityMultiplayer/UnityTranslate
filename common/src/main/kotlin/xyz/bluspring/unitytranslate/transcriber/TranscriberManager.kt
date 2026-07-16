@@ -45,6 +45,14 @@ class TranscriberManager {
                         continue
 
                     val holder = UnityTranslateApi.instance.getOrCreateTranscriptHolder(source.language)
+                    val original = processed
+                    var processed = original
+
+                    for ((processor, settings) in UnityTranslateApiImpl.preProcessors) {
+                        if (settings.transcriberLanguages == null || settings.transcriberLanguages!!.contains(source.language))
+                            processed = processor.processTranscript(processed, original, source.language)
+                    }
+
                     val transcriptData = DirectTranscriptData(source.sessionTimestamp, source.sender, source.language, processed, System.currentTimeMillis())
 
                     holder.update(transcriptData)

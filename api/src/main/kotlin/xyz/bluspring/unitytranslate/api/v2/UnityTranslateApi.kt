@@ -9,6 +9,10 @@ import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriberSource
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
+import xyz.bluspring.unitytranslate.api.v2.transcriber.processor.PostProcessorSettings
+import xyz.bluspring.unitytranslate.api.v2.transcriber.processor.PreProcessorSettings
+import xyz.bluspring.unitytranslate.api.v2.transcriber.processor.TranscriptPostProcessor
+import xyz.bluspring.unitytranslate.api.v2.transcriber.processor.TranscriptPreProcessor
 import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.TranscriptUser
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorManager
@@ -97,6 +101,16 @@ interface UnityTranslateApi {
     fun getLanguageDisplayId(display: LanguageDisplay): String {
         return this.getLanguageDisplayId(display.codec)
     }
+
+    /**
+     * Registers a transcript preprocessor, which processes the text that a transcriber has received.
+     */
+    fun registerTranscriptPreprocessor(processor: TranscriptPreProcessor, settings: PreProcessorSettings)
+
+    /**
+     * Registers a transcript postprocessor, which processes the text that has been translated by a translator.
+     */
+    fun registerTranscriptPostprocessor(processor: TranscriptPostProcessor, settings: PostProcessorSettings)
 
     /**
      * Gets the current spoken language. This is typically used as the default output language if none is set.

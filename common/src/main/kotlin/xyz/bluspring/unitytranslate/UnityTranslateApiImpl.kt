@@ -14,6 +14,10 @@ import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriberSource
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
+import xyz.bluspring.unitytranslate.api.v2.transcriber.processor.PostProcessorSettings
+import xyz.bluspring.unitytranslate.api.v2.transcriber.processor.PreProcessorSettings
+import xyz.bluspring.unitytranslate.api.v2.transcriber.processor.TranscriptPostProcessor
+import xyz.bluspring.unitytranslate.api.v2.transcriber.processor.TranscriptPreProcessor
 import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.TranscriptUser
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorManager
@@ -38,6 +42,9 @@ object UnityTranslateApiImpl : UnityTranslateApi {
 
     val translators: MutableMap<String, TranslatorInstance> = mutableMapOf()
     val translatorConfigs: MutableMap<String, SunsetConfig> = mutableMapOf()
+
+    val preProcessors = mutableMapOf<TranscriptPreProcessor, PreProcessorSettings>()
+    val postProcessors = mutableMapOf<TranscriptPostProcessor, PostProcessorSettings>()
 
     val configs: MutableMap<String, SunsetConfig> = mutableMapOf()
 
@@ -173,5 +180,19 @@ object UnityTranslateApiImpl : UnityTranslateApi {
 
     override fun getLanguageDisplayId(codec: MapCodec<out LanguageDisplay>): String {
         return this.languageDisplayLookup[codec]!!
+    }
+
+    override fun registerTranscriptPreprocessor(processor: TranscriptPreProcessor, settings: PreProcessorSettings) {
+        if (this.preProcessors.contains(processor))
+            throw IllegalArgumentException("Pre-processor $processor was already registered!")
+
+        this.preProcessors[processor] = settings
+    }
+
+    override fun registerTranscriptPostprocessor(processor: TranscriptPostProcessor, settings: PostProcessorSettings) {
+        if (this.postProcessors.contains(processor))
+            throw IllegalArgumentException("Post-processor $processor was already registered!")
+
+        this.postProcessors[processor] = settings
     }
 }
