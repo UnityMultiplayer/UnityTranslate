@@ -20,7 +20,7 @@ Thank you to [Argos Open Tech](https://www.argosopentech.com/) for developing [A
 Without Argos Translate, this project would have been made significantly more expensive, and the translation system would
 have been impossible to develop for free.
 
-An additional thank you to [CADIndie](https://github.com/CADIndie) for developing the Whisper4J library, as it provides
+An additional thank you to [the ggml organization](https://github.com/ggml-org) for developing whisper.cpp, as it provides
 significantly improved transcriptions for us while being fully local.
 
 ### License

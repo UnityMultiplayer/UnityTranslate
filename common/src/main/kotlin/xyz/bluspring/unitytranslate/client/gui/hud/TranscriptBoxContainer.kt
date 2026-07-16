@@ -6,7 +6,6 @@ import net.minecraft.client.gui.navigation.ScreenDirection
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
-import org.joml.Vector2f
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
@@ -23,7 +22,6 @@ import xyz.bluspring.unitytranslate.client.gui.element.UIElement
 import xyz.bluspring.unitytranslate.client.gui.element.context.ContextBox
 import xyz.bluspring.unitytranslate.client.gui.element.context.ExpandableContextBoxElement
 import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
-import xyz.bluspring.unitytranslate.util.ScreenUtil
 import xyz.bluspring.unitytranslate.util.ScreenUtil.inflate
 import java.util.*
 import kotlin.math.floor
@@ -357,8 +355,7 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
                 }
 
                 is TranscriptBoxConfig.Transforms.Position.Relative -> {
-                    val anchor = ScreenUtil.findAnchorPoint(Vector2f(this.x, this.y), this.width, this.height, screenWidth, screenHeight)
-                    this.config.transforms.position = TranscriptBoxConfig.Transforms.Position.Relative(anchor.x, anchor.y)
+                    this.config.transforms.position = TranscriptBoxConfig.Transforms.Position.Relative((this.x / screenWidth) + (this.width / screenWidth), (this.y / screenHeight) + (this.height / screenHeight))
                 }
             }
 
@@ -368,7 +365,7 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
                 }
 
                 is TranscriptBoxConfig.Transforms.Size.Anchored -> {
-                    this.config.transforms.size = TranscriptBoxConfig.Transforms.Size.Anchored(this.width, this.height)
+                    this.config.transforms.size = TranscriptBoxConfig.Transforms.Size.Anchored(this.width / screenWidth.toFloat(), this.height / screenHeight.toFloat(), this.width, this.height)
                 }
             }
 
@@ -398,13 +395,13 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
         val screenWidth = (ClientPlatformProxy.instance.windowWidth / ClientPlatformProxy.instance.guiScale).toInt()
         val screenHeight = (ClientPlatformProxy.instance.windowHeight / ClientPlatformProxy.instance.guiScale).toInt()
 
-        val pos = config.transforms.position.calculatePos(screenWidth, screenHeight)
-        val dimensions = config.transforms.size.calculateDimensions(pos, screenWidth, screenHeight)
+        val dimensions = config.transforms.size.calculateDimensions(screenWidth, screenHeight)
+        val pos = config.transforms.position.calculatePos(dimensions, screenWidth, screenHeight)
 
-        this.x = dimensions.left().toFloat()
-        this.y = dimensions.top().toFloat()
-        this.width = dimensions.width.toFloat()
-        this.height = dimensions.height.toFloat()
+        this.x = pos.x
+        this.y = pos.y
+        this.width = dimensions.x
+        this.height = dimensions.y
 
         this.updateHeader()
     }

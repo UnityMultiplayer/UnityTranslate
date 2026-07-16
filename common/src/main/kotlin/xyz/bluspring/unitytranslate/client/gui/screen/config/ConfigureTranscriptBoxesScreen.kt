@@ -119,7 +119,7 @@ class ConfigureTranscriptBoxesScreen(val onExit: () -> Unit = { ClientPlatformPr
                 ClientConfig.transcriptBoxes.add(TranscriptBoxConfig(UnityTranslateApi.instance.currentSpokenLanguage,
                     TranscriptBoxConfig.Transforms(
                         TranscriptBoxConfig.Transforms.Position.Relative(x / width, y / height),
-                        TranscriptBoxConfig.Transforms.Size.Anchored(defaultWidth, defaultHeight)
+                        TranscriptBoxConfig.Transforms.Size.Anchored(defaultWidth / ClientPlatformProxy.instance.viewportWidth, defaultHeight / ClientPlatformProxy.instance.viewportHeight, defaultWidth, defaultHeight)
                     )
                 ))
                 this.renderer.updateConfig(ClientConfig.transcriptBoxes)

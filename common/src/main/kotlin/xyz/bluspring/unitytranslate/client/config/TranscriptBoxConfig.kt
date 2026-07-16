@@ -4,11 +4,9 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.ChatFormatting
-import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.chat.Style
-import net.minecraft.util.Mth
 import org.joml.Vector2f
 import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.client.gui.TextureReference
@@ -17,8 +15,6 @@ import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptData
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 import xyz.bluspring.unitytranslate.transcriber.display.BuiltinLanguageDisplays
 import java.util.*
-import kotlin.math.min
-import kotlin.math.round
 
 class TranscriptBoxConfig(
     var language: Language,
@@ -209,10 +205,10 @@ class TranscriptBoxConfig(
                 }
             }
 
-            abstract fun calculatePos(screenWidth: Int, screenHeight: Int): Vector2f
+            abstract fun calculatePos(dimensions: Vector2f, screenWidth: Int, screenHeight: Int): Vector2f
 
             data class Absolute(var x: Int, var y: Int) : Position("absolute") {
-                override fun calculatePos(screenWidth: Int, screenHeight: Int): Vector2f {
+                override fun calculatePos(dimensions: Vector2f, screenWidth: Int, screenHeight: Int): Vector2f {
                     return Vector2f(
                         this.x.coerceAtMost(screenWidth).toFloat(),
                         this.y.coerceAtMost(screenHeight).toFloat()
@@ -236,8 +232,8 @@ class TranscriptBoxConfig(
                 var xAlign: Float, // screen %
                 var yAlign: Float,
             ) : Position("relative") {
-                override fun calculatePos(screenWidth: Int, screenHeight: Int): Vector2f {
-                    return Vector2f(this.xAlign * screenWidth, this.yAlign * screenHeight)
+                override fun calculatePos(dimensions: Vector2f, screenWidth: Int, screenHeight: Int): Vector2f {
+                    return Vector2f((this.xAlign - (dimensions.x / screenWidth)) * screenWidth, (this.yAlign - (dimensions.y / screenHeight)) * screenHeight)
                 }
 
                 companion object {
@@ -270,11 +266,11 @@ class TranscriptBoxConfig(
                 }
             }
 
-            abstract fun calculateDimensions(screenPos: Vector2f, screenWidth: Int, screenHeight: Int): ScreenRectangle
+            abstract fun calculateDimensions(screenWidth: Int, screenHeight: Int): Vector2f
 
             data class Absolute(var width: Float, var height: Float) : Size("absolute") {
-                override fun calculateDimensions(screenPos: Vector2f, screenWidth: Int, screenHeight: Int): ScreenRectangle {
-                    return ScreenRectangle(screenPos.x.toInt(), screenPos.y.toInt(), this.width.toInt(), this.height.toInt())
+                override fun calculateDimensions(screenWidth: Int, screenHeight: Int): Vector2f {
+                    return Vector2f(this.width, this.height)
                 }
 
                 companion object {
@@ -291,28 +287,46 @@ class TranscriptBoxConfig(
             }
 
             data class Anchored(
+                var expectedWidth: Float, // % of screen at the time
+                var expectedHeight: Float,
+
                 var targetWidth: Float, // px
                 var targetHeight: Float,
             ) : Size("anchored") {
-                override fun calculateDimensions(screenPos: Vector2f, screenWidth: Int, screenHeight: Int): ScreenRectangle {
-                    val maxWidth = screenWidth / 3f
-                    val maxHeight = screenHeight / 3f
-                    val anchorX = Mth.clamp(screenPos.x / screenWidth, 0f, 1f)
-                    val anchorY = Mth.clamp(screenPos.y / screenHeight, 0f, 1f)
+                override fun calculateDimensions(screenWidth: Int, screenHeight: Int): Vector2f {
+                    val expectedWidth = this.expectedWidth * screenWidth
+                    val expectedHeight = this.expectedHeight * screenHeight
+                    val aspectRatio = this.targetWidth / this.targetHeight
 
-                    val clampedWidth = min(this.targetWidth, maxWidth)
-                    val clampedHeight = min(this.targetHeight, maxHeight)
+                    val actualWidth = if (expectedWidth >= this.targetWidth && expectedHeight >= this.targetHeight)
+                        this.targetWidth
+                    else if (expectedHeight >= this.targetHeight)
+                        this.targetHeight * aspectRatio
+                    else if (expectedWidth >= this.targetWidth)
+                        this.targetWidth
+                    else
+                        expectedWidth * (1f / aspectRatio)
 
-                    return ScreenRectangle(
-                        round((screenWidth - clampedWidth) * anchorX).toInt(),
-                        round((screenHeight - clampedHeight) * anchorY).toInt(),
-                        clampedWidth.toInt(), clampedHeight.toInt()
-                    )
+                    val actualHeight = if (expectedHeight >= this.targetHeight && expectedHeight >= this.targetHeight)
+                        this.targetHeight
+                    else if (expectedHeight >= this.targetHeight)
+                        this.targetHeight * (1f / aspectRatio)
+                    else if (expectedHeight >= this.targetHeight)
+                        this.targetHeight
+                    else
+                        expectedHeight * aspectRatio
+
+                    return Vector2f(actualWidth, actualHeight)
                 }
 
                 companion object {
                     @JvmField val CODEC: MapCodec<Anchored> = RecordCodecBuilder.mapCodec { instance ->
                         instance.group(
+                            Codec.FLOAT.fieldOf("expected_width")
+                                .forGetter(Anchored::expectedWidth),
+                            Codec.FLOAT.fieldOf("expected_height")
+                                .forGetter(Anchored::expectedHeight),
+
                             Codec.FLOAT.fieldOf("target_width")
                                 .forGetter(Anchored::targetWidth),
                             Codec.FLOAT.fieldOf("target_height")

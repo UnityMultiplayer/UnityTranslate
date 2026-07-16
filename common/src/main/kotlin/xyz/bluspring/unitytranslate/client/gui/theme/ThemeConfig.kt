@@ -85,7 +85,9 @@ object ThemeConfig {
     var contextBoxElementOutlineFocused: ColorConfig = ColorConfig.Solid(
         Color(80, 80, 80, 170).rgb
     )
-    var contextBoxElementBackground: ColorConfig = ColorConfig.None
+    var contextBoxElementBackground: ColorConfig = ColorConfig.Solid(
+        Color(20, 20, 20, 140).rgb
+    )
     var contextBoxElementBackgroundFocused: ColorConfig = ColorConfig.Solid(
         Color(255, 255, 255, 80).rgb
     )
