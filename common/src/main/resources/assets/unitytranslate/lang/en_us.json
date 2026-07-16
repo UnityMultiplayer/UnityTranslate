@@ -39,6 +39,7 @@
     "unitytranslate.model.estimated.storage": "Estimated Storage Usage: %s",
     "unitytranslate.model.estimated.memory": "Estimated Memory Usage: %s",
 
+    "unitytranslate.language": "Language",
     "unitytranslate.language.native_and_localized": "%s / %s",
     "unitytranslate.language.en.native": "English",
     "unitytranslate.language.en.localized": "English",

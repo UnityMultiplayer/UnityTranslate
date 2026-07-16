@@ -1,11 +1,14 @@
 package xyz.bluspring.unitytranslate.client.gui.hud
 
+import kotlinx.coroutines.runBlocking
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.navigation.ScreenAxis
 import net.minecraft.client.gui.navigation.ScreenDirection
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
+import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
+import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
@@ -19,6 +22,7 @@ import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
 import xyz.bluspring.unitytranslate.client.gui.MouseHelper
 import xyz.bluspring.unitytranslate.client.gui.element.FocusableUIElement
 import xyz.bluspring.unitytranslate.client.gui.element.UIElement
+import xyz.bluspring.unitytranslate.client.gui.element.context.ActionContextBoxElement
 import xyz.bluspring.unitytranslate.client.gui.element.context.ContextBox
 import xyz.bluspring.unitytranslate.client.gui.element.context.ExpandableContextBoxElement
 import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
@@ -377,9 +381,27 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
         return super.mouseReleased(mouseX, mouseY, button)
     }
 
+    val languages: suspend () -> Collection<Language> = {
+        UnityTranslateApiImpl.translators.values.flatMap { it.getSupportedLanguages() }.distinct()
+    }
+
     fun createContextBox(x: Float, y: Float): ContextBox {
         return ContextBox(x, y, elements = listOf(
-            ExpandableContextBoxElement("config.unitytranslate.unitytranslate.hud.default_box_settings.header", listOf(
+            ExpandableContextBoxElement(
+                Component.translatable("unitytranslate.language").append(": ")
+                    .append(Component.translatable("unitytranslate.language.native_and_localized", this.config.language.nativeText, this.config.language.localizedText)),
+                runBlocking {
+                    languages()
+                }
+                    .sorted()
+                    .map {
+                        ActionContextBoxElement(Component.translatable("unitytranslate.language.native_and_localized", it.nativeText, it.localizedText)) {
+                            this.config.language = it
+                            this.updateConfig()
+                        }
+                    }
+            ),
+            ExpandableContextBoxElement(Component.translatable("config.unitytranslate.unitytranslate.hud.default_box_settings.header"), listOf(
 //                CyclingContextBoxElement(listOf(
 //
 //                )),
