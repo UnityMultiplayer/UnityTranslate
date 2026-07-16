@@ -29,6 +29,7 @@ import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 import xyz.bluspring.unitytranslate.util.ScreenUtil.inflate
 import java.util.*
 import kotlin.math.floor
+import kotlin.math.max
 
 class TranscriptBoxContainer(var holder: TranscriptHolder, val config: TranscriptBoxConfig) : UIElement(), FocusableUIElement {
     override var isFocused: Boolean = false
@@ -386,13 +387,20 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
     }
 
     fun createContextBox(x: Float, y: Float): ContextBox {
+        val languages = runBlocking {
+            languages()
+        }
+
+        val font = ClientPlatformProxy.instance.defaultFont
+        val width = languages.maxOf {
+            font.width(Component.translatable("unitytranslate.language.native_and_localized", it.nativeText, it.localizedText))
+        }
+
         return ContextBox(x, y, elements = listOf(
             ExpandableContextBoxElement(
                 Component.translatable("unitytranslate.language").append(": ")
                     .append(Component.translatable("unitytranslate.language.native_and_localized", this.config.language.nativeText, this.config.language.localizedText)),
-                runBlocking {
-                    languages()
-                }
+                languages
                     .sorted()
                     .map {
                         ActionContextBoxElement(Component.translatable("unitytranslate.language.native_and_localized", it.nativeText, it.localizedText)) {
@@ -400,7 +408,9 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
                             this.updateConfig()
                         }
                     }
-            ),
+            ).apply {
+                this.elementWidth = max(width + 4f, this.elementWidth)
+            },
             ExpandableContextBoxElement(Component.translatable("config.unitytranslate.unitytranslate.hud.default_box_settings.header"), listOf(
 //                CyclingContextBoxElement(listOf(
 //

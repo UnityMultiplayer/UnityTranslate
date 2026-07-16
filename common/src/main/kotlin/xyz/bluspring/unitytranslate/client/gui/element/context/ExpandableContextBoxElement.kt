@@ -8,6 +8,8 @@ import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 class ExpandableContextBoxElement(val text: Component, val elements: Collection<ContextBoxElement>) : ContextBoxElement() {
     private var contextBox: ContextBox? = null
 
+    var elementWidth = this.width
+
     override var isFocused: Boolean
         get() = super.isFocused || (this.contextBox != null && this.contextBox!!.isFocused)
         set(value) {
@@ -20,7 +22,7 @@ class ExpandableContextBoxElement(val text: Component, val elements: Collection<
             if (this.isFocused) ThemeConfig.contextBoxElementTextFocused else ThemeConfig.contextBoxElementText, true)
 
         if (this.isFocused && this.contextBox == null) {
-            this.contextBox = ContextBox(this.x + this.width, this.y, this.width.toInt(), this.elements, false)
+            this.contextBox = ContextBox(this.x + this.width, this.y, this.elementWidth.toInt(), this.elements, false)
             this.addChild(this.contextBox!!)
             this.contextBox!!.setup(ClientPlatformProxy.instance.viewportWidth, ClientPlatformProxy.instance.viewportHeight)
         } else if (!this.isFocused && this.contextBox != null) {

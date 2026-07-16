@@ -10,6 +10,9 @@ class ContextBox(val x: Float, val y: Float, val maxWidth: Int = 150, val elemen
     override var isFocused: Boolean = false
         get() = field || (this.children.any { it is FocusableUIElement && it.isFocused })
 
+    private val scale = if (this.shouldScale) 1f else 1f
+    private val inverseScale = 1.0f / scale
+
     override fun init(width: Int, height: Int) {
         super.init(width, height)
         for (element in this.elements) {
@@ -24,21 +27,21 @@ class ContextBox(val x: Float, val y: Float, val maxWidth: Int = 150, val elemen
         graphics.pushMatrix()
         graphics.translate(this.x, this.y)
         if (this.shouldScale)
-            graphics.scale(0.5f, 0.5f)
-        super.submit(graphics, partialTick, ((mouseX - this.x) * if (this.shouldScale) 2f else 1f).toInt(), ((mouseY - this.y) * if (this.shouldScale) 2f else 1f).toInt())
+            graphics.scale(this.scale, this.scale)
+        super.submit(graphics, partialTick, ((mouseX - this.x) * this.inverseScale).toInt(), ((mouseY - this.y) * this.inverseScale).toInt())
         graphics.popMatrix()
     }
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        return super.mouseClicked(((mouseX - this.x) * if (this.shouldScale) 2.0 else 1.0), ((mouseY - this.y) * if (this.shouldScale) 2.0 else 1.0), button)
+        return super.mouseClicked(((mouseX - this.x) * this.inverseScale), ((mouseY - this.y) * this.inverseScale), button)
     }
 
     override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        return super.mouseReleased(((mouseX - this.x) * if (this.shouldScale) 2.0 else 1.0), ((mouseY - this.y) * if (this.shouldScale) 2.0 else 1.0), button)
+        return super.mouseReleased(((mouseX - this.x) * this.inverseScale), ((mouseY - this.y) * this.inverseScale), button)
     }
 
     override fun mouseScrolled(mouseX: Double, mouseY: Double, scrollX: Double, scrollY: Double): Boolean {
-        return super.mouseScrolled(((mouseX - this.x) * if (this.shouldScale) 2.0 else 1.0), ((mouseY - this.y) * if (this.shouldScale) 2.0 else 1.0), scrollX, scrollY)
+        return super.mouseScrolled(((mouseX - this.x) * this.inverseScale), ((mouseY - this.y) * this.inverseScale), scrollX, scrollY)
     }
 
     override fun bounds(screenWidth: Int, screenHeight: Int): ScreenRectangle {
