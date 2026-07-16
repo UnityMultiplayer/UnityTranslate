@@ -87,7 +87,7 @@ object TranslatorManagerImpl : TranslatorManager {
                 this.pool.shutdownNow()
             } else emptyList()
 
-            this.pool = Executors.newFixedThreadPool(Config.maxThreads)
+            this.pool = Executors.newWorkStealingPool(Config.maxThreads)
             this.context = pool.asCoroutineDispatcher() + CoroutineName("UnityTranslate Translator Manager")
             this.scope = CoroutineScope(this.context) + CoroutineName("UnityTranslate Translator Manager")
 
@@ -109,9 +109,11 @@ object TranslatorManagerImpl : TranslatorManager {
 
     fun startTicking() {
         this.tickScope.launch {
-            tick()
-            yield()
-            LockSupport.parkNanos("Ticking for UnityTranslate translator", 50.milliseconds.inWholeNanoseconds)
+            while (true) {
+                tick()
+                yield()
+                LockSupport.parkNanos("Ticking for UnityTranslate translator", 50.milliseconds.inWholeNanoseconds)
+            }
         }
     }
 
@@ -147,6 +149,7 @@ object TranslatorManagerImpl : TranslatorManager {
 
             this.scope.launch(this.context) {
                 instance.prepareTranslationModels(langPair) // Make sure they're ready first.
+
                 val batchTranslated = instance.batchTranslate(entries.map { it.original }, langPair)
                 for ((i, translated) in batchTranslated.withIndex()) {
                     val original = translated
@@ -159,7 +162,6 @@ object TranslatorManagerImpl : TranslatorManager {
 
                     entries[i].deferred.complete(translated)
                 }
-                yield()
             }
 
             anyTranslationsQueued = true

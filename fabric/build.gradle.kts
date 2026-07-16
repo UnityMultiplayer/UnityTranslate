@@ -45,6 +45,8 @@ dependencies {
     moddedApi("net.fabricmc.fabric-api:fabric-api:${property("fabric_api")}")
     moddedApi(fletchingTable.modrinth("modmenu", stonecutter.current.version, "fabric"))
 
+    shadedDep(runtimeOnly("xyz.bluspring.unitytranslate:unitytranslate-library:${libs.versions.unitytranslatelib.get()}:natives-windows-x64")!!)
+
     moddedApi("maven.modrinth:talk-balloons:${libs.versions.talk.balloons.get()}+${stonecutter.current.version}-fabric")
     moddedRuntimeOnly(fletchingTable.modrinth("simple-voice-chat", stonecutter.current.version, "fabric"))
 }

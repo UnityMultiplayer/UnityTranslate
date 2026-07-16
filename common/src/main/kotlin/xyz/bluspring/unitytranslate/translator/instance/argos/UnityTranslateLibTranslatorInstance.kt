@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
@@ -34,13 +35,24 @@ object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
 
     val instances: MutableMap<LangPair, UnityTranslateLibInstance> = Collections.synchronizedMap(mutableMapOf())
     private val instanceLocks: MutableMap<LangPair, Mutex> = Collections.synchronizedMap(mutableMapOf())
-    private val queuedWaitingForInstance: Multimap<LangPair, Deferred<Unit>> = HashMultimap.create()
+    private val queuedWaitingForInstance: Multimap<LangPair, CompletableDeferred<Unit>> = HashMultimap.create()
 
     private val cachedTranslationPath = ConcurrentHashMap<LangPair, List<LangPair>>()
 
     private val gpuEnabledLock = Mutex()
+    private var wasLoadedSuccessfully = false
 
-    override suspend fun isAvailable(): Boolean = UnityTranslateLib.isAvailable()
+    init {
+        try {
+            UnityTranslateLib.autoLoad()
+            this.wasLoadedSuccessfully = true
+        } catch (e: Throwable) {
+            UnityTranslate.logger.error("Failed to load UnityTranslateLib!", e)
+            this.wasLoadedSuccessfully = false
+        }
+    }
+
+    override suspend fun isAvailable(): Boolean = UnityTranslateLib.isAvailable() && this.wasLoadedSuccessfully
 
     override suspend fun supportsLanguage(langPair: LangPair): Boolean {
         return this.getTranslationPath(langPair).isNotEmpty()
@@ -95,8 +107,12 @@ object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
             return
 
         // we're already prepared, we don't need any further setup.
-        if (translationPath.all { this.instances.contains(it) })
+        if (translationPath.all { this.instances.contains(it) }) {
+            for (pair in translationPath) {
+                this.unsuspendWaitingTranslators(pair)
+            }
             return
+        }
 
         val packageMap = translationPath.mapNotNull {
             for (index in this.packageIndexes) {
@@ -112,13 +128,17 @@ object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
 
         val deferreds = mutableListOf<Deferred<ModelInfo?>>()
         for ((index, pkg) in packageMap) {
-            if (this.instances.contains(pkg.langPair)) // We don't need another instance, fortunately.
+            if (this.instances.contains(pkg.langPair)) { // We don't need another instance, fortunately.
+                this.unsuspendWaitingTranslators(pkg.langPair)
                 continue
+            }
 
             deferreds += this.packagePrepareScope.async {
                 acquireLock(pkg.langPair).withLock { // Might as well lock it for the meantime.
-                    if (instances.contains(pkg.langPair)) // Looks like someone got to it before us, we can just skip over us then.
+                    if (instances.contains(pkg.langPair)) { // Looks like someone got to it before us, we can just skip over us then.
+                        unsuspendWaitingTranslators(pkg.langPair)
                         return@withLock null
+                    }
 
                     (index as PackageIndex<ModelPackage>).tryDownloadModelInfo(pkg)
                 }
@@ -130,17 +150,25 @@ object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
             if (info == null) // We already determined that our model is already loaded, we don't need it then.
                 continue
 
-            if (this.instances.contains(info.langPair)) // Looks like someone already got to this before us, we can just skip over us then.
+            if (this.instances.contains(info.langPair)) {// Looks like someone already got to this before us, we can just skip over us then.
+                this.unsuspendWaitingTranslators(langPair)
                 continue
+            }
 
             acquireLock(info.langPair).withLock { // Lock so we can store into the instance map.
                 synchronized(this.instances) {
                     this.instances[info.langPair] = this.library.createInstance(info.langPair.asLibraryPair, info.tokenizerType, info.tokenizerModelPath, info.translationModelPath, this.enableGpu)
+                    this.unsuspendWaitingTranslators(info.langPair)
                 }
             }
         }
+    }
 
-        yield()
+    private fun unsuspendWaitingTranslators(langPair: LangPair) {
+        synchronized(this.queuedWaitingForInstance) {
+            this.queuedWaitingForInstance[langPair].forEach { it.complete(Unit) }
+            this.queuedWaitingForInstance.removeAll(langPair)
+        }
     }
 
     override suspend fun batchTranslate(text: List<String>, langPair: LangPair): List<String> {
@@ -170,21 +198,22 @@ object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
             }
 
             // check again rq
-            if (this.instances.contains(langPair))
+            if (this.instances.contains(langPair)) {
                 deferred.complete(Unit)
+                this.unsuspendWaitingTranslators(langPair)
+            }
 
+            yield()
             deferred.await()
+        } else {
+            this.unsuspendWaitingTranslators(langPair)
         }
 
         val lock = this.acquireLock(langPair)
 
         lock.withLock {
             val instance = this.instances[langPair]!!
-            try {
-                return instance.batchTranslate(text)
-            } finally {
-                yield()
-            }
+            return instance.batchTranslate(text)
         }
     }
 
@@ -200,7 +229,5 @@ object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
                 this.instances.remove(langPair)
             }
         }
-
-        yield()
     }
 }

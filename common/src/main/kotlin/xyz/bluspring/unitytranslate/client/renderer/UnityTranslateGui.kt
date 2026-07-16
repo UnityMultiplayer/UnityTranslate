@@ -2,6 +2,7 @@ package xyz.bluspring.unitytranslate.client.renderer
 
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
+import xyz.bluspring.unitytranslate.client.config.ClientConfig
 import xyz.bluspring.unitytranslate.client.gui.LogoTransitionOverlay
 import xyz.bluspring.unitytranslate.client.gui.TranscriptBoxRenderer
 import xyz.bluspring.unitytranslate.client.gui.hud.QuickLanguageRadialSelector
@@ -29,7 +30,14 @@ object UnityTranslateGui {
         }
     }
 
+    private var hasInit = false
+
     fun tick() {
+        if (!this.hasInit) {
+            this.transcriptRenderer.updateConfig(ClientConfig.transcriptBoxes)
+            this.hasInit = true
+        }
+
         this.transcriptRenderer.tick()
         LogoTransitionOverlay.tick()
     }

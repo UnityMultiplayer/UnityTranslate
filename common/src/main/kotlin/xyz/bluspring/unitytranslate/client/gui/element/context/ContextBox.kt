@@ -23,25 +23,32 @@ class ContextBox(val x: Float, val y: Float, val maxWidth: Int = 150, val elemen
         }
     }
 
+    private var actualMouseX = 0
+    private var actualMouseY = 0
+
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
         graphics.pushMatrix()
         graphics.translate(this.x, this.y)
         if (this.shouldScale)
             graphics.scale(this.scale, this.scale)
-        super.submit(graphics, partialTick, ((mouseX - this.x) * this.inverseScale).toInt(), ((mouseY - this.y) * this.inverseScale).toInt())
+
+        this.actualMouseX = ((mouseX - this.x) * this.inverseScale).toInt()
+        this.actualMouseY = ((mouseY - this.y) * this.inverseScale).toInt()
+
+        super.submit(graphics, partialTick, actualMouseX, actualMouseY)
         graphics.popMatrix()
     }
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        return super.mouseClicked(((mouseX - this.x) * this.inverseScale), ((mouseY - this.y) * this.inverseScale), button)
+        return super.mouseClicked(this.actualMouseX.toDouble(), this.actualMouseY.toDouble(), button)
     }
 
     override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        return super.mouseReleased(((mouseX - this.x) * this.inverseScale), ((mouseY - this.y) * this.inverseScale), button)
+        return super.mouseReleased(this.actualMouseX.toDouble(), this.actualMouseY.toDouble(), button)
     }
 
     override fun mouseScrolled(mouseX: Double, mouseY: Double, scrollX: Double, scrollY: Double): Boolean {
-        return super.mouseScrolled(((mouseX - this.x) * this.inverseScale), ((mouseY - this.y) * this.inverseScale), scrollX, scrollY)
+        return super.mouseScrolled(this.actualMouseX.toDouble(), this.actualMouseY.toDouble(), scrollX, scrollY)
     }
 
     override fun bounds(screenWidth: Int, screenHeight: Int): ScreenRectangle {

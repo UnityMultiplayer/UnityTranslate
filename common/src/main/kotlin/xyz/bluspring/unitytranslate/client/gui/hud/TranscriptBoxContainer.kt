@@ -399,11 +399,11 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
         return ContextBox(x, y, elements = listOf(
             ExpandableContextBoxElement(
                 Component.translatable("unitytranslate.language").append(": ")
-                    .append(Component.translatable("unitytranslate.language.native_and_localized", this.config.language.nativeText, this.config.language.localizedText)),
+                    .append(this.config.language.nativeText),
                 languages
                     .sorted()
                     .map {
-                        ActionContextBoxElement(Component.translatable("unitytranslate.language.native_and_localized", it.nativeText, it.localizedText)) {
+                        ActionContextBoxElement(Component.literal(it.nativeText)) {
                             this.config.language = it
                             this.updateConfig()
                         }
