@@ -125,6 +125,10 @@ object UnityTranslateApiImpl : UnityTranslateApi {
         return this.translators[id] ?: InactiveTranslatorInstance
     }
 
+    fun getTranslatorConfig(id: String): SunsetConfig {
+        return this.transcriberConfigs[id] ?: this.transcriberConfigs["inactive"]!!
+    }
+
     fun getTranslatorId(translator: TranslatorInstance): String {
         return this.translators.filterValues { it == translator }.keys.first()
     }

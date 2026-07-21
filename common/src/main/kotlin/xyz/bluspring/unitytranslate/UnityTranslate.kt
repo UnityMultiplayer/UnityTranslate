@@ -49,6 +49,8 @@ object UnityTranslate {
 
         UnityTranslateApi.instance.registerTranslator("libretranslate", LibreTranslateTranslatorInstance) {
             listValue("entries", LibreTranslateTranslatorInstance.Entry.CODEC, LibreTranslateTranslatorInstance::entries)
+            boolean("enable_legacy_local", LibreTranslateTranslatorInstance::enableLegacyLocal)
+            integer("legacy_local_threads", 1, Runtime.getRuntime().availableProcessors(), 1, LibreTranslateTranslatorInstance::legacyThreads)
         }
 
         UnityTranslateApi.instance.registerLanguageDisplay("none", BuiltinLanguageDisplays.None.CODEC)
