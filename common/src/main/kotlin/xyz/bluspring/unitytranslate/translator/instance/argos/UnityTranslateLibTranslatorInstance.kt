@@ -28,7 +28,7 @@ object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
         .asCoroutineDispatcher() + CoroutineName("UnityTranslate Library Package Prepare")
     private val packagePrepareScope = CoroutineScope(this.packagePrepareDispatcher)
 
-    val library = UnityTranslateLib(UnityTranslateApi.instance.storagePath.resolve("library"))
+    val library = UnityTranslateLib()
     val packageIndexes = listOf<PackageIndex<*>>(
         ArgosPackageIndex(UnityTranslateApi.instance.storagePath.resolve("models/translator/argos")),
     )
