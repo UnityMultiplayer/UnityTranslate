@@ -100,4 +100,20 @@ object ThemeConfig {
     var transcriptBoxOutlineMoving: ColorConfig = ColorConfig.Solid(
         Color(255, 255, 255).rgb
     )
+
+    var downloadBackground: ColorConfig = ColorConfig.Gradient(ColorConfig.Gradient.GradientDirection.BOTTOM,
+        Color(0, 0, 0, 128).rgb,
+        Color(0, 0, 0, 172).rgb,
+    )
+    var downloadOutline: ColorConfig = ColorConfig.Gradient(ColorConfig.Gradient.GradientDirection.BOTTOM,
+        Color(0, 0, 0, 172).rgb,
+        Color(0, 0, 0, 200).rgb,
+    )
+    var downloadText: Int = Color(255, 255, 255).rgb
+    var downloadProgressBackground: ColorConfig = ColorConfig.Solid(Color(76, 76, 76).rgb)
+    var downloadProgressFill: ColorConfig = ColorConfig.Gradient(
+        ColorConfig.Gradient.GradientDirection.RIGHT,
+        Color(0, 200, 0).rgb,
+        Color(0, 255, 0).rgb
+    )
 }

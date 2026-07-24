@@ -6,10 +6,12 @@ import xyz.bluspring.unitytranslate.client.config.ClientConfig
 import xyz.bluspring.unitytranslate.client.gui.LogoTransitionOverlay
 import xyz.bluspring.unitytranslate.client.gui.TranscriptBoxRenderer
 import xyz.bluspring.unitytranslate.client.gui.hud.QuickLanguageRadialSelector
+import xyz.bluspring.unitytranslate.client.gui.hud.ingame.DownloadProgressHud
 
 object UnityTranslateGui {
     val transcriptRenderer = TranscriptBoxRenderer()
     val quickLanguageSelector = QuickLanguageRadialSelector()
+    val downloadProgressHud = DownloadProgressHud()
 
     fun resize() {
         for (container in this.transcriptRenderer.containers) {
@@ -45,11 +47,17 @@ object UnityTranslateGui {
     fun submit(uiGraphics: UIGraphics, partialTick: Float, mouseX: Double, mouseY: Double) {
         updateSizes()
         this.transcriptRenderer.submit(uiGraphics, partialTick, mouseX.toInt(), mouseY.toInt())
+        this.downloadProgressHud.submit(uiGraphics, partialTick, mouseX.toInt(), mouseY.toInt())
 //        this.quickLanguageSelector.submit(uiGraphics, partialTick, mouseX, mouseY)
     }
 
     fun submitLate(graphics: UIGraphics, partialTick: Float) {
         updateSizes()
+
+        val mouseX = ClientPlatformProxy.instance.mouseX
+        val mouseY = ClientPlatformProxy.instance.mouseY
+
+//        this.downloadProgressHud.submit(graphics, partialTick, mouseX.toInt(), mouseY.toInt())
         LogoTransitionOverlay.submit(graphics, partialTick)
     }
 }
