@@ -25,7 +25,10 @@ object TranslatorManagerImpl : TranslatorManager {
         var maxThreads: Int = 3.coerceAtMost(Runtime.getRuntime().availableProcessors())
         var batchSize: Int = 15
         var delayBetweenBatches: Int = 500
+        var maxTranslationWords: Int = 50
     }
+
+    private val WHITESPACE_REGEX = Regex("\\s*")
 
     private lateinit var pool: ExecutorService
     private lateinit var context: CoroutineContext
@@ -156,8 +159,23 @@ object TranslatorManagerImpl : TranslatorManager {
             this.scope.launch(this.context) {
                 prepareScope.async { instance.prepareTranslationModels(langPair) }.await() // Make sure they're ready first.
 
-                val batchTranslated = instance.batchTranslate(entries.map { it.original }, langPair)
-                for ((i, translated) in batchTranslated.withIndex()) {
+                val spliced = entries.map { // split them up so we don't have a Resa moment
+                    it.original.split(" ")
+                        .chunked(Config.maxTranslationWords)
+                        .map { b -> b.joinToString(" ") }
+                }
+
+                val batchTranslated = instance.batchTranslate(spliced.flatten(), langPair)
+                val combined = mutableListOf<String>()
+
+                // now join them back so they're not that bad
+                for ((i, texts) in spliced.withIndex()) {
+                    val length = texts.size
+
+                    combined += batchTranslated.slice(i until i + length).joinToString(" ")
+                }
+
+                for ((i, translated) in combined.withIndex()) {
                     val original = translated
                     var translated = original
 
