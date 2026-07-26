@@ -27,6 +27,9 @@ data class TranscriptHolder @ApiStatus.Internal constructor(
 ) {
     fun update(data: TranscriptData) {
         synchronized(this.transcripts) {
+            if (this.transcripts.any { it.id == data.id && it.timeUpdated > data.timeUpdated }) // avoid accidentally replacing stuff with the old data
+                return
+
             this.transcripts.removeIf { it.id == data.id }
             this.transcripts.add(data)
         }

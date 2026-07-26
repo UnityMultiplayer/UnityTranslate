@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.future.asCompletableFuture
 import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
 import xyz.bluspring.unitytranslate.api.v2.event.TranscriptEvent
+import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptData.Companion.id
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorManager
 import xyz.bluspring.unitytranslate.api.v2.util.LangPair
@@ -19,6 +20,8 @@ import java.util.concurrent.Executors
 import java.util.concurrent.locks.LockSupport
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 object TranslatorManagerImpl : TranslatorManager {
     object Config {
@@ -27,8 +30,6 @@ object TranslatorManagerImpl : TranslatorManager {
         var delayBetweenBatches: Int = 500
         var maxTranslationWords: Int = 50
     }
-
-    private val WHITESPACE_REGEX = Regex("\\s*")
 
     private lateinit var pool: ExecutorService
     private lateinit var context: CoroutineContext
@@ -46,7 +47,7 @@ object TranslatorManagerImpl : TranslatorManager {
                 return@register
 
             UnityTranslateApiImpl.transcriptHolders.forEach { (toLang, otherHolder) ->
-                this.queue(data.message, holder.language, toLang)
+                this.queueWithId(data.message, LangPair(holder.language, toLang), data.id, data.timeUpdated)
                     .asCompletableFuture()
                     .thenAccept { translated ->
                         otherHolder.update(TranslatedTranscriptData(
@@ -76,7 +77,9 @@ object TranslatorManagerImpl : TranslatorManager {
     @JvmRecord
     private data class Entry(
         val original: String,
-        val deferred: CompletableDeferred<String>
+        val deferred: CompletableDeferred<String>,
+        val id: String,
+        val lastUpdated: Long,
     )
 
     private var lastMaxThreads = -1
@@ -108,10 +111,15 @@ object TranslatorManagerImpl : TranslatorManager {
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     override fun queue(text: String, langPair: LangPair): Deferred<String> {
+        return queueWithId(text, langPair, "random_${Uuid.generateV7()}", System.currentTimeMillis())
+    }
+
+    fun queueWithId(text: String, langPair: LangPair, id: String, timeUpdated: Long): Deferred<String> {
         val deferred: CompletableDeferred<String> = CompletableDeferred()
         this.queued.computeIfAbsent(langPair) { ConcurrentLinkedQueue() }
-            .add(Entry(text, deferred))
+            .add(Entry(text, deferred, id, timeUpdated))
 
         return deferred
     }
@@ -150,7 +158,20 @@ object TranslatorManagerImpl : TranslatorManager {
                 if (entry.deferred.isCancelled)
                     continue
 
-                entries.add(entry)
+                if (entries.none { it.id == entry.id }) {
+                    entries.add(entry)
+                } else {
+                    val existing = entries.filter { it.id == entry.id && entry.lastUpdated > it.lastUpdated }
+
+                    if (existing.isNotEmpty()) {
+                        for (existingEntry in existing) {
+                            existingEntry.deferred.cancel("Superseded")
+                        }
+
+                        entries.removeAll(existing.toSet())
+                        entries.add(entry)
+                    }
+                }
 
                 if (entries.size >= Config.batchSize)
                     break
