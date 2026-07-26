@@ -30,6 +30,7 @@ object TranslatorManagerImpl : TranslatorManager {
     private lateinit var pool: ExecutorService
     private lateinit var context: CoroutineContext
     private lateinit var scope: CoroutineScope
+    private lateinit var prepareScope: CoroutineScope
 
     private val tickScope = CoroutineScope(Dispatchers.Default) + CoroutineName("UnityTranslate Translator Manager Tick")
 
@@ -83,13 +84,18 @@ object TranslatorManagerImpl : TranslatorManager {
                 this.scope.cancel("Thread count updated (${this.lastMaxThreads} -> ${Config.maxThreads})")
             }
 
+            if (this::prepareScope.isInitialized) {
+                this.prepareScope.cancel("Thread count updated (${this.lastMaxThreads} -> ${Config.maxThreads})")
+            }
+
             val tasks = if (this::pool.isInitialized) {
                 this.pool.shutdownNow()
             } else emptyList()
 
             this.pool = Executors.newWorkStealingPool(Config.maxThreads)
             this.context = pool.asCoroutineDispatcher() + CoroutineName("UnityTranslate Translator Manager")
-            this.scope = CoroutineScope(this.context) + CoroutineName("UnityTranslate Translator Manager")
+            this.scope = CoroutineScope(this.context) + CoroutineName("UnityTranslate Translator Manager (Translation Scope)")
+            this.prepareScope = CoroutineScope(this.context) + CoroutineName("UnityTranslate Translator Manager (Preparation Scope)")
 
             for (task in tasks) {
                 this.pool.submit(task)
@@ -148,7 +154,7 @@ object TranslatorManagerImpl : TranslatorManager {
             }
 
             this.scope.launch(this.context) {
-                instance.prepareTranslationModels(langPair) // Make sure they're ready first.
+                prepareScope.async { instance.prepareTranslationModels(langPair) }.await() // Make sure they're ready first.
 
                 val batchTranslated = instance.batchTranslate(entries.map { it.original }, langPair)
                 for ((i, translated) in batchTranslated.withIndex()) {

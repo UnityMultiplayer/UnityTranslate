@@ -44,7 +44,7 @@ class TranscriptBoxConfig(
         override var transcriptDisplay: TranscriptDisplay = TranscriptDisplay.default()
 
         override var padding: Padding = Padding.default()
-        override var msToLive: Int = 2_000 // 20 seconds
+        override var msToLive: Int = 20_000 // 20 seconds
         override var msToFadeOut: Int = 500 // 0.5 seconds
     }
 
