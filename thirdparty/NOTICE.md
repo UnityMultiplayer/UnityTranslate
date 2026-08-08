@@ -16,8 +16,13 @@ The complete text for each software license can be found in the directory "third
 * Original Source:
     * https://github.com/argosopentech/argos-translate
 
-## Java FLAC Encoder by Preston Lacey / plwww
-* Copyright © 2017 Preston Lacey
-* License: GNU Lesser General Public License v2.1 (SPDX: LGPL-2.1)
+## FLAC-library-Java by Project Nayuki
+* Copyright © 2022 Project Nayuki
+* License: GNU Lesser General Public License v3.0 (SPDX: LGPL-3.0)
 * Original Source:
-    * https://sourceforge.net/projects/javaflacencoder/files/
+    * https://github.com/nayuki/FLAC-library-Java
+* Modified Source:
+    * https://github.com/unprodstudio/FLAC-library-Java
+    * Modifications:
+      * Added publishing to https://mvn.devos.one/releases
+      * Disabled `println` calls so logs don't get spammed
