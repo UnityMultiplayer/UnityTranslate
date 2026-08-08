@@ -69,4 +69,29 @@ object AudioConverters {
 
         return result
     }
+
+    /**
+     * Converts 16-bit signed little-endian PCM bytes to float32 samples
+     * normalized to the range [-2,147,483,648, 2,147,483,647].
+     *
+     * @param pcm the float[] formatted packet
+     * @return the converted audio
+     */
+    @JvmStatic
+    fun floatPcm16ToInt(pcm: FloatArray): IntArray {
+        val result = IntArray(pcm.size)
+        for (i in pcm.indices) {
+            var f = pcm[i]
+
+            // Clamp to [-1.0, 1.0] just in case
+            if (f > 1.0f)
+                f = 1.0f
+            else if (f < -1.0f)
+                f = -1.0f
+
+            result[i] = (f * 32768f).toInt()
+        }
+
+        return result
+    }
 }

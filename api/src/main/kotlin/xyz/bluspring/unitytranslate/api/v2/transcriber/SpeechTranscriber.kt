@@ -19,6 +19,11 @@ abstract class SpeechTranscriber : AutoCloseable {
      */
     open val supportsExternal: Boolean = true
 
+    /**
+     * Specifies whether this transcriber requires new samples (i.e. if the transcriber streams the data in) or not (i.e. if it simply re-transcribes the whole text)
+     */
+    open val requiresUniqueSamples: Boolean = false
+
     abstract suspend fun supportsLanguage(language: Language): Boolean
 
     open fun onSelected() {}

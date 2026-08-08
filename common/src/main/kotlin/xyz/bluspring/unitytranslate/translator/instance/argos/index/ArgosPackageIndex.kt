@@ -61,6 +61,18 @@ class ArgosPackageIndex(path: Path) : PackageIndex<ArgosPackage>(path, "argos") 
             lastIndexTime = cachedFile.getLastModifiedTime().toMillis()
         }
 
+        // Try to load the cached data in the meantime.
+        if (cachedFile.exists()) {
+            try {
+                synchronized(cachedFile) {
+                    cachedFile.inputStream(options = arrayOf(StandardOpenOption.READ)).use { loadIndexFromStream(it) }
+                }
+            } catch (e: Throwable) {
+                UnityTranslate.logger.error("Failed to load cached Argos index! Deleting.", e)
+                cachedFile.deleteIfExists()
+            }
+        }
+
         if (System.currentTimeMillis() - lastIndexTime >= 1.days.inWholeMilliseconds) {
             try {
                 UnityTranslate.logger.debug("Cache outdated! Updating Argos index.")
@@ -77,18 +89,6 @@ class ArgosPackageIndex(path: Path) : PackageIndex<ArgosPackage>(path, "argos") 
             } catch (e: Exception) {
                 if (!cachedFile.exists())
                     UnityTranslate.logger.debug("Failed to update Argos index, and no cached index could be found!", e)
-            }
-        }
-
-        // Try to load the cached data in the meantime.
-        if (cachedFile.exists()) {
-            try {
-                synchronized(cachedFile) {
-                    cachedFile.inputStream(options = arrayOf(StandardOpenOption.READ)).use { loadIndexFromStream(it) }
-                }
-            } catch (e: Throwable) {
-                UnityTranslate.logger.error("Failed to load cached Argos index! Deleting.", e)
-                cachedFile.deleteIfExists()
             }
         }
     }

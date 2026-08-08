@@ -52,11 +52,12 @@ class TranscriberSourceImpl(
             this.sessionTimestamp = System.currentTimeMillis()
 
         val collected = mutableListOf<String>()
+        val transcriber = this.transcriber
 
         try {
             while (this.queuedOverflow.isNotEmpty()) {
                 val overflow = this.queuedOverflow.poll() ?: break
-                collected += this.transcriber.transcribeSamples(overflow, this.language).await()
+                collected += transcriber.transcribeSamples(overflow, this.language).await()
             }
 
             val samples = synchronized(this.speechSamples) { // make sure we're not concurrently accessing stuff
@@ -64,7 +65,10 @@ class TranscriberSourceImpl(
                 this.speechSamples.snapshot()
             }
 
-            collected += this.transcriber.transcribeSamples(samples, this.language).await()
+            if (transcriber.requiresUniqueSamples)
+                this.speechSamples.reset()
+
+            collected += transcriber.transcribeSamples(samples, this.language).await()
 
             return collected
         } catch (e: Throwable) {

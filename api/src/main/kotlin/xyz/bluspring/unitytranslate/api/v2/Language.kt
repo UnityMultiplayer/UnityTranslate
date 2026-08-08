@@ -27,6 +27,15 @@ data class Language(
     val localizedShortText: String
         get() = MinecraftLanguage.getInstance().getOrDefault("unitytranslate.language.$serialized.localized.short", this.nativeText)
 
+    val asBCP47: String
+        get() {
+            if (this.regionCode != null) {
+                return "$languageCode-$regionCode"
+            }
+
+            return languageCode
+        }
+
     override fun toString(): String = this.formatted
 
     override fun compareTo(other: Language): Int {

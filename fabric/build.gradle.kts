@@ -37,6 +37,7 @@ dependencies {
     implementation(project(":api"))
     runtimeOnly(project(":common:${stonecutter.current.version}"))
     runtimeOnly(project(":transcribers:whisper"))
+    runtimeOnly(project(":transcribers:google"))
 
     moddedImplementation(libs.fabric.loader)
     moddedApi(libs.fabric.kotlin)

@@ -16,10 +16,9 @@ object AudioHelper {
     fun ByteArray.toAudioFloatArray(): FloatArray {
         val floats = FloatArray(this.size / 2)
 
-        for (i in 0..<this.size / 2) {
+        for (i in 0 until this.size / 2) {
             if ((this[i * 2 + 1].toInt() and 0x80) != 0) {
-                floats[i] =
-                    (Short.MIN_VALUE + ((this[i * 2 + 1].toInt() and 0x7F) shl 8) or (this[i * 2].toInt() and 0xFF)).toFloat()
+                floats[i] = (Short.MIN_VALUE + ((this[i * 2 + 1].toInt() and 0x7F) shl 8) or (this[i * 2].toInt() and 0xFF)).toFloat()
             } else {
                 floats[i] = (((this[i * 2 + 1].toInt() shl 8) and 0xFF00) or (this[i * 2].toInt() and 0xFF)).toFloat()
             }

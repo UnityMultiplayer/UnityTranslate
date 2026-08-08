@@ -3,6 +3,7 @@ package xyz.bluspring.unitytranslate.api.v2.download
 import kotlinx.coroutines.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import xyz.bluspring.unitytranslate.api.v2.util.HttpHelper.requestContentLength
 import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.file.OpenOption
@@ -144,9 +145,7 @@ object DownloadHelper {
                         DigestOutputStream(fileStream, digest)
                     else
                         fileStream
-                    val connection = url.openConnection() as HttpURLConnection
-                    connection.requestMethod = "HEAD"
-                    info.totalBytes = connection.contentLengthLong
+                    info.totalBytes = url.requestContentLength()
 
                     url.openStream().use { downloadStream ->
                         var b: Int

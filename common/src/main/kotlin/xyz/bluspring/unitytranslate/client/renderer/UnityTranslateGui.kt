@@ -57,7 +57,7 @@ object UnityTranslateGui {
         val mouseX = ClientPlatformProxy.instance.mouseX
         val mouseY = ClientPlatformProxy.instance.mouseY
 
-//        this.downloadProgressHud.submit(graphics, partialTick, mouseX.toInt(), mouseY.toInt())
+        this.downloadProgressHud.submit(graphics, partialTick, mouseX.toInt(), mouseY.toInt())
         LogoTransitionOverlay.submit(graphics, partialTick)
     }
 }
