@@ -1,0 +1,18 @@
+{
+    "schemaVersion": 1,
+    "id": "unitytranslate_google",
+    "version": "1.0.0",
+    "name": "UnityTranslate: Google Transcriber Plugin",
+    "description": "The Google transcriber plugin for UnityTranslate.",
+    "authors": [
+        "BluSpring"
+    ],
+    "license": "Artistic-2.0",
+    "icon": "icon.png",
+    "environment": "*",
+    "custom": {
+        "modmenu": {
+            "parent": "unitytranslate"
+        }
+    }
+}

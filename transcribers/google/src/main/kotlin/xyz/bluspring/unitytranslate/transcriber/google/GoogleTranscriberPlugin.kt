@@ -7,10 +7,11 @@ import xyz.bluspring.unitytranslate.transcriber.google.internal.GoogleInternalTr
 
 class GoogleTranscriberPlugin : UnityTranslatePlugin {
     override fun onLoadPlugin(api: UnityTranslateApi, metadata: PluginMetadata) {
-        api.registerTranscriber("google_internal", GoogleInternalTranscriber) {
+        api.registerTranscriber("unitytranslate_google_internal", GoogleInternalTranscriber) {
         }
 
-//        api.registerTranscriber("google_cloud", GoogleCloudTranscriber) {
+        // TODO: Google Cloud API support, help
+//        api.registerTranscriber("unitytranslate_google_cloud", GoogleCloudTranscriber) {
 //            string("api_key", GoogleCloudTranscriber::apiKey)
 //        }
     }

@@ -1,0 +1,4 @@
+{
+    "unitytranslate.transcriber.unitytranslate_google_internal.name": "Google Speech API (Internal)",
+    "unitytranslate.transcriber.unitytranslate_google_internal.description": "A speech transcription API that utilizes internal Google Speech API services based on what is used in Google Chrome / Browser Transcription. Free, but sends data directly to Google and may pause randomly. Only use this if you use a weak computer."
+}
