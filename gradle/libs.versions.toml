@@ -57,6 +57,9 @@ whisper4j = "1.0.0"
 # https://maven.maxhenkel.de/#/releases/de/maxhenkel/voicechat/voicechat-api
 voicechat-api = "2.6.13"
 
+# https://plasmovoice.com/docs/api/
+plasmo-api = "2.1.13"
+
 # https://mvn.devos.one/#/releases/io/nayuki/flac-library-java
 flac-java = "1.4.1"
 
@@ -106,6 +109,8 @@ unitytranslatelib = { module = "xyz.bluspring.unitytranslate:unitytranslate-libr
 whispercpp = { module = "io.github.ggerganov:whispercpp", version.ref = "whispercpp" }
 
 voicechat-api = { module = "de.maxhenkel.voicechat:voicechat-api", version.ref = "voicechat-api" }
+plasmo-api-server = { module = "su.plo.voice.api:server", version.ref = "plasmo-api" }
+plasmo-api-client = { module = "su.plo.voice.api:client", version.ref = "plasmo-api" }
 sunset = { module = "xyz.bluspring.sunset:sunset-config", version.ref = "sunset" }
 
 flac-java = { module = "io.nayuki:flac-library-java", version.ref = "flac-java" }

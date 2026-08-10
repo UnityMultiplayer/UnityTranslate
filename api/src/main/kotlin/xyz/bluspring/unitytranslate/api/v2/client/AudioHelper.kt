@@ -26,4 +26,18 @@ object AudioHelper {
 
         return floats
     }
+
+    @JvmStatic
+    fun downsample48kTo16k(input: FloatArray): FloatArray {
+        val outputLength = input.size / 3
+        val output = FloatArray(outputLength)
+
+        for (i in 0 until outputLength) {
+            val base = i * 3
+            val sum = input[base] + input[base + 1] + input[base + 2]
+            output[i] = sum / 3f
+        }
+
+        return output
+    }
 }

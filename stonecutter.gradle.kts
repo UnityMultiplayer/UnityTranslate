@@ -39,6 +39,7 @@ allprojects {
         mavenProviding("https://maven.maxhenkel.de/releases", "de.maxhenkel")
         mavenProviding("https://api.modrinth.com/maven", "maven.modrinth")
         mavenProviding("https://www.cursemaven.com", "curse.maven")
+        mavenProviding("https://repo.plasmoverse.com/releases", "su.plo")
     }
 
     group = mod.group

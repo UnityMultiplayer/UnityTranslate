@@ -9,6 +9,7 @@ import de.maxhenkel.voicechat.api.events.EventRegistration
 import net.minecraft.client.Minecraft
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
+import xyz.bluspring.unitytranslate.api.v2.client.AudioHelper
 import xyz.bluspring.unitytranslate.api.v2.event.TranscriptEvent
 import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.PlayerUser
 import xyz.bluspring.unitytranslate.api.v2.util.AudioConverters
@@ -45,7 +46,7 @@ class SimpleVoiceChatIntegration : VoicechatPlugin {
                 source.reset()
 
             val samples = AudioConverters.shortPcm16ToFloat(event.rawAudio)
-            source.submitSpeechSamples(this.downsampleTo16k(samples))
+            source.submitSpeechSamples(AudioHelper.downsample48kTo16k(samples))
         }
 
         registration.registerEvent(ClientSoundEvent::class.java) { event ->
@@ -55,21 +56,7 @@ class SimpleVoiceChatIntegration : VoicechatPlugin {
                 source.reset()
 
             val samples = AudioConverters.shortPcm16ToFloat(event.rawAudio)
-            UnityTranslateMCClient.transcriberSource.submitSpeechSamples(this.downsampleTo16k(samples))
+            UnityTranslateMCClient.transcriberSource.submitSpeechSamples(AudioHelper.downsample48kTo16k(samples))
         }
-    }
-
-    // because SVC takes in 48k sample rate audio by default.
-    private fun downsampleTo16k(input: FloatArray): FloatArray {
-        val outputLength = input.size / 3
-        val output = FloatArray(outputLength)
-
-        for (i in 0 until outputLength) {
-            val base = i * 3
-            val sum = input[base] + input[base + 1] + input[base + 2]
-            output[i] = sum / 3f
-        }
-
-        return output
     }
 }
