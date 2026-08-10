@@ -1,5 +1,6 @@
 package xyz.bluspring.unitytranslate.client.gui.screen
 
+import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
@@ -50,10 +51,19 @@ class WrappedUTScreen(val actualScreen: UTScreen, private val parent: Screen? = 
     }
 
     override fun keyPressed(event: KeyEvent): Boolean {
+        if (shouldCloseOnEsc() && event.key == InputConstants.KEY_ESCAPE) {
+            this.minecraft.gui.setScreen(this.parent)
+            return true
+        }
+
         return actualScreen.keyPressed(event.key, event.scancode, event.modifiers)
     }
 
     override fun keyReleased(event: KeyEvent): Boolean {
         return actualScreen.keyReleased(event.key, event.scancode, event.modifiers)
+    }
+
+    override fun shouldCloseOnEsc(): Boolean {
+        return actualScreen.shouldCloseOnEsc()
     }
 }

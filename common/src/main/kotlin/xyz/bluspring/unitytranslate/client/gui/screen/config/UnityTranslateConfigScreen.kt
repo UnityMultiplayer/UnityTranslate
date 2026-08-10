@@ -16,17 +16,18 @@ class UnityTranslateConfigScreen : UTScreen() {
     val queuedTasks = mutableMapOf<String, Deferred<*>>()
 
     init {
-        this.sections += ConfigSection("unitytranslate", listOf(UnityTranslateApiImpl.configs["unitytranslate"]!!))
+        this.sections += ConfigSection(this, "unitytranslate", listOf(UnityTranslateApiImpl.configs["unitytranslate"]!!))
 
         val keys = UnityTranslateApiImpl.configs.keys.toMutableList()
         keys.remove("unitytranslate")
+        keys.remove("unitytranslate_theme")
         val pluginConfigs = mutableListOf<SunsetConfig>()
 
         for (key in keys.sorted()) {
             pluginConfigs += UnityTranslateApiImpl.configs[key]!!
         }
 
-        this.sections += ConfigSection("plugins", pluginConfigs)
+        this.sections += ConfigSection(this, "plugins", pluginConfigs)
     }
 
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
@@ -40,7 +41,8 @@ class UnityTranslateConfigScreen : UTScreen() {
         val sectionHeight = this.sections.sumOf { it.calculateSidebarHeight(font).toDouble() + 8.0 }.toFloat() + 16f // Kotlin why do you not permit floats in this?
 
         graphics.pushMatrix()
-        graphics.translate(0f, graphics.height / 2f - (sectionHeight / 2f))
+        if (sectionHeight < graphics.height)
+            graphics.translate(0f, graphics.height / 2f - (sectionHeight / 2f))
 
         var offsetY = 0f
         for (section in this.sections) {

@@ -19,7 +19,7 @@ import xyz.bluspring.unitytranslate.client.gui.screen.UTScreen
 import xyz.bluspring.unitytranslate.client.renderer.UnityTranslateGui
 import xyz.bluspring.unitytranslate.util.ScreenUtil.inflate
 
-class ConfigureTranscriptBoxesScreen(val onExit: () -> Unit = { ClientPlatformProxy.instance.setScreen(null) }) : UTScreen() {
+class ConfigureTranscriptBoxesScreen(private val onExit: () -> Unit = { ClientPlatformProxy.instance.setScreen(null) }) : UTScreen() {
     lateinit var renderer: TranscriptBoxRenderer
     lateinit var introText: UILabel
         private set
@@ -31,10 +31,14 @@ class ConfigureTranscriptBoxesScreen(val onExit: () -> Unit = { ClientPlatformPr
         super.init(width, height)
         val font = ClientPlatformProxy.instance.defaultFont
         this.introText = this.addChild(UILabel(width / 2f, height / 2f, Component.translatable("unitytranslate.intro.transcript_box"), font, maxWidth = width - 20, alignX = HorizontalAlign.CENTER, alignY = VerticalAlign.CENTER))
-        this.addChild(PlainUIButton(width / 2f, height - 12f, Component.translatable("unitytranslate.transcript_box.done").withStyle(Style.EMPTY.withUnderlined(true)), font, onClick = this.onExit))
+        this.addChild(PlainUIButton(width / 2f, height - 12f, Component.translatable("unitytranslate.transcript_box.done").withStyle(Style.EMPTY.withUnderlined(true)), font, onClick = this::onExit))
 
         this.renderer = this.addChild(UnityTranslateGui.transcriptRenderer)
         this.needsReinit = true
+    }
+
+    override fun onExit() {
+        this.onExit.invoke()
     }
 
     override fun tick() {

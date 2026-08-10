@@ -9,7 +9,7 @@ import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.config.values.HiddenConfigValue
 
-class ConfigSection(val id: String, val config: Collection<SunsetConfig>) {
+class ConfigSection(val parent: UnityTranslateConfigScreen, val id: String, val config: Collection<SunsetConfig>) {
     fun calculateSidebarHeight(font: Font): Float {
         var offsetY = 16f
 

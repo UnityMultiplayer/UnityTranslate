@@ -155,4 +155,6 @@ class FirstStartupScreen : UTScreen() {
 
         return super.charTyped(codepoint)
     }
+
+    override fun shouldCloseOnEsc(): Boolean = false
 }
