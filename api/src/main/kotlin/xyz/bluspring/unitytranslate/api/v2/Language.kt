@@ -4,9 +4,11 @@ import com.mojang.serialization.Codec
 import xyz.bluspring.unitytranslate.api.v2.util.reverse
 import net.minecraft.locale.Language as MinecraftLanguage
 
-data class Language(
+data class Language @JvmOverloads constructor(
     val languageCode: String, // ISO 639-1 codes
     val regionCode: String? = null, // ISO 3166-1 codes
+    val fallbackNativeName: String? = null,
+    val fallbackLocalizedName: String? = null,
 ) : Comparable<Language> {
     val formatted: String = if (this.regionCode == null)
         this.languageCode
@@ -19,13 +21,13 @@ data class Language(
         "${this.languageCode}_${this.regionCode.lowercase()}"
 
     val nativeText: String
-        get() = MinecraftLanguage.getInstance().getOrDefault("unitytranslate.language.$serialized.native", this.formatted)
+        get() = MinecraftLanguage.getInstance().getOrDefault("unitytranslate.language.$serialized.native", this.fallbackNativeName ?: this.formatted)
     val nativeShortText: String
-        get() = MinecraftLanguage.getInstance().getOrDefault("unitytranslate.language.$serialized.native.short", this.nativeText)
+        get() = MinecraftLanguage.getInstance().getOrDefault("unitytranslate.language.$serialized.native.short", this.fallbackNativeName ?: this.nativeText)
     val localizedText: String
-        get() = MinecraftLanguage.getInstance().getOrDefault("unitytranslate.language.$serialized.localized", this.formatted)
+        get() = MinecraftLanguage.getInstance().getOrDefault("unitytranslate.language.$serialized.localized", this.fallbackLocalizedName ?: this.formatted)
     val localizedShortText: String
-        get() = MinecraftLanguage.getInstance().getOrDefault("unitytranslate.language.$serialized.localized.short", this.nativeText)
+        get() = MinecraftLanguage.getInstance().getOrDefault("unitytranslate.language.$serialized.localized.short", this.fallbackLocalizedName ?: this.nativeText)
 
     val asBCP47: String
         get() {
@@ -42,6 +44,12 @@ data class Language(
         return this.formatted.compareTo(other.formatted)
     }
 
+    override fun hashCode(): Int {
+        var hash = this.languageCode.hashCode()
+        hash = 31 * hash + this.regionCode.hashCode()
+        return hash
+    }
+
     companion object {
         @JvmField val CODEC: Codec<Language> = Codec.STRING.xmap(Language::parse, Language::formatted)
 
@@ -55,14 +63,14 @@ data class Language(
             })
         }
 
-        @JvmStatic
-        fun parse(code: String): Language {
+        @JvmStatic @JvmOverloads
+        fun parse(code: String, nativeName: String? = null, localizedName: String? = null): Language {
             if (code.contains("-")) {
                 val split = code.split("-")
-                return Language(split[0], split[1])
+                return Language(split[0], split[1], nativeName, localizedName)
             }
 
-            return Language(code)
+            return Language(code, null, nativeName, localizedName)
         }
     }
 }

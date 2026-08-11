@@ -29,6 +29,7 @@ import xyz.bluspring.unitytranslate.translator.TranslatorManagerImpl
 import xyz.bluspring.unitytranslate.translator.instance.InactiveTranslatorInstance
 import xyz.bluspring.unitytranslate.translator.instance.argos.LibreTranslateTranslatorInstance
 import xyz.bluspring.unitytranslate.translator.instance.argos.UnityTranslateLibTranslatorInstance
+import xyz.bluspring.unitytranslate.translator.instance.microsoft.MicrosoftInternalTranslatorInstance
 import java.text.DecimalFormat
 import kotlin.reflect.KMutableProperty
 
@@ -51,6 +52,9 @@ object UnityTranslate {
             listValue("entries", LibreTranslateTranslatorInstance.Entry.CODEC, LibreTranslateTranslatorInstance::entries)
             boolean("enable_legacy_local", LibreTranslateTranslatorInstance::enableLegacyLocal)
             integer("legacy_local_threads", 1, Runtime.getRuntime().availableProcessors(), 1, LibreTranslateTranslatorInstance::legacyThreads)
+        }
+
+        UnityTranslateApi.instance.registerTranslator("microsoft_internal", MicrosoftInternalTranslatorInstance) {
         }
 
         UnityTranslateApi.instance.registerLanguageDisplay("none", BuiltinLanguageDisplays.None.CODEC)
