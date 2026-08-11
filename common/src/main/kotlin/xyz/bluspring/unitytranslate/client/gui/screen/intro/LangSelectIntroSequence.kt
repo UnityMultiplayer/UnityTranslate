@@ -29,11 +29,21 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
             UnityTranslateApiImpl.translators.values.flatMap { it.getSupportedLanguages() }.distinct()
         }
 
+        val currentTranscriber = UnityTranslateApi.instance.getTranscriber(this.currentTranscriberId)
+
         val visualizer: (Language) -> Component = { language ->
+            val supportLevel = runBlocking { currentTranscriber.checkLanguageSupport(language) }
+
             Component.translatable("unitytranslate.language.native_and_localized",
                 Component.translatableWithFallback("unitytranslate.language.${language.serialized}.native", language.formatted),
                 Component.translatableWithFallback("unitytranslate.language.${language.serialized}.localized", language.formatted)
             )
+                .withColor(
+                    when (supportLevel) {
+                        Language.SupportLevel.PARTIAL -> ThemeConfig.warningText
+                        else -> -1
+                    }
+                )
         }
 
         val font = ClientPlatformProxy.instance.defaultFont
@@ -46,8 +56,6 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
 
         val xPos = (width / 2f - elementWidth - elementOffset)
         val yPos = 25f + this.children.sumOf { it.bounds().height } + 24f
-
-        val currentTranscriber = UnityTranslateApi.instance.getTranscriber(this.currentTranscriberId)
 
         // Right side
         run {
@@ -98,14 +106,22 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
                 UnityTranslateApiImpl::currentSpokenLanguage,
                 { language ->
                     runBlocking {
-                        currentTranscriber.supportsLanguage(language)
+                        currentTranscriber.checkLanguageSupport(language).isSupported
                     }
                 }
             ) { language ->
-                if (language != null && !runBlocking { currentTranscriber.supportsLanguage(language) }) {
-                    Component.translatable("config.unitytranslate.language.error.unsupported_transcriber",
-                        Component.translatable("unitytranslate.transcriber.${this.currentTranscriberId}.name")
-                    ).withStyle(ChatFormatting.RED)
+                if (language != null) {
+                    val supportLevel = runBlocking { currentTranscriber.checkLanguageSupport(language) }
+
+                    when (supportLevel) {
+                        Language.SupportLevel.NONE -> Component.translatable("config.unitytranslate.language.error.transcriber.unsupported",
+                                Component.translatable("unitytranslate.transcriber.${this.currentTranscriberId}.name")
+                            ).withStyle(ChatFormatting.RED)
+                        Language.SupportLevel.PARTIAL -> Component.translatable("config.unitytranslate.language.warn.transcriber.partial_support",
+                            Component.translatable("unitytranslate.transcriber.${this.currentTranscriberId}.name")
+                        ).withStyle(ChatFormatting.GOLD)
+                        else -> Component.empty()
+                    }
                 } else Component.empty()
             })
 
@@ -118,14 +134,22 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
                     langHolder::languageOrNull, DropdownList.Type.DEFAULTED,
                     { language ->
                         runBlocking {
-                            currentTranscriber.supportsLanguage(language)
+                            currentTranscriber.checkLanguageSupport(language).isSupported
                         }
                     }
                 ) { language ->
-                    if (language != null && !runBlocking { currentTranscriber.supportsLanguage(language) }) {
-                        Component.translatable("config.unitytranslate.language.error.unsupported_transcriber",
-                            Component.translatable("unitytranslate.transcriber.${this.currentTranscriberId}.name")
-                        ).withStyle(ChatFormatting.RED)
+                    if (language != null) {
+                        val supportLevel = runBlocking { currentTranscriber.checkLanguageSupport(language) }
+
+                        when (supportLevel) {
+                            Language.SupportLevel.NONE -> Component.translatable("config.unitytranslate.language.error.transcriber.unsupported",
+                                Component.translatable("unitytranslate.transcriber.${this.currentTranscriberId}.name")
+                            ).withStyle(ChatFormatting.RED)
+                            Language.SupportLevel.PARTIAL -> Component.translatable("config.unitytranslate.language.warn.transcriber.partial_support",
+                                Component.translatable("unitytranslate.transcriber.${this.currentTranscriberId}.name")
+                            ).withStyle(ChatFormatting.GOLD)
+                            else -> Component.empty()
+                        }
                     } else Component.empty()
                 })
             }

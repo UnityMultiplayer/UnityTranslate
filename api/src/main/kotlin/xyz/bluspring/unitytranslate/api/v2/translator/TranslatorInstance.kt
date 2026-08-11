@@ -12,6 +12,11 @@ abstract class TranslatorInstance {
     abstract suspend fun getSupportedLanguages(): Set<Language>
 
     abstract suspend fun supportsLanguage(langPair: LangPair): Boolean
+
+    open suspend fun checkLanguageSupport(langPair: LangPair): Pair<Language.SupportLevel, Language.SupportLevel> {
+        TODO("Not yet implemented")
+    }
+
     abstract suspend fun batchTranslate(text: List<String>, langPair: LangPair): List<String>
     open suspend fun prepareTranslationModels(langPair: LangPair) {}
     open suspend fun close() {}

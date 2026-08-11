@@ -221,7 +221,8 @@
     "config.unitytranslate.unitytranslate.translator.delay_between_batches": "Delay Between Batches",
     "config.unitytranslate.unitytranslate.translator.instances": "Translation Instances",
 
-    "config.unitytranslate.language.error.unsupported_transcriber": "The \"%s\" transcriber does not support this language!",
+    "config.unitytranslate.language.error.transcriber.unsupported": "The \"%s\" transcriber does not support this language!",
+    "config.unitytranslate.language.warn.transcriber.partial_support": "The \"%s\" transcriber only partially supports this language! (only supports the general language, not this specific dialect.)",
 
     "config.unitytranslate.plugins": "Plugins"
 }

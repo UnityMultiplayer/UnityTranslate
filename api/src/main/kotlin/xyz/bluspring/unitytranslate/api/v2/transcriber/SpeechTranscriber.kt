@@ -26,6 +26,19 @@ abstract class SpeechTranscriber : AutoCloseable {
 
     abstract suspend fun supportsLanguage(language: Language): Boolean
 
+    /**
+     * Checks if this transcriber generally supports the language, whether natively supporting the language code and its dialect or simply supporting the language in general.
+     */
+    open suspend fun checkLanguageSupport(language: Language): Language.SupportLevel {
+        if (this.supportsLanguage(language))
+            return Language.SupportLevel.FULL // Supports the language directly
+
+        if (language.regionCode != null && this.supportsLanguage(language.withoutRegion))
+            return Language.SupportLevel.PARTIAL
+
+        return Language.SupportLevel.NONE
+    }
+
     open fun onSelected() {}
     abstract fun transcribeSamples(samples: FloatArray, language: Language): Deferred<String>
     abstract override fun close()

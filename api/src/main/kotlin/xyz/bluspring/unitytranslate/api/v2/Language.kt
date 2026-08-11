@@ -38,6 +38,9 @@ data class Language @JvmOverloads constructor(
             return languageCode
         }
 
+    val withoutRegion: Language
+        get() = Language(this.languageCode)
+
     override fun toString(): String = this.formatted
 
     override fun compareTo(other: Language): Int {
@@ -72,5 +75,29 @@ data class Language @JvmOverloads constructor(
 
             return Language(code, null, nativeName, localizedName)
         }
+    }
+
+    /**
+     * Represents the support level of a system, e.g. a transcriber or a translator.
+     */
+    enum class SupportLevel {
+        /**
+         * This system fully supports this language, including its specific regional dialect.
+         */
+        FULL,
+
+        /**
+         * This system supports the language, however it does not support its regional dialect.
+         */
+        PARTIAL,
+
+        /**
+         * This system does not support the language at all.
+         */
+        NONE,
+        ;
+
+        val isSupported: Boolean
+            get() = this != NONE
     }
 }
