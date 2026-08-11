@@ -9,14 +9,15 @@ import xyz.bluspring.unitytranslate.config.values.ValidatingRangedConfigValue
 
 class SliderConfigEntry<E : Number>(
     xPos: Float, yPos: Float,
-    width: Float, height: Float,
+    minWidth: Float, minHeight: Float,
     value: ValidatingRangedConfigValue<E>,
     rootKey: String = "",
     font: FontReference = ClientPlatformProxy.instance.defaultFont,
-) : ConfigEntry<E, ValidatingRangedConfigValue<E>>(xPos, yPos, width, height, value, rootKey, font) {
+) : ConfigEntry<E, ValidatingRangedConfigValue<E>>(xPos, yPos, minWidth, minHeight, value, rootKey, font) {
     override fun init(width: Int, height: Int) {
         super.init(width, height)
-        this.addChild(SliderElement(this.xPos, this.yPos + 6, this.width, this.height, this.value.property, this.value.min, this.value.max, this.value.step, this.font, (this.value.validator as ConfigValueBuilderImpl<E>).formatter ?: {
+
+        this.addChild(SliderElement(this.xPos + this.label.bounds().width + 8, this.yPos - 7, this.minWidth, this.minHeight, this.value.property, this.value.min, this.value.max, this.value.step, this.font, (this.value.validator as ConfigValueBuilderImpl<E>).formatter ?: {
             Component.literal(if (it is Int) "$it" else "%.2f".format(it))
         }))
     }

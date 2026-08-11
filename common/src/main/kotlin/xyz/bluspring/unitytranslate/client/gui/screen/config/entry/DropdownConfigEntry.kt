@@ -21,7 +21,7 @@ class DropdownConfigEntry<E : NameProvidingEntry>(
 ) {
     override fun init(width: Int, height: Int) {
         super.init(width, height)
-        this.addChild(DropdownList(this.xPos, this.yPos + 6f, this.width, this.height, this.font,
+        this.addChild(DropdownList(this.xPos + this.label.bounds().width + 8, this.yPos - 4, this.width, this.height, this.font,
             { this.value.values }, { value ->
                 val formatter = (this.value.validator as ConfigValueBuilderImpl<E>).formatter
                 if (formatter != null) {

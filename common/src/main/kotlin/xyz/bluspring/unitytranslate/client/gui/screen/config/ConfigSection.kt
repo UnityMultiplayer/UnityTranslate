@@ -1,15 +1,39 @@
 package xyz.bluspring.unitytranslate.client.gui.screen.config
 
 import net.minecraft.client.gui.Font
+import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
 import xyz.bluspring.sunset.SunsetConfig
 import xyz.bluspring.sunset.values.ConfigCategory
 import xyz.bluspring.sunset.values.ConfigValue
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
+import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
+import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
+import xyz.bluspring.unitytranslate.client.gui.element.UIElement
+import xyz.bluspring.unitytranslate.client.gui.screen.config.entry.ConfigEntry
 import xyz.bluspring.unitytranslate.config.values.HiddenConfigValue
 
-class ConfigSection(val parent: UnityTranslateConfigScreen, val id: String, val config: Collection<SunsetConfig>) {
+class ConfigSection(val parent: UnityTranslateConfigScreen, val id: String, val config: Collection<SunsetConfig>) : UIElement() {
+    override fun init(width: Int, height: Int) {
+        super.init(width, height)
+        val font = ClientPlatformProxy.instance.defaultFont
+        var offsetY = font.lineHeight + 2f
+
+        for (config in this.config) {
+            for (value in config.rootCategory.value) {
+                val entry = ConfigEntry.fromValue(value, 175f + 12, offsetY, 100f, font.lineHeight.toFloat(), "config.unitytranslate.$id", font)
+                offsetY += entry.bounds().height + 4
+
+                this.addChild(entry)
+            }
+        }
+    }
+
+    override fun bounds(screenWidth: Int, screenHeight: Int): ScreenRectangle {
+        return ScreenRectangle(175 + 12, 0, this.children.sumOf { it.getBounds(screenWidth, screenHeight).width }, this.children.sumOf { it.getBounds(screenWidth, screenHeight).height })
+    }
+
     fun calculateSidebarHeight(font: Font): Float {
         var offsetY = 16f
 
@@ -60,8 +84,10 @@ class ConfigSection(val parent: UnityTranslateConfigScreen, val id: String, val 
         if (value is HiddenConfigValue) return 0f
 
         var offsetY = offsetYFinal
+        val distance = 1f - (((offsetX - 8f) / 16f) / 6f)
 
-        graphics.text(FontReference.minecraft(font), font.substrByWidth(Component.translatable("config.unitytranslate.$id${value.fullId}"), 175 - offsetX), offsetX.toFloat(), offsetY, -1, true)
+        graphics.text(FontReference.minecraft(font), font.substrByWidth(Component.translatable("config.unitytranslate.$id${value.fullId}"), 175 - offsetX), offsetX.toFloat(), offsetY,
+            ARGBHelper.colorFromFloat(1f, distance, distance, distance), true)
         offsetY += font.lineHeight + 4
 
         if (value is ConfigCategory) {
@@ -72,5 +98,15 @@ class ConfigSection(val parent: UnityTranslateConfigScreen, val id: String, val 
         }
 
         return offsetY
+    }
+
+    override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
+        graphics.centeredText(ClientPlatformProxy.instance.defaultFont, Component.translatable("config.unitytranslate.$id")
+            .withStyle { it.withBold(true) }, graphics.width / 2f, 0f, -1, true)
+
+        graphics.pushMatrix()
+        graphics.translate(0f, 8f)
+        super.submit(graphics, partialTick, mouseX, mouseY)
+        graphics.popMatrix()
     }
 }

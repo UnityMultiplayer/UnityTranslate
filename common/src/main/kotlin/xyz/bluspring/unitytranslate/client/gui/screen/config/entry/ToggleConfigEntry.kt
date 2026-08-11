@@ -8,16 +8,16 @@ import xyz.bluspring.unitytranslate.config.values.ValidatingReflectingConfigValu
 
 class ToggleConfigEntry(
     xPos: Float, yPos: Float,
-    width: Float, height: Float,
+    minWidth: Float, minHeight: Float,
     value: ValidatingReflectingConfigValue<Boolean>,
     rootKey: String = "",
     font: FontReference = ClientPlatformProxy.instance.defaultFont,
-) : ConfigEntry<Boolean, ValidatingReflectingConfigValue<Boolean>>(xPos, yPos, width, height, value, rootKey, font) {
+) : ConfigEntry<Boolean, ValidatingReflectingConfigValue<Boolean>>(xPos, yPos, minWidth, minHeight, value, rootKey, font) {
     private lateinit var button: ToggleButton
 
     override fun init(width: Int, height: Int) {
         super.init(width, height)
-        this.button = this.addChild(ToggleButton(this.xPos, this.yPos + 7, 12f, this.value.property, ThemeConfig.toggleOutline,
+        this.button = this.addChild(ToggleButton(this.xPos + this.label.bounds().width + 8, this.yPos - 7, 12f, this.value.property, ThemeConfig.toggleOutline,
             ThemeConfig.toggleOutlineFocused, ThemeConfig.toggleDisabledFill, ThemeConfig.toggleEnabledFill))
     }
 

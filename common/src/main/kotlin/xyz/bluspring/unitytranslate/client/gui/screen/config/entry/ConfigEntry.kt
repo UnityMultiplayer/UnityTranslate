@@ -2,7 +2,9 @@ package xyz.bluspring.unitytranslate.client.gui.screen.config.entry
 
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
+import xyz.bluspring.sunset.values.ConfigCategory
 import xyz.bluspring.sunset.values.ConfigValue
+import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
@@ -12,6 +14,7 @@ import xyz.bluspring.unitytranslate.client.gui.element.UIElement
 import xyz.bluspring.unitytranslate.client.gui.element.UILabel
 import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 import xyz.bluspring.unitytranslate.config.values.DropdownValidatingReflectingConfigValue
+import xyz.bluspring.unitytranslate.config.values.IntColorConfigValue
 import xyz.bluspring.unitytranslate.config.values.ValidatingRangedConfigValue
 import xyz.bluspring.unitytranslate.config.values.ValidatingReflectingConfigValue
 import xyz.bluspring.unitytranslate.util.ScreenUtil
@@ -19,13 +22,19 @@ import kotlin.reflect.typeOf
 
 abstract class ConfigEntry<E, T : ConfigValue<E>>(
     val xPos: Float, val yPos: Float,
-    val width: Float, val height: Float,
+    val minWidth: Float, val minHeight: Float,
     val value: T,
     val rootKey: String = "",
     val font: FontReference = ClientPlatformProxy.instance.defaultFont,
 ) : UIElement(), FocusableUIElement, FadeableUIElement {
-    private lateinit var label: UILabel
+    protected lateinit var label: UILabel
     protected var shouldShowTooltip = true
+
+    open val width: Float
+        get() = this.minWidth
+
+    open val height: Float
+        get() = this.minHeight
 
     override var opacity: Float = 1f
         set(value) {
@@ -47,7 +56,8 @@ abstract class ConfigEntry<E, T : ConfigValue<E>>(
     }
 
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
-        if (this.bounds().containsPoint(mouseX, mouseY)) {
+        val bounds = this.bounds()
+        if (bounds.containsPoint(mouseX, mouseY)) {
             this.isFocused = true
             this.label.color = ThemeConfig.configEntryTextFocused
         } else {
@@ -83,16 +93,24 @@ abstract class ConfigEntry<E, T : ConfigValue<E>>(
         fun fromValue(
             value: ConfigValue<*>,
             xPos: Float, yPos: Float,
-            width: Float, height: Float,
+            minWidth: Float, minHeight: Float,
             rootKey: String = "", font: FontReference = ClientPlatformProxy.instance.defaultFont,
         ): ConfigEntry<*, *> = when (value) {
-            is ValidatingRangedConfigValue -> SliderConfigEntry(xPos, yPos, width, height, value, rootKey, font)
-            is DropdownValidatingReflectingConfigValue -> DropdownConfigEntry(xPos, yPos, width, height, value, rootKey, font)
+            is ValidatingRangedConfigValue -> SliderConfigEntry(xPos, yPos, minWidth, minHeight, value, rootKey, font)
+            is DropdownValidatingReflectingConfigValue -> DropdownConfigEntry(xPos, yPos, minWidth, minHeight, value, rootKey, font)
+            is IntColorConfigValue -> IntColorConfigEntry(xPos, yPos, minWidth, minHeight, value, rootKey, font)
             is ValidatingReflectingConfigValue -> when (value.type) {
-                typeOf<Boolean>() -> ToggleConfigEntry(xPos, yPos, width, height, value as ValidatingReflectingConfigValue<Boolean>, rootKey, font)
-                else -> throw IllegalArgumentException("Invalid entry type: $value (${value.fullId}, ${value.type})")
+                typeOf<Boolean>() -> ToggleConfigEntry(xPos, yPos, minWidth, minHeight, value as ValidatingReflectingConfigValue<Boolean>, rootKey, font)
+                else -> {
+                    UnityTranslate.logger.error("Invalid entry type: $value (${value.fullId}, ${value.type})")
+                    UnknownConfigValueEntry(xPos, yPos, minWidth, minHeight, rootKey, font, value.fullId)
+                }
             }
-            else -> throw IllegalArgumentException("Invalid entry type: $value (${value.fullId}, ${value.type})")
+            is ConfigCategory -> ConfigCategoryEntry(xPos, yPos, minWidth, minHeight, rootKey, font, value)
+            else -> {
+                UnityTranslate.logger.error("Invalid entry type: $value (${value.fullId}, ${value.type})")
+                UnknownConfigValueEntry(xPos, yPos, minWidth, minHeight, rootKey, font, value.fullId)
+            }
         }
     }
 }

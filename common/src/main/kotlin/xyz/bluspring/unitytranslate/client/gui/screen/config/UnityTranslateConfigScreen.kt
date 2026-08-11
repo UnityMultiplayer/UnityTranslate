@@ -7,6 +7,7 @@ import xyz.bluspring.sunset.SunsetConfig
 import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
+import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.withAlpha
 import xyz.bluspring.unitytranslate.client.gui.screen.UTScreen
 
 class UnityTranslateConfigScreen : UTScreen() {
@@ -15,7 +16,8 @@ class UnityTranslateConfigScreen : UTScreen() {
     val focused = ReferenceArraySet<ConfigSection>()
     val queuedTasks = mutableMapOf<String, Deferred<*>>()
 
-    init {
+    override fun init(width: Int, height: Int) {
+        super.init(width, height)
         this.sections += ConfigSection(this, "unitytranslate", listOf(UnityTranslateApiImpl.configs["unitytranslate"]!!))
 
         val keys = UnityTranslateApiImpl.configs.keys.toMutableList()
@@ -28,6 +30,10 @@ class UnityTranslateConfigScreen : UTScreen() {
         }
 
         this.sections += ConfigSection(this, "plugins", pluginConfigs)
+
+        for (section in this.sections) {
+            this.addChild(section)
+        }
     }
 
     override fun submit(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
@@ -51,5 +57,10 @@ class UnityTranslateConfigScreen : UTScreen() {
         }
 
         graphics.popMatrix()
+
+        graphics.enableScissor(175 + 4, 6, graphics.width - 175 - 4, graphics.height - 24 - 6)
+        graphics.fill(175f + 4, 6f, graphics.width.toFloat(), graphics.height.toFloat() - 24, 0.withAlpha(0.4f))
+
+        super.submit(graphics, partialTick, mouseX, mouseY)
     }
 }

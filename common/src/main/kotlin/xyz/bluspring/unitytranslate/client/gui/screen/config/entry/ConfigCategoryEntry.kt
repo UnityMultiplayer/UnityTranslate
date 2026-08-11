@@ -8,14 +8,13 @@ import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 
 open class ConfigCategoryEntry(
     xPos: Float, yPos: Float,
-    width: Float, height: Float,
+    minWidth: Float, minHeight: Float,
     rootKey: String = "",
     font: FontReference = ClientPlatformProxy.instance.defaultFont,
     category: ConfigCategory,
 ) : ConfigEntry<List<ConfigValue<*>>, ConfigCategory>(
-    xPos, yPos, width, height, category, rootKey, font
+    xPos, yPos, minWidth, minHeight, category, rootKey, font
 ) {
-    val entries = category.value.map { fromValue(it, xPos, yPos, width, height, rootKey, font) }
     private var hoveredEntry: ConfigEntry<*, *>? = null
     private val storedHeights = Reference2IntLinkedOpenHashMap<ConfigEntry<*, *>>()
     private var scrollAmount = 0.0
@@ -23,8 +22,16 @@ open class ConfigCategoryEntry(
     override fun init(width: Int, height: Int) {
         super.init(width, height)
 
+        var yOffset = 0f
+        val entries = this.value.value.map {
+            val entry = fromValue(it, xPos, yPos + yOffset, minWidth, minHeight, rootKey, font)
+            yOffset += entry.bounds().height
+
+            entry
+        }
+
         var yPos = this.yPos
-        for (entry in this.entries) {
+        for (entry in entries) {
             this.addChild(entry)
             yPos += entry.bounds().height + 4
         }
