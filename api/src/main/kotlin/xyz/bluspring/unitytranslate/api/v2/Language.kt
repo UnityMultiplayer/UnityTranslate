@@ -75,6 +75,10 @@ data class Language @JvmOverloads constructor(
 
             return Language(code, null, nativeName, localizedName)
         }
+
+        @JvmStatic
+        val Pair<SupportLevel, SupportLevel>.isSupported: Boolean
+            get() = this.first.isSupported && this.second.isSupported
     }
 
     /**

@@ -2,19 +2,33 @@ package xyz.bluspring.unitytranslate.api.v2.translator
 
 import com.google.common.collect.HashMultimap
 import xyz.bluspring.unitytranslate.api.v2.Language
+import xyz.bluspring.unitytranslate.api.v2.LanguageSupporter
 import xyz.bluspring.unitytranslate.api.v2.util.LangPair
 import java.util.*
 
-abstract class TranslatorInstance {
+abstract class TranslatorInstance : LanguageSupporter {
     /**
      * The languages supported by this translator. This should provide the languages that have at least one translation that provides it as an input (source) and as an output (target).
      */
     abstract suspend fun getSupportedLanguages(): Set<Language>
 
-    abstract suspend fun supportsLanguage(langPair: LangPair): Boolean
+    open suspend fun supportsLanguage(langPair: LangPair): Boolean {
+        return this.supportsLanguage(langPair.from) && this.supportsLanguage(langPair.to)
+    }
+
+    override suspend fun supportsLanguage(language: Language): Boolean {
+        return this.getSupportedLanguages().contains(language)
+    }
 
     open suspend fun checkLanguageSupport(langPair: LangPair): Pair<Language.SupportLevel, Language.SupportLevel> {
-        TODO("Not yet implemented")
+        return this.checkLanguageSupport(langPair.from) to this.checkLanguageSupport(langPair.to)
+    }
+
+    open suspend fun getEffectiveLanguagePair(langPair: LangPair): LangPair? {
+        val from = this.getEffectiveLanguage(langPair.from) ?: return null
+        val to = this.getEffectiveLanguage(langPair.to) ?: return null
+
+        return LangPair(from, to)
     }
 
     abstract suspend fun batchTranslate(text: List<String>, langPair: LangPair): List<String>

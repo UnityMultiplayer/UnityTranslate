@@ -9,10 +9,6 @@ object GoogleCloudTranslatorInstance : TranslatorInstance() {
         TODO("Not yet implemented")
     }
 
-    override suspend fun supportsLanguage(langPair: LangPair): Boolean {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun batchTranslate(
         text: List<String>,
         langPair: LangPair

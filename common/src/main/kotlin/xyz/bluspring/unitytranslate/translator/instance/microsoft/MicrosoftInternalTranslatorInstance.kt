@@ -51,10 +51,6 @@ object MicrosoftInternalTranslatorInstance : TranslatorInstance() {
         return this.entries
     }
 
-    override suspend fun supportsLanguage(langPair: LangPair): Boolean {
-        return this.entries.contains(langPair.from) && this.entries.contains(langPair.to)
-    }
-
     override suspend fun batchTranslate(text: List<String>, langPair: LangPair): List<String> {
         val reqJson = JsonArray()
         reqJson.addAll(text)

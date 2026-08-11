@@ -3,6 +3,7 @@ package xyz.bluspring.unitytranslate.translator
 import kotlinx.coroutines.*
 import kotlinx.coroutines.future.asCompletableFuture
 import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
+import xyz.bluspring.unitytranslate.api.v2.Language.Companion.isSupported
 import xyz.bluspring.unitytranslate.api.v2.event.TranscriptEvent
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptData.Companion.id
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
@@ -147,8 +148,9 @@ object TranslatorManagerImpl : TranslatorManager {
                 continue
 
             val instance = this.instances.firstOrNull {
-                it.isAvailable() && it.supportsLanguage(langPair)
+                it.isAvailable() && it.checkLanguageSupport(langPair).isSupported
             } ?: InactiveTranslatorInstance
+            val langPair = instance.getEffectiveLanguagePair(langPair) ?: langPair
 
             val entries = ArrayList<Entry>(Config.batchSize)
             while (queue.isNotEmpty()) {

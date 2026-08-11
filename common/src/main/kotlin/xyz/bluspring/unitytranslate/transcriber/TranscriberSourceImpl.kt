@@ -1,6 +1,7 @@
 package xyz.bluspring.unitytranslate.transcriber
 
 import com.google.common.collect.Queues
+import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriberSource
@@ -53,11 +54,17 @@ class TranscriberSourceImpl(
 
         val collected = mutableListOf<String>()
         val transcriber = this.transcriber
+        val language = transcriber.getEffectiveLanguage(this.language)
 
         try {
+            if (language == null) {
+                UnityTranslate.logger.warn("Language ${this.language} is unsupported under transcriber $transcriber!")
+                return emptyList()
+            }
+
             while (this.queuedOverflow.isNotEmpty()) {
                 val overflow = this.queuedOverflow.poll() ?: break
-                collected += transcriber.transcribeSamples(overflow, this.language).await()
+                collected += transcriber.transcribeSamples(overflow, language).await()
             }
 
             val samples = synchronized(this.speechSamples) { // make sure we're not concurrently accessing stuff
@@ -68,11 +75,11 @@ class TranscriberSourceImpl(
             if (transcriber.requiresUniqueSamples)
                 this.speechSamples.reset()
 
-            collected += transcriber.transcribeSamples(samples, this.language).await()
+            collected += transcriber.transcribeSamples(samples, language).await()
 
             return collected
         } catch (e: Throwable) {
-            e.printStackTrace()
+            UnityTranslate.logger.error("Failed to transcribe text!", e)
             throw e
         } finally {
             this.isProcessing = false

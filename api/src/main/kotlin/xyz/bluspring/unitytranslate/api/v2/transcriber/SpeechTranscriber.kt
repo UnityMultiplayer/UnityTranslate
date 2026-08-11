@@ -5,9 +5,10 @@ import com.mojang.serialization.MapCodec
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 import xyz.bluspring.unitytranslate.api.v2.Language
+import xyz.bluspring.unitytranslate.api.v2.LanguageSupporter
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 
-abstract class SpeechTranscriber : AutoCloseable {
+abstract class SpeechTranscriber : AutoCloseable, LanguageSupporter {
     /**
      * Initial setup that must occur before this transcriber may be used.
      */
@@ -23,21 +24,6 @@ abstract class SpeechTranscriber : AutoCloseable {
      * Specifies whether this transcriber requires new samples (i.e. if the transcriber streams the data in) or not (i.e. if it simply re-transcribes the whole text)
      */
     open val requiresUniqueSamples: Boolean = false
-
-    abstract suspend fun supportsLanguage(language: Language): Boolean
-
-    /**
-     * Checks if this transcriber generally supports the language, whether natively supporting the language code and its dialect or simply supporting the language in general.
-     */
-    open suspend fun checkLanguageSupport(language: Language): Language.SupportLevel {
-        if (this.supportsLanguage(language))
-            return Language.SupportLevel.FULL // Supports the language directly
-
-        if (language.regionCode != null && this.supportsLanguage(language.withoutRegion))
-            return Language.SupportLevel.PARTIAL
-
-        return Language.SupportLevel.NONE
-    }
 
     open fun onSelected() {}
     abstract fun transcribeSamples(samples: FloatArray, language: Language): Deferred<String>
