@@ -1,10 +1,10 @@
-package xyz.bluspring.unitytranslate.client.gui.element
+package xyz.bluspring.unitytranslate.api.v2.client.gui.element
 
 import net.minecraft.network.chat.FormattedText
 import org.lwjgl.glfw.GLFW
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
-import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
+import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
 
 open class PlainUIButton(
     x: Float,
@@ -45,7 +45,7 @@ open class PlainUIButton(
         super.submit(graphics, partialTick, mouseX, mouseY)
 
         this.isFocused = isHovered
-//        graphics.outline(bounds.left().toFloat(), bounds.top().toFloat(), bounds.right().toFloat(), bounds.bottom().toFloat(), 1f, -1)
+//        graphics.outline(bounds.left.toFloat(), bounds.top.toFloat(), bounds.right.toFloat(), bounds.bottom.toFloat(), 1f, -1)
     }
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {

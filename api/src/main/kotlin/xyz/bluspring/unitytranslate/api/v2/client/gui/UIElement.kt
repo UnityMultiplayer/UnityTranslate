@@ -1,31 +1,36 @@
-package xyz.bluspring.unitytranslate.client.gui.element
+package xyz.bluspring.unitytranslate.api.v2.client.gui
 
-import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
 import org.jetbrains.annotations.ApiStatus
-import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
+import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
+import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
+import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
+import xyz.bluspring.unitytranslate.api.v2.config.ColorConfig
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
-import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
-import xyz.bluspring.unitytranslate.client.config.ColorConfig
-import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 
 abstract class UIElement {
-    protected val children: List<UIElement>
-        field = mutableListOf<UIElement>()
-
-    protected var isSelected = false
-
     private val enableDebug: Boolean // don't optimize this into a const, this is so we can use hotswap to toggle debug display.
         get() = false
-    private var isInitialized = false
 
-    fun bounds(): ScreenRectangle {
-        return this.getBounds(ClientPlatformProxy.instance.viewportWidth, ClientPlatformProxy.instance.viewportHeight)
+
+    protected val children: List<UIElement>
+        field = mutableListOf()
+
+    protected var isSelected = false
+    protected var isInitialized = false
+        private set
+
+    @ApiStatus.NonExtendable
+    open fun bounds(): ScreenRectangle {
+        val access = UnityTranslateApi.instance.client
+        return this.getBounds(access.viewportWidth, access.viewportHeight)
     }
 
-    fun getBounds(screenWidth: Int, screenHeight: Int): ScreenRectangle {
+    @ApiStatus.NonExtendable
+    open fun getBounds(screenWidth: Int, screenHeight: Int): ScreenRectangle {
+        val access = UnityTranslateApi.instance.client
         if (!this.isInitialized) {
-            this.setup(ClientPlatformProxy.instance.viewportWidth, ClientPlatformProxy.instance.viewportHeight)
+            this.setup(access.viewportWidth, access.viewportHeight)
         }
 
         return this.bounds(screenWidth, screenHeight)
@@ -68,13 +73,14 @@ abstract class UIElement {
             else
                 ARGBHelper.color(60, 255, 255, 255)
 
-            graphics.outline(bounds.left().toFloat(), bounds.top().toFloat(), bounds.right().toFloat(), bounds.bottom().toFloat(), 1f, color)
+            graphics.outline(bounds.left.toFloat(), bounds.top.toFloat(), bounds.right.toFloat(), bounds.bottom.toFloat(), 1f, color)
 
             if (isHovered) {
+                val access = UnityTranslateApi.instance.client
                 graphics.pushMatrix()
-                graphics.translate(bounds.left().toFloat(), bounds.bottom().toFloat() + 2f)
+                graphics.translate(bounds.left.toFloat(), bounds.bottom.toFloat() + 2f)
                 graphics.scale(0.5f, 0.5f)
-                graphics.text(ClientPlatformProxy.instance.defaultFont, Component.literal("${this::class.simpleName} (x: ${bounds.left()}, y: ${bounds.top()}, width: ${bounds.right() - bounds.left()}, height: ${bounds.bottom() - bounds.top()})"), 0f, 0f, -1, true)
+                graphics.text(access.defaultFont, Component.literal("${this::class.simpleName} (x: ${bounds.x}, y: ${bounds.y}, width: ${bounds.width}, height: ${bounds.height})"), 0f, 0f, -1, true)
                 graphics.popMatrix()
             }
         }
@@ -151,11 +157,13 @@ abstract class UIElement {
 
         return false
     }
-
+    
     protected fun tooltip(graphics: UIGraphics, tooltip: Component) {
-        val mouseX = (ClientPlatformProxy.instance.mouseX / ClientPlatformProxy.instance.guiScale).toFloat()
-        val mouseY = (ClientPlatformProxy.instance.mouseY / ClientPlatformProxy.instance.guiScale).toFloat()
-        val font = ClientPlatformProxy.instance.defaultFont
+        val access = UnityTranslateApi.instance.client
+        
+        val mouseX = (access.mouseX / access.guiScale).toFloat()
+        val mouseY = (access.mouseY / access.guiScale).toFloat()
+        val font = access.defaultFont
 
         val split = font.split(tooltip, 220)
         val maxWidth = split.maxOf { font.width(it) }
@@ -163,11 +171,11 @@ abstract class UIElement {
         val tooltipWidth = maxWidth + 8
         var xPos = mouseX + 4f
         var yPos = mouseY - 3
-        if (ClientPlatformProxy.instance.viewportWidth <= xPos + tooltipWidth)
-            xPos -= (xPos + tooltipWidth) - ClientPlatformProxy.instance.viewportWidth + 4
+        if (access.viewportWidth <= xPos + tooltipWidth)
+            xPos -= (xPos + tooltipWidth) - access.viewportWidth + 4
 
-        if (ClientPlatformProxy.instance.viewportHeight <= yPos + (split.size * font.lineHeight) + 5)
-            yPos -= (yPos + (split.size * font.lineHeight) + 5) - ClientPlatformProxy.instance.viewportHeight + 4
+        if (access.viewportHeight <= yPos + (split.size * font.lineHeight) + 5)
+            yPos -= (yPos + (split.size * font.lineHeight) + 5) - access.viewportHeight + 4
 
         val bgMatrix = ColorConfig.separateMatrix(ThemeConfig.tooltipBackground)
         graphics.fill(xPos, yPos, xPos + tooltipWidth, yPos + (split.size * font.lineHeight) + 5,

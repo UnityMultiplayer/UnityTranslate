@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.client.config
+package xyz.bluspring.unitytranslate.api.v2.config
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
@@ -6,7 +6,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 import xyz.bluspring.unitytranslate.api.v2.util.AdditionalCodecs
 import xyz.bluspring.unitytranslate.api.v2.util.ColorMatrix
-import xyz.bluspring.unitytranslate.client.config.ColorConfig.Gradient.GradientDirection.*
 
 sealed class ColorConfig(val type: String) {
     // must be a 4-sized int array
@@ -86,35 +85,35 @@ sealed class ColorConfig(val type: String) {
     data class Gradient(val direction: GradientDirection, val fromColor: Int, val toColor: Int) : ColorConfig("gradient") {
         // top left  |  top right  |  bottom left  |  bottom right
         override val colors = when (this.direction) {
-            TOP_LEFT -> intArrayOf(
+            GradientDirection.TOP_LEFT -> intArrayOf(
                 toColor, ARGBHelper.srgbLerp(toColor, fromColor, 0.5f),
                 ARGBHelper.srgbLerp(toColor, fromColor, 0.5f), fromColor
             )
-            TOP -> intArrayOf(
+            GradientDirection.TOP -> intArrayOf(
                 toColor, toColor,
                 fromColor, fromColor
             )
-            TOP_RIGHT -> intArrayOf(
+            GradientDirection.TOP_RIGHT -> intArrayOf(
                 ARGBHelper.srgbLerp(fromColor, toColor, 0.5f), toColor,
                 fromColor, ARGBHelper.srgbLerp(fromColor, toColor, 0.5f)
             )
-            LEFT -> intArrayOf(
+            GradientDirection.LEFT -> intArrayOf(
                 toColor, fromColor,
                 toColor, fromColor
             )
-            RIGHT -> intArrayOf(
+            GradientDirection.RIGHT -> intArrayOf(
                 fromColor, toColor,
                 fromColor, toColor
             )
-            BOTTOM_LEFT -> intArrayOf(
+            GradientDirection.BOTTOM_LEFT -> intArrayOf(
                 fromColor, ARGBHelper.srgbLerp(fromColor, toColor, 0.5f),
                 toColor, ARGBHelper.srgbLerp(fromColor, toColor, 0.5f)
             )
-            BOTTOM -> intArrayOf(
+            GradientDirection.BOTTOM -> intArrayOf(
                 fromColor, fromColor,
                 toColor, toColor,
             )
-            BOTTOM_RIGHT -> intArrayOf(
+            GradientDirection.BOTTOM_RIGHT -> intArrayOf(
                 fromColor, ARGBHelper.srgbLerp(fromColor, toColor, 0.5f),
                 ARGBHelper.srgbLerp(fromColor, toColor, 0.5f), toColor
             )

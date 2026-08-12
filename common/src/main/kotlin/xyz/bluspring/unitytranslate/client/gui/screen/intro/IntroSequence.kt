@@ -1,14 +1,13 @@
 package xyz.bluspring.unitytranslate.client.gui.screen.intro
 
-import net.minecraft.client.gui.navigation.ScreenPosition
-import net.minecraft.client.gui.navigation.ScreenRectangle
+import xyz.bluspring.unitytranslate.api.v2.client.gui.UIElement
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
-import xyz.bluspring.unitytranslate.client.gui.element.FadeableUIElement
-import xyz.bluspring.unitytranslate.client.gui.element.UIElement
+import xyz.bluspring.unitytranslate.api.v2.client.gui.element.FadeableUIElement
+import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
 import xyz.bluspring.unitytranslate.client.gui.screen.FirstStartupScreen
 
 abstract class IntroSequence(protected val parent: FirstStartupScreen) : UIElement() {
-    override fun bounds(screenWidth: Int, screenHeight: Int): ScreenRectangle = ScreenRectangle(ScreenPosition(0, 0), screenWidth, screenHeight)
+    override fun bounds(screenWidth: Int, screenHeight: Int): ScreenRectangle = ScreenRectangle(0, 0, screenWidth, screenHeight)
 
     private var currentTick = 0
     private val transitionTime = 24 // ticks

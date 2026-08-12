@@ -153,7 +153,7 @@ object UnityTranslateStandalone : ReentrantBlockableEventLoop<Runnable>("UnityTr
 
     private fun renderFrame() {
         if (this.window.shouldClose()) {
-            this.stop()
+            this.stop
         }
 
         val renderStartTimer = Util.getNanos()
@@ -229,7 +229,7 @@ object UnityTranslateStandalone : ReentrantBlockableEventLoop<Runnable>("UnityTr
         this.windowSurfaceNeedsReconfiguring = true
     }
 
-    fun stop() {
+    fun stop {
         this.running = false
         UnityTranslate.logger.info("Stopping!")
     }

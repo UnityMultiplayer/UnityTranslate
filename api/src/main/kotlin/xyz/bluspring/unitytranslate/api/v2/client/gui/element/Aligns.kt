@@ -1,4 +1,4 @@
-package xyz.bluspring.unitytranslate.client.gui.element
+package xyz.bluspring.unitytranslate.api.v2.client.gui.element
 
 enum class HorizontalAlign(val adjustment: (Int) -> Float) {
     LEFT({ 0f }), CENTER({ it / 2f }), RIGHT({ it.toFloat() })

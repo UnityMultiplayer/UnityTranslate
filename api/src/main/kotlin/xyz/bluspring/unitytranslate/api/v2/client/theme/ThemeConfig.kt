@@ -1,6 +1,6 @@
-package xyz.bluspring.unitytranslate.client.gui.theme
+package xyz.bluspring.unitytranslate.api.v2.client.theme
 
-import xyz.bluspring.unitytranslate.client.config.ColorConfig
+import xyz.bluspring.unitytranslate.api.v2.config.ColorConfig
 import java.awt.Color
 
 object ThemeConfig {

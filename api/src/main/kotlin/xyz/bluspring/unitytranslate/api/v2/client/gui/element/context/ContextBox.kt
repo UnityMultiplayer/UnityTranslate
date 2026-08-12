@@ -1,10 +1,9 @@
-package xyz.bluspring.unitytranslate.client.gui.element.context
+package xyz.bluspring.unitytranslate.api.v2.client.gui.element.context
 
-import net.minecraft.client.gui.navigation.ScreenRectangle
+import xyz.bluspring.unitytranslate.api.v2.client.gui.UIElement
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
-import xyz.bluspring.unitytranslate.client.gui.element.FocusableUIElement
-import xyz.bluspring.unitytranslate.client.gui.element.UIElement
-import xyz.bluspring.unitytranslate.util.ScreenUtil
+import xyz.bluspring.unitytranslate.api.v2.client.gui.element.FocusableUIElement
+import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
 
 class ContextBox(val x: Float, val y: Float, val maxWidth: Int = 150, val elements: Collection<ContextBoxElement>, val shouldScale: Boolean = true) : UIElement(), FocusableUIElement {
     override var isFocused: Boolean = false
@@ -17,7 +16,7 @@ class ContextBox(val x: Float, val y: Float, val maxWidth: Int = 150, val elemen
         super.init(width, height)
         for (element in this.elements) {
             element.x = 0f
-            element.y = (this.children.maxOfOrNull { it.getBounds(width, height).bottom() } ?: 0f).toFloat()
+            element.y = (this.children.maxOfOrNull { it.getBounds(width, height).bottom } ?: 0f).toFloat()
             element.width = this.maxWidth.toFloat()
             this.addChild(element)
         }

@@ -6,7 +6,7 @@ import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.LanguageHolder
 import xyz.bluspring.unitytranslate.api.v2.Languages
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
-import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
+import xyz.bluspring.unitytranslate.api.v2.client.ClientAccess
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigBuilder
 import xyz.bluspring.unitytranslate.api.v2.display.LanguageDisplay
 import xyz.bluspring.unitytranslate.api.v2.plugin.PluginMetadata
@@ -71,6 +71,12 @@ object UnityTranslateApiImpl : UnityTranslateApi {
 
     override val storagePath: Path
         get() = PlatformProxy.instance.rootDir.resolve("unitytranslate")
+
+    override val client: ClientAccess
+        get() = ClientPlatformProxy.instance
+
+    override val isClient: Boolean
+        get() = PlatformProxy.instance.isClient
 
     override fun <T : TranslatorInstance> registerTranslator(id: String, value: T, configBuilder: ConfigBuilder.() -> Unit) {
         if (this.translators.contains(id)) {
@@ -154,9 +160,6 @@ object UnityTranslateApiImpl : UnityTranslateApi {
             builder.invoke(configBuilder)
         }
     }
-
-    override val defaultFont: FontReference
-        get() = ClientPlatformProxy.instance.defaultFont
 
     override fun registerOutputLanguage(id: String): LanguageHolder {
         if (this.outputLanguages.contains(id))

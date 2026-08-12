@@ -1,11 +1,11 @@
-package xyz.bluspring.unitytranslate.client.gui.element.context
+package xyz.bluspring.unitytranslate.api.v2.client.gui.element.context
 
-import net.minecraft.client.gui.navigation.ScreenRectangle
+import xyz.bluspring.unitytranslate.api.v2.client.gui.UIElement
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
-import xyz.bluspring.unitytranslate.client.config.ColorConfig
-import xyz.bluspring.unitytranslate.client.gui.element.FocusableUIElement
-import xyz.bluspring.unitytranslate.client.gui.element.UIElement
-import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
+import xyz.bluspring.unitytranslate.api.v2.client.gui.element.FocusableUIElement
+import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
+import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
+import xyz.bluspring.unitytranslate.api.v2.config.ColorConfig
 
 abstract class ContextBoxElement : UIElement(), FocusableUIElement {
     var x: Float = 0f
@@ -34,12 +34,12 @@ abstract class ContextBoxElement : UIElement(), FocusableUIElement {
             ThemeConfig.contextBoxElementOutline
         })
 
-        graphics.fill(bounds.left().toFloat(), bounds.top().toFloat(), bounds.right().toFloat(), bounds.bottom().toFloat(), bgMatrix)
-        graphics.outline(bounds.left().toFloat(), bounds.top().toFloat(), bounds.right().toFloat(), bounds.bottom().toFloat(), 1f, outlineMatrix)
+        graphics.fill(bounds.left.toFloat(), bounds.top.toFloat(), bounds.right.toFloat(), bounds.bottom.toFloat(), bgMatrix)
+        graphics.outline(bounds.left.toFloat(), bounds.top.toFloat(), bounds.right.toFloat(), bounds.bottom.toFloat(), 1f, outlineMatrix)
 
         super.submit(graphics, partialTick, mouseX, mouseY)
 
-        graphics.enableScissor(bounds.left(), bounds.top(), bounds.width, bounds.height)
+        graphics.enableScissor(bounds.left, bounds.top, bounds.width, bounds.height)
         this.submitElement(graphics, partialTick, mouseX, mouseY)
         graphics.disableScissor()
 

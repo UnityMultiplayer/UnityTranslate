@@ -1,10 +1,10 @@
 package xyz.bluspring.unitytranslate.client.gui
 
-import net.minecraft.client.gui.navigation.ScreenRectangle
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
+import xyz.bluspring.unitytranslate.api.v2.client.gui.UIElement
+import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
-import xyz.bluspring.unitytranslate.client.gui.element.UIElement
 import xyz.bluspring.unitytranslate.client.gui.hud.TranscriptBoxContainer
 
 class TranscriptBoxRenderer : UIElement() {

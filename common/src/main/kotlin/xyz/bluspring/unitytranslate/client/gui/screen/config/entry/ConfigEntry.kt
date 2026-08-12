@@ -1,18 +1,18 @@
 package xyz.bluspring.unitytranslate.client.gui.screen.config.entry
 
-import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
 import xyz.bluspring.sunset.values.ConfigCategory
 import xyz.bluspring.sunset.values.ConfigValue
 import xyz.bluspring.unitytranslate.UnityTranslate
+import xyz.bluspring.unitytranslate.api.v2.client.gui.UIElement
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
+import xyz.bluspring.unitytranslate.api.v2.client.gui.element.FadeableUIElement
+import xyz.bluspring.unitytranslate.api.v2.client.gui.element.FocusableUIElement
+import xyz.bluspring.unitytranslate.api.v2.client.gui.element.UILabel
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
+import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
+import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
-import xyz.bluspring.unitytranslate.client.gui.element.FadeableUIElement
-import xyz.bluspring.unitytranslate.client.gui.element.FocusableUIElement
-import xyz.bluspring.unitytranslate.client.gui.element.UIElement
-import xyz.bluspring.unitytranslate.client.gui.element.UILabel
-import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 import xyz.bluspring.unitytranslate.config.values.DropdownValidatingReflectingConfigValue
 import xyz.bluspring.unitytranslate.config.values.IntColorConfigValue
 import xyz.bluspring.unitytranslate.config.values.ValidatingRangedConfigValue

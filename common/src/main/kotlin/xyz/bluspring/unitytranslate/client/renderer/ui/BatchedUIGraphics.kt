@@ -3,7 +3,6 @@ package xyz.bluspring.unitytranslate.client.renderer.ui
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.font.TextRenderable
-import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.util.FormattedCharSequence
 import net.minecraft.util.LightCoordsUtil
@@ -12,6 +11,7 @@ import org.joml.Quaternionf
 import xyz.bluspring.unitytranslate.api.v2.client.gui.TextureReference
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
+import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.renderer.BatchedGuiRenderer
 import xyz.bluspring.unitytranslate.client.renderer.ui.font.MinecraftFontReference

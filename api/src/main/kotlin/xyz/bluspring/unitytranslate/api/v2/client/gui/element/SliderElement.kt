@@ -1,14 +1,16 @@
-package xyz.bluspring.unitytranslate.client.gui.element
+package xyz.bluspring.unitytranslate.api.v2.client.gui.element
 
-import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
-import net.minecraft.util.Mth
-import org.lwjgl.glfw.GLFW
+import org.joml.Math.clamp
+import xyz.bluspring.unitytranslate.api.v2.client.InputValue
+import xyz.bluspring.unitytranslate.api.v2.client.InputValue.Companion.eq
+import xyz.bluspring.unitytranslate.api.v2.client.gui.UIElement
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
+import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
+import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
+import xyz.bluspring.unitytranslate.api.v2.config.ColorConfig
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
-import xyz.bluspring.unitytranslate.client.config.ColorConfig
-import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 import kotlin.math.round
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.typeOf
@@ -83,12 +85,12 @@ class SliderElement<T : Number>(
 
     private fun calculateCurrentValue(mouseX: Int): Float {
         val step = this.step / (this.max.minus(this.min))
-        val delta = Mth.clamp((mouseX - this.x) / this.width, 0f, 1f)
+        val delta = clamp((mouseX - this.x) / this.width, 0f, 1f)
         return this.min + (round(delta / step) * step) * (this.max - this.min)
     }
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && this.bounds().containsPoint(mouseX.toInt(), mouseY.toInt())) {
+        if (button eq InputValue.MOUSE_BUTTON_LEFT && this.bounds().containsPoint(mouseX.toInt(), mouseY.toInt())) {
             this.value = this.calculateCurrentValue(mouseX.toInt())
             this.isSelected = true
             return true
@@ -98,7 +100,7 @@ class SliderElement<T : Number>(
     }
 
     override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && this.isSelected) {
+        if (button eq InputValue.MOUSE_BUTTON_LEFT && this.isSelected) {
             this.isSelected = false
             return true
         }

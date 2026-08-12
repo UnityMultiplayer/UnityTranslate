@@ -2,30 +2,30 @@ package xyz.bluspring.unitytranslate.client.gui.hud
 
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.navigation.ScreenAxis
-import net.minecraft.client.gui.navigation.ScreenDirection
-import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
 import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
+import xyz.bluspring.unitytranslate.api.v2.client.gui.UIElement
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
+import xyz.bluspring.unitytranslate.api.v2.client.gui.element.FocusableUIElement
+import xyz.bluspring.unitytranslate.api.v2.client.gui.element.context.ActionContextBoxElement
+import xyz.bluspring.unitytranslate.api.v2.client.gui.element.context.ContextBox
+import xyz.bluspring.unitytranslate.api.v2.client.gui.element.context.ExpandableContextBoxElement
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
+import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
+import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenAxis
+import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenDirection
+import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
+import xyz.bluspring.unitytranslate.api.v2.config.ColorConfig
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptData
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.alpha
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
-import xyz.bluspring.unitytranslate.client.config.ColorConfig
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
 import xyz.bluspring.unitytranslate.client.gui.MouseHelper
-import xyz.bluspring.unitytranslate.client.gui.element.FocusableUIElement
-import xyz.bluspring.unitytranslate.client.gui.element.UIElement
-import xyz.bluspring.unitytranslate.client.gui.element.context.ActionContextBoxElement
-import xyz.bluspring.unitytranslate.client.gui.element.context.ContextBox
-import xyz.bluspring.unitytranslate.client.gui.element.context.ExpandableContextBoxElement
-import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 import xyz.bluspring.unitytranslate.util.ScreenUtil.inflate
 import java.util.*
 import kotlin.math.floor
@@ -210,7 +210,7 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
                     directions
                 }
 
-                graphics.outline(bounds.left().toFloat(), bounds.top().toFloat(), bounds.right().toFloat(), bounds.bottom().toFloat(), 1f,
+                graphics.outline(bounds.left.toFloat(), bounds.top.toFloat(), bounds.right.toFloat(), bounds.bottom.toFloat(), 1f,
                     this.colorOrNone(matrix.topLeft, directions, ScreenDirection.UP, ScreenDirection.LEFT), this.colorOrNone(matrix.topRight, directions, ScreenDirection.UP, ScreenDirection.RIGHT),
                     this.colorOrNone(matrix.bottomLeft, directions, ScreenDirection.DOWN, ScreenDirection.LEFT), this.colorOrNone(matrix.bottomRight, directions, ScreenDirection.DOWN, ScreenDirection.RIGHT)
                 )
@@ -321,16 +321,16 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
 
     private fun setupMovingDirections(mouseX: Int, mouseY: Int, directions: EnumSet<ScreenDirection>) {
         val bounds = this.bounds()
-        if (inRange(mouseX, bounds.left()))
+        if (inRange(mouseX, bounds.left))
             directions.add(ScreenDirection.LEFT)
 
-        if (inRange(mouseY, bounds.top()))
+        if (inRange(mouseY, bounds.top))
             directions.add(ScreenDirection.UP)
 
-        if (inRange(mouseY, bounds.bottom()))
+        if (inRange(mouseY, bounds.bottom))
             directions.add(ScreenDirection.DOWN)
 
-        if (inRange(mouseX, bounds.right()))
+        if (inRange(mouseX, bounds.right))
             directions.add(ScreenDirection.RIGHT)
 
         if (directions.isEmpty()) {

@@ -1,18 +1,21 @@
-package xyz.bluspring.unitytranslate.client.gui.element
+package xyz.bluspring.unitytranslate.api.v2.client.gui.element
 
 import kotlinx.coroutines.*
-import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.FormattedText
-import net.minecraft.util.Mth
-import org.lwjgl.glfw.GLFW
+import org.joml.Math
+import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
+import xyz.bluspring.unitytranslate.api.v2.client.InputValue
+import xyz.bluspring.unitytranslate.api.v2.client.InputValue.Companion.eq
+import xyz.bluspring.unitytranslate.api.v2.client.InputValue.Companion.fromPlatform
+import xyz.bluspring.unitytranslate.api.v2.client.gui.UIElement
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
+import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
+import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
+import xyz.bluspring.unitytranslate.api.v2.config.ColorConfig
 import xyz.bluspring.unitytranslate.api.v2.event.Event
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
-import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
-import xyz.bluspring.unitytranslate.client.config.ColorConfig
-import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 import kotlin.math.floor
 import kotlin.reflect.KMutableProperty
 
@@ -193,7 +196,7 @@ class DropdownList<E : Comparable<E>>(
 
         if (this.isOpened) {
             val elements = this.elements
-            val usableScreenHeight = ClientPlatformProxy.instance.viewportHeight - this.y - this.height - 2
+            val usableScreenHeight = UnityTranslateApi.instance.client.viewportHeight - this.y - this.height - 2
             val elementHeight = (this.height * elements.size)
             val maxAreaHeight = elementHeight.coerceAtMost(usableScreenHeight - 4)
 
@@ -286,12 +289,12 @@ class DropdownList<E : Comparable<E>>(
 
     override fun mouseScrolled(mouseX: Double, mouseY: Double, scrollX: Double, scrollY: Double): Boolean {
         val elements = this.elements
-        val usableScreenHeight = ClientPlatformProxy.instance.viewportHeight - this.y - this.height - 2
+        val usableScreenHeight = UnityTranslateApi.instance.client.viewportHeight - this.y - this.height - 2
         val elementHeight = (this.height * elements.size)
         val maxAreaHeight = elementHeight.coerceAtMost(usableScreenHeight - 4)
 
         if (this.isOpened && mouseX >= this.x && mouseX <= this.x + this.width && mouseY >= this.y + height + 2 && mouseY <= this.y + this.height + 2 + maxAreaHeight) {
-            this.scrollOffset = Mth.clamp(scrollOffset + (scrollY * 5.0), (-elementHeight + maxAreaHeight).toDouble(), 0.0)
+            this.scrollOffset = Math.clamp(scrollOffset + (scrollY * 5.0), (-elementHeight + maxAreaHeight).toDouble(), 0.0)
             return true
         }
 
@@ -299,19 +302,19 @@ class DropdownList<E : Comparable<E>>(
     }
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && this.mainBounds.containsPoint(mouseX.toInt(), mouseY.toInt()) && !this.isDisabled && this.isLoaded && this.elements.isNotEmpty()) {
+        if (button eq InputValue.MOUSE_BUTTON_LEFT && this.mainBounds.containsPoint(mouseX.toInt(), mouseY.toInt()) && !this.isDisabled && this.isLoaded && this.elements.isNotEmpty()) {
             this.isOpened = !this.isOpened
             this.lastStoredIndex = this.currentIndex
-        } else if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && this.isOpened) {
+        } else if (button eq InputValue.MOUSE_BUTTON_LEFT && this.isOpened) {
             val elements = this.elements
-            val usableScreenHeight = ClientPlatformProxy.instance.viewportHeight - this.y - this.height - 2
+            val usableScreenHeight = UnityTranslateApi.instance.client.viewportHeight - this.y - this.height - 2
             val elementHeight = (this.height * elements.size)
             val maxAreaHeight = elementHeight.coerceAtMost(usableScreenHeight - 4)
 
             if (mouseX >= this.x && mouseX <= this.x + this.width && mouseY >= this.y + height + 2 && mouseY <= this.y + this.height + 2 + maxAreaHeight) {
                 val mouseY = mouseY - this.scrollOffset.toFloat()
                 val yOffset = mouseY - (this.y + height + 2)
-                val index = Mth.clamp(((yOffset / elementHeight * elements.size)).toInt(), 0, elements.lastIndex)
+                val index = Math.clamp(((yOffset / elementHeight * elements.size)).toInt(), 0, elements.lastIndex)
 
                 val isDisabled = !this.validator(elements[index])
 
@@ -333,15 +336,15 @@ class DropdownList<E : Comparable<E>>(
     override fun keyPressed(key: Int, scanCode: Int, modifiers: Int): Boolean {
         if (this.isOpened) {
             val elements = this.elements
-            val usableScreenHeight = ClientPlatformProxy.instance.viewportHeight - this.y - this.height - 2
+            val usableScreenHeight = UnityTranslateApi.instance.client.viewportHeight - this.y - this.height - 2
             val elementHeight = (this.height * elements.size)
             val maxAreaHeight = elementHeight.coerceAtMost(usableScreenHeight - 4)
 
             val topVisibleArea = this.y + this.height + 2 - this.scrollOffset
             val bottomVisibleArea = topVisibleArea + maxAreaHeight
 
-            when (key) {
-                GLFW.GLFW_KEY_UP -> {
+            when (key.fromPlatform()) {
+                InputValue.KEY_UP -> {
                     var isDisabled: Boolean
                     val startingIndex = this.currentIndex
                     do {
@@ -361,13 +364,13 @@ class DropdownList<E : Comparable<E>>(
                     // FIXME: balloon languages hate this for some reason.
                     val yPos = this.y + this.height + 2 + (this.currentIndex * this.height)
                     if (yPos !in topVisibleArea..bottomVisibleArea) {
-                        this.scrollOffset = Mth.clamp((maxAreaHeight - yPos).toDouble(), (-elementHeight + maxAreaHeight).toDouble(), 0.0)
+                        this.scrollOffset = Math.clamp((maxAreaHeight - yPos).toDouble(), (-elementHeight + maxAreaHeight).toDouble(), 0.0)
                     }
 
                     return true
                 }
 
-                GLFW.GLFW_KEY_DOWN -> {
+                InputValue.KEY_DOWN -> {
                     this.currentIndex++
 
                     if (this.currentIndex > this.elements.lastIndex)
@@ -376,23 +379,25 @@ class DropdownList<E : Comparable<E>>(
                     // key down moving the scroll box
                     val yPos = this.y + this.height + 2 + (this.currentIndex * this.height) + this.height
                     if (yPos !in topVisibleArea..bottomVisibleArea) {
-                        this.scrollOffset = Mth.clamp((maxAreaHeight - yPos + maxAreaHeight).toDouble(), (-elementHeight + maxAreaHeight).toDouble(), 0.0)
+                        this.scrollOffset = Math.clamp((maxAreaHeight - yPos + maxAreaHeight).toDouble(), (-elementHeight + maxAreaHeight).toDouble(), 0.0)
                     }
 
                     return true
                 }
 
-                GLFW.GLFW_KEY_ESCAPE -> {
+                InputValue.KEY_ESCAPE -> {
                     this.isOpened = false
                     this.currentIndex = this.lastStoredIndex
                     return true
                 }
 
-                GLFW.GLFW_KEY_ENTER -> {
+                InputValue.KEY_RETURN -> {
                     this.isOpened = false
                     this.updateProperty()
                     return true
                 }
+
+                else -> {}
             }
         }
 

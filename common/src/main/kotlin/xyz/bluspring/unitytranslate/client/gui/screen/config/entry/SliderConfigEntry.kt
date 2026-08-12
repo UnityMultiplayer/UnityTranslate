@@ -1,9 +1,9 @@
 package xyz.bluspring.unitytranslate.client.gui.screen.config.entry
 
 import net.minecraft.network.chat.Component
+import xyz.bluspring.unitytranslate.api.v2.client.gui.element.SliderElement
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
-import xyz.bluspring.unitytranslate.client.gui.element.SliderElement
 import xyz.bluspring.unitytranslate.config.builders.ConfigValueBuilderImpl
 import xyz.bluspring.unitytranslate.config.values.ValidatingRangedConfigValue
 

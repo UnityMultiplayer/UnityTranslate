@@ -1,6 +1,5 @@
 package xyz.bluspring.unitytranslate.client.gui.screen
 
-import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
@@ -8,6 +7,7 @@ import net.minecraft.client.input.CharacterEvent
 import net.minecraft.client.input.KeyEvent
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.network.chat.Component
+import xyz.bluspring.unitytranslate.api.v2.client.gui.screen.UTScreen
 import xyz.bluspring.unitytranslate.client.renderer.ui.MinecraftUIGraphics
 
 class WrappedUTScreen(val actualScreen: UTScreen, private val parent: Screen? = null) : Screen(Component.empty()) {
@@ -31,39 +31,46 @@ class WrappedUTScreen(val actualScreen: UTScreen, private val parent: Screen? = 
     }
 
     override fun extractRenderState(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, a: Float) {
+        super.extractRenderState(graphics, mouseX, mouseY, a)
         actualScreen.submit(MinecraftUIGraphics(graphics), Minecraft.getInstance().deltaTracker.getGameTimeDeltaPartialTick(true), mouseX, mouseY)
     }
 
     override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {
         return actualScreen.mouseClicked(event.x, event.y, event.button())
+            || super.mouseClicked(event, doubleClick)
     }
 
     override fun mouseScrolled(x: Double, y: Double, scrollX: Double, scrollY: Double): Boolean {
         return actualScreen.mouseScrolled(x, y, scrollX, scrollY)
+            || super.mouseScrolled(x, y, scrollX, scrollY)
     }
 
     override fun mouseReleased(event: MouseButtonEvent): Boolean {
         return actualScreen.mouseReleased(event.x, event.y, event.button())
+            || super.mouseReleased(event)
     }
 
     override fun charTyped(event: CharacterEvent): Boolean {
         return actualScreen.charTyped(event.codepoint)
+            || super.charTyped(event)
     }
 
     override fun keyPressed(event: KeyEvent): Boolean {
-        if (shouldCloseOnEsc() && event.key == InputConstants.KEY_ESCAPE) {
-            this.minecraft.gui.setScreen(this.parent)
-            return true
-        }
-
         return actualScreen.keyPressed(event.key, event.scancode, event.modifiers)
+            || super.keyPressed(event)
     }
 
     override fun keyReleased(event: KeyEvent): Boolean {
         return actualScreen.keyReleased(event.key, event.scancode, event.modifiers)
+            || super.keyReleased(event)
     }
 
     override fun shouldCloseOnEsc(): Boolean {
         return actualScreen.shouldCloseOnEsc()
+            || super.shouldCloseOnEsc()
+    }
+
+    override fun onClose() {
+        this.minecraft.gui.setScreen(this.parent)
     }
 }

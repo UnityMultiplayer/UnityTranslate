@@ -1,12 +1,12 @@
 package xyz.bluspring.unitytranslate.client.gui.screen.config.entry
 
 import net.minecraft.network.chat.Component
+import xyz.bluspring.unitytranslate.api.v2.client.gui.element.DropdownList
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.config.NameProvidingEntry
 import xyz.bluspring.unitytranslate.api.v2.config.TooltipProvidingEntry
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadableEntry
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
-import xyz.bluspring.unitytranslate.client.gui.element.DropdownList
 import xyz.bluspring.unitytranslate.config.builders.ConfigValueBuilderImpl
 import xyz.bluspring.unitytranslate.config.values.DropdownValidatingReflectingConfigValue
 

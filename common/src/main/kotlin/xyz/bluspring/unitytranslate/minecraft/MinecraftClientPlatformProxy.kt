@@ -4,11 +4,10 @@ import com.mojang.blaze3d.pipeline.RenderTarget
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.TitleScreen
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
-import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
-import xyz.bluspring.unitytranslate.client.gui.screen.UTScreen
+import xyz.bluspring.unitytranslate.api.v2.client.gui.screen.UTScreen
 import xyz.bluspring.unitytranslate.client.gui.screen.WrappedUTScreen
 
-abstract class MinecraftClientPlatformProxy : ClientPlatformProxy {
+abstract class MinecraftClientPlatformProxy : Blaze3DClientPlatformProxy() {
     override val framebuffer: RenderTarget
         get() =
             Minecraft.getInstance().gameRenderer.mainRenderTarget()

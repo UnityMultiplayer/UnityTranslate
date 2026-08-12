@@ -1,7 +1,7 @@
 package xyz.bluspring.unitytranslate.api.v2
 
 import com.mojang.serialization.MapCodec
-import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
+import xyz.bluspring.unitytranslate.api.v2.client.ClientAccess
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigBuilder
 import xyz.bluspring.unitytranslate.api.v2.display.LanguageDisplay
 import xyz.bluspring.unitytranslate.api.v2.plugin.PluginMetadata
@@ -118,9 +118,21 @@ interface UnityTranslateApi {
     val currentSpokenLanguage: Language
 
     /**
-     * Gets the default font used in this instance of UnityTranslate.
+     * Specifies whether the current instance of UnityTranslate is a client or not.
+     * If it is a client, it is guaranteed to have a GUI.
      */
-    val defaultFont: FontReference
+    val isClient: Boolean
+
+    /**
+     * Provides access to client-only information.
+     */
+    val client: ClientAccess
+
+    /**
+     * Provides access to some text components. Note that this is currently unstable, as there are plans to replace the Minecraft Component class
+     * with a custom implementation.
+     */
+    val platform: PlatformAccess
 
     companion object {
         @JvmStatic

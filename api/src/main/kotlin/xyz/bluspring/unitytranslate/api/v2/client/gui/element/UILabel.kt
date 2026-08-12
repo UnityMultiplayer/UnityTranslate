@@ -1,11 +1,12 @@
-package xyz.bluspring.unitytranslate.client.gui.element
+package xyz.bluspring.unitytranslate.api.v2.client.gui.element
 
-import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.FormattedText
+import xyz.bluspring.unitytranslate.api.v2.client.gui.UIElement
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
+import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
+import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
-import xyz.bluspring.unitytranslate.client.gui.theme.ThemeConfig
 
 open class UILabel(
     val x: Float, val y: Float,

@@ -4,18 +4,18 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
+import xyz.bluspring.unitytranslate.api.v2.client.gui.element.HorizontalAlign
+import xyz.bluspring.unitytranslate.api.v2.client.gui.element.PlainUIButton
+import xyz.bluspring.unitytranslate.api.v2.client.gui.element.UILabel
+import xyz.bluspring.unitytranslate.api.v2.client.gui.element.VerticalAlign
+import xyz.bluspring.unitytranslate.api.v2.client.gui.element.context.ActionContextBoxElement
+import xyz.bluspring.unitytranslate.api.v2.client.gui.element.context.ContextBox
+import xyz.bluspring.unitytranslate.api.v2.client.gui.screen.UTScreen
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.withAlpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.ClientConfig
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
 import xyz.bluspring.unitytranslate.client.gui.TranscriptBoxRenderer
-import xyz.bluspring.unitytranslate.client.gui.element.HorizontalAlign
-import xyz.bluspring.unitytranslate.client.gui.element.PlainUIButton
-import xyz.bluspring.unitytranslate.client.gui.element.UILabel
-import xyz.bluspring.unitytranslate.client.gui.element.VerticalAlign
-import xyz.bluspring.unitytranslate.client.gui.element.context.ActionContextBoxElement
-import xyz.bluspring.unitytranslate.client.gui.element.context.ContextBox
-import xyz.bluspring.unitytranslate.client.gui.screen.UTScreen
 import xyz.bluspring.unitytranslate.client.renderer.UnityTranslateGui
 import xyz.bluspring.unitytranslate.util.ScreenUtil.inflate
 

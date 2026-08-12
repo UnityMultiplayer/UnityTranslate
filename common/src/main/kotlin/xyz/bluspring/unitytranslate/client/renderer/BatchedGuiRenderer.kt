@@ -10,11 +10,11 @@ import com.mojang.blaze3d.textures.GpuTextureView
 import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.ByteBufferBuilder
 import com.mojang.blaze3d.vertex.VertexConsumer
-import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.renderer.Projection
 import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.rendertype.RenderType
 import org.joml.Matrix4f
+import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import java.nio.ByteBuffer
 import java.util.*
@@ -102,7 +102,7 @@ object BatchedGuiRenderer {
 
                                 val scissorArea = draw.scissorArea
                                 if (scissorArea != null) {
-                                    renderPass.enableScissor(scissorArea.left(), framebuffer.height - scissorArea.bottom(), 0.coerceAtLeast((scissorArea.right() - scissorArea.left())), 0.coerceAtLeast(scissorArea.bottom() - scissorArea.top()))
+                                    renderPass.enableScissor(scissorArea.left, framebuffer.height - scissorArea.bottom, 0.coerceAtLeast((scissorArea.right - scissorArea.left)), 0.coerceAtLeast(scissorArea.bottom - scissorArea.top))
                                 } else {
                                     renderPass.disableScissor()
                                 }
