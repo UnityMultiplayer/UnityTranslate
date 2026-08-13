@@ -1,9 +1,11 @@
 package xyz.bluspring.unitytranslate.api.v2.client.gui.font
 
 import net.minecraft.client.gui.Font
-import net.minecraft.network.chat.FormattedText
-import net.minecraft.util.FormattedCharSequence
+import org.jetbrains.annotations.ApiStatus
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
+import xyz.bluspring.unitytranslate.client.renderer.ui.font.FreeTypeFontReference
 import xyz.bluspring.unitytranslate.client.renderer.ui.font.MinecraftFontReference
+import java.io.InputStream
 
 /**
  * A reference to the current font used.
@@ -11,14 +13,16 @@ import xyz.bluspring.unitytranslate.client.renderer.ui.font.MinecraftFontReferen
 interface FontReference {
     val lineHeight: Int
 
-    fun width(text: FormattedText): Int
-    fun width(text: FormattedCharSequence): Int
+    fun width(text: TextComponent): Int
     fun width(text: String): Int
-    fun split(text: FormattedText, maxWidth: Int): List<FormattedCharSequence>
-    fun substr(text: FormattedText, maxWidth: Int): FormattedText
+    fun split(text: TextComponent, maxWidth: Int): List<TextComponent>
+    fun substr(text: TextComponent, maxWidth: Int): TextComponent
 
     companion object {
-        @JvmStatic
+        @JvmStatic @ApiStatus.Experimental
         fun minecraft(font: Font): FontReference = MinecraftFontReference(font) as FontReference
+
+        @JvmStatic
+        fun freeType(fontStream: InputStream, size: Float): FontReference = FreeTypeFontReference(fontStream, size) as FontReference
     }
 }

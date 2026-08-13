@@ -31,7 +31,7 @@ class DropdownList<E : Comparable<E>>(
     val type: Type,
 
     validator: (E) -> Boolean = { true },
-    private val tooltip: (E?) -> Component = { Component.empty() },
+    private val tooltip: (E?) -> Component = { PlatformAccess.empty() },
 ) : UIElement(), FadeableUIElement {
     fun interface DropdownCallback<E> {
         fun onDropdownEvent(item: E)
@@ -46,7 +46,7 @@ class DropdownList<E : Comparable<E>>(
     }
     override var opacity = 1f
 
-    constructor(x: Float, y: Float, width: Float, height: Float, font: FontReference, elements: suspend () -> Collection<E>, visualizer: (E) -> Component, property: KMutableProperty<E>, validator: (E) -> Boolean = { true }, tooltip: (E?) -> Component = { Component.empty() },)
+    constructor(x: Float, y: Float, width: Float, height: Float, font: FontReference, elements: suspend () -> Collection<E>, visualizer: (E) -> Component, property: KMutableProperty<E>, validator: (E) -> Boolean = { true }, tooltip: (E?) -> Component = { PlatformAccess.empty() },)
         : this(x, y, width, height, font, elements, visualizer, property as KMutableProperty<E?>, Type.REQUIRED, validator, tooltip)
 
     enum class Type {
@@ -59,7 +59,7 @@ class DropdownList<E : Comparable<E>>(
 
     private val visualizer: (E?) -> Component = {
         if (it == null)
-            Component.translatable("unitytranslate.config.${when (this.type) {
+            PlatformAccess.translatable("unitytranslate.config.${when (this.type) {
                 Type.OPTIONAL -> "none"
                 Type.DEFAULTED -> "default"
                 else -> throw IllegalStateException()
@@ -170,21 +170,21 @@ class DropdownList<E : Comparable<E>>(
         val isDisabled = this.isDisabled || !this.elementGetter.isCompleted || this.elements.isEmpty()
 
         if (!this.elementGetter.isCompleted) {
-            graphics.text(this.font, Component.translatable("unitytranslate.config.loading").append(".".repeat(floor(this.currentTick / 20f).toInt() + 1)), this.x + 4, this.y + (this.height / 2f - 4), disabledColor.multiplyAlpha(this.opacity), true)
+            graphics.text(this.font, PlatformAccess.translatable("unitytranslate.config.loading").append(".".repeat(floor(this.currentTick / 20f).toInt() + 1)), this.x + 4, this.y + (this.height / 2f - 4), disabledColor.multiplyAlpha(this.opacity), true)
         } else if (this.elements.isEmpty()) {
-            graphics.text(this.font, Component.translatable("unitytranslate.config.empty"), this.x + 4, this.y + (this.height / 2f - 4), disabledColor.multiplyAlpha(this.opacity), true)
+            graphics.text(this.font, PlatformAccess.translatable("unitytranslate.config.empty"), this.x + 4, this.y + (this.height / 2f - 4), disabledColor.multiplyAlpha(this.opacity), true)
         } else {
             graphics.text(this.font, ellipsize(this.visualizer(this.selected), this.width.toInt() - 15), this.x + 4, this.y + (this.height / 2f - 4), colorWithHover.multiplyAlpha(this.opacity), true)
         }
 
-        graphics.text(this.font, Component.literal(if (this.isOpened) "▲" else "▼"), this.x + this.width - 10, this.y + (this.height / 2f - 4), (if (isDisabled) disabledColor else colorWithHover).multiplyAlpha(this.opacity), true)
+        graphics.text(this.font, PlatformAccess.literal(if (this.isOpened) "▲" else "▼"), this.x + this.width - 10, this.y + (this.height / 2f - 4), (if (isDisabled) disabledColor else colorWithHover).multiplyAlpha(this.opacity), true)
     }
 
     private fun ellipsize(text: FormattedText, maxWidth: Int): FormattedText {
         val subbed = this.font.substr(text, maxWidth)
 
         return if (subbed != text)
-            Component.literal("${subbed.string}...")
+            PlatformAccess.literal("${subbed.string}...")
         else
             text
     }

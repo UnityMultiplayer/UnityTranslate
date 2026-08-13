@@ -1,17 +1,15 @@
 package xyz.bluspring.unitytranslate.client.renderer.ui.font
 
 import net.minecraft.client.gui.Font
-import net.minecraft.network.chat.FormattedText
-import net.minecraft.util.FormattedCharSequence
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 
 data class MinecraftFontReference(val font: Font) : FontReference {
     override val lineHeight: Int
         get() = this.font.lineHeight
 
-    override fun width(text: FormattedText): Int = this.font.width(text)
+    override fun width(text: TextComponent): Int = this.font.width(text)
     override fun width(text: String): Int = this.font.width(text)
-    override fun width(text: FormattedCharSequence): Int = this.font.width(text)
-    override fun split(text: FormattedText, maxWidth: Int): List<FormattedCharSequence> = this.font.split(text, maxWidth)
-    override fun substr(text: FormattedText, maxWidth: Int): FormattedText = this.font.substrByWidth(text, maxWidth)
+    override fun split(text: TextComponent, maxWidth: Int): List<TextComponent> = this.font.split(text, maxWidth)
+    override fun substr(text: TextComponent, maxWidth: Int): TextComponent = this.font.substrByWidth(text, maxWidth)
 }

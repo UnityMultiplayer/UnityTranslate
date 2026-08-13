@@ -12,12 +12,12 @@ import xyz.bluspring.unitytranslate.api.v2.client.gui.element.UILabel
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
 import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
+import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenUtil
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.config.values.DropdownValidatingReflectingConfigValue
 import xyz.bluspring.unitytranslate.config.values.IntColorConfigValue
 import xyz.bluspring.unitytranslate.config.values.ValidatingRangedConfigValue
 import xyz.bluspring.unitytranslate.config.values.ValidatingReflectingConfigValue
-import xyz.bluspring.unitytranslate.util.ScreenUtil
 import kotlin.reflect.typeOf
 
 abstract class ConfigEntry<E, T : ConfigValue<E>>(

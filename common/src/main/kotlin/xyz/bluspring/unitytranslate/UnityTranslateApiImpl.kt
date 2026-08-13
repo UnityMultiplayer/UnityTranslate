@@ -2,10 +2,7 @@ package xyz.bluspring.unitytranslate
 
 import com.mojang.serialization.MapCodec
 import xyz.bluspring.sunset.SunsetConfig
-import xyz.bluspring.unitytranslate.api.v2.Language
-import xyz.bluspring.unitytranslate.api.v2.LanguageHolder
-import xyz.bluspring.unitytranslate.api.v2.Languages
-import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
+import xyz.bluspring.unitytranslate.api.v2.*
 import xyz.bluspring.unitytranslate.api.v2.client.ClientAccess
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigBuilder
 import xyz.bluspring.unitytranslate.api.v2.display.LanguageDisplay
@@ -22,6 +19,7 @@ import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.TranscriptUser
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorInstance
 import xyz.bluspring.unitytranslate.api.v2.translator.TranslatorManager
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
+import xyz.bluspring.unitytranslate.client.MinecraftPlatformAccess
 import xyz.bluspring.unitytranslate.config.builders.SunsetWrappedConfigBuilder
 import xyz.bluspring.unitytranslate.plugin.PluginManager
 import xyz.bluspring.unitytranslate.transcriber.TranscriberSourceImpl
@@ -74,6 +72,9 @@ object UnityTranslateApiImpl : UnityTranslateApi {
 
     override val client: ClientAccess
         get() = ClientPlatformProxy.instance
+
+    override val platform: PlatformAccess
+        get() = MinecraftPlatformAccess
 
     override val isClient: Boolean
         get() = PlatformProxy.instance.isClient

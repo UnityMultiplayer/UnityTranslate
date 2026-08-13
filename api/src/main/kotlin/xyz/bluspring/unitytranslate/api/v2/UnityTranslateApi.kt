@@ -129,8 +129,7 @@ interface UnityTranslateApi {
     val client: ClientAccess
 
     /**
-     * Provides access to some text components. Note that this is currently unstable, as there are plans to replace the Minecraft Component class
-     * with a custom implementation.
+     * Provides access to platform-specific information.
      */
     val platform: PlatformAccess
 
