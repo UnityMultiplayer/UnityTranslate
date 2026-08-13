@@ -1,15 +1,16 @@
 package xyz.bluspring.unitytranslate.api.v2.client.gui.element
 
-import net.minecraft.network.chat.FormattedText
-import org.lwjgl.glfw.GLFW
+import xyz.bluspring.unitytranslate.api.v2.client.InputValue
+import xyz.bluspring.unitytranslate.api.v2.client.InputValue.Companion.eq
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 
 open class PlainUIButton(
     x: Float,
     y: Float,
-    text: FormattedText,
+    text: TextComponent,
     font: FontReference,
 
     dropShadow: Boolean = true,
@@ -50,7 +51,7 @@ open class PlainUIButton(
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
         if (this.bounds().containsPoint(mouseX.toInt(), mouseY.toInt())) {
-            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && !this.isDisabled) {
+            if (button eq InputValue.MOUSE_BUTTON_LEFT && !this.isDisabled) {
                 this.onClick()
                 return true
             }

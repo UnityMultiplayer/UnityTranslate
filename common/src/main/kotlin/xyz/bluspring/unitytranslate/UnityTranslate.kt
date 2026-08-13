@@ -2,7 +2,6 @@ package xyz.bluspring.unitytranslate
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
-import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import net.minecraft.resources.Identifier
 import org.slf4j.Logger
@@ -13,6 +12,7 @@ import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
 import xyz.bluspring.unitytranslate.api.v2.config.ColorConfig
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigBuilder
 import xyz.bluspring.unitytranslate.api.v2.display.LanguageDisplay
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
 import xyz.bluspring.unitytranslate.client.UnityTranslateClient
@@ -94,56 +94,56 @@ object UnityTranslate {
                     category("padding") {
                         float("left", 0f, 32f, step = 0.1f, property = TranscriptBoxConfig.Defaults.padding::left) {
                             formatting {
-                                Component.literal("${"%.1f".format(it)} px")
+                                TextComponent.literal("${"%.1f".format(it)} px")
                             }
                         }
 
                         float("right", 0f, 32f, step = 0.1f, property = TranscriptBoxConfig.Defaults.padding::right) {
                             formatting {
-                                Component.literal("${"%.1f".format(it)} px")
+                                TextComponent.literal("${"%.1f".format(it)} px")
                             }
                         }
 
                         float("top", 0f, step = 0.1f, property = TranscriptBoxConfig.Defaults.padding::top) {
                             formatting {
-                                Component.literal("${"%.1f".format(it)} px")
+                                TextComponent.literal("${"%.1f".format(it)} px")
                             }
                         }
 
                         float("bottom", 0f, step = 0.1f, property = TranscriptBoxConfig.Defaults.padding::bottom) {
                             formatting {
-                                Component.literal("${"%.1f".format(it)} px")
+                                TextComponent.literal("${"%.1f".format(it)} px")
                             }
                         }
                     }
 
                     float("corner_radius", min = 0f, max = 16f, step = 0.5f, property = TranscriptBoxConfig.Defaults::cornerRadius) {
                         formatting {
-                            Component.literal("${"%.1f".format(it)} px")
+                            TextComponent.literal("${"%.1f".format(it)} px")
                         }
                     }
 
                     float("font_scale", min = 0f, max = 16f, step = 0.5f, property = TranscriptBoxConfig.Defaults::fontScale) {
                         formatting {
                             if (it == 0f)
-                                Component.translatable("unitytranslate.config.none")
+                                TextComponent.translatable("unitytranslate.config.none")
                             else
-                                Component.literal("${"%.1f".format(it * 100f)}%")
+                                TextComponent.literal("${"%.1f".format(it * 100f)}%")
                         }
                     }
 
                     integer("time_to_live", min = 0, max = 180_000, step = 250, property = TranscriptBoxConfig.Defaults::msToLive) {
                         formatting {
                             if (it == 0)
-                                Component.translatable("unitytranslate.measurement.seconds", "∞")
+                                TextComponent.translatable("unitytranslate.measurement.seconds", "∞")
                             else
-                                Component.translatable("unitytranslate.measurement.seconds", DecimalFormat("0.###").format((it / 1000.0)))
+                                TextComponent.translatable("unitytranslate.measurement.seconds", DecimalFormat("0.###").format((it / 1000.0)))
                         }
                     }
 
                     integer("time_to_fade_out", min = 0, max = 5_000, step = 250, property = TranscriptBoxConfig.Defaults::msToFadeOut) {
                         formatting {
-                            Component.translatable("unitytranslate.measurement.seconds", DecimalFormat("0.###").format((it / 1000.0)))
+                            TextComponent.translatable("unitytranslate.measurement.seconds", DecimalFormat("0.###").format((it / 1000.0)))
                         }
                     }
                 }

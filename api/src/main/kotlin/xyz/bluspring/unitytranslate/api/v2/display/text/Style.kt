@@ -1,5 +1,10 @@
 package xyz.bluspring.unitytranslate.api.v2.display.text
 
+import com.mojang.serialization.Codec
+import com.mojang.serialization.codecs.RecordCodecBuilder
+import xyz.bluspring.unitytranslate.api.v2.util.AdditionalCodecs.forGetter
+import java.util.*
+
 @JvmRecord
 data class Style(
     val color: Int? = null,
@@ -10,6 +15,18 @@ data class Style(
     val strikethrough: Boolean? = null,
     val obfuscated: Boolean? = null,
 ) {
+    constructor(
+        color: Optional<Int>, shadow: Optional<Int>,
+        bold: Optional<Boolean>, italic: Optional<Boolean>,
+        underlined: Optional<Boolean>, strikethrough: Optional<Boolean>,
+        obfuscated: Optional<Boolean>,
+    ) : this(
+        color.orElse(null), shadow.orElse(null),
+        bold.orElse(null), italic.orElse(null),
+        underlined.orElse(null), strikethrough.orElse(null),
+        obfuscated.orElse(null),
+    )
+
     fun withColor(color: Int): Style = update(color = color)
     fun withShadow(color: Int): Style = update(shadow = color)
     fun withoutShadow(): Style = update(shadow = 0)
@@ -42,5 +59,24 @@ data class Style(
 
     companion object {
         @JvmField val EMPTY = Style()
+        @JvmField val CODEC: Codec<Style> = RecordCodecBuilder.create { instance ->
+            instance.group(
+                Codec.INT.optionalFieldOf("color")
+                    .forGetter(Style::color),
+                Codec.INT.optionalFieldOf("shadow")
+                    .forGetter(Style::shadow),
+                Codec.BOOL.optionalFieldOf("bold")
+                    .forGetter(Style::bold),
+                Codec.BOOL.optionalFieldOf("italic")
+                    .forGetter(Style::italic),
+                Codec.BOOL.optionalFieldOf("underlined")
+                    .forGetter(Style::underlined),
+                Codec.BOOL.optionalFieldOf("strikethrough")
+                    .forGetter(Style::strikethrough),
+                Codec.BOOL.optionalFieldOf("obfuscated")
+                    .forGetter(Style::obfuscated),
+            )
+                .apply(instance, ::Style)
+        }
     }
 }

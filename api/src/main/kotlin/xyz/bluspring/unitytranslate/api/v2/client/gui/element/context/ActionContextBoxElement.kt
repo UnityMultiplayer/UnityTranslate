@@ -1,11 +1,11 @@
 package xyz.bluspring.unitytranslate.api.v2.client.gui.element.context
 
-import net.minecraft.network.chat.Component
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 
-class ActionContextBoxElement(val text: Component, val onClick: () -> Unit) : ContextBoxElement() {
+class ActionContextBoxElement(val text: TextComponent, val onClick: () -> Unit) : ContextBoxElement() {
     override fun submitElement(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
         val font = UnityTranslateApi.instance.client.defaultFont
         graphics.centeredText(font, text, this.x + (this.width / 2f), this.y + (this.bounds().height / 2f) - (font.lineHeight / 2f),

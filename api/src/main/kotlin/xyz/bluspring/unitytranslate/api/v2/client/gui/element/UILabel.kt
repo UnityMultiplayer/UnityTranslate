@@ -1,16 +1,16 @@
 package xyz.bluspring.unitytranslate.api.v2.client.gui.element
 
-import net.minecraft.network.chat.FormattedText
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIElement
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
 import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 
 open class UILabel(
     val x: Float, val y: Float,
-    open val text: FormattedText,
+    open val text: TextComponent,
     val font: FontReference,
 
     val dropShadow: Boolean = true,

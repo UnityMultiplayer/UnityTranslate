@@ -1,8 +1,6 @@
 package xyz.bluspring.unitytranslate.api.v2.client.gui.element
 
 import kotlinx.coroutines.*
-import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.FormattedText
 import org.joml.Math
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.InputValue
@@ -14,6 +12,7 @@ import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
 import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
 import xyz.bluspring.unitytranslate.api.v2.config.ColorConfig
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.api.v2.event.Event
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import kotlin.math.floor
@@ -25,13 +24,13 @@ class DropdownList<E : Comparable<E>>(
 
     val font: FontReference,
     elements: suspend () -> Collection<E>,
-    visualizer: (E) -> Component,
+    visualizer: (E) -> TextComponent,
 
     val property: KMutableProperty<E?>,
     val type: Type,
 
     validator: (E) -> Boolean = { true },
-    private val tooltip: (E?) -> Component = { PlatformAccess.empty() },
+    private val tooltip: (E?) -> TextComponent = { TextComponent.empty() },
 ) : UIElement(), FadeableUIElement {
     fun interface DropdownCallback<E> {
         fun onDropdownEvent(item: E)
@@ -46,7 +45,7 @@ class DropdownList<E : Comparable<E>>(
     }
     override var opacity = 1f
 
-    constructor(x: Float, y: Float, width: Float, height: Float, font: FontReference, elements: suspend () -> Collection<E>, visualizer: (E) -> Component, property: KMutableProperty<E>, validator: (E) -> Boolean = { true }, tooltip: (E?) -> Component = { PlatformAccess.empty() },)
+    constructor(x: Float, y: Float, width: Float, height: Float, font: FontReference, elements: suspend () -> Collection<E>, visualizer: (E) -> TextComponent, property: KMutableProperty<E>, validator: (E) -> Boolean = { true }, tooltip: (E?) -> TextComponent = { TextComponent.empty() },)
         : this(x, y, width, height, font, elements, visualizer, property as KMutableProperty<E?>, Type.REQUIRED, validator, tooltip)
 
     enum class Type {
@@ -57,9 +56,9 @@ class DropdownList<E : Comparable<E>>(
         private val scope = CoroutineScope(Dispatchers.Default)
     }
 
-    private val visualizer: (E?) -> Component = {
+    private val visualizer: (E?) -> TextComponent = {
         if (it == null)
-            PlatformAccess.translatable("unitytranslate.config.${when (this.type) {
+            TextComponent.translatable("unitytranslate.config.${when (this.type) {
                 Type.OPTIONAL -> "none"
                 Type.DEFAULTED -> "default"
                 else -> throw IllegalStateException()
@@ -87,7 +86,7 @@ class DropdownList<E : Comparable<E>>(
             val completed = this.elementGetter.getCompleted()
             return if (this.type != Type.REQUIRED)
                 (completed.toMutableList() as MutableList<E?>).apply {
-                    addFirst(null)
+                    add(0, null)
                 }
             else
                 completed
@@ -170,21 +169,21 @@ class DropdownList<E : Comparable<E>>(
         val isDisabled = this.isDisabled || !this.elementGetter.isCompleted || this.elements.isEmpty()
 
         if (!this.elementGetter.isCompleted) {
-            graphics.text(this.font, PlatformAccess.translatable("unitytranslate.config.loading").append(".".repeat(floor(this.currentTick / 20f).toInt() + 1)), this.x + 4, this.y + (this.height / 2f - 4), disabledColor.multiplyAlpha(this.opacity), true)
+            graphics.text(this.font, TextComponent.translatable("unitytranslate.config.loading").append(".".repeat(floor(this.currentTick / 20f).toInt() + 1)), this.x + 4, this.y + (this.height / 2f - 4), disabledColor.multiplyAlpha(this.opacity), true)
         } else if (this.elements.isEmpty()) {
-            graphics.text(this.font, PlatformAccess.translatable("unitytranslate.config.empty"), this.x + 4, this.y + (this.height / 2f - 4), disabledColor.multiplyAlpha(this.opacity), true)
+            graphics.text(this.font, TextComponent.translatable("unitytranslate.config.empty"), this.x + 4, this.y + (this.height / 2f - 4), disabledColor.multiplyAlpha(this.opacity), true)
         } else {
             graphics.text(this.font, ellipsize(this.visualizer(this.selected), this.width.toInt() - 15), this.x + 4, this.y + (this.height / 2f - 4), colorWithHover.multiplyAlpha(this.opacity), true)
         }
 
-        graphics.text(this.font, PlatformAccess.literal(if (this.isOpened) "▲" else "▼"), this.x + this.width - 10, this.y + (this.height / 2f - 4), (if (isDisabled) disabledColor else colorWithHover).multiplyAlpha(this.opacity), true)
+        graphics.text(this.font, TextComponent.literal(if (this.isOpened) "▲" else "▼"), this.x + this.width - 10, this.y + (this.height / 2f - 4), (if (isDisabled) disabledColor else colorWithHover).multiplyAlpha(this.opacity), true)
     }
 
-    private fun ellipsize(text: FormattedText, maxWidth: Int): FormattedText {
+    private fun ellipsize(text: TextComponent, maxWidth: Int): TextComponent {
         val subbed = this.font.substr(text, maxWidth)
 
         return if (subbed != text)
-            PlatformAccess.literal("${subbed.string}...")
+            TextComponent.literal("${subbed.string}...")
         else
             text
     }
@@ -192,7 +191,7 @@ class DropdownList<E : Comparable<E>>(
     override fun submitLate(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
         super.submitLate(graphics, partialTick, mouseX, mouseY)
 
-        var currentTooltip: Component? = null
+        var currentTooltip: TextComponent? = null
 
         if (this.isOpened) {
             val elements = this.elements
@@ -239,7 +238,7 @@ class DropdownList<E : Comparable<E>>(
                     val textWidth = font.width(text)
                     if (textWidth > maxWidth) {
                         graphics.enableScissor(this.x.toInt() + 4, y.toInt(), maxWidth, this.height.toInt())
-                        graphics.translate(Mth.lerp((this.currentTick + (partialTick * (if (this.isReversing) -1f else 1f))) / this.maxScrollTick.toFloat(), 0f, (maxWidth - textWidth).toFloat()), 0f)
+                        graphics.translate(Math.lerp((this.currentTick + (partialTick * (if (this.isReversing) -1f else 1f))) / this.maxScrollTick.toFloat(), 0f, (maxWidth - textWidth).toFloat()), 0f)
                     }
 
                     graphics.text(this.font, text, this.x + 4, y + 4f, colorWithHover.multiplyAlpha(this.opacity), true)

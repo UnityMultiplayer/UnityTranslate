@@ -1,13 +1,13 @@
 package xyz.bluspring.unitytranslate.client.gui.hud
 
 import net.minecraft.ChatFormatting
-import net.minecraft.client.Minecraft
-import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
+import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
-import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.withAlpha
+import xyz.bluspring.unitytranslate.util.PlatformConversion.withStyle
 import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.floor
@@ -22,15 +22,15 @@ class QuickLanguageRadialSelector {
         val diffX = mouseX - centerX
         val diffY = mouseY - centerY
 
-        val font = Minecraft.getInstance().font
-        val fontReference = FontReference.minecraft(font)
+        val font = UnityTranslateApi.instance.client.defaultFont
 
         val languages = listOf("English", "Español", "Portugués", "Français", "Svenska", "Bahasa Melayu", "Deutsch", "Nederlands")
         val totalLanguages = languages.size
 
         if (totalLanguages <= 0) {
-            graphics.centeredText(fontReference, Component.literal("You do not currently have any quick languages assigned!")
-                .withStyle(ChatFormatting.RED), centerX.toFloat(), centerY.toFloat() - 4f, -1, true)
+            graphics.centeredText(
+                font, TextComponent.literal("You do not currently have any quick languages assigned!")
+                    .withStyle(ChatFormatting.RED), centerX.toFloat(), centerY.toFloat() - 4f, -1, true)
             return
         }
 
@@ -82,9 +82,9 @@ class QuickLanguageRadialSelector {
             val mid = end - ((end - start) / 2f) - 4f
 
             graphics.meshFill(startX * start, startY * start, startX * end, startY * end, endX * start, endY * start, endX * end, endY * end, colorInner, colorOuter, colorInner, colorOuter)
-            val splitText = font.split(Component.literal(languages[i]), 60)
+            val splitText = font.split(TextComponent.literal(languages[i]), 60)
             for ((n, value) in splitText.reversed().withIndex()) {
-                graphics.centeredText(fontReference, value, midX * mid, midY * mid - ((splitText.size / 2f) + (n * font.lineHeight)), (-1).withAlpha(alpha), true)
+                graphics.centeredText(font, value, midX * mid, midY * mid - ((splitText.size / 2f) + (n * font.lineHeight)), (-1).withAlpha(alpha), true)
             }
         }
 
@@ -103,17 +103,17 @@ class QuickLanguageRadialSelector {
 
         graphics.popMatrix()
 
-        val splitText = font.split(Component.literal("Select spoken language"), 100)
+        val splitText = font.split(TextComponent.literal("Select spoken language"), 100)
         for ((i, text) in splitText.withIndex()) {
-            graphics.centeredText(fontReference, text, centerX.toFloat(), centerY.toFloat() - 6f - (splitText.size / 2f) + (i * font.lineHeight), -1, true)
+            graphics.centeredText(font, text, centerX.toFloat(), centerY.toFloat() - 6f - (splitText.size / 2f) + (i * font.lineHeight), -1, true)
         }
 
         if (debug) {
-            graphics.centeredText(fontReference, Component.literal("$index"), centerX.toFloat(), centerY.toFloat(), -1, true)
+            graphics.centeredText(font, TextComponent.literal("$index"), centerX.toFloat(), centerY.toFloat(), -1, true)
 
-            graphics.centeredText(fontReference, Component.literal("a: ${"%.2f deg / %.2f deg".format(angle, angle + offsetAngle)}"), centerX.toFloat(), centerY.toFloat() + 12, -1, true)
-            graphics.centeredText(fontReference, Component.literal("d: ${"%.2f".format(divisions)} deg"), centerX.toFloat(), centerY.toFloat() + 24, -1, true)
-            graphics.centeredText(fontReference, Component.literal("o: ${"%.2f".format(offsetAngle)} deg"), centerX.toFloat(), centerY.toFloat() + 36, -1, true)
+            graphics.centeredText(font, TextComponent.literal("a: ${"%.2f deg / %.2f deg".format(angle, angle + offsetAngle)}"), centerX.toFloat(), centerY.toFloat() + 12, -1, true)
+            graphics.centeredText(font, TextComponent.literal("d: ${"%.2f".format(divisions)} deg"), centerX.toFloat(), centerY.toFloat() + 24, -1, true)
+            graphics.centeredText(font, TextComponent.literal("o: ${"%.2f".format(offsetAngle)} deg"), centerX.toFloat(), centerY.toFloat() + 36, -1, true)
         }
     }
 }

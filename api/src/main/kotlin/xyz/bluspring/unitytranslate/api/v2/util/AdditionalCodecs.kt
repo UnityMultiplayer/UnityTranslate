@@ -3,6 +3,7 @@ package xyz.bluspring.unitytranslate.api.v2.util
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.MapCodec
+import com.mojang.serialization.codecs.RecordCodecBuilder
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.alpha
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.blue
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.green
@@ -73,5 +74,13 @@ object AdditionalCodecs {
     fun <T : Any> Codec<T>.optionalFieldOf(name: String, defaultGetter: () -> T): MapCodec<T> {
         return Codec.optionalField(name, this, false)
             .xmap({ it.orElse(defaultGetter()) }, Optional<T>::of)
+    }
+
+    @JvmStatic
+    fun <T : Any, U : Any> MapCodec<Optional<U>>.forGetter(getter: (T) -> U?): RecordCodecBuilder<T, Optional<U>> {
+        return this.forGetter {
+            val value = getter(it)
+            Optional.ofNullable(value)
+        }
     }
 }

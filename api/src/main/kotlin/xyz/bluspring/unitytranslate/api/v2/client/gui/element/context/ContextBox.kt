@@ -4,6 +4,7 @@ import xyz.bluspring.unitytranslate.api.v2.client.gui.UIElement
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.element.FocusableUIElement
 import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
+import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenUtil
 
 class ContextBox(val x: Float, val y: Float, val maxWidth: Int = 150, val elements: Collection<ContextBoxElement>, val shouldScale: Boolean = true) : UIElement(), FocusableUIElement {
     override var isFocused: Boolean = false

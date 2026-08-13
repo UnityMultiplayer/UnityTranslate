@@ -1,11 +1,11 @@
 package xyz.bluspring.unitytranslate.api.v2.client.gui.element.context
 
-import net.minecraft.network.chat.Component
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 
-class ExpandableContextBoxElement(val text: Component, val elements: Collection<ContextBoxElement>) : ContextBoxElement() {
+class ExpandableContextBoxElement(val text: TextComponent, val elements: Collection<ContextBoxElement>) : ContextBoxElement() {
     private var contextBox: ContextBox? = null
 
     var elementWidth = this.width
@@ -21,7 +21,7 @@ class ExpandableContextBoxElement(val text: Component, val elements: Collection<
         graphics.centeredText(font, text, this.x + (this.width / 2f), this.y + (this.bounds().height / 2f) - (font.lineHeight / 2f),
             if (this.isFocused) ThemeConfig.contextBoxElementTextFocused else ThemeConfig.contextBoxElementText, true)
 
-        val arrowText = Component.literal("➤")
+        val arrowText = TextComponent.literal("➤")
         graphics.text(font, arrowText, this.x + this.width - font.width(arrowText) - 1, this.y + (this.bounds().height / 2f) - (font.lineHeight / 2f),
             if (this.isFocused) ThemeConfig.contextBoxElementTextFocused else ThemeConfig.contextBoxElementText, true)
 

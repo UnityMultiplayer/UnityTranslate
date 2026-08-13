@@ -1,9 +1,9 @@
 package xyz.bluspring.unitytranslate.api.v2.client.gui.element.context
 
-import net.minecraft.network.chat.Component
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import kotlin.reflect.KMutableProperty
 
 class ToggleContextBoxElement(
@@ -13,8 +13,8 @@ class ToggleContextBoxElement(
     override fun submitElement(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
         val font = UnityTranslateApi.instance.client.defaultFont
         val value = this.property.getter.call()
-        val text = Component.translatable(this.rootKey).append(": ").append(
-            Component.translatable("unitytranslate.value.$value")
+        val text = TextComponent.translatable(this.rootKey).append(": ").append(
+            TextComponent.translatable("unitytranslate.value.$value")
                 .withStyle { style -> style.withColor(if (value) ThemeConfig.enabledText else ThemeConfig.disabledText) }
         )
         graphics.centeredText(font, text, this.x + (this.width / 2f), this.y + (this.bounds().height / 2f) - (font.lineHeight / 2f),

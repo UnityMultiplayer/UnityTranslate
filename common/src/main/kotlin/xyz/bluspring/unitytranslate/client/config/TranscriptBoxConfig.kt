@@ -4,17 +4,17 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.ChatFormatting
-import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.ComponentSerialization
-import net.minecraft.network.chat.Style
 import org.joml.Vector2f
 import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.client.gui.TextureReference
 import xyz.bluspring.unitytranslate.api.v2.config.ColorConfig
 import xyz.bluspring.unitytranslate.api.v2.display.LanguageDisplay
+import xyz.bluspring.unitytranslate.api.v2.display.text.Style
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptData
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 import xyz.bluspring.unitytranslate.transcriber.display.BuiltinLanguageDisplays
+import xyz.bluspring.unitytranslate.util.PlatformConversion.withColor
 import java.util.*
 
 class TranscriptBoxConfig(
@@ -444,7 +444,7 @@ class TranscriptBoxConfig(
         var alignY: VerticalAlignment = VerticalAlignment.Top,
         var hasShadow: Boolean = true,
     ) {
-        fun text(language: Language): Component
+        fun text(language: Language): TextComponent
             = this.display.text(this.langDecoration.decorate(this.langDisplay.text(language, this.langStyle))).copy().withStyle(this.style)
 
         companion object {
@@ -457,11 +457,11 @@ class TranscriptBoxConfig(
                 instance.group(
                     HeaderDisplay.CODEC.optionalFieldOf("display", HeaderDisplay.Transcript)
                         .forGetter(Header::display),
-                    Style.Serializer.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
+                    Style.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
                         .forGetter(Header::style),
                     LanguageDisplay.CODEC.optionalFieldOf("lang_display", BuiltinLanguageDisplays.LangCodeShortUppercase)
                         .forGetter(Header::langDisplay),
-                    Style.Serializer.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
+                    Style.CODEC.optionalFieldOf("style", DEFAULT_STYLE)
                         .forGetter(Header::langStyle),
                     LanguageDecoration.CODEC.optionalFieldOf("lang_decoration", LanguageDecoration.None)
                         .forGetter(Header::langDecoration),
@@ -561,24 +561,24 @@ class TranscriptBoxConfig(
             }
         }
 
-        abstract fun decorate(languageDisplay: Component): Component
+        abstract fun decorate(languageDisplay: TextComponent): TextComponent
 
         object None : LanguageDecoration("none") {
             @JvmField val CODEC: MapCodec<None> = MapCodec.unit(None)
 
-            override fun decorate(languageDisplay: Component): Component = languageDisplay
+            override fun decorate(languageDisplay: TextComponent): TextComponent = languageDisplay
         }
 
         object Parentheses : LanguageDecoration("parentheses") {
             @JvmField val CODEC: MapCodec<Parentheses> = MapCodec.unit(Parentheses)
 
-            override fun decorate(languageDisplay: Component): Component = Component.translatable("$DECORATION_KEY.parentheses", languageDisplay)
+            override fun decorate(languageDisplay: TextComponent): TextComponent = TextComponent.translatable("$DECORATION_KEY.parentheses", languageDisplay)
         }
 
         object Brackets : LanguageDecoration("brackets") {
             @JvmField val CODEC: MapCodec<Brackets> = MapCodec.unit(Brackets)
 
-            override fun decorate(languageDisplay: Component): Component = Component.translatable("$DECORATION_KEY.brackets", languageDisplay)
+            override fun decorate(languageDisplay: TextComponent): TextComponent = TextComponent.translatable("$DECORATION_KEY.brackets", languageDisplay)
         }
     }
 
@@ -601,46 +601,46 @@ class TranscriptBoxConfig(
             }
         }
 
-        abstract fun text(languageDisplay: Component): Component
+        abstract fun text(languageDisplay: TextComponent): TextComponent
 
         object None : HeaderDisplay("none") {
             @JvmField val CODEC: MapCodec<None> = MapCodec.unit(None)
 
-            override fun text(languageDisplay: Component): Component = Component.empty().append(languageDisplay)
+            override fun text(languageDisplay: TextComponent): TextComponent = TextComponent.empty().append(languageDisplay)
         }
 
         object Transcript : HeaderDisplay("transcript") {
             @JvmField val CODEC: MapCodec<Transcript> = MapCodec.unit(Transcript)
 
-            override fun text(languageDisplay: Component): Component = Component.translatable("$HEADER_LANG.transcript", languageDisplay)
+            override fun text(languageDisplay: TextComponent): TextComponent = TextComponent.translatable("$HEADER_LANG.transcript", languageDisplay)
         }
 
         object Translation : HeaderDisplay("translation") {
             @JvmField val CODEC: MapCodec<Translation> = MapCodec.unit(Translation)
 
-            override fun text(languageDisplay: Component): Component = Component.translatable("$HEADER_LANG.translation", languageDisplay)
+            override fun text(languageDisplay: TextComponent): TextComponent = TextComponent.translatable("$HEADER_LANG.translation", languageDisplay)
         }
 
         object Translations : HeaderDisplay("translations") {
             @JvmField val CODEC: MapCodec<Translations> = MapCodec.unit(Translations)
 
-            override fun text(languageDisplay: Component): Component = Component.translatable("$HEADER_LANG.translations", languageDisplay)
+            override fun text(languageDisplay: TextComponent): TextComponent = TextComponent.translatable("$HEADER_LANG.translations", languageDisplay)
         }
 
         object UTTranslation : HeaderDisplay("mod_translation") {
             @JvmField val CODEC: MapCodec<UTTranslation> = MapCodec.unit(UTTranslation)
 
-            override fun text(languageDisplay: Component): Component = Component.translatable("$HEADER_LANG.mod_translation", languageDisplay)
+            override fun text(languageDisplay: TextComponent): TextComponent = TextComponent.translatable("$HEADER_LANG.mod_translation", languageDisplay)
         }
 
         object UTTranslations : HeaderDisplay("mod_translations") {
             @JvmField val CODEC: MapCodec<UTTranslations> = MapCodec.unit(UTTranslations)
 
-            override fun text(languageDisplay: Component): Component = Component.translatable("$HEADER_LANG.mod_translations", languageDisplay)
+            override fun text(languageDisplay: TextComponent): TextComponent = TextComponent.translatable("$HEADER_LANG.mod_translations", languageDisplay)
         }
 
         data class Custom(val text: String, val appendLanguage: Boolean) : HeaderDisplay("custom") {
-            override fun text(languageDisplay: Component): Component = Component.literal(this.text).run {
+            override fun text(languageDisplay: TextComponent): TextComponent = TextComponent.literal(this.text).run {
                 if (appendLanguage)
                     this.append(" ").append(languageDisplay)
                 else this
@@ -659,8 +659,8 @@ class TranscriptBoxConfig(
             }
         }
 
-        data class CustomRich(val text: Component, val appendLanguage: Boolean) : HeaderDisplay("custom_rich") {
-            override fun text(languageDisplay: Component): Component = this.text.copy().run {
+        data class CustomRich(val text: TextComponent, val appendLanguage: Boolean) : HeaderDisplay("custom_rich") {
+            override fun text(languageDisplay: TextComponent): TextComponent = this.text.copy().run {
                 if (appendLanguage)
                     this.append(" ").append(languageDisplay)
                 else this
@@ -669,7 +669,7 @@ class TranscriptBoxConfig(
             companion object {
                 @JvmField val CODEC: MapCodec<CustomRich> = RecordCodecBuilder.mapCodec { instance ->
                     instance.group(
-                        ComponentSerialization.CODEC.fieldOf("text")
+                        TextComponent.CODEC.fieldOf("text")
                             .forGetter(CustomRich::text),
                         Codec.BOOL.optionalFieldOf("append_language", true)
                             .forGetter(CustomRich::appendLanguage),
@@ -693,7 +693,7 @@ class TranscriptBoxConfig(
                 instance.group(
                     LanguageDisplay.CODEC.optionalFieldOf("lang_display", BuiltinLanguageDisplays.LangCodeShortUppercase)
                         .forGetter(TranscriptDisplay::langDisplay),
-                    Style.Serializer.CODEC.optionalFieldOf("lang_style", DEFAULT_STYLE)
+                    Style.CODEC.optionalFieldOf("lang_style", DEFAULT_STYLE)
                         .forGetter(TranscriptDisplay::langStyle),
                     LanguageDecoration.CODEC.optionalFieldOf("lang_decoration", LanguageDecoration.Parentheses)
                         .forGetter(TranscriptDisplay::langDecoration)
@@ -704,7 +704,7 @@ class TranscriptBoxConfig(
             @JvmStatic fun default(): TranscriptDisplay = TranscriptDisplay()
         }
 
-        fun text(data: TranscriptData): Component = Component.translatable(MESSAGE_LANG,
+        fun text(data: TranscriptData): TextComponent = TextComponent.translatable(MESSAGE_LANG,
             data.sender.displayName,
             this.langDecoration.decorate(this.langDisplay.text(data.language, this.langStyle)),
             data.message

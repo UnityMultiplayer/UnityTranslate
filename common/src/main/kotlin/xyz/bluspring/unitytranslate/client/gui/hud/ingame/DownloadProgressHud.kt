@@ -1,11 +1,11 @@
 package xyz.bluspring.unitytranslate.client.gui.hud.ingame
 
-import net.minecraft.network.chat.Component
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIElement
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
 import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
 import xyz.bluspring.unitytranslate.api.v2.config.ColorConfig
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadHelper
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadHelper.bytesToNearestLarge
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadInfo
@@ -50,17 +50,17 @@ class DownloadProgressHud : UIElement() {
             val x = bounds.left + 2
             var y = bounds.top + 2
 
-            graphics.text(font, Component.literal("Downloading ${downloads.size} files..."), x.toFloat(), y.toFloat(), textColor, true)
+            graphics.text(font, TextComponent.literal("Downloading ${downloads.size} files..."), x.toFloat(), y.toFloat(), textColor, true)
             y += font.lineHeight
 
             val downloadBarBgMatrix = ColorConfig.separateMatrix(ThemeConfig.downloadProgressBackground)
             val downloadBarFillMatrix = ColorConfig.separateMatrix(ThemeConfig.downloadProgressFill)
 
             for ((path, info) in downloads) {
-                graphics.text(font, Component.literal("Downloading ${path.name}"), x.toFloat(), y.toFloat(), textColor, false)
+                graphics.text(font, TextComponent.literal("Downloading ${path.name}"), x.toFloat(), y.toFloat(), textColor, false)
                 graphics.fill(x.toFloat(), y.toFloat() + font.lineHeight, bounds.right.toFloat() - 2, y.toFloat() + font.lineHeight + 2, downloadBarBgMatrix)
                 graphics.fill(x.toFloat(), y.toFloat() + font.lineHeight, x.toFloat() + ((bounds.width - 4) * info.progress).toFloat(), y.toFloat() + font.lineHeight + 2, downloadBarFillMatrix)
-                graphics.text(font, Component.literal("${info.downloadedBytes.bytesToNearestLarge()} / ${info.totalBytes.bytesToNearestLarge()}"), x.toFloat(), y.toFloat() + font.lineHeight + 5, textColor, false)
+                graphics.text(font, TextComponent.literal("${info.downloadedBytes.bytesToNearestLarge()} / ${info.totalBytes.bytesToNearestLarge()}"), x.toFloat(), y.toFloat() + font.lineHeight + 5, textColor, false)
 
                 y += font.lineHeight * 2 + 4
             }

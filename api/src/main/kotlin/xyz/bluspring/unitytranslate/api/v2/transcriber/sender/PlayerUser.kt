@@ -1,7 +1,7 @@
 package xyz.bluspring.unitytranslate.api.v2.transcriber.sender
 
-import net.minecraft.network.chat.Component
 import org.joml.Vector3f
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import java.util.*
 
 /**
@@ -20,7 +20,7 @@ data class PlayerUser(
      * and as such it is up to the implementation to look up the player's username
      * using the [uuid].
      */
-    override val displayName: Component,
+    override val displayName: TextComponent,
 ) : TranscriptUser {
 
     override fun hashCode(): Int {

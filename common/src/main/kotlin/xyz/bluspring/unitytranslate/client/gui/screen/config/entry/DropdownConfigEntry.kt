@@ -1,10 +1,10 @@
 package xyz.bluspring.unitytranslate.client.gui.screen.config.entry
 
-import net.minecraft.network.chat.Component
 import xyz.bluspring.unitytranslate.api.v2.client.gui.element.DropdownList
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.config.NameProvidingEntry
 import xyz.bluspring.unitytranslate.api.v2.config.TooltipProvidingEntry
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadableEntry
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.config.builders.ConfigValueBuilderImpl
@@ -27,7 +27,7 @@ class DropdownConfigEntry<E : NameProvidingEntry>(
                 if (formatter != null) {
                     formatter(value)
                 } else {
-                    Component.translatable("${this.rootKey}${this.value.fullId}.${value.serializedName}")
+                    TextComponent.translatable("${this.rootKey}${this.value.fullId}.${value.serializedName}")
                 }
             }, this.value.property,
             validator = { entry ->
@@ -37,8 +37,8 @@ class DropdownConfigEntry<E : NameProvidingEntry>(
             },
             tooltip = { entry ->
                 (if (entry != null)
-                    Component.translatableWithFallback("${this.rootKey}${this.value.fullId}.${entry.serializedName}.description", "")
-                else Component.empty()).apply {
+                    TextComponent.translatableWithFallback("${this.rootKey}${this.value.fullId}.${entry.serializedName}.description", "")
+                else TextComponent.empty()).apply {
                     if (entry is TooltipProvidingEntry) {
                         for (tooltip in entry.tooltip) {
                             if (tooltip.translationKey.isBlank()) {
@@ -51,7 +51,7 @@ class DropdownConfigEntry<E : NameProvidingEntry>(
                             if (!this.string.isBlank())
                                 this.append("\n")
 
-                            this.append(Component.translatable(tooltip.translationKey, *tooltip.args.toTypedArray()).withColor(tooltip.color))
+                            this.append(TextComponent.translatable(tooltip.translationKey, *tooltip.args.toTypedArray()).withColor(tooltip.color))
                         }
                     }
                 }

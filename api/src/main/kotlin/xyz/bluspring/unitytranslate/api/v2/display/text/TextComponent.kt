@@ -1,11 +1,14 @@
 package xyz.bluspring.unitytranslate.api.v2.display.text
 
+/**
+ * A variation of text components for UnityTranslate's own usage.
+ */
 interface TextComponent {
-    val text: String
+    val contents: ComponentContents
     val style: Style
     val siblings: List<TextComponent>
 
-    val fullString: String
+    val string: String
         get() {
             var current = ""
             this.visit { text -> current += text }
@@ -41,22 +44,22 @@ interface TextComponent {
 //    }
 
     fun visit(visitor: TextVisitor) {
-        visitor.visit(this.text)
+        visitor.visit(this.contents.text)
         for (component in this.siblings) {
             component.visit(visitor)
         }
     }
 
-    fun visit(visitor: StyledTextVisitor, parentStyle: Style) {
+    fun visit(visitor: StyledTextVisitor, parentStyle: Style = Style.EMPTY) {
         val currentStyle = parentStyle.merge(this.style)
-        visitor.visit(this.text, currentStyle)
+        visitor.visit(this.contents.text, currentStyle)
         for (component in this.siblings) {
             component.visit(visitor, currentStyle)
         }
     }
 
-    fun plainCopy(): MutableTextComponent = MutableTextComponent(this.text)
-    fun copy(): MutableTextComponent = MutableTextComponent(this.text, this.style, this.siblings)
+    fun plainCopy(): MutableTextComponent = MutableTextComponent(this.contents)
+    fun copy(): MutableTextComponent = MutableTextComponent(this.contents, this.style, this.siblings.toMutableList())
 
     fun interface TextVisitor {
         fun visit(text: String)
@@ -64,5 +67,12 @@ interface TextComponent {
 
     fun interface StyledTextVisitor {
         fun visit(text: String, style: Style)
+    }
+
+    companion object {
+        @JvmStatic fun empty(): MutableTextComponent = MutableTextComponent(ComponentContents.Literal(""))
+        @JvmStatic fun literal(text: String): MutableTextComponent = MutableTextComponent(ComponentContents.Literal(text))
+        @JvmStatic fun translatable(key: String, vararg args: Any?): MutableTextComponent = MutableTextComponent(ComponentContents.Translatable(key, args.toList()))
+        @JvmStatic fun translatableWithFallback(key: String, fallback: String, vararg args: Any?): MutableTextComponent = MutableTextComponent(ComponentContents.Translatable(key, args.toList(), fallback))
     }
 }

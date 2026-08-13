@@ -1,11 +1,11 @@
 package xyz.bluspring.unitytranslate.api.v2.client.gui
 
-import net.minecraft.network.chat.Component
 import org.jetbrains.annotations.ApiStatus
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
 import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
 import xyz.bluspring.unitytranslate.api.v2.config.ColorConfig
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 
 abstract class UIElement {
@@ -80,7 +80,7 @@ abstract class UIElement {
                 graphics.pushMatrix()
                 graphics.translate(bounds.left.toFloat(), bounds.bottom.toFloat() + 2f)
                 graphics.scale(0.5f, 0.5f)
-                graphics.text(access.defaultFont, Component.literal("${this::class.simpleName} (x: ${bounds.x}, y: ${bounds.y}, width: ${bounds.width}, height: ${bounds.height})"), 0f, 0f, -1, true)
+                graphics.text(access.defaultFont, TextComponent.literal("${this::class.simpleName} (x: ${bounds.x}, y: ${bounds.y}, width: ${bounds.width}, height: ${bounds.height})"), 0f, 0f, -1, true)
                 graphics.popMatrix()
             }
         }
@@ -158,7 +158,7 @@ abstract class UIElement {
         return false
     }
     
-    protected fun tooltip(graphics: UIGraphics, tooltip: Component) {
+    protected fun tooltip(graphics: UIGraphics, tooltip: TextComponent) {
         val access = UnityTranslateApi.instance.client
         
         val mouseX = (access.mouseX / access.guiScale).toFloat()

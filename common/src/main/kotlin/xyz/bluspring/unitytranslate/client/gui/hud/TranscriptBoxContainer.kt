@@ -1,8 +1,6 @@
 package xyz.bluspring.unitytranslate.client.gui.hud
 
 import kotlinx.coroutines.runBlocking
-import net.minecraft.client.Minecraft
-import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
 import xyz.bluspring.unitytranslate.api.v2.Language
@@ -13,12 +11,13 @@ import xyz.bluspring.unitytranslate.api.v2.client.gui.element.FocusableUIElement
 import xyz.bluspring.unitytranslate.api.v2.client.gui.element.context.ActionContextBoxElement
 import xyz.bluspring.unitytranslate.api.v2.client.gui.element.context.ContextBox
 import xyz.bluspring.unitytranslate.api.v2.client.gui.element.context.ExpandableContextBoxElement
-import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
 import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenAxis
 import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenDirection
 import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
+import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenUtil.inflate
 import xyz.bluspring.unitytranslate.api.v2.config.ColorConfig
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptData
 import xyz.bluspring.unitytranslate.api.v2.transcriber.TranscriptHolder
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.alpha
@@ -26,7 +25,6 @@ import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
 import xyz.bluspring.unitytranslate.client.gui.MouseHelper
-import xyz.bluspring.unitytranslate.util.ScreenUtil.inflate
 import java.util.*
 import kotlin.math.floor
 import kotlin.math.max
@@ -41,9 +39,9 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
     var y = 0f
     var width = 0f
     var height = 0f
-    var font = Minecraft.getInstance().font
+    var font = UnityTranslateApi.instance.client.defaultFont
 
-    private var headerText: Component = Component.empty()
+    private var headerText: TextComponent = TextComponent.empty()
     private var headerX: Float = 0f
     private var headerY: Float = 0f
 
@@ -151,7 +149,7 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
         graphics.popMatrix()
 
         // Header
-        graphics.text(FontReference.minecraft(font), headerText.visualOrderText, this.headerX, this.headerY, -1, this.config.header.hasShadow)
+        graphics.text(font, headerText, this.headerX, this.headerY, -1, this.config.header.hasShadow)
 
         graphics.enableScissor(0, font.lineHeight + 2, this.width.toInt(), this.height.toInt() - 7)
         graphics.pushMatrix()
@@ -172,7 +170,7 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
 
             for (sequence in font.split(text, this.width.toInt() - 4).reversed()) {
                 val hasShadow = this.config.shadowColor.alpha() <= 10
-                graphics.text(FontReference.minecraft(font), sequence, 0f, -offset, this.config.textColor.multiplyAlpha(fadeMultiplier), hasShadow) // TODO: shadow
+                graphics.text(font, sequence, 0f, -offset, this.config.textColor.multiplyAlpha(fadeMultiplier), hasShadow) // TODO: shadow
                 offset += 10
             }
 
@@ -393,17 +391,17 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
 
         val font = ClientPlatformProxy.instance.defaultFont
         val width = languages.maxOf {
-            font.width(Component.translatable("unitytranslate.language.native_and_localized", it.nativeText, it.localizedText))
+            font.width(TextComponent.translatable("unitytranslate.language.native_and_localized", it.nativeText, it.localizedText))
         }
 
         return ContextBox(x, y, elements = listOf(
             ExpandableContextBoxElement(
-                Component.translatable("unitytranslate.language").append(": ")
+                TextComponent.translatable("unitytranslate.language").append(": ")
                     .append(this.config.language.nativeText),
                 languages
                     .sorted()
                     .map {
-                        ActionContextBoxElement(Component.literal(it.nativeText)) {
+                        ActionContextBoxElement(TextComponent.literal(it.nativeText)) {
                             this.config.language = it
                             this.updateConfig()
                         }
@@ -411,7 +409,7 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
             ).apply {
                 this.elementWidth = max(width + 4f, this.elementWidth)
             },
-            ExpandableContextBoxElement(Component.translatable("config.unitytranslate.unitytranslate.hud.default_box_settings.header"), listOf(
+            ExpandableContextBoxElement(TextComponent.translatable("config.unitytranslate.unitytranslate.hud.default_box_settings.header"), listOf(
 //                CyclingContextBoxElement(listOf(
 //
 //                )),
@@ -441,7 +439,7 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
     private fun updateHeader() {
         this.headerText = this.config.header.text(this.holder.language)
 
-        val headerLength = font.width(this.config.header.display.text(Component.empty()))
+        val headerLength = font.width(this.config.header.display.text(TextComponent.empty()))
         val languageLength = font.width(this.config.header.langDecoration.decorate(this.config.header.langDisplay.text(this.holder.language, this.config.header.langStyle)))
         this.headerX = this.config.header.alignX.align(this.width, headerLength, languageLength)
         this.headerY = this.config.header.alignY.align(this.height)

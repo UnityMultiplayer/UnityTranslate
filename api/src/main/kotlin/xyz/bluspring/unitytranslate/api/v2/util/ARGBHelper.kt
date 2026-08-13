@@ -56,6 +56,10 @@ object ARGBHelper {
     }
 
     @JvmStatic
+    inline val Int.opaque: Int
+        get() = this.withAlpha(255)
+
+    @JvmStatic
     fun colorFromFloat(a: Float, r: Float, g: Float, b: Float): Int {
         return color((a * MAX_COMPONENT_SIZE).toInt(), (r * MAX_COMPONENT_SIZE).toInt(), (g * MAX_COMPONENT_SIZE).toInt(), (b * MAX_COMPONENT_SIZE).toInt())
     }

@@ -1,6 +1,5 @@
 package xyz.bluspring.unitytranslate.client.gui.screen.config.entry
 
-import net.minecraft.network.chat.Component
 import xyz.bluspring.sunset.values.ConfigCategory
 import xyz.bluspring.sunset.values.ConfigValue
 import xyz.bluspring.unitytranslate.UnityTranslate
@@ -13,6 +12,7 @@ import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
 import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
 import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenUtil
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.config.values.DropdownValidatingReflectingConfigValue
 import xyz.bluspring.unitytranslate.config.values.IntColorConfigValue
@@ -47,7 +47,7 @@ abstract class ConfigEntry<E, T : ConfigValue<E>>(
 
     override fun init(width: Int, height: Int) {
         super.init(width, height)
-        this.label = this.addChild(UILabel(this.xPos, this.yPos, Component.translatable("$rootKey${this.value.fullId}").append(": "), font))
+        this.label = this.addChild(UILabel(this.xPos, this.yPos, TextComponent.translatable("$rootKey${this.value.fullId}").append(": "), font))
     }
 
     override fun bounds(screenWidth: Int, screenHeight: Int): ScreenRectangle {
@@ -69,7 +69,7 @@ abstract class ConfigEntry<E, T : ConfigValue<E>>(
 
     override fun submitLate(graphics: UIGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
         if (this.bounds().containsPoint(mouseX, mouseY) && this.shouldShowTooltip) {
-            val text = Component.translatableWithFallback("${this.rootKey}${this.value.fullId}.description", "")
+            val text = TextComponent.translatableWithFallback("${this.rootKey}${this.value.fullId}.description", "")
 
             if (!text.string.isBlank()) {
                 this.tooltip(graphics, text)

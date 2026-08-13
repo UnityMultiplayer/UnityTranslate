@@ -1,9 +1,7 @@
 package xyz.bluspring.unitytranslate.api.v2.client.gui
 
-import net.minecraft.locale.Language
-import net.minecraft.network.chat.FormattedText
-import net.minecraft.util.FormattedCharSequence
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
 import xyz.bluspring.unitytranslate.api.v2.util.ColorMatrix
 
@@ -16,16 +14,10 @@ interface UIGraphics {
     fun enableScissor(x: Int, y: Int, width: Int, height: Int)
     fun disableScissor()
 
-    fun centeredText(font: FontReference, text: FormattedCharSequence, x: Float, y: Float, color: Int, dropShadow: Boolean)
+    fun centeredText(font: FontReference, text: TextComponent, x: Float, y: Float, color: Int, dropShadow: Boolean)
         = text(font, text, x - (font.width(text) / 2f), y, color, dropShadow)
 
-    fun centeredText(font: FontReference, text: FormattedText, x: Float, y: Float, color: Int, dropShadow: Boolean)
-        = centeredText(font, Language.getInstance().getVisualOrder(text), x, y, color, dropShadow)
-
-    fun text(font: FontReference, text: FormattedText, x: Float, y: Float, color: Int, dropShadow: Boolean)
-        = text(font, Language.getInstance().getVisualOrder(text), x, y, color, dropShadow)
-
-    fun text(font: FontReference, text: FormattedCharSequence, x: Float, y: Float, color: Int, dropShadow: Boolean)
+    fun text(font: FontReference, text: TextComponent, x: Float, y: Float, color: Int, dropShadow: Boolean)
 
     fun fill(x1: Float, y1: Float, x2: Float, y2: Float, colorFrom: Int, colorTo: Int = colorFrom)
         = fill(x1, y1, x2, y2, colorFrom, colorFrom, colorTo, colorTo)

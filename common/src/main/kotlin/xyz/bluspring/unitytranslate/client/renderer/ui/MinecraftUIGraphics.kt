@@ -7,12 +7,12 @@ import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.state.gui.GuiRenderState
-import net.minecraft.util.FormattedCharSequence
 import net.minecraft.util.Mth
 import org.joml.Matrix3x2f
 import xyz.bluspring.unitytranslate.api.v2.client.gui.TextureReference
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.client.renderer.ui.font.MinecraftFontReference
 import xyz.bluspring.unitytranslate.client.renderer.ui.minecraft.ColoredBlitRenderState
 import xyz.bluspring.unitytranslate.client.renderer.ui.minecraft.ColoredMeshBlitRenderState
@@ -20,6 +20,7 @@ import xyz.bluspring.unitytranslate.client.renderer.ui.minecraft.GradientedFillR
 import xyz.bluspring.unitytranslate.client.renderer.ui.minecraft.GradientedMeshFillRenderState
 import xyz.bluspring.unitytranslate.client.renderer.ui.texture.AbstractTextureReference
 import xyz.bluspring.unitytranslate.mixin.accessor.GuiGraphicsExtractorAccessor
+import xyz.bluspring.unitytranslate.util.PlatformConversion.asMinecraft
 
 class MinecraftUIGraphics(private val graphics: GuiGraphicsExtractor) : UIGraphics {
     private val GuiGraphicsExtractor.guiRenderState: GuiRenderState
@@ -41,8 +42,8 @@ class MinecraftUIGraphics(private val graphics: GuiGraphicsExtractor) : UIGraphi
         graphics.disableScissor()
     }
 
-    override fun text(font: FontReference, text: FormattedCharSequence, x: Float, y: Float, color: Int, dropShadow: Boolean) {
-        graphics.text((font as MinecraftFontReference).font, text, x.toInt(), y.toInt(), color, dropShadow)
+    override fun text(font: FontReference, text: TextComponent, x: Float, y: Float, color: Int, dropShadow: Boolean) {
+        graphics.text((font as MinecraftFontReference).font, text.asMinecraft(), x.toInt(), y.toInt(), color, dropShadow)
     }
 
     override fun fill(

@@ -1,6 +1,5 @@
 package xyz.bluspring.unitytranslate.api.v2.client.gui.element
 
-import net.minecraft.network.chat.Component
 import org.joml.Math.clamp
 import xyz.bluspring.unitytranslate.api.v2.client.InputValue
 import xyz.bluspring.unitytranslate.api.v2.client.InputValue.Companion.eq
@@ -10,6 +9,7 @@ import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
 import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
 import xyz.bluspring.unitytranslate.api.v2.config.ColorConfig
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import kotlin.math.round
 import kotlin.reflect.KMutableProperty
@@ -22,7 +22,7 @@ class SliderElement<T : Number>(
     val property: KMutableProperty<T>,
     min: T, max: T, step: T,
     val font: FontReference,
-    val visualizer: (T) -> Component,
+    val visualizer: (T) -> TextComponent,
 ) : UIElement(), FocusableUIElement, FadeableUIElement {
     override var opacity = 1f
 
