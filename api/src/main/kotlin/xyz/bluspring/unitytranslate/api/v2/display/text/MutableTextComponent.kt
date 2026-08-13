@@ -1,6 +1,6 @@
 package xyz.bluspring.unitytranslate.api.v2.display.text
 
-class MutableTextComponent(
+class MutableTextComponent @JvmOverloads constructor(
     override val contents: ComponentContents,
     override var style: Style = Style.EMPTY,
     override val siblings: MutableList<TextComponent> = mutableListOf(),
@@ -12,6 +12,11 @@ class MutableTextComponent(
 
     fun withStyle(styleBuilder: (Style) -> Style): MutableTextComponent {
         this.style = styleBuilder(this.style)
+        return this
+    }
+
+    fun withColor(color: Int): MutableTextComponent {
+        this.style = this.style.withColor(color)
         return this
     }
 

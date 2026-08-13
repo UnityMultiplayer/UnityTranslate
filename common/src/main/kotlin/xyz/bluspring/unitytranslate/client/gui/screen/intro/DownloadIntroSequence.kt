@@ -1,11 +1,11 @@
 package xyz.bluspring.unitytranslate.client.gui.screen.intro
 
-import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.element.HorizontalAlign
 import xyz.bluspring.unitytranslate.api.v2.client.gui.element.PlainUIButton
 import xyz.bluspring.unitytranslate.api.v2.client.gui.element.UILabel
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.withAlpha
 import xyz.bluspring.unitytranslate.api.v2.util.CommonEasing
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
@@ -19,11 +19,11 @@ class DownloadIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent) 
         super.init(width, height)
 
         val font = ClientPlatformProxy.instance.defaultFont
-        this.downloadText = this.addChild(UILabel(width / 2f, height / 2f, Component.translatable("unitytranslate.intro.download_required"), font, alignX = HorizontalAlign.CENTER, maxWidth = width - 40))
+        this.downloadText = this.addChild(UILabel(width / 2f, height / 2f, TextComponent.translatable("unitytranslate.intro.download_required"), font, alignX = HorizontalAlign.CENTER, maxWidth = width - 40))
 
         val yPos = height - ((height - this.children.maxOf { it.getBounds(width, height).bottom } + (font.lineHeight * 2)) / 2f)
-        val proceedText = Component.translatable("unitytranslate.intro.download_required.proceed")
-        val backText = Component.translatable("unitytranslate.intro.download_required.back")
+        val proceedText = TextComponent.translatable("unitytranslate.intro.download_required.proceed")
+        val backText = TextComponent.translatable("unitytranslate.intro.download_required.back")
 
         this.addChild(PlainUIButton(width / 2f, yPos, proceedText, font) {
             this.parent.next()

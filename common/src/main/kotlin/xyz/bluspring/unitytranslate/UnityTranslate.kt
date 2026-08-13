@@ -2,7 +2,6 @@ package xyz.bluspring.unitytranslate
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
-import net.minecraft.network.chat.Style
 import net.minecraft.resources.Identifier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -12,6 +11,7 @@ import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
 import xyz.bluspring.unitytranslate.api.v2.config.ColorConfig
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigBuilder
 import xyz.bluspring.unitytranslate.api.v2.display.LanguageDisplay
+import xyz.bluspring.unitytranslate.api.v2.display.text.Style
 import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.api.v2.transcriber.SpeechTranscriber
@@ -82,9 +82,9 @@ object UnityTranslate {
 
                     category("header") {
                         value("display", TranscriptBoxConfig.HeaderDisplay.CODEC, TranscriptBoxConfig.Defaults.header::display)
-                        value("style", Style.Serializer.CODEC, TranscriptBoxConfig.Defaults.header::style)
+                        value("style", Style.CODEC, TranscriptBoxConfig.Defaults.header::style)
                         value("lang_display", LanguageDisplay.CODEC, TranscriptBoxConfig.Defaults.header::langDisplay)
-                        value("lang_style", Style.Serializer.CODEC, TranscriptBoxConfig.Defaults.header::langStyle)
+                        value("lang_style", Style.CODEC, TranscriptBoxConfig.Defaults.header::langStyle)
                         value("lang_decoration", TranscriptBoxConfig.LanguageDecoration.CODEC, TranscriptBoxConfig.Defaults.header::langDecoration)
                         value("align_x", TranscriptBoxConfig.Header.HorizontalAlignment.CODEC, TranscriptBoxConfig.Defaults.header::alignX)
                         value("align_y", TranscriptBoxConfig.Header.VerticalAlignment.CODEC, TranscriptBoxConfig.Defaults.header::alignY)

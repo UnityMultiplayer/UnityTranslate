@@ -1,12 +1,13 @@
 package xyz.bluspring.unitytranslate.api.v2.display.text
 
 import com.mojang.serialization.Codec
+import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import xyz.bluspring.unitytranslate.api.v2.util.AdditionalCodecs.forGetter
 import java.util.*
 
 @JvmRecord
-data class Style(
+data class Style @JvmOverloads constructor(
     val color: Int? = null,
     val shadow: Int? = null,
     val bold: Boolean? = null,
@@ -59,7 +60,7 @@ data class Style(
 
     companion object {
         @JvmField val EMPTY = Style()
-        @JvmField val CODEC: Codec<Style> = RecordCodecBuilder.create { instance ->
+        @JvmField val MAP_CODEC: MapCodec<Style> = RecordCodecBuilder.mapCodec { instance ->
             instance.group(
                 Codec.INT.optionalFieldOf("color")
                     .forGetter(Style::color),
@@ -78,5 +79,6 @@ data class Style(
             )
                 .apply(instance, ::Style)
         }
+        @JvmField val CODEC: Codec<Style> = MAP_CODEC.codec()
     }
 }

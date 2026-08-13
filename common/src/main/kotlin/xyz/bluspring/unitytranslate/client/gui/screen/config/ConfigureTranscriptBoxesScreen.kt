@@ -1,7 +1,5 @@
 package xyz.bluspring.unitytranslate.client.gui.screen.config
 
-import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.Style
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.element.HorizontalAlign
@@ -11,13 +9,15 @@ import xyz.bluspring.unitytranslate.api.v2.client.gui.element.VerticalAlign
 import xyz.bluspring.unitytranslate.api.v2.client.gui.element.context.ActionContextBoxElement
 import xyz.bluspring.unitytranslate.api.v2.client.gui.element.context.ContextBox
 import xyz.bluspring.unitytranslate.api.v2.client.gui.screen.UTScreen
+import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenUtil.inflate
+import xyz.bluspring.unitytranslate.api.v2.display.text.Style
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.withAlpha
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.ClientConfig
 import xyz.bluspring.unitytranslate.client.config.TranscriptBoxConfig
 import xyz.bluspring.unitytranslate.client.gui.TranscriptBoxRenderer
 import xyz.bluspring.unitytranslate.client.renderer.UnityTranslateGui
-import xyz.bluspring.unitytranslate.util.ScreenUtil.inflate
 
 class ConfigureTranscriptBoxesScreen(private val onExit: () -> Unit = { ClientPlatformProxy.instance.setScreen(null) }) : UTScreen() {
     lateinit var renderer: TranscriptBoxRenderer
@@ -30,8 +30,9 @@ class ConfigureTranscriptBoxesScreen(private val onExit: () -> Unit = { ClientPl
     override fun init(width: Int, height: Int) {
         super.init(width, height)
         val font = ClientPlatformProxy.instance.defaultFont
-        this.introText = this.addChild(UILabel(width / 2f, height / 2f, Component.translatable("unitytranslate.intro.transcript_box"), font, maxWidth = width - 20, alignX = HorizontalAlign.CENTER, alignY = VerticalAlign.CENTER))
-        this.addChild(PlainUIButton(width / 2f, height - 12f, Component.translatable("unitytranslate.transcript_box.done").withStyle(Style.EMPTY.withUnderlined(true)), font, onClick = this::onExit))
+        this.introText = this.addChild(UILabel(width / 2f, height / 2f, TextComponent.translatable("unitytranslate.intro.transcript_box"), font, maxWidth = width - 20, alignX = HorizontalAlign.CENTER, alignY = VerticalAlign.CENTER))
+        this.addChild(PlainUIButton(width / 2f, height - 12f, TextComponent.translatable("unitytranslate.transcript_box.done").withStyle(
+            Style.EMPTY.withUnderlined(true)), font, onClick = this::onExit))
 
         this.renderer = this.addChild(UnityTranslateGui.transcriptRenderer)
         this.needsReinit = true
@@ -110,7 +111,7 @@ class ConfigureTranscriptBoxesScreen(private val onExit: () -> Unit = { ClientPl
         val defaultHeight = 250f
 
         return ContextBox(x, y, elements = listOf(
-            ActionContextBoxElement(Component.translatable("unitytranslate.transcript_box.create")) {
+            ActionContextBoxElement(TextComponent.translatable("unitytranslate.transcript_box.create")) {
                 val width = ClientPlatformProxy.instance.viewportWidth
                 val height = ClientPlatformProxy.instance.viewportHeight
 

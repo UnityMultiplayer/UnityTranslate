@@ -1,5 +1,10 @@
 package xyz.bluspring.unitytranslate.api.v2.display.text
 
+import com.mojang.serialization.Codec
+import com.mojang.serialization.codecs.RecordCodecBuilder
+import xyz.bluspring.unitytranslate.api.v2.display.text.ComponentUtils.join
+import xyz.bluspring.unitytranslate.api.v2.util.AdditionalCodecs.withAlternativeUT
+
 /**
  * A variation of text components for UnityTranslate's own usage.
  */
@@ -74,5 +79,31 @@ interface TextComponent {
         @JvmStatic fun literal(text: String): MutableTextComponent = MutableTextComponent(ComponentContents.Literal(text))
         @JvmStatic fun translatable(key: String, vararg args: Any?): MutableTextComponent = MutableTextComponent(ComponentContents.Translatable(key, args.toList()))
         @JvmStatic fun translatableWithFallback(key: String, fallback: String, vararg args: Any?): MutableTextComponent = MutableTextComponent(ComponentContents.Translatable(key, args.toList(), fallback))
+
+        @JvmField
+        val SIMPLE_CODEC: Codec<TextComponent> = Codec.STRING.xmap({ literal(it) }, TextComponent::string)
+
+        @JvmField
+        val FULL_CODEC: Codec<TextComponent> = Codec.recursive("unitytranslate_text_component_full") { codec ->
+            RecordCodecBuilder.create { instance ->
+                instance.group(
+                    ComponentContents.CODEC
+                        .forGetter(TextComponent::contents),
+                    Style.MAP_CODEC
+                        .forGetter(TextComponent::style),
+                    codec.listOf().optionalFieldOf("extra", emptyList())
+                        .forGetter(TextComponent::siblings)
+                )
+                    .apply(instance, ::MutableTextComponent)
+            }
+        }
+
+        @JvmField
+        val CODEC: Codec<TextComponent> = Codec.recursive("unitytranslate_text_component") { codec ->
+            FULL_CODEC.withAlternativeUT(SIMPLE_CODEC)
+                .withAlternativeUT(
+                    codec.listOf().xmap({ it.join() }, { listOf(it) })
+                )
+        }
     }
 }

@@ -2,7 +2,6 @@ package xyz.bluspring.unitytranslate.client.gui.screen.intro
 
 import kotlinx.coroutines.runBlocking
 import net.minecraft.ChatFormatting
-import net.minecraft.network.chat.Component
 import xyz.bluspring.unitytranslate.UnityTranslate
 import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
 import xyz.bluspring.unitytranslate.api.v2.Language
@@ -10,6 +9,7 @@ import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.element.*
 import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.api.v2.transcriber.InactiveTranscriber
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.config.ClientConfig
@@ -17,6 +17,7 @@ import xyz.bluspring.unitytranslate.client.gui.screen.FirstStartupScreen
 import xyz.bluspring.unitytranslate.client.gui.screen.config.entry.ConfigEntry
 import xyz.bluspring.unitytranslate.client.gui.screen.config.entry.DropdownConfigEntry
 import xyz.bluspring.unitytranslate.config.builders.ConfigValueBuilderImpl
+import xyz.bluspring.unitytranslate.util.PlatformConversion.withStyle
 
 class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent) {
     var currentTranscriberId: String = UnityTranslateApi.instance.getTranscriberId(ClientConfig.transcriber)
@@ -31,12 +32,12 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
 
         val currentTranscriber = UnityTranslateApi.instance.getTranscriber(this.currentTranscriberId)
 
-        val visualizer: (Language) -> Component = { language ->
+        val visualizer: (Language) -> TextComponent = { language ->
             val supportLevel = runBlocking { currentTranscriber.checkLanguageSupport(language) }
 
-            Component.translatable("unitytranslate.language.native_and_localized",
-                Component.translatableWithFallback("unitytranslate.language.${language.serialized}.native", language.formatted),
-                Component.translatableWithFallback("unitytranslate.language.${language.serialized}.localized", language.formatted)
+            TextComponent.translatable("unitytranslate.language.native_and_localized",
+                TextComponent.translatableWithFallback("unitytranslate.language.${language.serialized}.native", language.formatted),
+                TextComponent.translatableWithFallback("unitytranslate.language.${language.serialized}.localized", language.formatted)
             )
                 .withColor(
                     when (supportLevel) {
@@ -52,7 +53,7 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
             UILabel(
                 width / 2f,
                 25f,
-                Component.translatable("unitytranslate.intro.language_select"),
+                TextComponent.translatable("unitytranslate.intro.language_select"),
                 font,
                 alignX = HorizontalAlign.CENTER,
                 maxWidth = (width * (3 / 4f)).toInt()
@@ -75,7 +76,7 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
                 UILabel(
                     xPos + (elementWidth / 2f),
                     yPos,
-                    Component.translatable("config.unitytranslate.unitytranslate.transcriber")
+                    TextComponent.translatable("config.unitytranslate.unitytranslate.transcriber")
                         .withStyle { it.withUnderlined(true) },
                     font,
                     alignX = HorizontalAlign.CENTER,
@@ -88,7 +89,7 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
                 UILabel(
                     xPos,
                     yPos,
-                    Component.translatable("config.unitytranslate.unitytranslate.transcriber").append(": "),
+                    TextComponent.translatable("config.unitytranslate.unitytranslate.transcriber").append(": "),
                     font,
                     alignX = HorizontalAlign.LEFT,
                     alignY = VerticalAlign.CENTER
@@ -98,11 +99,11 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
                 DropdownList(
                     xPos, yPos + 6f, elementWidth, elementHeight, font,
                     { UnityTranslateApiImpl.transcribers.keys }, { id ->
-                        Component.translatable("unitytranslate.transcriber.$id.name")
+                        TextComponent.translatable("unitytranslate.transcriber.$id.name")
                     }, this::currentTranscriberId, tooltip = { id ->
                         if (id != null)
-                            Component.translatableWithFallback("unitytranslate.transcriber.$id.description", "")
-                        else Component.empty()
+                            TextComponent.translatableWithFallback("unitytranslate.transcriber.$id.description", "")
+                        else TextComponent.empty()
                     })
             )
 
@@ -133,7 +134,7 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
                 UILabel(
                     xPos + (elementWidth / 2f),
                     yPos,
-                    Component.translatable("config.unitytranslate.unitytranslate.languages")
+                    TextComponent.translatable("config.unitytranslate.unitytranslate.languages")
                         .withStyle { it.withUnderlined(true) },
                     font,
                     alignX = HorizontalAlign.CENTER,
@@ -146,7 +147,7 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
                 UILabel(
                     xPos,
                     yPos - 6f,
-                    Component.translatable("config.unitytranslate.unitytranslate.languages.spoken").append(": "),
+                    TextComponent.translatable("config.unitytranslate.unitytranslate.languages.spoken").append(": "),
                     font,
                     alignX = HorizontalAlign.LEFT,
                     alignY = VerticalAlign.CENTER
@@ -166,19 +167,19 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
                     val supportLevel = runBlocking { currentTranscriber.checkLanguageSupport(language) }
 
                     when (supportLevel) {
-                        Language.SupportLevel.NONE -> Component.translatable(
+                        Language.SupportLevel.NONE -> TextComponent.translatable(
                             "config.unitytranslate.language.error.transcriber.unsupported",
-                            Component.translatable("unitytranslate.transcriber.${this.currentTranscriberId}.name")
+                            TextComponent.translatable("unitytranslate.transcriber.${this.currentTranscriberId}.name")
                         ).withStyle(ChatFormatting.RED)
 
-                        Language.SupportLevel.PARTIAL -> Component.translatable(
+                        Language.SupportLevel.PARTIAL -> TextComponent.translatable(
                             "config.unitytranslate.language.warn.transcriber.partial_support",
-                            Component.translatable("unitytranslate.transcriber.${this.currentTranscriberId}.name")
+                            TextComponent.translatable("unitytranslate.transcriber.${this.currentTranscriberId}.name")
                         ).withStyle(ChatFormatting.GOLD)
 
-                        else -> Component.empty()
+                        else -> TextComponent.empty()
                     }
-                } else Component.empty()
+                } else TextComponent.empty()
             })
 
             var index = 1
@@ -189,7 +190,7 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
                     UILabel(
                         xPos,
                         yPos + offset - 6f,
-                        Component.translatable("config.unitytranslate.unitytranslate.languages.$id").append(": "),
+                        TextComponent.translatable("config.unitytranslate.unitytranslate.languages.$id").append(": "),
                         font,
                         alignX = HorizontalAlign.LEFT,
                         alignY = VerticalAlign.CENTER
@@ -209,24 +210,24 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
                         val supportLevel = runBlocking { currentTranscriber.checkLanguageSupport(language) }
 
                         when (supportLevel) {
-                            Language.SupportLevel.NONE -> Component.translatable(
+                            Language.SupportLevel.NONE -> TextComponent.translatable(
                                 "config.unitytranslate.language.error.transcriber.unsupported",
-                                Component.translatable("unitytranslate.transcriber.${this.currentTranscriberId}.name")
+                                TextComponent.translatable("unitytranslate.transcriber.${this.currentTranscriberId}.name")
                             ).withStyle(ChatFormatting.RED)
 
-                            Language.SupportLevel.PARTIAL -> Component.translatable(
+                            Language.SupportLevel.PARTIAL -> TextComponent.translatable(
                                 "config.unitytranslate.language.warn.transcriber.partial_support",
-                                Component.translatable("unitytranslate.transcriber.${this.currentTranscriberId}.name")
+                                TextComponent.translatable("unitytranslate.transcriber.${this.currentTranscriberId}.name")
                             ).withStyle(ChatFormatting.GOLD)
 
-                            else -> Component.empty()
+                            else -> TextComponent.empty()
                         }
-                    } else Component.empty()
+                    } else TextComponent.empty()
                 })
             }
         }
 
-        val nextText = Component.translatable("unitytranslate.intro.language_select.next")
+        val nextText = TextComponent.translatable("unitytranslate.intro.language_select.next")
         this.nextButton = this.addChild(PlainUIButton(width - 4f - font.width(nextText), height - 16f, nextText, font) {
             ClientConfig.transcriber = UnityTranslateApi.instance.getTranscriber(this.currentTranscriberId)
             this.parent.next()
@@ -258,7 +259,7 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
         val currentTranscriber = UnityTranslateApi.instance.getTranscriber(this.currentTranscriberId)
         if (currentTranscriber == InactiveTranscriber) {
             val font = ClientPlatformProxy.instance.defaultFont
-            val splitText = font.split(Component.translatable("unitytranslate.intro.language_select.warning.inactive_transcriber"), 200)
+            val splitText = font.split(TextComponent.translatable("unitytranslate.intro.language_select.warning.inactive_transcriber"), 200)
             for ((index, text) in splitText.withIndex()) {
                 graphics.text(font, text, 4f,
                     ClientPlatformProxy.instance.viewportHeight - (splitText.size * font.lineHeight) - 2f + (index * font.lineHeight), ThemeConfig.warningText, true)

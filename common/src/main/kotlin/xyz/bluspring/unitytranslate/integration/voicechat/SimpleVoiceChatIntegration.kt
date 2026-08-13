@@ -15,6 +15,7 @@ import xyz.bluspring.unitytranslate.api.v2.transcriber.sender.PlayerUser
 import xyz.bluspring.unitytranslate.api.v2.util.AudioConverters
 import xyz.bluspring.unitytranslate.client.UnityTranslateMCClient
 import xyz.bluspring.unitytranslate.transcriber.TranscriberSourceImpl
+import xyz.bluspring.unitytranslate.util.PlatformConversion.asUnityTranslate
 import kotlin.time.Duration.Companion.seconds
 
 @ForgeVoicechatPlugin
@@ -40,7 +41,7 @@ class SimpleVoiceChatIntegration : VoicechatPlugin {
 
             val uuid = event.entityId
             val entity = Minecraft.getInstance().level?.getEntity(uuid) ?: return@registerEvent
-            val source = UnityTranslateApi.instance.getOrCreateTranscriberSource(PlayerUser(entity.uuid, entity.position().toVector3f(), entity.displayName))
+            val source = UnityTranslateApi.instance.getOrCreateTranscriberSource(PlayerUser(entity.uuid, entity.position().toVector3f(), entity.displayName.asUnityTranslate()))
 
             if (System.currentTimeMillis() - (source as TranscriberSourceImpl).lastUpdateTimestamp >= 2.seconds.inWholeMilliseconds)
                 source.reset()

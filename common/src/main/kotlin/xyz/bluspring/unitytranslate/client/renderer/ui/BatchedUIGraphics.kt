@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.font.TextRenderable
 import net.minecraft.client.renderer.RenderPipelines
-import net.minecraft.util.FormattedCharSequence
 import net.minecraft.util.LightCoordsUtil
 import net.minecraft.util.Mth
 import org.joml.Quaternionf
@@ -12,10 +11,12 @@ import xyz.bluspring.unitytranslate.api.v2.client.gui.TextureReference
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.font.FontReference
 import xyz.bluspring.unitytranslate.api.v2.client.util.ScreenRectangle
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.client.ClientPlatformProxy
 import xyz.bluspring.unitytranslate.client.renderer.BatchedGuiRenderer
 import xyz.bluspring.unitytranslate.client.renderer.ui.font.MinecraftFontReference
 import xyz.bluspring.unitytranslate.client.renderer.ui.texture.AbstractTextureReference
+import xyz.bluspring.unitytranslate.util.PlatformConversion.asMinecraft
 import java.util.*
 
 class BatchedUIGraphics(private val layer: BatchedGuiRenderer.DrawLayer) : UIGraphics {
@@ -38,9 +39,9 @@ class BatchedUIGraphics(private val layer: BatchedGuiRenderer.DrawLayer) : UIGra
         this.scissorState.pop()
     }
 
-    override fun text(font: FontReference, text: FormattedCharSequence, x: Float, y: Float, color: Int, dropShadow: Boolean) {
+    override fun text(font: FontReference, text: TextComponent, x: Float, y: Float, color: Int, dropShadow: Boolean) {
         val pose = poseStack.last()
-        val prepared = (font as MinecraftFontReference).font.prepareText(text, x, y, color, dropShadow, true, 0)
+        val prepared = (font as MinecraftFontReference).font.prepareText(text.asMinecraft().visualOrderText, x, y, color, dropShadow, true, 0)
         prepared.visit(object : Font.GlyphVisitor {
             override fun acceptEffect(effect: TextRenderable) {
                 accept(effect)

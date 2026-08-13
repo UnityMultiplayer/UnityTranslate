@@ -137,7 +137,9 @@ enum class InputValue {
     MOD_NUM_LOCK,
     ;
 
-    val asPlatform: Int = UnityTranslateApi.instance.client.translate(this)
+    val asPlatform: Int by lazy {
+        UnityTranslateApi.instance.client.translate(this)
+    }
 
     infix fun eq(other: Int): Boolean {
         return other == this.asPlatform

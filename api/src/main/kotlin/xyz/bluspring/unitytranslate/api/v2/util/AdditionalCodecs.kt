@@ -1,5 +1,6 @@
 package xyz.bluspring.unitytranslate.api.v2.util
 
+import com.mojang.datafixers.util.Either
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.MapCodec
@@ -11,6 +12,7 @@ import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.red
 import java.nio.file.InvalidPathException
 import java.nio.file.Path
 import java.util.*
+import java.util.function.Function
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
 
@@ -76,11 +78,28 @@ object AdditionalCodecs {
             .xmap({ it.orElse(defaultGetter()) }, Optional<T>::of)
     }
 
+    /**
+     * A nice helper for Kotlin to auto-map nullables to Optional.
+     */
     @JvmStatic
     fun <T : Any, U : Any> MapCodec<Optional<U>>.forGetter(getter: (T) -> U?): RecordCodecBuilder<T, Optional<U>> {
         return this.forGetter {
             val value = getter(it)
             Optional.ofNullable(value)
         }
+    }
+
+    @JvmStatic
+    fun <T> Codec<T>.withAlternativeUT(alternative: Codec<out T>): Codec<T> {
+        return Codec.either(this, alternative)
+            .xmap({ it.map(Function.identity(), Function.identity()) },
+                Either<T, out T>::left)
+    }
+
+    @JvmStatic
+    fun <T> MapCodec<T>.withAlternativeUT(alternative: MapCodec<out T>): MapCodec<T> {
+        return Codec.mapEither(this, alternative)
+            .xmap({ it.map(Function.identity(), Function.identity()) },
+                Either<T, out T>::left)
     }
 }

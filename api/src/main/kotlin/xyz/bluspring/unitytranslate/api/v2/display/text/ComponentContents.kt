@@ -1,10 +1,12 @@
 package xyz.bluspring.unitytranslate.api.v2.display.text
 
+import com.mojang.datafixers.util.Either
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import java.util.*
+import java.util.function.Function
 
 sealed interface ComponentContents {
     val text: String
@@ -17,7 +19,7 @@ sealed interface ComponentContents {
     }
 
     @JvmRecord
-    data class Translatable(val key: String, val args: List<Any?>, val fallback: Optional<String> = Optional.empty()) : ComponentContents {
+    data class Translatable @JvmOverloads constructor(val key: String, val args: List<Any?>, val fallback: Optional<String> = Optional.empty()) : ComponentContents {
         constructor(key: String, args: List<Any?>, fallback: String) : this(key, args, Optional.of(fallback))
 
         override val text: String
@@ -41,5 +43,15 @@ sealed interface ComponentContents {
                     .apply(instance, ::Translatable)
             }
         }
+    }
+
+    companion object {
+        @JvmField val CODEC: MapCodec<ComponentContents> = Codec.mapEither(Literal.CODEC, Translatable.CODEC)
+            .xmap({ it.map(Function.identity(), Function.identity()) }, { it ->
+                when (it) {
+                    is Literal -> Either.left(it)
+                    is Translatable -> Either.right(it)
+                }
+            })
     }
 }

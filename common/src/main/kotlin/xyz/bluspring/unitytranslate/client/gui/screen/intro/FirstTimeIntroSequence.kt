@@ -1,18 +1,18 @@
 package xyz.bluspring.unitytranslate.client.gui.screen.intro
 
 import net.minecraft.ChatFormatting
-import net.minecraft.client.Minecraft
-import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.element.PlainUIButton
 import xyz.bluspring.unitytranslate.api.v2.client.theme.ThemeConfig
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.multiplyAlpha
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper.withAlpha
 import xyz.bluspring.unitytranslate.api.v2.util.CommonEasing
 import xyz.bluspring.unitytranslate.client.gui.LogoTransitionOverlay
 import xyz.bluspring.unitytranslate.client.gui.screen.FirstStartupScreen
+import xyz.bluspring.unitytranslate.util.PlatformConversion.withStyle
 
 class FirstTimeIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent) {
     override fun init(width: Int, height: Int) {
@@ -20,7 +20,7 @@ class FirstTimeIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent)
 
         this.addChild(PlainUIButton(
             width / 2f, height / 2f + 80f,
-            Component.translatable("unitytranslate.intro.first_time.next").withStyle(ChatFormatting.UNDERLINE),
+            TextComponent.translatable("unitytranslate.intro.first_time.next").withStyle(ChatFormatting.UNDERLINE),
             UnityTranslateApi.instance.client.defaultFont,
         ) {
             this.parent.next()
@@ -37,13 +37,13 @@ class FirstTimeIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent)
         else -1)
         graphics.popMatrix()
 
-        val font = Minecraft.getInstance().font
-        val splitText = font.split(Component.translatable("unitytranslate.intro.first_time"), 315)
+        val font = UnityTranslateApi.instance.client.defaultFont
+        val splitText = font.split(TextComponent.translatable("unitytranslate.intro.first_time"), 315)
 
         graphics.pushMatrix()
         graphics.translate(0f, Mth.lerp(1f - CommonEasing.SMOOTH.getValue(transitionProgress), 0f, 4f))
         for ((index, text) in splitText.withIndex()) {
-            graphics.centeredText(UnityTranslateApi.instance.client.defaultFont, text,
+            graphics.centeredText(font, text,
                 graphics.width / 2f, graphics.height / 2f + 40f + (index * font.lineHeight),
                 ThemeConfig.textColor.multiplyAlpha(transitionProgress), true)
         }

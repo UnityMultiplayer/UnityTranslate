@@ -2,9 +2,9 @@ package xyz.bluspring.unitytranslate.client.gui.screen.config
 
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet
 import kotlinx.coroutines.Deferred
-import net.minecraft.client.Minecraft
 import xyz.bluspring.sunset.SunsetConfig
 import xyz.bluspring.unitytranslate.UnityTranslateApiImpl
+import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
 import xyz.bluspring.unitytranslate.api.v2.client.gui.UIGraphics
 import xyz.bluspring.unitytranslate.api.v2.client.gui.screen.UTScreen
 import xyz.bluspring.unitytranslate.api.v2.util.ARGBHelper
@@ -42,7 +42,7 @@ class UnityTranslateConfigScreen : UTScreen() {
             ARGBHelper.colorFromFloat(0.6f, 0f, 0f, 0f)
         )
 
-        val font = Minecraft.getInstance().font
+        val font = UnityTranslateApi.instance.client.defaultFont
 
         val sectionHeight = this.sections.sumOf { it.calculateSidebarHeight(font).toDouble() + 8.0 }.toFloat() + 16f // Kotlin why do you not permit floats in this?
 

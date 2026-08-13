@@ -1,12 +1,12 @@
 package xyz.bluspring.unitytranslate.config.builders
 
 import com.mojang.serialization.Codec
-import net.minecraft.network.chat.Component
 import xyz.bluspring.sunset.SunsetConfig
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigBuilder
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigButtonBuilder
 import xyz.bluspring.unitytranslate.api.v2.config.ConfigValueBuilder
 import xyz.bluspring.unitytranslate.api.v2.config.NameProvidingEntry
+import xyz.bluspring.unitytranslate.api.v2.display.text.TextComponent
 import xyz.bluspring.unitytranslate.api.v2.download.DownloadableEntry
 import xyz.bluspring.unitytranslate.config.values.*
 import kotlin.reflect.KMutableProperty
@@ -223,7 +223,7 @@ class SunsetWrappedConfigBuilder(val wrapped: SunsetConfig.CategoryBuilder) : Co
     ) {
         this.wrapped.custom(IntColorConfigValue(id, property, owner, ConfigValueBuilderImpl<Int>(id).apply {
             formatting {
-                Component.literal("#%08x".format(it))
+                TextComponent.literal("#%08x".format(it))
             }
         }.apply(builder)))
     }

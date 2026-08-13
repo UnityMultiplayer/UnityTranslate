@@ -1,6 +1,5 @@
 package xyz.bluspring.unitytranslate.client.gui.screen.config
 
-import net.minecraft.client.gui.Font
 import xyz.bluspring.sunset.SunsetConfig
 import xyz.bluspring.sunset.values.ConfigCategory
 import xyz.bluspring.sunset.values.ConfigValue
@@ -34,7 +33,7 @@ class ConfigSection(val parent: UnityTranslateConfigScreen, val id: String, val 
         return ScreenRectangle(175 + 12, 0, this.children.sumOf { it.getBounds(screenWidth, screenHeight).width }, this.children.sumOf { it.getBounds(screenWidth, screenHeight).height })
     }
 
-    fun calculateSidebarHeight(font: Font): Float {
+    fun calculateSidebarHeight(font: FontReference): Float {
         var offsetY = 16f
 
         for (config in this.config) {
@@ -47,7 +46,7 @@ class ConfigSection(val parent: UnityTranslateConfigScreen, val id: String, val 
         return offsetY
     }
 
-    private fun recursiveCalculateSidebarHeight(font: Font, value: ConfigValue<*>): Float {
+    private fun recursiveCalculateSidebarHeight(font: FontReference, value: ConfigValue<*>): Float {
         if (value is HiddenConfigValue) return 0f
 
         var offsetY = 0f
