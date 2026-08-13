@@ -4,9 +4,9 @@ import net.minecraft.locale.Language
 import xyz.bluspring.unitytranslate.api.v2.PlatformAccess
 
 object MinecraftPlatformAccess : PlatformAccess {
-    override fun translated(key: String, vararg args: Any?): String
-        = Language.getInstance().getOrDefault(key).format(*args)
+    override fun translated(key: String): String
+        = Language.getInstance().getOrDefault(key)
 
-    override fun translatedWithFallback(key: String, fallback: String, vararg args: Any?): String
-        = Language.getInstance().getOrDefault(key, fallback).format(args)
+    override fun translated(key: String, fallback: String): String
+        = Language.getInstance().getOrDefault(key, fallback)
 }

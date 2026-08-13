@@ -49,7 +49,7 @@ interface TextComponent {
 //    }
 
     fun visit(visitor: TextVisitor) {
-        visitor.visit(this.contents.text)
+        this.contents.visit(visitor)
         for (component in this.siblings) {
             component.visit(visitor)
         }
@@ -57,7 +57,7 @@ interface TextComponent {
 
     fun visit(visitor: StyledTextVisitor, parentStyle: Style = Style.EMPTY) {
         val currentStyle = parentStyle.merge(this.style)
-        visitor.visit(this.contents.text, currentStyle)
+        this.contents.visit(visitor, currentStyle)
         for (component in this.siblings) {
             component.visit(visitor, currentStyle)
         }

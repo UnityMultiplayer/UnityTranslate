@@ -1,7 +1,8 @@
 {
-  "name": "UnityTranslate Google API Transcriber",
-  "group": "xyz.bluspring.unitytranslate",
-  "id": "google_transcriber",
-  "version": "${version}",
-  "authors": ["BluSpring"]
+    "name": "UnityTranslate Google API Transcriber",
+    "group": "xyz.bluspring.unitytranslate",
+    "id": "google_transcriber",
+    "version": "${version}",
+    "authors": ["BluSpring"],
+    "entrypoint": "xyz.bluspring.unitytranslate.transcriber.google.GoogleTranscriberPlugin"
 }

@@ -62,7 +62,15 @@ object PlatformConversion {
     }
 
     fun MutableTextComponent.withStyle(color: ChatFormatting): MutableTextComponent
-        = this.withStyle(TextColor.fromLegacyFormat(color)!!)
+        = when (color) {
+            ChatFormatting.UNDERLINE -> this.withStyle { it.withUnderlined(true) }
+            ChatFormatting.BOLD -> this.withStyle { it.withBold(true) }
+            ChatFormatting.ITALIC -> this.withStyle { it.withItalic(true) }
+            ChatFormatting.STRIKETHROUGH -> this.withStyle { it.withStrikethrough(true) }
+            ChatFormatting.OBFUSCATED -> this.withStyle { it.withObfuscated(true) }
+            ChatFormatting.RESET -> this.withStyle { it.withReset() }
+            else -> this.withStyle(TextColor.fromLegacyFormat(color)!!)
+        }
 
     fun MutableTextComponent.withStyle(color: TextColor): MutableTextComponent
         = this.withStyle { it.withColor(color) }

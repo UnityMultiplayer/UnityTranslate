@@ -1,5 +1,7 @@
 package xyz.bluspring.unitytranslate.api.v2.display.text
 
+import java.util.*
+
 class MutableTextComponent @JvmOverloads constructor(
     override val contents: ComponentContents,
     override var style: Style = Style.EMPTY,
@@ -28,5 +30,29 @@ class MutableTextComponent @JvmOverloads constructor(
     fun append(text: TextComponent): MutableTextComponent {
         this.siblings.add(text)
         return this
+    }
+
+    override fun hashCode(): Int {
+        var hash = Objects.hash(this.contents, this.style)
+
+        for (sibling in this.siblings) {
+            hash = 31 * hash + sibling.hashCode()
+        }
+
+        return hash
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        if (other !is TextComponent)
+            return false
+
+        if (contents != other.contents) return false
+        if (style != other.style) return false
+        if (siblings != other.siblings) return false
+
+        return true
     }
 }

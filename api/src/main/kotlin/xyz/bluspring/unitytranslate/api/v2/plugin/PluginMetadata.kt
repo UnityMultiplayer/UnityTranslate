@@ -13,6 +13,7 @@ data class PluginMetadata(
     val name: String,
     val version: String,
     val authors: List<String>,
+    val entrypoint: String,
 ) {
     val fullId: String
         get() = "$group.$id"
@@ -29,7 +30,9 @@ data class PluginMetadata(
                 Codec.STRING.fieldOf("version")
                     .forGetter(PluginMetadata::version),
                 Codec.STRING.listOf().fieldOf("authors")
-                    .forGetter(PluginMetadata::authors)
+                    .forGetter(PluginMetadata::authors),
+                Codec.STRING.fieldOf("entrypoint")
+                    .forGetter(PluginMetadata::entrypoint),
             )
                 .apply(instance, ::PluginMetadata)
         }

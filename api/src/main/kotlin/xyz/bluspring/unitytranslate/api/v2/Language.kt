@@ -20,13 +20,13 @@ data class Language @JvmOverloads constructor(
         "${this.languageCode}_${this.regionCode.lowercase()}"
 
     val nativeText: String
-        get() = UnityTranslateApi.instance.platform.translatedWithFallback("unitytranslate.language.$serialized.native", this.fallbackNativeName ?: this.formatted)
+        get() = UnityTranslateApi.instance.platform.translated("unitytranslate.language.$serialized.native", this.fallbackNativeName ?: this.formatted)
     val nativeShortText: String
-        get() = UnityTranslateApi.instance.platform.translatedWithFallback("unitytranslate.language.$serialized.native.short", this.fallbackNativeName ?: this.nativeText)
+        get() = UnityTranslateApi.instance.platform.translated("unitytranslate.language.$serialized.native.short", this.fallbackNativeName ?: this.nativeText)
     val localizedText: String
-        get() = UnityTranslateApi.instance.platform.translatedWithFallback("unitytranslate.language.$serialized.localized", this.fallbackLocalizedName ?: this.formatted)
+        get() = UnityTranslateApi.instance.platform.translated("unitytranslate.language.$serialized.localized", this.fallbackLocalizedName ?: this.formatted)
     val localizedShortText: String
-        get() = UnityTranslateApi.instance.platform.translatedWithFallback("unitytranslate.language.$serialized.localized.short", this.fallbackLocalizedName ?: this.nativeText)
+        get() = UnityTranslateApi.instance.platform.translated("unitytranslate.language.$serialized.localized.short", this.fallbackLocalizedName ?: this.nativeText)
 
     val asBCP47: String
         get() {

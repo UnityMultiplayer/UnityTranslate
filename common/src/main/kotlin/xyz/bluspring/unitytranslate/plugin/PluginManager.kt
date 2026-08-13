@@ -10,7 +10,6 @@ import xyz.bluspring.unitytranslate.api.v2.plugin.PluginMetadata
 import xyz.bluspring.unitytranslate.api.v2.plugin.UnityTranslatePlugin
 import java.net.URLClassLoader
 import java.nio.file.Path
-import java.util.*
 import java.util.jar.JarFile
 import kotlin.io.path.extension
 import kotlin.io.path.walk
@@ -46,15 +45,16 @@ object PluginManager {
         isLoaded = true
 
         val classLoader = createClassLoader()
-        val plugins = ServiceLoader.load(UnityTranslatePlugin::class.java, classLoader)
-        for (plugin in plugins) {
-            try {
-                val metadata = PluginMetadata.CODEC.decode(JsonOps.INSTANCE, JsonParser.parseString(plugin::class.java.getResource("/unitytranslate.plugin.json")!!.readText()))
-                    .orThrow.first
 
-                this.plugins[metadata] = plugin
+        for (metaResource in classLoader.getResources("unitytranslate.plugin.json")) {
+            try {
+                val metadata = PluginMetadata.CODEC.decode(JsonOps.INSTANCE, JsonParser.parseString(metaResource.readText()))
+                    .orThrow.first
+                val plugin = classLoader.loadClass(metadata.entrypoint) as Class<UnityTranslatePlugin>
+
+                this.plugins[metadata] = plugin.getDeclaredConstructor().newInstance()
             } catch (e: Throwable) {
-                logger.error("Failed to load plugin metadata for class ${plugin::class.java.name}!", e)
+                logger.error("Failed to load plugin metadata for ${metaResource}!", e)
             }
         }
 

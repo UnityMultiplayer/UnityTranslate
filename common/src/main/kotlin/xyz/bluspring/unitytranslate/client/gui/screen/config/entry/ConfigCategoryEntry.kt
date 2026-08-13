@@ -22,7 +22,7 @@ open class ConfigCategoryEntry(
     override fun init(width: Int, height: Int) {
         super.init(width, height)
 
-        var yOffset = 0f
+        var yOffset = 10f
         val entries = this.value.value.map {
             val entry = fromValue(it, xPos, yPos + yOffset, minWidth, minHeight, rootKey, font)
             yOffset += entry.bounds().height
