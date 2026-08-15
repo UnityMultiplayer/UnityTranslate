@@ -26,7 +26,7 @@ open class UILabel(
         screenHeight: Int
     ): ScreenRectangle {
         val split = this.font.split(this.text, this.maxWidth)
-        val fontWidth = split.maxOf { this.font.width(it) }
+        val fontWidth = split.maxOfOrNull { this.font.width(it) } ?: 0
         val textHeight = this.font.lineHeight * split.size
 
         return ScreenRectangle((this.x - this.alignX.adjustment(fontWidth)).toInt(), (this.y - this.alignY.adjustment(textHeight)).toInt(), fontWidth, textHeight)

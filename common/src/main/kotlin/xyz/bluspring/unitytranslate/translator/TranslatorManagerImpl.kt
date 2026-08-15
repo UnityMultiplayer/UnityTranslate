@@ -13,6 +13,7 @@ import xyz.bluspring.unitytranslate.transcriber.DirectTranscriptData
 import xyz.bluspring.unitytranslate.transcriber.TranslatedTranscriptData
 import xyz.bluspring.unitytranslate.translator.instance.InactiveTranslatorInstance
 import xyz.bluspring.unitytranslate.translator.instance.argos.UnityTranslateLibTranslatorInstance
+import xyz.bluspring.unitytranslate.translator.instance.microsoft.MicrosoftInternalTranslatorInstance
 import java.util.Queue
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -66,6 +67,7 @@ object TranslatorManagerImpl : TranslatorManager {
 
     override var instances = mutableListOf<TranslatorInstance>(
         UnityTranslateLibTranslatorInstance,
+        MicrosoftInternalTranslatorInstance,
     )
 
     override fun getInstanceById(id: String): TranslatorInstance? {

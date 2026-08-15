@@ -66,8 +66,10 @@ class WrappedUTScreen(val actualScreen: UTScreen, private val parent: Screen? = 
     }
 
     override fun shouldCloseOnEsc(): Boolean {
-        return actualScreen.shouldCloseOnEsc()
-            || super.shouldCloseOnEsc()
+        if (!actualScreen.shouldCloseOnEsc())
+            return false
+
+        return super.shouldCloseOnEsc()
     }
 
     override fun onClose() {

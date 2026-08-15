@@ -27,7 +27,7 @@ class LangSelectIntroSequence(parent: FirstStartupScreen) : IntroSequence(parent
         super.init(width, height)
 
         val languages: suspend () -> Collection<Language> = {
-            UnityTranslateApiImpl.translators.values.flatMap { it.getSupportedLanguages() }.distinct()
+            UnityTranslateApiImpl.translators.values.flatMap { it.getSupportedLanguages() }.distinctBy { language -> language.asBCP47 }
         }
 
         val currentTranscriber = UnityTranslateApi.instance.getTranscriber(this.currentTranscriberId)

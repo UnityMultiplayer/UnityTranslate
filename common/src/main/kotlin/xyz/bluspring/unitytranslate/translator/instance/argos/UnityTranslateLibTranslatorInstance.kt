@@ -28,7 +28,11 @@ object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
         .asCoroutineDispatcher() + CoroutineName("UnityTranslate Library Package Prepare")
     private val packagePrepareScope = CoroutineScope(this.packagePrepareDispatcher)
 
-    val library = UnityTranslateLib()
+    val library by lazy {
+        if (this.wasLoadedSuccessfully)
+            UnityTranslateLib()
+        else null
+    }
     val packageIndexes = listOf<PackageIndex<*>>(
         ArgosPackageIndex(UnityTranslateApi.instance.storagePath.resolve("models/translator/argos")),
     )
@@ -40,15 +44,13 @@ object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
     private val cachedTranslationPath = ConcurrentHashMap<LangPair, List<LangPair>>()
 
     private val gpuEnabledLock = Mutex()
-    private var wasLoadedSuccessfully = false
-
-    init {
+    private val wasLoadedSuccessfully by lazy {
         try {
             UnityTranslateLib.autoLoad()
-            this.wasLoadedSuccessfully = true
+            true
         } catch (e: Throwable) {
             UnityTranslate.logger.error("Failed to load UnityTranslateLib!", e)
-            this.wasLoadedSuccessfully = false
+            false
         }
     }
 
@@ -100,6 +102,9 @@ object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
     }
 
     override suspend fun prepareTranslationModels(langPair: LangPair) {
+        if (this.library == null)
+            throw IllegalStateException("Tried to prepare translation models on UnityTranslateLib instance while none exist!")
+
         super.prepareTranslationModels(langPair)
 
         val translationPath = this.getTranslationPath(langPair)
@@ -157,7 +162,7 @@ object UnityTranslateLibTranslatorInstance : TranslatorInstance() {
 
             acquireLock(info.langPair).withLock { // Lock so we can store into the instance map.
                 synchronized(this.instances) {
-                    this.instances[info.langPair] = this.library.createInstance(info.langPair.asLibraryPair, info.tokenizerType, info.tokenizerModelPath, info.translationModelPath, this.enableGpu)
+                    this.instances[info.langPair] = this.library!!.createInstance(info.langPair.asLibraryPair, info.tokenizerType, info.tokenizerModelPath, info.translationModelPath, this.enableGpu)
                     this.unsuspendWaitingTranslators(info.langPair)
                 }
             }

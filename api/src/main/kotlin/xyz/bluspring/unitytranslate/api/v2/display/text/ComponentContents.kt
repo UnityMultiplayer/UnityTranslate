@@ -57,11 +57,11 @@ sealed interface ComponentContents {
             var argIndex = 0
             var lastTextIndex = 0
 
-            for (result in FORMAT_PATTERN.findAll(translated)) {
+            val matched = FORMAT_PATTERN.findAll(translated).toList()
+            for (result in matched) {
                 if (result.range.first != 0) {
                     val text = translated.substring(lastTextIndex, result.range.first)
                     texts.add(TextComponent.literal(text).withStyle(style))
-                    lastTextIndex = result.range.last + 1
                 }
 
                 if (result.value == "%%") {
@@ -76,6 +76,12 @@ sealed interface ComponentContents {
                     val index = (potentialIndex?.toIntOrNull() ?: (argIndex++ + 1)) - 1
                     texts.add(replacements.getOrNull(index) ?: TextComponent.literal(result.value).withStyle(style))
                 }
+
+                lastTextIndex = result.range.last + 1
+            }
+
+            if (lastTextIndex < translated.length) {
+                texts.add(TextComponent.literal(translated.substring(lastTextIndex, translated.length)).withStyle(style))
             }
 
             return texts

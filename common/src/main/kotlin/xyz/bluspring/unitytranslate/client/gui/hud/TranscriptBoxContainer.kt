@@ -390,9 +390,9 @@ class TranscriptBoxContainer(var holder: TranscriptHolder, val config: Transcrip
         }
 
         val font = ClientPlatformProxy.instance.defaultFont
-        val width = languages.maxOf {
+        val width = languages.maxOfOrNull {
             font.width(TextComponent.translatable("unitytranslate.language.native_and_localized", it.nativeText, it.localizedText))
-        }
+        } ?: 0
 
         return ContextBox(x, y, elements = listOf(
             ExpandableContextBoxElement(

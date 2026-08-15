@@ -166,7 +166,7 @@ abstract class UIElement {
         val font = access.defaultFont
 
         val split = font.split(tooltip, 220)
-        val maxWidth = split.maxOf { font.width(it) }
+        val maxWidth = split.maxOfOrNull { font.width(it) } ?: 0
 
         val tooltipWidth = maxWidth + 8
         var xPos = mouseX + 4f
