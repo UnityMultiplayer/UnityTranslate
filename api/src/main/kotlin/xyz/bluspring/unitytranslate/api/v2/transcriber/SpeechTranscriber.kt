@@ -7,6 +7,8 @@ import kotlinx.coroutines.Deferred
 import xyz.bluspring.unitytranslate.api.v2.Language
 import xyz.bluspring.unitytranslate.api.v2.LanguageSupporter
 import xyz.bluspring.unitytranslate.api.v2.UnityTranslateApi
+import xyz.bluspring.unitytranslate.api.v2.transcriber.sampling.BufferedSamplingStrategy
+import xyz.bluspring.unitytranslate.api.v2.transcriber.sampling.TranscriberSamplingStrategy
 
 abstract class SpeechTranscriber : AutoCloseable, LanguageSupporter {
     /**
@@ -21,9 +23,9 @@ abstract class SpeechTranscriber : AutoCloseable, LanguageSupporter {
     open val supportsExternal: Boolean = true
 
     /**
-     * Specifies whether this transcriber requires new samples (i.e. if the transcriber streams the data in) or not (i.e. if it simply re-transcribes the whole text)
+     * Creates a new [TranscriberSamplingStrategy] for a [TranscriberSource] to provide samples to a transcriber.
      */
-    open val requiresUniqueSamples: Boolean = false
+    open val samplingStrategyProvider: () -> TranscriberSamplingStrategy = ::BufferedSamplingStrategy
 
     open fun onSelected() {}
     abstract fun transcribeSamples(samples: FloatArray, language: Language): Deferred<String>
