@@ -3,21 +3,24 @@ package xyz.bluspring.unitytranslate.api.v2
 import com.mojang.serialization.Codec
 import xyz.bluspring.unitytranslate.api.v2.util.reverse
 
+@JvmRecord
 data class Language @JvmOverloads constructor(
     val languageCode: String, // ISO 639-1 codes
     val regionCode: String? = null, // ISO 3166-1 codes
     val fallbackNativeName: String? = null,
     val fallbackLocalizedName: String? = null,
 ) : Comparable<Language> {
-    val formatted: String = if (this.regionCode == null)
-        this.languageCode
-    else
-        "${this.languageCode}-${this.regionCode}"
+    val formatted: String
+        get() = if (this.regionCode == null)
+            this.languageCode
+        else
+            "${this.languageCode}-${this.regionCode}"
 
-    val serialized: String = if (this.regionCode == null)
-        this.languageCode
-    else
-        "${this.languageCode}_${this.regionCode.lowercase()}"
+    val serialized: String
+        get() = if (this.regionCode == null)
+            this.languageCode
+        else
+            "${this.languageCode}_${this.regionCode.lowercase()}"
 
     val nativeText: String
         get() = UnityTranslateApi.instance.platform.translated("unitytranslate.language.$serialized.native", this.fallbackNativeName ?: this.formatted)
@@ -44,6 +47,18 @@ data class Language @JvmOverloads constructor(
 
     override fun compareTo(other: Language): Int {
         return this.formatted.compareTo(other.formatted)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Language
+
+        if (languageCode != other.languageCode) return false
+        if (regionCode != other.regionCode) return false
+
+        return true
     }
 
     override fun hashCode(): Int {

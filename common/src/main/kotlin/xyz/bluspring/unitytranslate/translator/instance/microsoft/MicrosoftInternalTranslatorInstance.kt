@@ -74,7 +74,11 @@ object MicrosoftInternalTranslatorInstance : TranslatorInstance() {
             val responseJson = JsonParser.parseString(response.body()).asJsonArray
 
             return responseJson.map {
-                it.asString
+                if (it.isJsonObject)
+                    it.asJsonObject.getAsJsonArray("translations")
+                        .first().asJsonObject.get("text").asString
+                else
+                    it.asString
             }
         } catch (e: Throwable) {
             logger.warn("Failed to translate texts (${text.joinToString(", ") { "\"it\"" }}) from ${langPair.from} -> ${langPair.to} under Bing translator!", e)
