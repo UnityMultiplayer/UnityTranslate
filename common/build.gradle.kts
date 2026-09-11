@@ -58,6 +58,7 @@ dependencies {
     api(libs.sunset)
     api(libs.plasmo.api.server)
     api(libs.plasmo.api.client)
+    api(libs.modernui)
 
     api("maven.modrinth:talk-balloons:${libs.versions.talk.balloons.get()}+${mcVersion}-neoforge")
 }

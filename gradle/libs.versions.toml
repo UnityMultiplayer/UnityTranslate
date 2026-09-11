@@ -71,6 +71,9 @@ jna = "5.19.1"
 
 joml = "1.10.8"
 
+# https://github.com/BloCamLimb/ModernUI/releases
+modernui = "3.13.0"
+
 [bundles]
 kotlin = [
     "kotlinx-coroutines-core", "kotlinx-coroutines-core-jvm", "kotlinx-coroutines-jdk8", "kotlinx-serialization-json"
@@ -117,6 +120,7 @@ flac-java = { module = "io.nayuki:flac-library-java", version.ref = "flac-java" 
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 
 joml = { module = "org.joml:joml", version.ref = "joml" }
+modernui = { module = "dev.icyllis:modernui-core", version.ref = "modernui" }
 
 [plugins]
 moddevgradle = { id = "net.neoforged.moddev" }
